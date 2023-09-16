@@ -39,12 +39,14 @@ export default function Login({ navigation }) {
           await UserSessionUtils.setUserRefreshToken(info.refreshToken);
           await UserSessionUtils.setFullSessionObject(info);
           navigation.navigate("welcome");
+          setPassword("");
+          setUsername("");
+        } else if (status === 400) {
+          Alert.alert("Invalid username or password");
         }
       })
       .catch((error) => {
-        setLoading(false);
         Alert.alert("Login Failed!", error?.message);
-        console.log(error.message);
       });
   };
   return (
