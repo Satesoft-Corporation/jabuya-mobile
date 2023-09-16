@@ -1,13 +1,52 @@
 import React, { useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+  Alert,
+  SafeAreaView,
+} from "react-native";
 import MaterialButton from "../components/MaterialButton";
 import MaterialInput from "../components/MaterialInput";
 import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
+import { BaseApiService } from "../utils/BaseApiService";
+import { UserSessionUtils } from "../utils/UserSessionUtils";
 
 export default function Login({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  let loginInfo = {
+    username,
+    password,
+  };
+
+  const onLogin = () => {
+    new BaseApiService("/auth/login")
+      .postRequest(loginInfo)
+      .then(async (response) => {
+        let d = { info: await response.json(), status: response.status };
+        return d;
+      })
+      .then(async (data) => {
+        let { info, status } = data;
+        if (status === 200) {
+          await UserSessionUtils.setLoggedIn(true);
+          await UserSessionUtils.setUserDetails(info.user);
+          await UserSessionUtils.setUserAuthToken(info.accessToken);
+          await UserSessionUtils.setUserRefreshToken(info.refreshToken);
+          await UserSessionUtils.setFullSessionObject(info);
+          navigation.navigate("welcome");
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        Alert.alert("Login Failed!", error?.message);
+        console.log(error.message);
+      });
+  };
   return (
     <View
       style={{
@@ -50,7 +89,6 @@ export default function Login({ navigation }) {
         value={username}
         onChangeText={(text) => {
           setUsername(text);
-          console.log(text);
         }}
         placeholder="Username,Email or Phone number"
         style={{
@@ -97,10 +135,7 @@ export default function Login({ navigation }) {
           fontWeight: "bold",
           color: Colors.primary,
         }}
-        buttonPress={() => {
-            navigation.navigate("welcome")
-          console.log(77);
-        }}
+        buttonPress={() => onLogin()}
       />
 
       <View
