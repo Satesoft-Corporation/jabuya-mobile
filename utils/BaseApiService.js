@@ -1,22 +1,19 @@
-import { Platform } from "react-native";
 import { INTERNAL_SERVER_ERROR } from "../constants/ErrorMessages";
-import { BASE_URL } from "../tools/Constants";
 import { UserSessionUtils } from "./UserSessionUtils";
-import { expo } from "../app.json";
+import { BASE_URL } from "./BaseUrl";
+
 export class BaseApiService {
   apiEndpoint;
   authToken = UserSessionUtils.getBearerToken();
   requestHeaders = {};
-  pageContext = null;
 
   /**
    * This is constructor is used to initialize the API service endpoint to be used for this call.
    *
    * @param apiEndpoint
    */
-  constructor(pageContext, apiEndpoint) {
+  constructor(apiEndpoint) {
     this.apiEndpoint = BASE_URL + apiEndpoint;
-    this.pageContext = pageContext;
   }
 
   /**
@@ -30,14 +27,14 @@ export class BaseApiService {
     const headers = {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
-      "App-Version": expo.version,
-      "Platform-Type": Platform.OS,
-      "Platform-Version": Platform.Version,
     };
-    return await fetch(this.apiEndpoint + "?" + new URLSearchParams(queryParameters), {
-      method: "GET",
-      headers: headers,
-    });
+    return await fetch(
+      this.apiEndpoint + "?" + new URLSearchParams(queryParameters),
+      {
+        method: "GET",
+        headers: headers,
+      }
+    );
   }
 
   /**
@@ -56,7 +53,7 @@ export class BaseApiService {
         let errorMessage = data?.responseMessage ?? INTERNAL_SERVER_ERROR;
         throw new TypeError(errorMessage);
       } else if (response.status == 401 || response.status == 403) {
-        UserSessionUtils.clearLocalStorageAndLogout(this.pageContext);
+        UserSessionUtils.clearLocalStorageAndLogout();
       } else {
         throw new TypeError(INTERNAL_SERVER_ERROR);
       }
@@ -75,9 +72,6 @@ export class BaseApiService {
       Accept: "application/json",
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
-      "App-Version": expo.version,
-      "Platform-Type": Platform.OS,
-      "Platform-Version": Platform.Version,
     };
     return await fetch(this.apiEndpoint, {
       method: "POST",
@@ -103,12 +97,16 @@ export class BaseApiService {
         if (responseData?.status == 200) {
           console.log(JSON.stringify(responseData));
           return responseData;
-        } else if (responseData?.status == 400 || responseData?.status == 403 || responseData?.status == 500) {
+        } else if (
+          responseData?.status == 400 ||
+          responseData?.status == 403 ||
+          responseData?.status == 500
+        ) {
           let data = responseData;
           let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
           throw new TypeError(errorMessage);
         } else if (responseData?.status == 401) {
-          UserSessionUtils.clearLocalStorageAndLogout(this.pageContext);
+          UserSessionUtils.clearLocalStorageAndLogout();
         } else {
           throw new TypeError(INTERNAL_SERVER_ERROR);
         }
@@ -122,7 +120,9 @@ export class BaseApiService {
     let requestBody = { token: UserSessionUtils.getRefreshToken() };
     return await fetch(this.apiEndpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "App-Version": expo.version, "Platform-Type": Platform.OS, "Platform-Version": Platform.Version },
+      headers: {
+        "Content-Type": "application/json",
+      },
 
       body: JSON.stringify(requestBody),
     });
