@@ -34,6 +34,9 @@ function SalesEntry() {
   const [showMoodal, setShowModal] = useState(false);
   const [selection, setSelection] = useState(null);
   const [totalCost, setTotalCost] = useState(0);
+  const [recievedAmount, setRecievedAmount] = useState(0);
+  const [showMoodal_1, setShowModal_1] = useState(false);
+  const [shopId, setShopId] = useState(null);
 
   useEffect(() => {
     fetchProducts();
@@ -44,12 +47,27 @@ function SalesEntry() {
     new BaseApiService("/shop-products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
+        console.log(response);
         setProducts(response.records);
       })
       .catch((error) => {
         console.log(error);
       });
     setLoading(false);
+  };
+
+  const postSales = () => {
+    let payLoad = {
+      id: 0,
+      shopId: shopId,
+      amountPaid: totalCost,
+      lineItems: selectedProducts,
+    };
+    console.log(payLoad);
+    new BaseApiService("/shop-sales")
+      .postRequest(payLoad)
+      .then((d) => d)
+      .then((d) => console.log(d));
   };
 
   const handleChange = (value) => {
@@ -78,7 +96,7 @@ function SalesEntry() {
             color="white"
             indicatorSize="large"
             messageFontSize={24}
-            message="Loading..."
+            message=""
           />
 
           <DropdownComponent
@@ -123,7 +141,7 @@ function SalesEntry() {
                   fontWeight: 500,
                 }}
               >
-                UGX 10,000
+                UGX {recievedAmount}
               </Text>
             </View>
           </View>
@@ -233,7 +251,7 @@ function SalesEntry() {
                   fontWeight: 500,
                 }}
               >
-                UGX 500
+                UGX {recievedAmount === 0 ? 0 : recievedAmount - totalCost}
               </Text>
             </View>
           </View>
@@ -242,7 +260,9 @@ function SalesEntry() {
             setSelectedProducts={() => setSelectedProducts([])}
             setSelections={() => setSelections([])}
             setTotalCost={() => setTotalCost(0)}
+            setSelection={() => setSelection(null)}
           />
+
           <MaterialButton
             title="Confirm Purchase"
             style={{
@@ -255,10 +275,13 @@ function SalesEntry() {
               color: Colors.primary,
             }}
             buttonPress={() => {
-              console.log(selections);
-              setShowModal(true);
+              if (selections.length > 0) {
+                console.log(selections);
+                setShowModal_1(true);
+              }
             }}
           />
+
           <ModalContent visible={showMoodal} style={{ padding: 35 }}>
             <Card
               style={{
@@ -310,9 +333,13 @@ function SalesEntry() {
                   }}
                   buttonPress={() => {
                     let cost = selection.salesPrice * quantity;
-                    setLoading(true);
                     setTotalCost(totalCost + cost);
-                    selectedProducts.push(selection);
+                    setShopId(selection.shopId);
+                    selectedProducts.push({
+                      id: selection.productId,
+                      shopProductId: selection.shopId,
+                      quantity: quantity,
+                    });
                     setSelections((prev) => [
                       ...prev,
                       [
@@ -322,8 +349,69 @@ function SalesEntry() {
                         selection.salesPrice,
                       ],
                     ]);
-                    setLoading(false);
                     setShowModal(false);
+                    setLoading(true);
+                    setTimeout(() => {
+                      setLoading(false);
+                    }, 1000);
+                  }}
+                />
+              </View>
+            </Card>
+          </ModalContent>
+
+          <ModalContent visible={showMoodal_1} style={{ padding: 35 }}>
+            <Card
+              style={{
+                paddingHorizontal: 15,
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "white",
+                  padding: 2,
+                }}
+              >
+                <Text
+                  style={{
+                    marginTop: 10,
+                    fontWeight: "500",
+                    fontSize: 18,
+                    marginBottom: 5,
+                    marginStart: 10,
+                    marginTop: 20,
+                  }}
+                >
+                  Input recieved amount
+                </Text>
+
+                <TextInput
+                  inputMode="numeric"
+                  onChangeText={(text) => setRecievedAmount(text)}
+                  maxLength={10}
+                  style={{
+                    backgroundColor: Colors.light_3,
+                    borderRadius: 8,
+                    padding: 6,
+                  }}
+                />
+                <MaterialButton
+                  title="Confirm"
+                  style={{
+                    backgroundColor: Colors.dark,
+                    marginTop: 10,
+                    borderRadius: 5,
+                    width: 150,
+                    alignSelf: "center",
+                    marginBottom: 20,
+                  }}
+                  titleStyle={{
+                    fontWeight: "bold",
+                    color: Colors.primary,
+                  }}
+                  buttonPress={() => {
+                    setShowModal_1(false);
+                    postSales();
                   }}
                 />
               </View>
@@ -389,6 +477,7 @@ const IconsComponent = ({
   setSelectedProducts,
   setSelections,
   setTotalCost,
+  setSelection,
 }) => {
   return (
     <View
@@ -459,6 +548,7 @@ const IconsComponent = ({
             setSelections();
             setSelectedProducts();
             setTotalCost();
+            setSelection();
           }}
         />
         <Text style={{ alignSelf: "center" }}>Clear</Text>
