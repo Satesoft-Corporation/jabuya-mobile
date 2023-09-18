@@ -4,7 +4,7 @@ import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
 import MaterialButton from "../components/MaterialButton";
 
-export default function LandingScreen({navigation}) {
+export default function LandingScreen({ navigation }) {
   return (
     <View
       style={{
@@ -20,7 +20,7 @@ export default function LandingScreen({navigation}) {
           style={{
             alignItems: "center",
             justifyContent: "center",
-            marginTop:50
+            marginTop: 50,
           }}
         >
           <Image
@@ -73,7 +73,7 @@ export default function LandingScreen({navigation}) {
                 paddingHorizontal: 10,
                 letterSpacing: 2,
               }}
-              buttonPress={() => navigation.navigate("salesEntry")}
+              buttonPress={() => navigation.navigate("viewSales")}
             />
           </View>
         </View>
