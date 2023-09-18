@@ -7,6 +7,7 @@ import {
   ScrollView,
   SafeAreaView,
   TextInput,
+  Alert,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../constants/Colors";
@@ -20,10 +21,12 @@ import { BaseApiService } from "../utils/BaseApiService";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import ModalContent from "../components/ModalContent";
 import Card from "../components/Card";
+import { UserSessionUtils } from "../utils/UserSessionUtils";
+import ConfirmSalesDialog from "../components/ConfirmSalesDialog";
 
 const tableHead = ["No", "Product", "Qnty", "Amount"];
 
-function SalesEntry() {
+function SalesEntry({ navigation }) {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [limit, setLimit] = useState(20);
@@ -37,10 +40,21 @@ function SalesEntry() {
   const [recievedAmount, setRecievedAmount] = useState(0);
   const [showMoodal_1, setShowModal_1] = useState(false);
   const [shopId, setShopId] = useState(null);
+  const [attendantShopId, setAttendantShopId] = useState(null);
+  const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
+  const [postedPdts, setPostedPdts] = useState([]);
 
   useEffect(() => {
     fetchProducts();
   }, [searchTerm]);
+
+  useEffect(() => {
+    UserSessionUtils.getFullSessionObject().then((d) => {
+      setShopId(d.user.shopOwnerId);
+      setAttendantShopId(d.user.attendantShopId);
+      console.log(d);
+    });
+  }, []);
 
   const fetchProducts = async () => {
     let searchParameters = { searchTerm: searchTerm, offset: 0, limit: limit };
@@ -58,16 +72,48 @@ function SalesEntry() {
 
   const postSales = () => {
     let payLoad = {
-      id: 0,
-      shopId: shopId,
+      id: shopId,
+      shopId: attendantShopId,
       amountPaid: totalCost,
       lineItems: selectedProducts,
     };
-    console.log(payLoad);
+
+    setLoading(true);
+
     new BaseApiService("/shop-sales")
       .postRequest(payLoad)
-      .then((d) => d)
-      .then((d) => console.log(d));
+      .then(async (response) => {
+        let d = { info: await response.json(), status: response.status };
+        return d;
+      })
+      .then(async (d) => {
+        let { info, status } = d;
+        let items = info.lineItems;
+        let id = info.id;
+        if (status === 200) {
+          saveSales(items, id);
+        }
+      })
+      .catch((error) => {
+        Alert.alert("Failed to confirm purchases!", error?.message);
+      });
+  };
+
+  const saveSales = (items, id) => {
+    postedPdts.push(items);
+    console.log(postedPdts[0]);
+    new BaseApiService(`/shop-sales/${id}/confirm`)
+      .postRequest()
+      .then((d) => d.json())
+      .then((d) => {
+        if (d.status === "Success") {
+          setLoading(false);
+          setShowConfirmed(true);
+        }
+      })
+      .catch((error) => {
+        Alert.alert("Failed to confirm purchases!", error?.message);
+      });
   };
 
   const handleChange = (value) => {
@@ -79,6 +125,17 @@ function SalesEntry() {
     setShowModal(true);
     setSelection(item);
   };
+
+  const clearEverything = () => {
+    setSelectedProducts([]);
+    setQuantity(null);
+    setSelection(null);
+    setTotalCost(0);
+    setRecievedAmount(0);
+    setShowConfirmed(false);
+    setSelections([]);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View
@@ -98,7 +155,11 @@ function SalesEntry() {
             messageFontSize={24}
             message=""
           />
-
+          <ConfirmSalesDialog
+            visible={showConfirmed}
+            navigation={navigation}
+            addSale={clearEverything}
+          />
           <DropdownComponent
             products={products}
             handleChange={(t) => handleChange(t)}
@@ -256,12 +317,7 @@ function SalesEntry() {
             </View>
           </View>
 
-          <IconsComponent
-            setSelectedProducts={() => setSelectedProducts([])}
-            setSelections={() => setSelections([])}
-            setTotalCost={() => setTotalCost(0)}
-            setSelection={() => setSelection(null)}
-          />
+          <IconsComponent clear={clearEverything} />
 
           <MaterialButton
             title="Confirm Purchase"
@@ -334,10 +390,9 @@ function SalesEntry() {
                   buttonPress={() => {
                     let cost = selection.salesPrice * quantity;
                     setTotalCost(totalCost + cost);
-                    setShopId(selection.shopId);
                     selectedProducts.push({
-                      id: selection.productId,
-                      shopProductId: selection.shopId,
+                      id: selection.id,
+                      shopProductId: selection.id,
                       quantity: quantity,
                     });
                     setSelections((prev) => [
@@ -450,7 +505,6 @@ const DropdownComponent = ({
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
-          setValue(item.productName);
           setIsFocus(false);
           setLoading(false);
           makeSelection(item);
@@ -473,12 +527,7 @@ const DropdownComponent = ({
   );
 };
 
-const IconsComponent = ({
-  setSelectedProducts,
-  setSelections,
-  setTotalCost,
-  setSelection,
-}) => {
+const IconsComponent = ({ clear }) => {
   return (
     <View
       style={{
@@ -545,10 +594,7 @@ const IconsComponent = ({
           size={30}
           color="black"
           onPress={() => {
-            setSelections();
-            setSelectedProducts();
-            setTotalCost();
-            setSelection();
+            clear();
           }}
         />
         <Text style={{ alignSelf: "center" }}>Clear</Text>
