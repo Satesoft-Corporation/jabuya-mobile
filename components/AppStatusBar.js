@@ -5,6 +5,13 @@ import Colors from "../constants/Colors";
 export default function AppStatusBar({
   translucent = false,
   bgColor = Colors.primary,
+  content = "dark-content",
 }) {
-  return <StatusBar translucent={translucent} backgroundColor={bgColor} barStyle="dark-content"/>;
+  return (
+    <StatusBar
+      translucent={translucent}
+      backgroundColor={bgColor}
+      barStyle={content}
+    />
+  );
 }
