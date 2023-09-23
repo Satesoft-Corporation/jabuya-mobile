@@ -24,7 +24,7 @@ import Card from "../components/Card";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import ConfirmSalesDialog from "../components/ConfirmSalesDialog";
 
-const tableHead = ["No", "Product", "Qnty", "Amount"];
+const tableHead = ["Product", "Unit Price", "Qnty", "Amount"];
 
 function SalesEntry({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -52,7 +52,6 @@ function SalesEntry({ navigation }) {
     UserSessionUtils.getFullSessionObject().then((d) => {
       setShopId(d.user.shopOwnerId);
       setAttendantShopId(d.user.attendantShopId);
-      console.log(d);
     });
   }, []);
 
@@ -61,7 +60,6 @@ function SalesEntry({ navigation }) {
     new BaseApiService("/shop-products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
-        console.log(response);
         setProducts(response.records);
       })
       .catch((error) => {
@@ -223,7 +221,7 @@ function SalesEntry({ navigation }) {
                   // margin: 5,
                   fontWeight: 600,
                 }}
-                flexArr={[0.8, 2, 0.8, 1]}
+                flexArr={[1.8, 1.5, 0.8, 1]}
               />
 
               <TableWrapper style={{ flexDirection: "row" }}>
@@ -234,7 +232,7 @@ function SalesEntry({ navigation }) {
                     margin: 5,
                     textAlign: "left",
                   }}
-                  flexArr={[0.8, 2, 0.8, 1]}
+                  flexArr={[1.8, 1.5, 0.8, 1]}
                 />
               </TableWrapper>
             </Table>
@@ -250,7 +248,7 @@ function SalesEntry({ navigation }) {
               <View>
                 <Text style={{ fontWeight: "bold" }}>Purchased Amount</Text>
                 <Text>
-                  Payment for {selections.length}{" "}
+                  Payment for {selections.length}
                   {selections.length > 1 ? (
                     <Text>items</Text>
                   ) : (
@@ -398,10 +396,10 @@ function SalesEntry({ navigation }) {
                     setSelections((prev) => [
                       ...prev,
                       [
-                        selections.length + 1,
                         selection.productName,
-                        quantity,
                         selection.salesPrice,
+                        quantity,
+                        cost,
                       ],
                     ]);
                     setShowModal(false);
