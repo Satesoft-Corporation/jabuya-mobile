@@ -5,13 +5,16 @@ import AppStatusBar from "../components/AppStatusBar";
 import { Ionicons } from "@expo/vector-icons";
 import Icon from "../components/Icon";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
+import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 
 export default function LandingScreen({ navigation }) {
   const [tab, setTab] = useState("home");
-  const [user, setUser] = useState({});
   const [role, setRole] = useState("");
-
-  let userName = user.firstName + " " + user.lastName;
+  const [joinDate, setJoinDate] = useState("");
+  const [shopName, setShopName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("");
+  const [shopId, setShopId] = useState("");
 
   const categoryIcons = [
     {
@@ -40,21 +43,69 @@ export default function LandingScreen({ navigation }) {
     },
   ];
   useEffect(() => {
-    UserSessionUtils.getFullSessionObject().then((d) => {
-      setUser(d.user);
-      setRole(d.user.roles[0].name);
+    UserSessionUtils.getFullSessionObject().then((data) => {
+      const {
+        dateCreated,
+        roles,
+        attendantShopName,
+        firstName,
+        lastName,
+        attendantShopId,
+      } = data.user;
+      setRole(roles[0].name);
+      setJoinDate(formatDate(dateCreated));
+      setShopId(attendantShopId);
+      setShopName(attendantShopName);
+      setName(firstName + " " + lastName);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
     });
   }, []);
+  function formatDate(inputDate) {
+    const date = new Date(inputDate);
+
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    const formattedDay = dayNames[date.getUTCDay()];
+    const formattedMonth = monthNames[date.getUTCMonth()];
+    const formattedYear = date.getUTCFullYear();
+
+    const formattedDate = `${formattedDay}, ${formattedMonth} ${date.getUTCDate()}, ${formattedYear}`;
+
+    return formattedDate;
+  }
+
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: Colors.dark,
-        // paddingHorizontal: 15,
       }}
     >
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
-
+      <OrientationLoadingOverlay
+        visible={loading}
+        color={Colors.primary}
+        indicatorSize="large"
+        messageFontSize={24}
+        message=""
+      />
       <View
         style={{
           flexDirection: "row",
@@ -99,7 +150,7 @@ export default function LandingScreen({ navigation }) {
                 fontSize: 15,
               }}
             >
-              {userName}
+              {name}
             </Text>
             <Text
               style={{
@@ -113,11 +164,11 @@ export default function LandingScreen({ navigation }) {
           </View>
 
           <Image
-            source={require("../assets/images/profile.png")}
+            source={require("../assets/images/male-placeholder.png")}
             style={{
               width: 50,
               height: 50,
-              resizeMode: "stretch",
+              resizeMode: "cover",
               borderRadius: 50,
               marginStart: 5,
             }}
@@ -136,7 +187,7 @@ export default function LandingScreen({ navigation }) {
         <View>
           <Text style={{ color: Colors.primary_light }}>Shop Name</Text>
           <Text style={{ color: Colors.primary, fontSize: 16 }}>
-            {user.attendantShopName}
+            {shopName}
           </Text>
         </View>
         <View>
@@ -148,7 +199,7 @@ export default function LandingScreen({ navigation }) {
               alignSelf: "flex-end",
             }}
           >
-            {user.attendantShopId}
+            {shopId}
           </Text>
         </View>
       </View>
@@ -164,7 +215,7 @@ export default function LandingScreen({ navigation }) {
         <View>
           <Text style={{ color: Colors.primary_light }}>Join Date</Text>
           <Text style={{ color: Colors.primary, fontSize: 16 }}>
-            Thu, Jul 27,2023
+            {joinDate}
           </Text>
         </View>
         <View>
@@ -196,9 +247,8 @@ export default function LandingScreen({ navigation }) {
               onPress={() => navigation.navigate(item.target)}
             />
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           numColumns={2}
-          // ItemSeparatorComponent={Separator}
         />
       </View>
 
