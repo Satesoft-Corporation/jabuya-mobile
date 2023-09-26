@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Duqact",
-    "slug": "Duqact",
+    "slug": "jabuya",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,10 +21,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.byaffe.jabuya"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "35e0f948-b9f9-4419-94b8-0bbac79c60eb"
+      }
+    },
+    "owner": "raygdhrt"
   }
 }
