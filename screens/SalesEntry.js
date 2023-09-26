@@ -43,6 +43,8 @@ function SalesEntry({ navigation }) {
   const [attendantShopId, setAttendantShopId] = useState(null);
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
   const [postedPdts, setPostedPdts] = useState([]);
+  const [lineItems, setLineItems] = useState([]);
+  const [returnCost, setReturnedCost] = useState(0);
 
   useEffect(() => {
     fetchProducts();
@@ -86,8 +88,14 @@ function SalesEntry({ navigation }) {
       })
       .then(async (d) => {
         let { info, status } = d;
+
         let items = info.lineItems;
         let id = info.id;
+        let totalCost_1 = info.totalCost;
+        setReturnedCost(totalCost_1);
+        for (let item of items) {
+          lineItems.push([item.shopProductName, item.quantity, item.totalCost]);
+        }
         if (status === 200) {
           saveSales(items, id);
         }
@@ -99,7 +107,6 @@ function SalesEntry({ navigation }) {
 
   const saveSales = (items, id) => {
     postedPdts.push(items);
-    console.log(postedPdts[0]);
     new BaseApiService(`/shop-sales/${id}/confirm`)
       .postRequest()
       .then((d) => d.json())
@@ -132,6 +139,7 @@ function SalesEntry({ navigation }) {
     setRecievedAmount(0);
     setShowConfirmed(false);
     setSelections([]);
+    setLineItems([]);
   };
 
   return (
@@ -157,6 +165,8 @@ function SalesEntry({ navigation }) {
             visible={showConfirmed}
             navigation={navigation}
             addSale={clearEverything}
+            sales={lineItems}
+            total={returnCost}
           />
           <DropdownComponent
             products={products}
@@ -330,7 +340,6 @@ function SalesEntry({ navigation }) {
             }}
             buttonPress={() => {
               if (selections.length > 0) {
-                console.log(selections);
                 setShowModal_1(true);
               }
             }}
