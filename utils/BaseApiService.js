@@ -95,7 +95,6 @@ export class BaseApiService {
       )
       .then((responseData) => {
         if (responseData?.status == 200) {
-          console.log(JSON.stringify(responseData));
           return responseData;
         } else if (
           responseData?.status == 400 ||
