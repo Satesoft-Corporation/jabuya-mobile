@@ -33,7 +33,7 @@ export default function LandingScreen({ navigation }) {
       id: 3,
       icon: require("../assets/icons/icons8-box-50.png"),
       title: "Stocking",
-      target: "salesEntry",
+      target: "viewSales",
     },
     {
       id: 4,
