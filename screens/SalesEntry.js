@@ -24,7 +24,7 @@ import Card from "../components/Card";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import ConfirmSalesDialog from "../components/ConfirmSalesDialog";
 
-const tableHead = ["No", "Product", "Qnty", "Amount"];
+const tableHead = ["Product", "Unit Price", "Qnty", "Amount"];
 
 function SalesEntry({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -43,6 +43,8 @@ function SalesEntry({ navigation }) {
   const [attendantShopId, setAttendantShopId] = useState(null);
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
   const [postedPdts, setPostedPdts] = useState([]);
+  const [lineItems, setLineItems] = useState([]);
+  const [returnCost, setReturnedCost] = useState(0);
 
   useEffect(() => {
     fetchProducts();
@@ -52,7 +54,6 @@ function SalesEntry({ navigation }) {
     UserSessionUtils.getFullSessionObject().then((d) => {
       setShopId(d.user.shopOwnerId);
       setAttendantShopId(d.user.attendantShopId);
-      console.log(d);
     });
   }, []);
 
@@ -61,7 +62,6 @@ function SalesEntry({ navigation }) {
     new BaseApiService("/shop-products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
-        console.log(response);
         setProducts(response.records);
       })
       .catch((error) => {
@@ -88,8 +88,14 @@ function SalesEntry({ navigation }) {
       })
       .then(async (d) => {
         let { info, status } = d;
+
         let items = info.lineItems;
         let id = info.id;
+        let totalCost_1 = info.totalCost;
+        setReturnedCost(totalCost_1);
+        for (let item of items) {
+          lineItems.push([item.shopProductName, item.quantity, item.totalCost]);
+        }
         if (status === 200) {
           saveSales(items, id);
         }
@@ -101,7 +107,6 @@ function SalesEntry({ navigation }) {
 
   const saveSales = (items, id) => {
     postedPdts.push(items);
-    console.log(postedPdts[0]);
     new BaseApiService(`/shop-sales/${id}/confirm`)
       .postRequest()
       .then((d) => d.json())
@@ -134,6 +139,7 @@ function SalesEntry({ navigation }) {
     setRecievedAmount(0);
     setShowConfirmed(false);
     setSelections([]);
+    setLineItems([]);
   };
 
   return (
@@ -159,6 +165,8 @@ function SalesEntry({ navigation }) {
             visible={showConfirmed}
             navigation={navigation}
             addSale={clearEverything}
+            sales={lineItems}
+            total={returnCost}
           />
           <DropdownComponent
             products={products}
@@ -223,7 +231,7 @@ function SalesEntry({ navigation }) {
                   // margin: 5,
                   fontWeight: 600,
                 }}
-                flexArr={[0.8, 2, 0.8, 1]}
+                flexArr={[1.8, 1.5, 0.8, 1]}
               />
 
               <TableWrapper style={{ flexDirection: "row" }}>
@@ -234,7 +242,7 @@ function SalesEntry({ navigation }) {
                     margin: 5,
                     textAlign: "left",
                   }}
-                  flexArr={[0.8, 2, 0.8, 1]}
+                  flexArr={[1.8, 1.5, 0.8, 1]}
                 />
               </TableWrapper>
             </Table>
@@ -250,7 +258,7 @@ function SalesEntry({ navigation }) {
               <View>
                 <Text style={{ fontWeight: "bold" }}>Purchased Amount</Text>
                 <Text>
-                  Payment for {selections.length}{" "}
+                  Payment for {selections.length}
                   {selections.length > 1 ? (
                     <Text>items</Text>
                   ) : (
@@ -332,7 +340,6 @@ function SalesEntry({ navigation }) {
             }}
             buttonPress={() => {
               if (selections.length > 0) {
-                console.log(selections);
                 setShowModal_1(true);
               }
             }}
@@ -398,10 +405,10 @@ function SalesEntry({ navigation }) {
                     setSelections((prev) => [
                       ...prev,
                       [
-                        selections.length + 1,
                         selection.productName,
-                        quantity,
                         selection.salesPrice,
+                        quantity,
+                        cost,
                       ],
                     ]);
                     setShowModal(false);

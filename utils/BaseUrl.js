@@ -1,2 +1,1 @@
-export const BASE_URL =
-  "http://jabuyaloadbalanced-env.eba-8skhys9a.eu-north-1.elasticbeanstalk.com/api/v1";
+export const BASE_URL = "https://backend.duqact.com/api/v1";
