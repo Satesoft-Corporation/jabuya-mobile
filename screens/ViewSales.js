@@ -56,6 +56,7 @@ export default function ViewSales({ navigation }) {
           bgColor={Colors.dark}
           title="Shop Sales"
           titleStyle={{ color: Colors.primary }}
+          navPress={()=>navigation.goBack()}
         />
 
         <View
