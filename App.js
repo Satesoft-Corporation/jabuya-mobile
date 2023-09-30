@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./screens/Login";
 import LandingScreen from "./screens/LandingScreen";
 import SalesEntry from "./screens/SalesEntry";
-
+import ViewSales from "./screens/ViewSales";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -21,6 +21,7 @@ export default function App() {
 
         <Stack.Screen name="salesEntry" component={SalesEntry} />
 
+        <Stack.Screen name="viewSales" component={ViewSales} />
       </Stack.Navigator>
     </NavigationContainer>
   );
