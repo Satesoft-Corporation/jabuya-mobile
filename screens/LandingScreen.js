@@ -164,7 +164,7 @@ export default function LandingScreen({ navigation }) {
           </View>
 
           <Image
-            source={require("../assets/images/male-placeholder.png")}
+            source={require("../assets/icon.png")}
             style={{
               width: 50,
               height: 50,
