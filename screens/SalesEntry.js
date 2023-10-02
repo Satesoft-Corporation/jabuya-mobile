@@ -104,6 +104,7 @@ function SalesEntry({ navigation }) {
       .catch((error) => {
         Alert.alert("Failed to confirm purchases!", error?.message);
         setLoading(false);
+        
       });
   };
 
@@ -165,6 +166,8 @@ function SalesEntry({ navigation }) {
             addSale={clearEverything}
             sales={lineItems}
             total={returnCost}
+            setVisible={()=>setShowConfirmed(false)}
+            clear={clearEverything}
           />
           <DropdownComponent
             products={products}
