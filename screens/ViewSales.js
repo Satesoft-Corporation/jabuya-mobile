@@ -33,7 +33,6 @@ export default function ViewSales({ navigation }) {
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
         setSales(response.records);
-        console.log(response.records);
         setTotalSales(response.totalItems);
         setTimeout(() => {
           setLoading(false);
