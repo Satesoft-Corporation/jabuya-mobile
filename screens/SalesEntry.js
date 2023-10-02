@@ -48,7 +48,7 @@ function SalesEntry({ navigation }) {
 
   useEffect(() => {
     fetchProducts();
-  }, [searchTerm]);
+  }, []);
 
   useEffect(() => {
     UserSessionUtils.getFullSessionObject().then((d) => {
@@ -63,11 +63,12 @@ function SalesEntry({ navigation }) {
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setProducts(response.records);
+        setTimeout(() => setLoading(false), 1000);
       })
       .catch((error) => {
         Alert.alert("Cannot get shop Products, Please contact support.");
+        setLoading(false);
       });
-    setLoading(false);
   };
 
   const postSales = () => {
@@ -123,11 +124,6 @@ function SalesEntry({ navigation }) {
       });
   };
 
-  const handleChange = (value) => {
-    setLoading(true);
-    setSearchTerm(value);
-  };
-
   const makeSelection = (item) => {
     setShowModal(true);
     setSelection(item);
@@ -172,7 +168,6 @@ function SalesEntry({ navigation }) {
           />
           <DropdownComponent
             products={products}
-            handleChange={(t) => handleChange(t)}
             setLoading={() => setLoading(false)}
             makeSelection={makeSelection}
           />
@@ -486,12 +481,7 @@ function SalesEntry({ navigation }) {
     </SafeAreaView>
   );
 }
-const DropdownComponent = ({
-  products,
-  handleChange,
-  setLoading,
-  makeSelection,
-}) => {
+const DropdownComponent = ({ products, setLoading, makeSelection }) => {
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
 
@@ -518,20 +508,7 @@ const DropdownComponent = ({
           setLoading(false);
           makeSelection(item);
         }}
-        onChangeText={(text) => handleChange(text)}
       />
-      {/* <TouchableOpacity
-        style={{
-          backgroundColor: Colors.primary,
-        }}
-      >
-        <MaterialCommunityIcons
-          name="qrcode-scan"
-          size={30}
-          color="black"
-          style={{}}
-        />
-      </TouchableOpacity> */}
     </View>
   );
 };
