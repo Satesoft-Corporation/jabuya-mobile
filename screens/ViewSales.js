@@ -123,6 +123,7 @@ export default function ViewSales({ navigation }) {
     getSales();
   }, []);
 
+  
   const showSummary = (item) => {
     setLoading(true);
     if (item.lineItems !== undefined) {
