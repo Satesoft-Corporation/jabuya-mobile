@@ -15,6 +15,7 @@ import MultiColumnView from "../components/MultiColumnView";
 import HeaderOneButton from "../components/HeaderOneButton";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import SaleSummaryDialog from "../components/SaleSummaryDialog";
+import { UserSessionUtils } from "../utils/UserSessionUtils";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -92,14 +93,15 @@ export default function ViewSales({ navigation }) {
       },
     ],
   };
-
+  let shopId = null;
   const getSales = async () => {
     let searchParameters = {
       searchTerm: "",
       offset: 0,
-      limit: 0,
+      limit: 20,
+      shopId: shopId,
     };
-
+console.log(JSON.stringify(searchParameters))
     new BaseApiService("/shop-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
@@ -115,12 +117,12 @@ export default function ViewSales({ navigation }) {
       });
   };
 
-  useEffect(() => {
+  useEffect(async () => {
+    shopId = await UserSessionUtils.getShopId();
     getSales();
   }, []);
 
   const showSummary = (item) => {
-    setLoading(true);
     if (item.lineItems !== undefined) {
       setSale(item);
       for (let item of item.lineItems) {
@@ -131,10 +133,8 @@ export default function ViewSales({ navigation }) {
           item.totalCost,
         ]);
       }
-      setTimeout(() => {
         setVisible(true);
-        setLoading(false);
-      }, 500);
+        
     } else {
       setSale(dummy);
       for (let item of dummy.lineItems) {
@@ -145,10 +145,8 @@ export default function ViewSales({ navigation }) {
           item.totalCost,
         ]);
       }
-      setTimeout(() => {
         setVisible(true);
-        setLoading(false);
-      }, 500);
+     
     }
   };
 
