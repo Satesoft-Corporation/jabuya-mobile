@@ -101,7 +101,7 @@ export default function ViewSales({ navigation }) {
     let searchParameters = {
       searchTerm: "",
       offset: 0,
-      limit: 10,
+      limit: 0,
     };
 
     new BaseApiService("/shop-sales")
