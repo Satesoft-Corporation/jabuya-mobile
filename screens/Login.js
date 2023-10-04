@@ -27,6 +27,7 @@ export default function Login({ navigation }) {
     new BaseApiService("/auth/login")
       .postRequest(loginInfo)
       .then(async (response) => {
+        
         let d = { info: await response.json(), status: response.status };
         return d;
       })
@@ -38,6 +39,7 @@ export default function Login({ navigation }) {
           await UserSessionUtils.setUserAuthToken(info.accessToken);
           await UserSessionUtils.setUserRefreshToken(info.refreshToken);
           await UserSessionUtils.setFullSessionObject(info);
+          await UserSessionUtils.setShopid(String(info.user.attendantShopId))
           navigation.navigate("welcome");
           setPassword("");
           setUsername("");

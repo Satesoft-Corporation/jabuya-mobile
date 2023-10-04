@@ -5,4 +5,5 @@ export default {
   USER_DETAILS_JSON: "@user_details_json",
   FULL_LOGIN_DETAILS_JSON: "@full_login_details_json",
   USERNAME: "@username",
+  SHOP_ID:'@shop_id'
 };
