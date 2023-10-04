@@ -29,7 +29,7 @@ const tableHead = ["Product", "Unit Price", "Qnty", "Amount"];
 function SalesEntry({ navigation }) {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [limit, setLimit] = useState(0);
+  const [limit, setLimit] = useState(20);
   const [loading, setLoading] = useState(true);
   const [selectedProducts, setSelectedProducts] = useState([]); //unfiltered selections array
   const [quantity, setQuantity] = useState(null);
@@ -58,7 +58,7 @@ function SalesEntry({ navigation }) {
   }, []);
 
   const fetchProducts = async () => {
-    let searchParameters = { searchTerm: searchTerm, offset: 0, limit: 10 };
+    let searchParameters = { searchTerm: searchTerm, offset: 0, limit: limit};
     new BaseApiService("/shop-products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
