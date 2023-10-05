@@ -47,27 +47,31 @@ function SalesEntry({ navigation }) {
   const [returnCost, setReturnedCost] = useState(0);
 
   useEffect(() => {
-    fetchProducts();
-  }, [searchTerm]);
-
-  useEffect(() => {
     UserSessionUtils.getFullSessionObject().then((d) => {
       setShopId(d.user.shopOwnerId);
       setAttendantShopId(d.user.attendantShopId);
+      fetchProducts(null);
     });
   }, []);
 
-  const fetchProducts = async () => {
-    let searchParameters = { searchTerm: searchTerm, offset: 0, limit: limit};
+  const fetchProducts = async (query) => {
+    let searchParameters = { offset: 0, limit: limit, shopId: attendantShopId };
+    if (query != undefined && query != null) {
+      searchParameters.searchTerm = query;
+    }
+
     new BaseApiService("/shop-products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setProducts(response.records);
+
+        setLoading(false);
       })
       .catch((error) => {
-        Alert.alert("Cannot get shop Products, Please contact support.");
+        console.log(error);
+
+        setLoading(false);
       });
-    setLoading(false);
   };
 
   const postSales = () => {
@@ -102,7 +106,6 @@ function SalesEntry({ navigation }) {
       })
       .catch((error) => {
         Alert.alert("Failed to confirm purchases!", error?.message);
-        setLoading(false);
       });
   };
 
@@ -119,13 +122,14 @@ function SalesEntry({ navigation }) {
       })
       .catch((error) => {
         Alert.alert("Failed to confirm purchases!", error?.message);
-        setLoading(false);
       });
   };
+
   const handleChange = (value) => {
     // setLoading(true);
-    setSearchTerm(value);
+    fetchProducts(value);
   };
+
   const makeSelection = (item) => {
     setShowModal(true);
     setSelection(item);
@@ -167,14 +171,12 @@ function SalesEntry({ navigation }) {
             addSale={clearEverything}
             sales={lineItems}
             total={returnCost}
-            setVisible={() => setShowConfirmed(false)}
-            clear={clearEverything}
           />
           <DropdownComponent
             products={products}
+            handleChange={(t) => handleChange(t)}
             setLoading={() => setLoading(false)}
             makeSelection={makeSelection}
-            handleChange={(t) => handleChange(t)}
           />
           <View
             style={{
@@ -488,9 +490,9 @@ function SalesEntry({ navigation }) {
 }
 const DropdownComponent = ({
   products,
+  handleChange,
   setLoading,
   makeSelection,
-  handleChange,
 }) => {
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
@@ -513,12 +515,25 @@ const DropdownComponent = ({
         value={value}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChangeText={(text) => handleChange(text)}
         onChange={(item) => {
+          setIsFocus(false);
           setLoading(false);
           makeSelection(item);
         }}
+        onChangeText={(text) => handleChange(text)}
       />
+      {/* <TouchableOpacity
+        style={{
+          backgroundColor: Colors.primary,
+        }}
+      >
+        <MaterialCommunityIcons
+          name="qrcode-scan"
+          size={30}
+          color="black"
+          style={{}}
+        />
+      </TouchableOpacity> */}
     </View>
   );
 };
