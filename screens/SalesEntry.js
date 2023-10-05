@@ -47,27 +47,31 @@ function SalesEntry({ navigation }) {
   const [returnCost, setReturnedCost] = useState(0);
 
   useEffect(() => {
-    fetchProducts();
-  }, [searchTerm]);
-
-  useEffect(() => {
     UserSessionUtils.getFullSessionObject().then((d) => {
       setShopId(d.user.shopOwnerId);
       setAttendantShopId(d.user.attendantShopId);
+      fetchProducts(null);
     });
   }, []);
 
-  const fetchProducts = async () => {
-    let searchParameters = { searchTerm: searchTerm, offset: 0, limit: limit };
+  const fetchProducts = async (query) => {
+    let searchParameters = { offset: 0, limit: limit, shopId: attendantShopId };
+    if (query != undefined && query != null) {
+      searchParameters.searchTerm = query;
+    }
+
     new BaseApiService("/shop-products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setProducts(response.records);
+
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
+
+        setLoading(false);
       });
-    setLoading(false);
   };
 
   const postSales = () => {
@@ -122,8 +126,8 @@ function SalesEntry({ navigation }) {
   };
 
   const handleChange = (value) => {
-    setLoading(true);
-    setSearchTerm(value);
+    // setLoading(true);
+    fetchProducts(value);
   };
 
   const makeSelection = (item) => {
