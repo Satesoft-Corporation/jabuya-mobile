@@ -41,43 +41,11 @@ export class UserSessionUtils {
    *
    * @param bearerToken
    */
-  static async setUserSettings(settings) {
-    await AsyncStorage.setItem(StorageParams.USER_SETTINGS, JSON.stringify(settings));
-  }
-  /**
-   * This method is use to set the user's bearer token.
-   *
-   * @param bearerToken
-   */
-  static async setCountry(country) {
-    await AsyncStorage.setItem(StorageParams.COUNTRY, JSON.stringify(country));
-  }
-
-  /**
-   * This method is use to set the user's app settings.
-   *
-   */
-  static async getCountry() {
-    const value = await AsyncStorage.getItem(StorageParams.COUNTRY);
-    return JSON.parse(value);
-  }
-
-  /**
-   * This method is use to set the user's app settings.
-   *
-   */
-  static async getUserSettings() {
-    const value = await AsyncStorage.getItem(StorageParams.USER_SETTINGS);
-    return JSON.parse(value);
-  }
-
-  /**
-   * This method is use to set the user's bearer token.
-   *
-   * @param bearerToken
-   */
   static async setFullSessionObject(fullObject) {
-    await AsyncStorage.setItem(StorageParams.FULL_LOGIN_DETAILS_JSON, JSON.stringify(fullObject));
+    await AsyncStorage.setItem(
+      StorageParams.FULL_LOGIN_DETAILS_JSON,
+      JSON.stringify(fullObject)
+    );
   }
 
   /**
@@ -86,7 +54,9 @@ export class UserSessionUtils {
    * @param bearerToken
    */
   static async getFullSessionObject() {
-    const value = await AsyncStorage.getItem(StorageParams.FULL_LOGIN_DETAILS_JSON);
+    const value = await AsyncStorage.getItem(
+      StorageParams.FULL_LOGIN_DETAILS_JSON
+    );
     return JSON.parse(value);
   }
   /**
@@ -104,7 +74,10 @@ export class UserSessionUtils {
    * @param userDetails
    */
   static async setUserDetails(userDetails) {
-    await AsyncStorage.setItem(StorageParams.USER_DETAILS_JSON, JSON.stringify(userDetails));
+    await AsyncStorage.setItem(
+      StorageParams.USER_DETAILS_JSON,
+      JSON.stringify(userDetails)
+    );
   }
 
   /**
@@ -145,74 +118,19 @@ export class UserSessionUtils {
   }
 
   /**
-   * This method is used to get the stored expo device Id.
+   * This method is used to get the attendant shopId
+   * @returns shopId
    */
-  static async getDeviceId() {
-    return await AsyncStorage.getItem(StorageParams.EXPO_DEVICE_ID);
+  static async getShopId() {
+    let id = await AsyncStorage.getItem(StorageParams.SHOP_ID);
+    return Number(id);
   }
 
   /**
-   * This method is used to store the expo device Id.
+   * This method is used to set the attendant shopId
+   * @param {id} id
    */
-  static async setDeviceId(token) {
-    await AsyncStorage.setItem(StorageParams.EXPO_DEVICE_ID, token);
-  }
-
-  /**
-   * This method is used to save a JSON object containing country details.
-   *
-   * @param country
-   */
-  static async setUserCountry(country) {
-    await AsyncStorage.setItem(StorageParams.COUNTRY, JSON.stringify(country));
-  }
-
-  /**
-   * This method is used to get user country details
-   * @returns
-   */
-  static async getUserCountry() {
-    return await AsyncStorage.getItem(StorageParams.COUNTRY);
-  }
-
-  /**
-   * This method is used to save a JSON object containing language.
-   *
-   * @param language
-   */
-  static async setUserLanguage(language) {
-    await AsyncStorage.setItem(StorageParams.LANGUAGE, JSON.stringify(language));
-  }
-
-  /**
-   * This method is used to get a JSON object containing user country details
-   * @returns
-   */
-  static async getUserLanguage() {
-    return await AsyncStorage.getItem(StorageParams.LANGUAGE);
-  }
-  /*
-   * This method is used to check whether a user is a church member
-   * @returns
-   */
-  static async isChurchMember() {
-    const churchMember = await AsyncStorage.getItem(StorageParams.IS_CHURCH_MEMBER);
-    console.log("isChurchMember=========" + churchMember);
-    if (churchMember !== null && churchMember == "true") {
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * This method is used to set a user as a church member
-   * @returns
-   */
-  static async setChurchMember(churchMember) {
-    if (churchMember) {
-      await AsyncStorage.setItem(StorageParams.IS_CHURCH_MEMBER, "true");
-    } else {
-      await AsyncStorage.setItem(StorageParams.IS_CHURCH_MEMBER, "false");
-    }
+  static async setShopid(id) {
+    await AsyncStorage.setItem(StorageParams.SHOP_ID, id);
   }
 }
