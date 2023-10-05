@@ -6,7 +6,7 @@ import Colors from "../constants/Colors";
 import MaterialButton from "./MaterialButton";
 import { Table, Row, Rows, TableWrapper } from "react-native-table-component";
 
-function ConfirmSalesDialog({ visible, navigation, addSale, sales, total }) {
+function ConfirmSalesDialog({ visible, navigation, addSale, sales, total,setVisible,clear }) {
   const tableHead = ["Product", "Qnty", "Amount"];
 
   return (
@@ -126,7 +126,11 @@ function ConfirmSalesDialog({ visible, navigation, addSale, sales, total }) {
                   fontWeight: "bold",
                   color: Colors.primary,
                 }}
-                buttonPress={() => navigation.navigate('viewSales')}
+                buttonPress={() =>{
+                  setVisible()
+                  clear()
+                  navigation.navigate('viewSales')
+                }}
               />
             </View>
           </View>

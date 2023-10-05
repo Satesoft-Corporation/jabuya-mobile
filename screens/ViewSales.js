@@ -46,7 +46,6 @@ export default function ViewSales({ navigation }) {
 
   useEffect(() => {
     getSales();
-    UserSessionUtils.getFullSessionObject().then((d) => {});
   }, []);
 
   return (
@@ -56,7 +55,7 @@ export default function ViewSales({ navigation }) {
           bgColor={Colors.dark}
           title="Shop Sales"
           titleStyle={{ color: Colors.primary }}
-          navPress={()=>navigation.goBack()}
+          navPress={() => navigation.goBack()}
         />
 
         <View
