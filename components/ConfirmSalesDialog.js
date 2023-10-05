@@ -126,7 +126,7 @@ function ConfirmSalesDialog({ visible, navigation, addSale, sales, total }) {
                   fontWeight: "bold",
                   color: Colors.primary,
                 }}
-                buttonPress={() => addSale()}
+                buttonPress={() => navigation.navigate('viewSales')}
               />
             </View>
           </View>

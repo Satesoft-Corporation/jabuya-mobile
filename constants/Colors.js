@@ -5,6 +5,8 @@ let Colors = {
   light: "#ffffff",
   light_2: "#f1f1f1",
   light_3: "#e1ede4",
+  lime: "#5ca30e",
+  gray:"#a3a4ac"
 };
 
 export default Colors;

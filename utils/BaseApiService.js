@@ -50,7 +50,7 @@ export class BaseApiService {
         return response.json();
       } else if (response.status == 400 || response.status == 500) {
         let data = await response.json();
-        let errorMessage = data?.responseMessage ?? INTERNAL_SERVER_ERROR;
+        let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
         throw new TypeError(errorMessage);
       } else if (response.status == 401 || response.status == 403) {
         UserSessionUtils.clearLocalStorageAndLogout();
@@ -95,7 +95,6 @@ export class BaseApiService {
       )
       .then((responseData) => {
         if (responseData?.status == 200) {
-          console.log(JSON.stringify(responseData));
           return responseData;
         } else if (
           responseData?.status == 400 ||

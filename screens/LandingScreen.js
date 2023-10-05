@@ -33,7 +33,7 @@ export default function LandingScreen({ navigation }) {
       id: 3,
       icon: require("../assets/icons/icons8-box-50.png"),
       title: "Stocking",
-      target: "salesEntry",
+      target: "viewSales",
     },
     {
       id: 4,
@@ -164,7 +164,7 @@ export default function LandingScreen({ navigation }) {
           </View>
 
           <Image
-            source={require("../assets/icon.png")}
+            source={require("../assets/images/man_placeholder.jpg")}
             style={{
               width: 50,
               height: 50,
