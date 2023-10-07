@@ -15,6 +15,7 @@ export default function LandingScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [shopId, setShopId] = useState("");
+  const [routeParams, setRouteParams] = useState(null);
 
   const categoryIcons = [
     {
@@ -57,6 +58,7 @@ export default function LandingScreen({ navigation }) {
       setShopId(attendantShopId);
       setShopName(attendantShopName);
       setName(firstName + " " + lastName);
+      setRouteParams(data.user);
       setTimeout(() => {
         setLoading(false);
       }, 1500);
@@ -244,7 +246,7 @@ export default function LandingScreen({ navigation }) {
           renderItem={({ item }) => (
             <Icon
               icon={item}
-              onPress={() => navigation.navigate(item.target)}
+              onPress={() => navigation.navigate(item.target,routeParams)}
             />
           )}
           keyExtractor={(item) => item.id.toString()}
