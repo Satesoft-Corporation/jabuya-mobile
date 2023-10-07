@@ -6,6 +6,7 @@ import {
   ScrollView,
   Dimensions,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { BaseApiService } from "../utils/BaseApiService";
@@ -26,6 +27,7 @@ export default function ViewSales({ navigation }) {
   const [visible, setVisible] = useState(false);
   const [sale, setSale] = useState(null); //individual sale
   const [lineItems, setLineItems] = useState([]);
+  const [offset, setOffset] = useState(0);
 
   let dummy = {
     status: "Success",
@@ -95,17 +97,18 @@ export default function ViewSales({ navigation }) {
   };
   let shopId = null;
   const getSales = async () => {
+    shopId = await UserSessionUtils.getShopId();
     let searchParameters = {
       searchTerm: "",
-      offset: 0,
-      limit: 20,
+      offset: offset,
+      limit: 0,
       shopId: shopId,
     };
-console.log(JSON.stringify(searchParameters))
     new BaseApiService("/shop-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
-        setSales(response.records);
+        setSales((prev) => [...prev, ...response.records]);
+        setOffset(offset + 1);
         setTotalSales(response.totalItems);
         setTimeout(() => {
           setLoading(false);
@@ -117,8 +120,7 @@ console.log(JSON.stringify(searchParameters))
       });
   };
 
-  useEffect(async () => {
-    shopId = await UserSessionUtils.getShopId();
+  useEffect(() => {
     getSales();
   }, []);
 
@@ -133,8 +135,7 @@ console.log(JSON.stringify(searchParameters))
           item.totalCost,
         ]);
       }
-        setVisible(true);
-        
+      setVisible(true);
     } else {
       setSale(dummy);
       for (let item of dummy.lineItems) {
@@ -145,8 +146,7 @@ console.log(JSON.stringify(searchParameters))
           item.totalCost,
         ]);
       }
-        setVisible(true);
-     
+      setVisible(true);
     }
   };
 
@@ -158,53 +158,50 @@ console.log(JSON.stringify(searchParameters))
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <HeaderOneButton
-          bgColor={Colors.dark}
-          title="Shop Sales"
-          titleStyle={{ color: Colors.primary }}
-          navPress={() => navigation.goBack()}
-        />
+      <HeaderOneButton
+        bgColor={Colors.dark}
+        title="Shop Sales"
+        titleStyle={{ color: Colors.primary }}
+        navPress={() => navigation.goBack()}
+      />
 
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: Colors.light_2,
-            paddingHorizontal: 15,
-            paddingBottom: 30,
-          }}
-        >
-          <OrientationLoadingOverlay
-            visible={loading}
-            color={Colors.primary}
-            indicatorSize="large"
-            messageFontSize={24}
-            message=""
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: Colors.light_2,
+          paddingBottom: 30,
+        }}
+      >
+        <OrientationLoadingOverlay
+          visible={loading}
+          color={Colors.primary}
+          indicatorSize="large"
+          messageFontSize={24}
+          message=""
+        />
+        <AppStatusBar bgColor="black" content="light-content" />
+
+        <View>
+          <FlatList
+            containerStyle={{ padding: 5 }}
+            data={sales}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TransactionItem
+                data={item}
+                index={sales.indexOf(item) + 1}
+                showSummary={() => showSummary(item)}
+              />
+            )}
           />
-          <AppStatusBar bgColor="black" content="light-content" />
-
-          <View>
-            <MultiColumnView
-              containerStyle={{ padding: 5 }}
-              data={sales}
-              renderItem={(item, i) => (
-                <TransactionItem
-                  key={i}
-                  data={item}
-                  index={sales.indexOf(item) + 1}
-                  showSummary={() => showSummary(item)}
-                />
-              )}
-            />
-          </View>
         </View>
-        <SaleSummaryDialog
-          visible={visible}
-          closeSummary={closeSummary}
-          sale={sale}
-          lineItems={lineItems}
-        />
-      </ScrollView>
+      </View>
+      <SaleSummaryDialog
+        visible={visible}
+        closeSummary={closeSummary}
+        sale={sale}
+        lineItems={lineItems}
+      />
     </SafeAreaView>
   );
 }
