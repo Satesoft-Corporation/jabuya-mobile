@@ -26,9 +26,9 @@ import ConfirmSalesDialog from "../components/ConfirmSalesDialog";
 
 const tableHead = ["Product", "Unit Price", "Qnty", "Amount"];
 
-function SalesEntry({ navigation }) {
+function SalesEntry({ route, navigation }) {
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(null);
   const [limit, setLimit] = useState(20);
   const [loading, setLoading] = useState(true);
   const [selectedProducts, setSelectedProducts] = useState([]); //unfiltered selections array
@@ -39,20 +39,18 @@ function SalesEntry({ navigation }) {
   const [totalCost, setTotalCost] = useState(0);
   const [recievedAmount, setRecievedAmount] = useState(0);
   const [showMoodal_1, setShowModal_1] = useState(false);
-  const [shopId, setShopId] = useState(null);
-  const [attendantShopId, setAttendantShopId] = useState(null);
+  const [shopId, setShopId] = useState(route.params.shopOwnerId);
+  const [attendantShopId, setAttendantShopId] = useState(
+    route.params.attendantShopId
+  );
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
   const [postedPdts, setPostedPdts] = useState([]);
   const [lineItems, setLineItems] = useState([]);
   const [returnCost, setReturnedCost] = useState(0);
 
   useEffect(() => {
-    UserSessionUtils.getFullSessionObject().then((d) => {
-      setShopId(d.user.shopOwnerId);
-      setAttendantShopId(d.user.attendantShopId);
-      fetchProducts(null);
-    });
-  }, []);
+    fetchProducts(searchTerm);
+  }, [searchTerm]);
 
   const fetchProducts = async (query) => {
     let searchParameters = { offset: 0, limit: limit, shopId: attendantShopId };
@@ -171,6 +169,8 @@ function SalesEntry({ navigation }) {
             addSale={clearEverything}
             sales={lineItems}
             total={returnCost}
+            setVisible={() => setShowConfirmed(false)}
+            clear={clearEverything}
           />
           <DropdownComponent
             products={products}
@@ -384,44 +384,79 @@ function SalesEntry({ navigation }) {
                     padding: 6,
                   }}
                 />
-                <MaterialButton
-                  title="Confirm"
+                <View
                   style={{
-                    backgroundColor: Colors.dark,
-                    marginTop: 10,
-                    borderRadius: 5,
-                    width: 150,
-                    alignSelf: "center",
-                    marginBottom: 20,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
                   }}
-                  titleStyle={{
-                    fontWeight: "bold",
-                    color: Colors.primary,
-                  }}
-                  buttonPress={() => {
-                    let cost = selection.salesPrice * quantity;
-                    setTotalCost(totalCost + cost);
-                    selectedProducts.push({
-                      id: selection.id,
-                      shopProductId: selection.id,
-                      quantity: quantity,
-                    });
-                    setSelections((prev) => [
-                      ...prev,
-                      [
-                        selection.productName,
-                        selection.salesPrice,
-                        quantity,
-                        cost,
-                      ],
-                    ]);
-                    setShowModal(false);
-                    setLoading(true);
-                    setTimeout(() => {
-                      setLoading(false);
-                    }, 1000);
-                  }}
-                />
+                >
+                  <MaterialButton
+                    title="Cancel"
+                    style={{
+                      backgroundColor: Colors.dark,
+                      marginTop: 10,
+                      borderRadius: 5,
+                      width: 100,
+                      alignSelf: "center",
+                      marginBottom: 20,
+                    }}
+                    titleStyle={{
+                      fontWeight: "bold",
+                      color: Colors.primary,
+                    }}
+                    buttonPress={() => {
+                      setShowModal(false);
+                    }}
+                  />
+                  <MaterialButton
+                    title="Confirm"
+                    style={{
+                      backgroundColor: Colors.dark,
+                      marginTop: 10,
+                      borderRadius: 5,
+                      width: 100,
+                      alignSelf: "center",
+                      marginBottom: 20,
+                    }}
+                    titleStyle={{
+                      fontWeight: "bold",
+                      color: Colors.primary,
+                    }}
+                    buttonPress={() => {
+                      const parsedQuantity = parseInt(quantity, 10);
+
+                      if (isNaN(parsedQuantity)) {
+                        Alert.alert("Quantity is not a valid number");
+                        return;
+                      }
+
+                      let cost = selection.salesPrice * parsedQuantity;
+                      setTotalCost(totalCost + cost);
+
+                      selectedProducts.push({
+                        id: selection.id,
+                        shopProductId: selection.id,
+                        quantity: parsedQuantity, // Use the parsed quantity
+                      });
+
+                      setSelections((prev) => [
+                        ...prev,
+                        [
+                          selection.productName,
+                          selection.salesPrice,
+                          parsedQuantity, // Use the parsed quantity
+                          cost,
+                        ],
+                      ]);
+
+                      setShowModal(false);
+                      setLoading(true);
+                      setTimeout(() => {
+                        setLoading(false);
+                      }, 1000);
+                    }}
+                  />
+                </View>
               </View>
             </Card>
           </ModalContent>
@@ -519,21 +554,10 @@ const DropdownComponent = ({
           setIsFocus(false);
           setLoading(false);
           makeSelection(item);
+          setValue(null);
         }}
         onChangeText={(text) => handleChange(text)}
       />
-      {/* <TouchableOpacity
-        style={{
-          backgroundColor: Colors.primary,
-        }}
-      >
-        <MaterialCommunityIcons
-          name="qrcode-scan"
-          size={30}
-          color="black"
-          style={{}}
-        />
-      </TouchableOpacity> */}
     </View>
   );
 };
