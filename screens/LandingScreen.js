@@ -28,19 +28,17 @@ export default function LandingScreen({ navigation }) {
       id: 2,
       icon: require("../assets/icons/icons8-report-50.png"),
       title: "Reports",
-      target: "salesEntry",
+      target: "viewSales",
     },
     {
       id: 3,
       icon: require("../assets/icons/icons8-box-50.png"),
       title: "Stocking",
-      target: "viewSales",
     },
     {
       id: 4,
       icon: require("../assets/icons/icons8-chat-50.png"),
       title: "Chat",
-      target: "salesEntry",
     },
   ];
   useEffect(() => {
@@ -246,7 +244,11 @@ export default function LandingScreen({ navigation }) {
           renderItem={({ item }) => (
             <Icon
               icon={item}
-              onPress={() => navigation.navigate(item.target,routeParams)}
+              onPress={() =>
+                item.target
+                  ? navigation.navigate(item.target, routeParams)
+                  : null
+              }
             />
           )}
           keyExtractor={(item) => item.id.toString()}

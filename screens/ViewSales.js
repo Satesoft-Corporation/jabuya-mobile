@@ -184,6 +184,7 @@ export default function ViewSales({ navigation }) {
         <View>
           <FlatList
             containerStyle={{ padding: 5 }}
+            showsHorizontalScrollIndicator={false}
             data={sales}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
