@@ -39,21 +39,23 @@ function SalesEntry({ route, navigation }) {
   const [totalCost, setTotalCost] = useState(0);
   const [recievedAmount, setRecievedAmount] = useState(0);
   const [showMoodal_1, setShowModal_1] = useState(false);
-  const [shopId, setShopId] = useState(route.params.shopOwnerId);
-  const [attendantShopId, setAttendantShopId] = useState(
-    route.params.attendantShopId
-  );
+  // const [shopId, setShopId] = useState(route.params.shopOwnerId);
+  // const [attendantShopId, setAttendantShopId] = useState(
+  //   route.params.attendantShopId
+  // );
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
   const [postedPdts, setPostedPdts] = useState([]);
   const [lineItems, setLineItems] = useState([]);
   const [returnCost, setReturnedCost] = useState(0);
+  const [qntyList, setQntyList] = useState([]);
+  const [a, b] = useState(0);
 
   useEffect(() => {
     fetchProducts(searchTerm);
   }, [searchTerm]);
 
   const fetchProducts = async (query) => {
-    let searchParameters = { offset: 0, limit: limit, shopId: attendantShopId };
+    let searchParameters = { offset: 0, limit: limit, shopId: 0 };
     if (query != undefined && query != null) {
       searchParameters.searchTerm = query;
     }
@@ -67,7 +69,6 @@ function SalesEntry({ route, navigation }) {
       })
       .catch((error) => {
         console.log(error);
-
         setLoading(false);
       });
   };
@@ -124,7 +125,6 @@ function SalesEntry({ route, navigation }) {
   };
 
   const handleChange = (value) => {
-    // setLoading(true);
     fetchProducts(value);
   };
 
@@ -144,6 +144,11 @@ function SalesEntry({ route, navigation }) {
     setLineItems([]);
   };
 
+  const getTotalItems = () => {
+    b(qntyList.reduce((a, b) => a + b, 0));
+  };
+
+  useEffect(() => getTotalItems(), [qntyList]);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View
@@ -232,7 +237,6 @@ function SalesEntry({ route, navigation }) {
                 data={tableHead}
                 style={{ height: 40 }}
                 textStyle={{
-                  // margin: 5,
                   fontWeight: 600,
                 }}
                 flexArr={[1.8, 1.5, 0.8, 1]}
@@ -261,14 +265,12 @@ function SalesEntry({ route, navigation }) {
             >
               <View>
                 <Text style={{ fontWeight: "bold" }}>Purchased Amount</Text>
-                <Text>
-                  Payment for {selections.length}
-                  {selections.length > 1 ? (
-                    <Text>items</Text>
-                  ) : (
-                    <Text>item</Text>
-                  )}
-                </Text>
+                {a > 1 && (
+                  <Text>
+                    Payment for {a}
+                    {a > 1 ? <Text> items</Text> : <Text> item</Text>}
+                  </Text>
+                )}
               </View>
               <View
                 style={{
@@ -433,12 +435,14 @@ function SalesEntry({ route, navigation }) {
                       let cost = selection.salesPrice * parsedQuantity;
                       setTotalCost(totalCost + cost);
 
+                      setQntyList((prev) => [...prev, parsedQuantity]);
+
                       selectedProducts.push({
                         id: selection.id,
                         shopProductId: selection.id,
                         quantity: parsedQuantity, // Use the parsed quantity
                       });
-
+                      setQntyList((prev) => [...prev, 2]);
                       setSelections((prev) => [
                         ...prev,
                         [
