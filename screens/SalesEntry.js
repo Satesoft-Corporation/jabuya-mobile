@@ -39,10 +39,10 @@ function SalesEntry({ route, navigation }) {
   const [totalCost, setTotalCost] = useState(0);
   const [recievedAmount, setRecievedAmount] = useState(0);
   const [showMoodal_1, setShowModal_1] = useState(false);
-  // const [shopId, setShopId] = useState(route.params.shopOwnerId);
-  // const [attendantShopId, setAttendantShopId] = useState(
-  //   route.params.attendantShopId
-  // );
+  const [shopId, setShopId] = useState(route.params.shopOwnerId);
+  const [attendantShopId, setAttendantShopId] = useState(
+    route.params.attendantShopId
+  );
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
   const [postedPdts, setPostedPdts] = useState([]);
   const [lineItems, setLineItems] = useState([]);
