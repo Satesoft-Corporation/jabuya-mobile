@@ -21,7 +21,6 @@ import { BaseApiService } from "../utils/BaseApiService";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import ModalContent from "../components/ModalContent";
 import Card from "../components/Card";
-import { UserSessionUtils } from "../utils/UserSessionUtils";
 import ConfirmSalesDialog from "../components/ConfirmSalesDialog";
 
 const tableHead = ["Product", "Unit Price", "Qnty", "Amount"];
@@ -48,14 +47,14 @@ function SalesEntry({ route, navigation }) {
   const [lineItems, setLineItems] = useState([]);
   const [returnCost, setReturnedCost] = useState(0);
   const [qntyList, setQntyList] = useState([]);
-  const [a, b] = useState(0);
+  const [a, b] = useState(0); // responsible for updating the total items in a cart
 
   useEffect(() => {
     fetchProducts(searchTerm);
   }, [searchTerm]);
 
   const fetchProducts = async (query) => {
-    let searchParameters = { offset: 0, limit: limit, shopId: 0 };
+    let searchParameters = { offset: 0, limit: limit, shopId: attendantShopId };
     if (query != undefined && query != null) {
       searchParameters.searchTerm = query;
     }
@@ -64,7 +63,7 @@ function SalesEntry({ route, navigation }) {
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setProducts(response.records);
-
+        console.log(response);
         setLoading(false);
       })
       .catch((error) => {
@@ -142,6 +141,7 @@ function SalesEntry({ route, navigation }) {
     setShowConfirmed(false);
     setSelections([]);
     setLineItems([]);
+    setQntyList([])
   };
 
   const getTotalItems = () => {
@@ -442,7 +442,6 @@ function SalesEntry({ route, navigation }) {
                         shopProductId: selection.id,
                         quantity: parsedQuantity, // Use the parsed quantity
                       });
-                      setQntyList((prev) => [...prev, 2]);
                       setSelections((prev) => [
                         ...prev,
                         [
