@@ -3,105 +3,38 @@ import {
   Text,
   Alert,
   SafeAreaView,
-  ScrollView,
   Dimensions,
   TouchableOpacity,
   FlatList,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { BaseApiService } from "../utils/BaseApiService";
+import { Table, Row, Rows, TableWrapper } from "react-native-table-component";
 import Colors from "../constants/Colors";
+
 import AppStatusBar from "../components/AppStatusBar";
-import MultiColumnView from "../components/MultiColumnView";
 import HeaderOneButton from "../components/HeaderOneButton";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
-import SaleSummaryDialog from "../components/SaleSummaryDialog";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
+import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
 
-const screenWidth = Dimensions.get("window").width;
+const tableHead = ["Item", "Price", "Qty", "Amount"];
 
 export default function ViewSales({ navigation }) {
   const [sales, setSales] = useState([]); // sales got from the server
   const [totalSales, setTotalSales] = useState(0);
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
-  const [sale, setSale] = useState(null); //individual sale
-  const [lineItems, setLineItems] = useState([]);
   const [offset, setOffset] = useState(0);
 
-  let dummy = {
-    status: "Success",
-    message: "Data retrieved successfully",
-    createdById: 1,
-    createdByUsername: "john_doe",
-    createdByFullName: "John Doe",
-    changedById: 2,
-    changedByUserName: "jane_smith",
-    changedByFullName: "Jane Smith",
-    dateCreated: "2023-10-04T17:15:52.858Z",
-    dateChanged: "2023-10-04T17:15:52.858Z",
-    recordStatus: "Active",
-    serialNumber: "ABC123",
-    id: 12345,
-    totalCost: 100.5,
-    amountPaid: 75.0,
-    balanceGivenOut: 25.5,
-    shopAttendantId: 3,
-    shopAttendantName: "Alice Johnson",
-    shopId: 987,
-    shopName: "BestMart",
-    statusId: 4,
-    statusName: "Completed",
-    lineItems: [
-      {
-        id: 5,
-        shopProductId: 105,
-        shopProductName: "Potatoes - 5 lbs",
-        quantity: 2,
-        unitCost: 200,
-        totalCost: 400,
-      },
-      {
-        id: 6,
-        shopProductId: 106,
-        shopProductName: "Orange Juice - 64 oz",
-        quantity: 1,
-        unitCost: 350,
-        totalCost: 350,
-      },
-      {
-        id: 7,
-        shopProductId: 107,
-        shopProductName: "Granola Cereal - 16 oz",
-        quantity: 2,
-        unitCost: 180,
-        totalCost: 360,
-      },
-      {
-        id: 8,
-        shopProductId: 108,
-        shopProductName: "Chicken Thighs - 4-Pack",
-        quantity: 2,
-        unitCost: 450,
-        totalCost: 900,
-      },
-      {
-        id: 9,
-        shopProductId: 109,
-        shopProductName: "Toilet Paper - 12 Rolls",
-        quantity: 1,
-        unitCost: 550,
-        totalCost: 550,
-      },
-    ],
-  };
   let shopId = null;
   const getSales = async () => {
     shopId = await UserSessionUtils.getShopId();
     let searchParameters = {
       searchTerm: "",
       offset: offset,
-      limit: 0,
+      limit: 20,
       shopId: shopId,
     };
     new BaseApiService("/shop-sales")
@@ -124,51 +57,79 @@ export default function ViewSales({ navigation }) {
     getSales();
   }, []);
 
-  const showSummary = (item) => {
-    if (item.lineItems !== undefined) {
-      setSale(item);
-      for (let item of item.lineItems) {
-        lineItems.push([
-          item.shopProductName,
-          item.unitCost,
-          item.quantity,
-          item.totalCost,
-        ]);
-      }
-      setVisible(true);
-    } else {
-      setSale(dummy);
-      for (let item of dummy.lineItems) {
-        lineItems.push([
-          item.shopProductName,
-          item.unitCost,
-          item.quantity,
-          item.totalCost,
-        ]);
-      }
-      setVisible(true);
-    }
-  };
-
-  const closeSummary = () => {
-    setVisible(false);
-    setLineItems([]);
-    setSale(null);
-  };
-
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <HeaderOneButton
-        bgColor={Colors.dark}
-        title="Shop Sales"
-        titleStyle={{ color: Colors.primary }}
-        navPress={() => navigation.goBack()}
-      />
+    <BlackAndWhiteScreen flex={1.4}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          paddingHorizontal: 10,
+          marginVertical: 10,
+        }}
+      >
+        <View>
+          <Text
+            style={{ color: Colors.primary, fontSize: 16, fontWeight: 500 }}
+          >
+            Day's Sales
+          </Text>
+          <Text style={{ color: Colors.primary }}>Report</Text>
+        </View>
 
+        <TouchableOpacity
+          style={{
+            backgroundColor: Colors.primary,
+            borderRadius: 3,
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.dark,
+              padding: 10,
+            }}
+          >
+            Investment
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          marginTop: 15,
+          justifyContent: "space-between",
+          paddingHorizontal: 5,
+        }}
+      >
+        <ItemHeader title="Items" value="450" unit="Qty" />
+        <View
+          style={{
+            width: 1,
+            height: "inherit",
+            backgroundColor: Colors.primary,
+          }}
+        />
+        <ItemHeader title="Sales" value="16,000,000" />
+        <View
+          style={{
+            width: 1,
+            height: "inherit",
+            backgroundColor: Colors.primary,
+          }}
+        />
+        <ItemHeader title="Capital" value="16,000,000" />
+        <View
+          style={{
+            width: 1,
+            height: "inherit",
+            backgroundColor: Colors.primary,
+          }}
+        />
+        <ItemHeader title="Profit" value="16,0000,000" />
+      </View>
       <View
         style={{
           flex: 1,
-          backgroundColor: Colors.light_2,
+          // backgroundColor: Colors.light_2,
           paddingBottom: 30,
         }}
       >
@@ -181,33 +142,21 @@ export default function ViewSales({ navigation }) {
         />
         <AppStatusBar bgColor="black" content="light-content" />
 
-        <View>
+        <View style={{ marginTop: 20 }}>
           <FlatList
             containerStyle={{ padding: 5 }}
             showsHorizontalScrollIndicator={false}
             data={sales}
             keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <TransactionItem
-                data={item}
-                index={sales.indexOf(item) + 1}
-                showSummary={() => showSummary(item)}
-              />
-            )}
+            renderItem={({ item }) => <TransactionItem data={item} />}
           />
         </View>
       </View>
-      <SaleSummaryDialog
-        visible={visible}
-        closeSummary={closeSummary}
-        sale={sale}
-        lineItems={lineItems}
-      />
-    </SafeAreaView>
+    </BlackAndWhiteScreen>
   );
 }
 
-function TransactionItem({ data, index, showSummary }) {
+function TransactionItem({ data }) {
   function formatDate(inputDate) {
     const options = {
       weekday: "short",
@@ -224,110 +173,258 @@ function TransactionItem({ data, index, showSummary }) {
 
     return formattedDate;
   }
+
+  const { lineItems, totalCost, amountPaid, balanceGivenOut } = data;
+
+  const [expanded, setExpanded] = useState(false);
+  const [list, setList] = useState([]); //to be rendered in the table
+
+  const toggleExpand = () => {
+    setExpanded(!expanded);
+  };
+  useEffect(() => {
+    if (data.lineItems !== undefined) {
+      if (list.length === 0) {
+        for (let item of data.lineItems) {
+          list.push([
+            item.shopProductName,
+            item.unitCost,
+            item.quantity,
+            item.totalCost,
+          ]);
+        }
+      }
+    }
+  });
   return (
-    <TouchableOpacity onPress={showSummary}>
+    <View
+      style={{
+        flex: 1,
+        marginTop: 10,
+        marginHorizontal: 10,
+        borderRadius: 3,
+        backgroundColor: "white",
+        paddingVertical: 15,
+        paddingHorizontal: 5,
+      }}
+    >
       <View
         style={{
-          width: screenWidth - 30,
           flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-around",
-          marginTop: 10,
-          marginHorizontal: 10,
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.3,
-          shadowRadius: 5,
-          borderRadius: 5,
-          elevation: 3,
-          backgroundColor: "white",
-          paddingHorizontal: 20,
-          paddingVertical: 15,
+          justifyContent: "space-between",
         }}
       >
-        <View
+        <Text
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: Colors.primary,
+            fontSize: 12,
+            fontWeight: "bold",
+            color: Colors.dark,
+            marginBottom: 2,
           }}
         >
-          <Text style={{ color: "black" }}>#{index}</Text>
+          Txn ID: {data.id}
+        </Text>
+
+        <Text
+          style={{
+            fontSize: 12,
+            color: Colors.gray,
+            alignSelf: "flex-end",
+          }}
+        >
+          Date: {formatDate(data.dateCreated)}
+        </Text>
+      </View>
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          margin: 10,
+        }}
+      >
+        <View style={{ alignItems: "center" }}>
+          <Text>Items</Text>
+          <Text>{(lineItems && lineItems.length) || 0}</Text>
         </View>
-        <View style={{ flex: 1, paddingHorizontal: 10 }}>
-          <Text
-            style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              color: Colors.dark,
-              marginBottom: 2,
-            }}
-          >
-            Amount Recieved:
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              color: Colors.dark,
-              marginBottom: 2,
-            }}
-          >
-            Created by:
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              color: Colors.dark,
-              marginBottom: 2,
-            }}
-          >
-            Transaction Id:
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              color: Colors.gray,
-              marginTop: 4,
-              marginBottom: 2,
-            }}
-          >
-            {formatDate(data.dateCreated)}
-          </Text>
+        <View style={{ alignItems: "center" }}>
+          <Text>Amount</Text>
+          <Text>{totalCost}</Text>
         </View>
-        <View style={{ alignItems: "flex-end" }}>
-          <Text
-            style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              color: Colors.lime,
-              marginBottom: 2,
-            }}
-          >
-            UGX {data.amountPaid}
-          </Text>
-          <Text style={{ fontSize: 12, fontWeight: 500, marginBottom: 2 }}>
-            {data.createdByFullName}
-          </Text>
-          <Text style={{ fontSize: 12, fontWeight: 500, marginBottom: 2 }}>
-            {data.id}
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              color: Colors.light,
-              marginTop: 4,
-              marginBottom: 2,
-              opacity: 0,
-            }}
-          >
-            some space
-          </Text>
+        <View style={{ alignItems: "center" }}>
+          <Text>Recieved</Text>
+          <Text>{amountPaid}</Text>
+        </View>
+        <View style={{ alignItems: "center" }}>
+          <Text>Balance</Text>
+          <Text>{balanceGivenOut}</Text>
         </View>
       </View>
-    </TouchableOpacity>
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text
+          style={{
+            fontWeight: 500,
+          }}
+        >
+          Served By: {data.createdByFullName}
+        </Text>
+        <TouchableOpacity
+          onPress={toggleExpand}
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: Colors.dark,
+            borderRadius: 3,
+            paddingHorizontal: 10,
+            paddingVertical: 4,
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.primary,
+              fontSize: 13,
+            }}
+          >
+            {expanded ? "Hide" : " View More"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      {expanded && (
+        <View style={{ flex: 1 }}>
+          <Table style={{ paddingBottom: 10 }}>
+            <Row
+              data={tableHead}
+              style={{ height: 40 }}
+              textStyle={{
+                fontWeight: "bold",
+              }}
+              flexArr={[3.5, 1.2, 0.9, 1]}
+            />
+
+            <TableWrapper style={{ flexDirection: "row" }}>
+              <Rows
+                style={{
+                  borderTopColor: Colors.dark,
+                  borderTopWidth: 0.5,
+                }}
+                data={list}
+                textStyle={{
+                  margin: 5,
+                  textAlign: "left",
+                }}
+                flexArr={[3.5, 1.3, 1, 0.8]}
+              />
+            </TableWrapper>
+          </Table>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginBottom: 5,
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>Total </Text>
+            <Text
+              style={{
+                alignSelf: "flex-end",
+                fontWeight: "bold",
+                marginEnd: 4,
+              }}
+            >
+              {lineItems && lineItems.length}
+            </Text>
+            <Text
+              style={{
+                alignSelf: "flex-end",
+                fontWeight: "bold",
+                marginEnd: 4,
+              }}
+            >
+              <Text style={{ fontSize: 11, color: Colors.gray }}>UGX</Text>
+              {totalCost}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>Recieved </Text>
+            <Text
+              style={{
+                alignSelf: "flex-end",
+                fontWeight: "bold",
+                marginEnd: 4,
+              }}
+            >
+              <Text style={{ fontSize: 11, color: Colors.gray }}>UGX</Text>
+              {amountPaid}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>Purchased </Text>
+            <Text
+              style={{
+                alignSelf: "flex-end",
+                fontWeight: "bold",
+                marginEnd: 4,
+              }}
+            >
+              <Text style={{ fontSize: 11, color: Colors.gray }}>UGX</Text>
+              {totalCost}
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>Balance</Text>
+            <Text
+              style={{
+                alignSelf: "flex-end",
+                fontWeight: "bold",
+                marginEnd: 4,
+              }}
+            >
+              <Text style={{ fontSize: 11, color: Colors.gray }}>UGX</Text>
+              {balanceGivenOut}
+            </Text>
+          </View>
+        </View>
+      )}
+    </View>
+  );
+}
+
+function ItemHeader({ title, value, unit = "Ugx" }) {
+  return (
+    <View style={{ alignItems: "center" }}>
+      <Text
+        style={{ fontSize: 12, color: Colors.primary, alignSelf: "flex-start" }}
+      >
+        {unit}
+      </Text>
+      <Text style={{ fontSize: 14, color: Colors.primary }}>{value}</Text>
+      <Text
+        style={{ fontSize: 12, color: Colors.primary, alignSelf: "flex-start" }}
+      >
+        {title}
+      </Text>
+    </View>
   );
 }

@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   TextInput,
   Alert,
+  Image,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../constants/Colors";
@@ -22,8 +23,10 @@ import OrientationLoadingOverlay from "react-native-orientation-loading-overlay"
 import ModalContent from "../components/ModalContent";
 import Card from "../components/Card";
 import ConfirmSalesDialog from "../components/ConfirmSalesDialog";
+import { Ionicons } from "@expo/vector-icons";
+import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
 
-const tableHead = ["Product", "Unit Price", "Qnty", "Amount"];
+const tableHead = ["Item", "Price", "Qnty", "Amount"];
 
 function SalesEntry({ route, navigation }) {
   const [products, setProducts] = useState([]);
@@ -36,7 +39,7 @@ function SalesEntry({ route, navigation }) {
   const [showMoodal, setShowModal] = useState(false);
   const [selection, setSelection] = useState(null);
   const [totalCost, setTotalCost] = useState(0);
-  const [recievedAmount, setRecievedAmount] = useState(0);
+  const [recievedAmount, setRecievedAmount] = useState("");
   const [showMoodal_1, setShowModal_1] = useState(false);
   const [shopId, setShopId] = useState(route.params.shopOwnerId);
   const [attendantShopId, setAttendantShopId] = useState(
@@ -48,22 +51,26 @@ function SalesEntry({ route, navigation }) {
   const [returnCost, setReturnedCost] = useState(0);
   const [qntyList, setQntyList] = useState([]);
   const [a, b] = useState(0); // responsible for updating the total items in a cart
+  const [returnedList, setReturnedList] = useState([]);
+  const [returnedId, setReturnedId] = useState(null);
+  const [length, setLength] = useState(null);
+  const [amountPaid, setAmountPaid] = useState(null);
+  const [balanceGivenOut, setBalanceGivenOut] = useState(null);
 
   useEffect(() => {
-    fetchProducts(searchTerm);
+    fetchProducts();
   }, [searchTerm]);
 
-  const fetchProducts = async (query) => {
+  const fetchProducts = async () => {
     let searchParameters = { offset: 0, limit: limit, shopId: attendantShopId };
-    if (query != undefined && query != null) {
-      searchParameters.searchTerm = query;
-    }
+    // if (query != undefined && query != null) {
+    //   searchParameters.searchTerm = query;
+    // }
 
     new BaseApiService("/shop-products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setProducts(response.records);
-        console.log(response);
         setLoading(false);
       })
       .catch((error) => {
@@ -79,9 +86,6 @@ function SalesEntry({ route, navigation }) {
       amountPaid: totalCost,
       lineItems: selectedProducts,
     };
-
-    setLoading(true);
-
     new BaseApiService("/shop-sales")
       .postRequest(payLoad)
       .then(async (response) => {
@@ -90,36 +94,50 @@ function SalesEntry({ route, navigation }) {
       })
       .then(async (d) => {
         let { info, status } = d;
-
         let items = info.lineItems;
         let id = info.id;
         let totalCost_1 = info.totalCost;
         setReturnedCost(totalCost_1);
+        setReturnedList(items);
+        setReturnedId(id);
+        setLength(items.length);
+        setAmountPaid(info.amountPaid);
+        setBalanceGivenOut(info.balanceGivenOut);
         for (let item of items) {
-          lineItems.push([item.shopProductName, item.quantity, item.totalCost]);
+          lineItems.push([
+            item.shopProductName,
+            item.quantity,
+            item.unitCost,
+            item.totalCost,
+          ]);
         }
-        if (status === 200) {
-          saveSales(items, id);
-        }
+        setShowConfirmed(true);
+        setTimeout(() => setLoading(false), 1000);
+
       })
       .catch((error) => {
         Alert.alert("Failed to confirm purchases!", error?.message);
+        setLoading(false);
       });
   };
 
   const saveSales = (items, id) => {
+    setLoading(true);
     postedPdts.push(items);
     new BaseApiService(`/shop-sales/${id}/confirm`)
       .postRequest()
       .then((d) => d.json())
       .then((d) => {
         if (d.status === "Success") {
+          setShowConfirmed(false)
+          Alert.alert("Sale Confirmed Successfully");
           setLoading(false);
-          setShowConfirmed(true);
+          clearEverything();
         }
       })
       .catch((error) => {
         Alert.alert("Failed to confirm purchases!", error?.message);
+        setLoading(false);
       });
   };
 
@@ -141,7 +159,7 @@ function SalesEntry({ route, navigation }) {
     setShowConfirmed(false);
     setSelections([]);
     setLineItems([]);
-    setQntyList([])
+    setQntyList([]);
   };
 
   const getTotalItems = () => {
@@ -150,380 +168,368 @@ function SalesEntry({ route, navigation }) {
 
   useEffect(() => getTotalItems(), [qntyList]);
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <BlackAndWhiteScreen flex={1.15}>
+      <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
+
+      <OrientationLoadingOverlay
+        visible={loading}
+        color="white"
+        indicatorSize="large"
+        messageFontSize={24}
+        message=""
+      />
+      <ConfirmSalesDialog
+        visible={showConfirmed}
+        addSale={() => {
+          saveSales(returnedList, returnedId);
+        }}
+        sales={lineItems}
+        total={returnCost}
+        setVisible={() => setShowConfirmed(false)}
+        clear={clearEverything}
+        transID={returnedId}
+        amountPaid={amountPaid}
+        balanceGivenOut={balanceGivenOut}
+        length={length}
+        resetList={() => setLineItems([])}
+      />
+<View style={{paddingHorizontal:10}}>
+      <DropdownComponent
+        products={products}
+        handleChange={(t) => handleChange(t)}
+        setLoading={() => setLoading(false)}
+        makeSelection={makeSelection}
+      />
       <View
         style={{
-          flex: 1,
-          backgroundColor: Colors.light_2,
-          paddingHorizontal: 15,
-          paddingBottom: 30,
+          backgroundColor: Colors.light,
+          borderRadius: 5,
+          padding: 10,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          
         }}
       >
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <AppStatusBar />
-          <OrientationLoadingOverlay
-            visible={loading}
-            color="white"
-            indicatorSize="large"
-            messageFontSize={24}
-            message=""
-          />
-          <ConfirmSalesDialog
-            visible={showConfirmed}
-            navigation={navigation}
-            addSale={clearEverything}
-            sales={lineItems}
-            total={returnCost}
-            setVisible={() => setShowConfirmed(false)}
-            clear={clearEverything}
-          />
-          <DropdownComponent
-            products={products}
-            handleChange={(t) => handleChange(t)}
-            setLoading={() => setLoading(false)}
-            makeSelection={makeSelection}
-          />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            elevation: 10,
+            shadowOffset: { width: 0, height: 25 },
+            shadowOpacity: 0.8,
+          }}
+        >
+          <FontAwesome5 name="money-bill" size={24} color="black" />
           <View
             style={{
-              backgroundColor: Colors.light,
-              borderRadius: 5,
-              padding: 10,
-              flexDirection: "row",
-              justifyContent: "space-between",
+              marginLeft: 10,
             }}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <FontAwesome5 name="money-bill" size={24} color="black" />
-              <View
-                style={{
-                  marginLeft: 10,
-                }}
-              >
-                <Text style={{ fontWeight: "bold" }}>Recieved</Text>
-                <Text>Amount paid</Text>
-              </View>
-            </View>
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "flex-end",
-              }}
-            >
-              <Text
-                style={{
-                  fontWeight: 500,
-                }}
-              >
-                UGX {recievedAmount}
-              </Text>
-            </View>
+            <Text style={{ fontWeight: "bold" }}>Recieved Amt</Text>
           </View>
-
+        </View>
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "flex-end",
+          }}
+        >
           <View
             style={{
-              backgroundColor: Colors.light,
-              borderRadius: 5,
-              padding: 10,
-              marginTop: 15,
+              flexDirection: "row",
+              justifyContent: "center",
             }}
           >
-            <Table>
-              <Row
-                data={tableHead}
-                style={{ height: 40 }}
-                textStyle={{
-                  fontWeight: 600,
-                }}
-                flexArr={[1.8, 1.5, 0.8, 1]}
-              />
-
-              <TableWrapper style={{ flexDirection: "row" }}>
-                <Rows
-                  style={{ borderTopColor: Colors.dark, borderTopWidth: 0.5 }}
-                  data={selections}
-                  textStyle={{
-                    margin: 5,
-                    textAlign: "left",
-                  }}
-                  flexArr={[1.8, 1.5, 0.8, 1]}
-                />
-              </TableWrapper>
-            </Table>
-            <View
+            <Text
+              style={{
+                alignSelf: "center",
+                color: Colors.gray,
+                fontSize: 17,
+                marginEnd: 5,
+              }}
+            >
+              UGX
+            </Text>
+            <TextInput
+              value={recievedAmount}
+              inputMode="numeric"
+              onChangeText={(text) => setRecievedAmount(text)}
               style={{
                 backgroundColor: Colors.light,
-                borderRadius: 5,
-                padding: 10,
+                borderRadius: 8,
+                padding: 5,
+                width: 120,
+                fontSize: 17,
+              }}
+              placeholder="Enter Amount"
+            />
+          </View>
+        </View>
+      </View>
+
+      <View
+        style={{
+          backgroundColor: Colors.light,
+          borderRadius: 5,
+          padding: 10,
+          marginTop: 10,
+        }}
+      >
+        <Table>
+          <Row
+            data={tableHead}
+            style={{ height: 40 }}
+            textStyle={{
+              fontWeight: 600,
+            }}
+            flexArr={[2.5, 1.3, 0.6, 1]}
+          />
+
+          <TableWrapper style={{ flexDirection: "row" }}>
+            <ScrollView
+              style={{ height: 150 }}
+              showsVerticalScrollIndicator={false}
+            >
+              <Rows
+                style={{
+                  borderTopColor: Colors.gray,
+                  borderTopWidth: 0.3,
+                }}
+                data={selections}
+                textStyle={{
+                  margin: 5,
+                  textAlign: "left",
+                }}
+                flexArr={[2.5, 1.3, 0.6, 1]}
+              />
+            </ScrollView>
+          </TableWrapper>
+        </Table>
+        <View
+          style={{
+            backgroundColor: Colors.light,
+            borderRadius: 5,
+            padding: 10,
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <View>
+            <Text style={{ fontWeight: "bold", marginTop: 5, fontSize: 17 }}>
+              Purchased{" "}
+              {a >= 1 && (
+                <Text>
+                  {a}
+                  {a > 1 ? <Text> items</Text> : <Text> item</Text>}
+                </Text>
+              )}
+            </Text>
+          </View>
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "flex-end",
+            }}
+          >
+            <Text
+              style={{
+                fontWeight: 700,
+                fontSize: 17,
+              }}
+            >
+              UGX {totalCost}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      <View
+        style={{
+          backgroundColor: Colors.light,
+          borderRadius: 5,
+          padding: 10,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 10,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <FontAwesome5 name="money-bill" size={24} color="black" />
+          <View
+            style={{
+              marginLeft: 10,
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>Balance</Text>
+          </View>
+        </View>
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "flex-end",
+          }}
+        >
+          <Text
+            style={{
+              fontWeight: 700,
+            }}
+          >
+            UGX {recievedAmount === 0 ? 0 : recievedAmount - totalCost}
+          </Text>
+        </View>
+      </View>
+
+      <IconsComponent clear={clearEverything} />
+
+      <TouchableOpacity
+        style={{
+          backgroundColor: Colors.dark,
+          borderRadius: 3,
+          height: 40,
+          justifyContent: "center",
+          marginTop: 8,
+        }}
+        onPress={() => {
+          if (recievedAmount !== 0 && selections.length > 0) {
+            setLoading(true);
+            postSales();
+          }
+        }}
+      >
+        <Text
+          style={{
+            color: Colors.primary,
+            alignSelf: "center",
+            fontSize: 17,
+          }}
+        >
+          Confirm Purchase
+        </Text>
+      </TouchableOpacity>
+
+      <ModalContent visible={showMoodal} style={{ padding: 35 }}>
+        <Card
+          style={{
+            paddingHorizontal: 15,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              padding: 2,
+            }}
+          >
+            <Text
+              style={{
+                marginTop: 10,
+                fontWeight: "500",
+                fontSize: 18,
+                marginBottom: 5,
+                marginStart: 10,
+                marginTop: 20,
+              }}
+            >
+              Input quantity
+            </Text>
+
+            <TextInput
+              inputMode="numeric"
+              onChangeText={(text) => setQuantity(text)}
+              maxLength={3}
+              style={{
+                backgroundColor: Colors.light_3,
+                borderRadius: 8,
+                padding: 6,
+              }}
+            />
+            <View
+              style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
               }}
             >
-              <View>
-                <Text style={{ fontWeight: "bold" }}>Purchased Amount</Text>
-                {a > 1 && (
-                  <Text>
-                    Payment for {a}
-                    {a > 1 ? <Text> items</Text> : <Text> item</Text>}
-                  </Text>
-                )}
-              </View>
-              <View
+              <MaterialButton
+                title="Cancel"
                 style={{
-                  justifyContent: "center",
-                  alignItems: "flex-end",
+                  backgroundColor: "transparent",
+                  borderRadius: 5,
+                  borderWidth: 1,
+                  borderColor: Colors.dark,
+                  marginStart: -2,
+                  margin: 10,
+                  height: 40,
                 }}
-              >
-                <Text
-                  style={{
-                    fontWeight: 500,
-                  }}
-                >
-                  UGX {totalCost}
-                </Text>
-              </View>
+                titleStyle={{
+                  fontWeight: "bold",
+                  color: Colors.dark,
+                }}
+                buttonPress={() => {
+                  setShowModal(false);
+                }}
+              />
+              <MaterialButton
+                title="Confirm"
+                style={{
+                  backgroundColor: Colors.dark,
+                  borderRadius: 5,
+                  borderWidth: 1,
+                  borderColor: Colors.dark,
+                  marginStart: 2,
+                  marginEnd: -2,
+                  margin: 10,
+                  height: 40,
+                }}
+                titleStyle={{
+                  fontWeight: "bold",
+                  color: Colors.primary,
+                }}
+                buttonPress={() => {
+                  const parsedQuantity = parseInt(quantity, 10);
+
+                  if (isNaN(parsedQuantity)) {
+                    Alert.alert("Quantity is not a valid number");
+                    return;
+                  }
+
+                  let cost = selection.salesPrice * parsedQuantity;
+                  setTotalCost(totalCost + cost);
+
+                  setQntyList((prev) => [...prev, parsedQuantity]);
+
+                  selectedProducts.push({
+                    id: selection.id,
+                    shopProductId: selection.id,
+                    quantity: parsedQuantity, // Use the parsed quantity
+                  });
+                  setSelections((prev) => [
+                    ...prev,
+                    [
+                      selection.productName,
+                      selection.salesPrice,
+                      parsedQuantity, // Use the parsed quantity
+                      cost,
+                    ],
+                  ]);
+
+                  setShowModal(false);
+                  setLoading(true);
+                  setQuantity(null);
+                  setTimeout(() => {
+                    setLoading(false);
+                  }, 1000);
+                }}
+              />
             </View>
           </View>
-
-          <View
-            style={{
-              backgroundColor: Colors.light,
-              borderRadius: 5,
-              padding: 10,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 10,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <FontAwesome5 name="money-bill" size={24} color="black" />
-              <View
-                style={{
-                  marginLeft: 10,
-                }}
-              >
-                <Text style={{ fontWeight: "bold" }}>Balance</Text>
-                <Text>Cash less purchase</Text>
-              </View>
-            </View>
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "flex-end",
-              }}
-            >
-              <Text
-                style={{
-                  fontWeight: 500,
-                }}
-              >
-                UGX {recievedAmount === 0 ? 0 : recievedAmount - totalCost}
-              </Text>
-            </View>
-          </View>
-
-          <IconsComponent clear={clearEverything} />
-
-          <MaterialButton
-            title="Confirm Purchase"
-            style={{
-              backgroundColor: Colors.dark,
-              marginTop: 10,
-              borderRadius: 5,
-            }}
-            titleStyle={{
-              fontWeight: "bold",
-              color: Colors.primary,
-            }}
-            buttonPress={() => {
-              if (selections.length > 0) {
-                setShowModal_1(true);
-              }
-            }}
-          />
-
-          <ModalContent visible={showMoodal} style={{ padding: 35 }}>
-            <Card
-              style={{
-                paddingHorizontal: 15,
-              }}
-            >
-              <View
-                style={{
-                  backgroundColor: "white",
-                  padding: 2,
-                }}
-              >
-                <Text
-                  style={{
-                    marginTop: 10,
-                    fontWeight: "500",
-                    fontSize: 18,
-                    marginBottom: 5,
-                    marginStart: 10,
-                    marginTop: 20,
-                  }}
-                >
-                  Input quantity
-                </Text>
-
-                <TextInput
-                  inputMode="numeric"
-                  onChangeText={(text) => setQuantity(text)}
-                  maxLength={3}
-                  style={{
-                    backgroundColor: Colors.light_3,
-                    borderRadius: 8,
-                    padding: 6,
-                  }}
-                />
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <MaterialButton
-                    title="Cancel"
-                    style={{
-                      backgroundColor: Colors.dark,
-                      marginTop: 10,
-                      borderRadius: 5,
-                      width: 100,
-                      alignSelf: "center",
-                      marginBottom: 20,
-                    }}
-                    titleStyle={{
-                      fontWeight: "bold",
-                      color: Colors.primary,
-                    }}
-                    buttonPress={() => {
-                      setShowModal(false);
-                    }}
-                  />
-                  <MaterialButton
-                    title="Confirm"
-                    style={{
-                      backgroundColor: Colors.dark,
-                      marginTop: 10,
-                      borderRadius: 5,
-                      width: 100,
-                      alignSelf: "center",
-                      marginBottom: 20,
-                    }}
-                    titleStyle={{
-                      fontWeight: "bold",
-                      color: Colors.primary,
-                    }}
-                    buttonPress={() => {
-                      const parsedQuantity = parseInt(quantity, 10);
-
-                      if (isNaN(parsedQuantity)) {
-                        Alert.alert("Quantity is not a valid number");
-                        return;
-                      }
-
-                      let cost = selection.salesPrice * parsedQuantity;
-                      setTotalCost(totalCost + cost);
-
-                      setQntyList((prev) => [...prev, parsedQuantity]);
-
-                      selectedProducts.push({
-                        id: selection.id,
-                        shopProductId: selection.id,
-                        quantity: parsedQuantity, // Use the parsed quantity
-                      });
-                      setSelections((prev) => [
-                        ...prev,
-                        [
-                          selection.productName,
-                          selection.salesPrice,
-                          parsedQuantity, // Use the parsed quantity
-                          cost,
-                        ],
-                      ]);
-
-                      setShowModal(false);
-                      setLoading(true);
-                      setTimeout(() => {
-                        setLoading(false);
-                      }, 1000);
-                    }}
-                  />
-                </View>
-              </View>
-            </Card>
-          </ModalContent>
-
-          <ModalContent visible={showMoodal_1} style={{ padding: 35 }}>
-            <Card
-              style={{
-                paddingHorizontal: 15,
-              }}
-            >
-              <View
-                style={{
-                  backgroundColor: "white",
-                  padding: 2,
-                }}
-              >
-                <Text
-                  style={{
-                    marginTop: 10,
-                    fontWeight: "500",
-                    fontSize: 18,
-                    marginBottom: 5,
-                    marginStart: 10,
-                    marginTop: 20,
-                  }}
-                >
-                  Input recieved amount
-                </Text>
-
-                <TextInput
-                  inputMode="numeric"
-                  onChangeText={(text) => setRecievedAmount(text)}
-                  maxLength={10}
-                  style={{
-                    backgroundColor: Colors.light_3,
-                    borderRadius: 8,
-                    padding: 6,
-                  }}
-                />
-                <MaterialButton
-                  title="Confirm"
-                  style={{
-                    backgroundColor: Colors.dark,
-                    marginTop: 10,
-                    borderRadius: 5,
-                    width: 150,
-                    alignSelf: "center",
-                    marginBottom: 20,
-                  }}
-                  titleStyle={{
-                    fontWeight: "bold",
-                    color: Colors.primary,
-                  }}
-                  buttonPress={() => {
-                    setShowModal_1(false);
-                    postSales();
-                  }}
-                />
-              </View>
-            </Card>
-          </ModalContent>
-        </ScrollView>
+        </Card>
+      </ModalContent>
       </View>
-    </SafeAreaView>
+    </BlackAndWhiteScreen>
   );
 }
 const DropdownComponent = ({
@@ -644,7 +650,8 @@ export default SalesEntry;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
+    marginTop: 10,
+    width: "100%",
   },
   dropdown: {
     height: 50,

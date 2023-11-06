@@ -16,6 +16,7 @@ function ConfirmSalesDialog({
   length,
   balanceGivenOut,
   amountPaid,
+  resetList
 }) {
   const tableHead = ["Item", "Qty", "Price", "Amount"];
 
@@ -53,7 +54,7 @@ function ConfirmSalesDialog({
               >
                 Confirm Sale
               </Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={()=>setVisible()}>
                 <Image
                   source={require("../assets/icons/ic_close.png")}
                   style={{
@@ -62,7 +63,7 @@ function ConfirmSalesDialog({
                     resizeMode: "contain",
                     marginStart: 15,
                     alignSelf: "center",
-                    marginBottom: 4,
+                    marginTop:10
                   }}
                 />
               </TouchableOpacity>
@@ -152,7 +153,7 @@ function ConfirmSalesDialog({
                     marginEnd: 4,
                   }}
                 >
-                  <Text style={{ fontSize: 11, color: Colors.gray }}>UGX</Text>{" "}
+                  <Text style={{ fontSize: 11, color: Colors.gray }}>UGX</Text>
                   {total}
                 </Text>
               </View>
@@ -201,6 +202,7 @@ function ConfirmSalesDialog({
                 }}
                 buttonPress={() => {
                   setVisible();
+                  resetList()
                 }}
               />
               <MaterialButton
