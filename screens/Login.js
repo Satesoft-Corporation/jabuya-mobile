@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-  Alert,
-  SafeAreaView,
-} from "react-native";
+import { Image, Text, TouchableOpacity, View, Alert } from "react-native";
 import MaterialButton from "../components/MaterialButton";
 import MaterialInput from "../components/MaterialInput";
 import Colors from "../constants/Colors";
@@ -27,7 +20,6 @@ export default function Login({ navigation }) {
     new BaseApiService("/auth/login")
       .postRequest(loginInfo)
       .then(async (response) => {
-        
         let d = { info: await response.json(), status: response.status };
         return d;
       })
@@ -39,7 +31,7 @@ export default function Login({ navigation }) {
           await UserSessionUtils.setUserAuthToken(info.accessToken);
           await UserSessionUtils.setUserRefreshToken(info.refreshToken);
           await UserSessionUtils.setFullSessionObject(info);
-          await UserSessionUtils.setShopid(String(info.user.attendantShopId))
+          await UserSessionUtils.setShopid(String(info.user.attendantShopId));
           navigation.navigate("welcome");
           setPassword("");
           setUsername("");
@@ -126,21 +118,20 @@ export default function Login({ navigation }) {
         }}
       />
 
-      <MaterialButton
-        title="LOGIN"
+      <TouchableOpacity
+        onPress={() => onLogin()}
         style={{
           backgroundColor: Colors.dark,
           marginTop: 30,
           borderRadius: 5,
           borderWidth: 1,
           borderColor: Colors.primary,
+          paddingVertical: 10,
+          justifyContent:'center'
         }}
-        titleStyle={{
-          fontWeight: "bold",
-          color: Colors.primary,
-        }}
-        buttonPress={() => onLogin()}
-      />
+      >
+        <Text style={{ fontWeight: "bold", color: Colors.primary,alignSelf:'center',fontSize:16 }}>Login</Text>
+      </TouchableOpacity>
 
       <View
         style={{
