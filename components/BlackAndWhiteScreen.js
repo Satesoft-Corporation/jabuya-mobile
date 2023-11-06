@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet,TouchableOpacity,Image ,Text} from "react-native";
+import { View, StyleSheet, TouchableOpacity, Image, Text } from "react-native";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Colors from "../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-
 
 const BlackAndWhiteScreen = ({ children, flex = 1.5, showProfile = true }) => {
   const [role, setRole] = useState("");
@@ -24,7 +23,6 @@ const BlackAndWhiteScreen = ({ children, flex = 1.5, showProfile = true }) => {
         <View style={styles.whiteThreeQuarters}></View>
       </View>
       <View style={styles.content}>
-
         {showProfile && ( //render user info if true
           <View
             style={{
@@ -32,6 +30,7 @@ const BlackAndWhiteScreen = ({ children, flex = 1.5, showProfile = true }) => {
               justifyContent: "space-between",
               marginTop: 10,
               alignItems: "center",
+              paddingHorizontal:10
             }}
           >
             <TouchableOpacity>
@@ -106,7 +105,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     zIndex: 1,
-    padding: 10,
   },
   background: {
     position: "absolute",
