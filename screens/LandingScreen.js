@@ -2,10 +2,10 @@ import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
-import { Ionicons } from "@expo/vector-icons";
 import Icon from "../components/Icon";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
+import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
 
 export default function LandingScreen({ navigation }) {
   const [tab, setTab] = useState("home");
@@ -92,12 +92,7 @@ export default function LandingScreen({ navigation }) {
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: Colors.dark,
-      }}
-    >
+    <BlackAndWhiteScreen >
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
       <OrientationLoadingOverlay
         visible={loading}
@@ -106,82 +101,13 @@ export default function LandingScreen({ navigation }) {
         messageFontSize={24}
         message=""
       />
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 10,
-          alignItems: "center",
-          paddingHorizontal: 15,
-        }}
-      >
-        <TouchableOpacity>
-          <Image
-            source={require("../assets/icons/menu2.png")}
-            style={{
-              width: 30,
-              height: 25,
-            }}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={{ marginStart: 75 }}>
-          <Ionicons
-            name="notifications-outline"
-            size={24}
-            color={Colors.primary_light}
-          />
-        </TouchableOpacity>
-        {/* </View> */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingStart: 15,
-            alignItems: "center",
-            marginTop: 10,
-          }}
-        >
-          <View>
-            <Text
-              style={{
-                color: Colors.primary,
-                fontWeight: "bold",
-                fontSize: 15,
-              }}
-            >
-              {name}
-            </Text>
-            <Text
-              style={{
-                color: Colors.primary,
-                fontWeight: "bold",
-                alignSelf: "flex-end",
-              }}
-            >
-              {role}
-            </Text>
-          </View>
-
-          <Image
-            source={require("../assets/images/man_placeholder.jpg")}
-            style={{
-              width: 50,
-              height: 50,
-              resizeMode: "cover",
-              borderRadius: 50,
-              marginStart: 5,
-            }}
-          />
-        </View>
-      </View>
+     
 
       <View
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
           marginTop: 20,
-          paddingHorizontal: 15,
         }}
       >
         <View>
@@ -209,7 +135,6 @@ export default function LandingScreen({ navigation }) {
           flexDirection: "row",
           justifyContent: "space-between",
           marginTop: 20,
-          paddingHorizontal: 15,
         }}
       >
         <View>
@@ -235,7 +160,7 @@ export default function LandingScreen({ navigation }) {
         style={{
           flex: 1,
           backgroundColor: Colors.light_2,
-          marginTop: 10,
+          marginTop: 25,
         }}
       >
         <FlatList
@@ -341,6 +266,6 @@ export default function LandingScreen({ navigation }) {
           />
         </TouchableOpacity>
       </View>
-    </View>
+    </BlackAndWhiteScreen>
   );
 }
