@@ -18,6 +18,7 @@ import HeaderOneButton from "../components/HeaderOneButton";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
+import { TextInput } from "react-native";
 
 const tableHead = ["Item", "Price", "Qty", "Amount"];
 
@@ -58,7 +59,7 @@ export default function ViewSales({ navigation }) {
   }, []);
 
   return (
-    <BlackAndWhiteScreen flex={1.4}>
+    <BlackAndWhiteScreen flex={1.1} bgColor={Colors.light_2}>
       <View
         style={{
           flexDirection: "row",
@@ -69,35 +70,51 @@ export default function ViewSales({ navigation }) {
       >
         <View>
           <Text
-            style={{ color: Colors.primary, fontSize: 16, fontWeight: 500 }}
+            style={{ color: Colors.primary, fontSize: 16, fontWeight: 600 }}
           >
-            Day's Sales
+            Day's sales
           </Text>
-          <Text style={{ color: Colors.primary }}>Report</Text>
         </View>
 
-        <TouchableOpacity
-          style={{
-            backgroundColor: Colors.primary,
-            borderRadius: 3,
-          }}
-        >
-          <Text
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <TextInput
             style={{
-              color: Colors.dark,
-              padding: 10,
+              backgroundColor: Colors.light,
+              height: 25,
+              borderRadius: 3,
+              marginHorizontal: 5,
+              width: 100,
             }}
+            placeholder="Search text"
+          />
+          <TouchableOpacity
+            style={{
+              backgroundColor: Colors.primary,
+              borderRadius: 3,
+              height: 25,
+              justifyContent: "center",
+            }}
+            onPress={() => navigation.navigate("shopSummary")}
           >
-            Investment
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={{
+                color: Colors.dark,
+                paddingHorizontal: 6,
+                alignSelf: "center",
+                justifyContent: "center",
+              }}
+            >
+              Investment
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
       <View
         style={{
           flexDirection: "row",
           marginTop: 15,
           justifyContent: "space-between",
-          paddingHorizontal: 5,
+          paddingHorizontal: 12,
         }}
       >
         <ItemHeader title="Items" value="450" unit="Qty" />
@@ -130,7 +147,7 @@ export default function ViewSales({ navigation }) {
         style={{
           flex: 1,
           // backgroundColor: Colors.light_2,
-          paddingBottom: 30,
+          paddingBottom: 20,
         }}
       >
         <OrientationLoadingOverlay
@@ -142,7 +159,7 @@ export default function ViewSales({ navigation }) {
         />
         <AppStatusBar bgColor="black" content="light-content" />
 
-        <View style={{ marginTop: 20 }}>
+        <View style={{ marginTop: 33 }}>
           <FlatList
             containerStyle={{ padding: 5 }}
             showsHorizontalScrollIndicator={false}
@@ -205,7 +222,7 @@ function TransactionItem({ data }) {
         borderRadius: 3,
         backgroundColor: "white",
         paddingVertical: 15,
-        paddingHorizontal: 5,
+        paddingHorizontal: 10,
       }}
     >
       <View
@@ -225,76 +242,98 @@ function TransactionItem({ data }) {
           Txn ID: {data.id}
         </Text>
 
-        <Text
-          style={{
-            fontSize: 12,
-            color: Colors.gray,
-            alignSelf: "flex-end",
-          }}
-        >
-          Date: {formatDate(data.dateCreated)}
-        </Text>
-      </View>
-
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          margin: 10,
-        }}
-      >
-        <View style={{ alignItems: "center" }}>
-          <Text>Items</Text>
-          <Text>{(lineItems && lineItems.length) || 0}</Text>
-        </View>
-        <View style={{ alignItems: "center" }}>
-          <Text>Amount</Text>
-          <Text>{totalCost}</Text>
-        </View>
-        <View style={{ alignItems: "center" }}>
-          <Text>Recieved</Text>
-          <Text>{amountPaid}</Text>
-        </View>
-        <View style={{ alignItems: "center" }}>
-          <Text>Balance</Text>
-          <Text>{balanceGivenOut}</Text>
-        </View>
-      </View>
-
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text
-          style={{
-            fontWeight: 500,
-          }}
-        >
-          Served By: {data.createdByFullName}
-        </Text>
-        <TouchableOpacity
-          onPress={toggleExpand}
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: Colors.dark,
-            borderRadius: 3,
-            paddingHorizontal: 10,
-            paddingVertical: 4,
-          }}
-        >
+        <View>
           <Text
             style={{
-              color: Colors.primary,
-              fontSize: 13,
+              alignSelf: "flex-end",
+              fontSize: 12,
             }}
           >
-            {expanded ? "Hide" : " View More"}
+            Currency : UGX
           </Text>
-        </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 12,
+              color: Colors.gray,
+              alignSelf: "flex-end",
+            }}
+          >
+            {formatDate(data.dateCreated)}
+          </Text>
+        </View>
       </View>
+      {!expanded && (
+        <>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              margin: 10,
+            }}
+          >
+            <View style={{ alignItems: "center" }}>
+              <Text>Items</Text>
+              <Text>{(lineItems && lineItems.length) || 0}</Text>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <Text>Amount</Text>
+              <Text>{totalCost}</Text>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <Text>Recieved</Text>
+              <Text>{amountPaid}</Text>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <Text>Balance</Text>
+              <Text>{balanceGivenOut}</Text>
+            </View>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text
+              style={{
+                fontWeight: 300,
+                fontSize: 12,
+              }}
+            >
+              Served by:{" "}
+              <Text
+                style={{
+                  fontWeight: 400,
+                }}
+              >
+                {data.createdByFullName}
+              </Text>
+            </Text>
+            <TouchableOpacity
+              onPress={toggleExpand}
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: Colors.dark,
+                borderRadius: 3,
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.primary,
+                  fontSize: 13,
+                  fontWeight: 300,
+                }}
+              >
+                More
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+
       {expanded && (
         <View style={{ flex: 1 }}>
           <Table style={{ paddingBottom: 10 }}>
@@ -330,25 +369,31 @@ function TransactionItem({ data }) {
             }}
           >
             <Text style={{ fontWeight: "bold" }}>Total </Text>
-            <Text
+
+            <View
               style={{
-                alignSelf: "flex-end",
-                fontWeight: "bold",
-                marginEnd: 4,
+                flexDirection: "row",
               }}
             >
-              {lineItems && lineItems.length}
-            </Text>
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                fontWeight: "bold",
-                marginEnd: 4,
-              }}
-            >
-              <Text style={{ fontSize: 11, color: Colors.gray }}>UGX</Text>
-              {totalCost}
-            </Text>
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  marginEnd: 25,
+                }}
+              >
+                {lineItems && lineItems.length}
+              </Text>
+
+              <Text
+                style={{
+                  alignSelf: "flex-end",
+                  fontWeight: "bold",
+                  marginEnd: 4,
+                }}
+              >
+                {totalCost}
+              </Text>
+            </View>
           </View>
           <View
             style={{
@@ -364,7 +409,6 @@ function TransactionItem({ data }) {
                 marginEnd: 4,
               }}
             >
-              <Text style={{ fontSize: 11, color: Colors.gray }}>UGX</Text>
               {amountPaid}
             </Text>
           </View>
@@ -382,7 +426,6 @@ function TransactionItem({ data }) {
                 marginEnd: 4,
               }}
             >
-              <Text style={{ fontSize: 11, color: Colors.gray }}>UGX</Text>
               {totalCost}
             </Text>
           </View>
@@ -401,9 +444,53 @@ function TransactionItem({ data }) {
                 marginEnd: 4,
               }}
             >
-              <Text style={{ fontSize: 11, color: Colors.gray }}>UGX</Text>
               {balanceGivenOut}
             </Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: 10,
+            }}
+          >
+            <Text
+              style={{
+                fontWeight: 300,
+                fontSize: 12,
+              }}
+            >
+              Served by:{" "}
+              <Text
+                style={{
+                  fontWeight: 400,
+                }}
+              >
+                {data.createdByFullName}
+              </Text>
+            </Text>
+            <TouchableOpacity
+              onPress={toggleExpand}
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: Colors.dark,
+                borderRadius: 3,
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.primary,
+                  fontSize: 13,
+                  fontWeight: 300,
+                }}
+              >
+                Hide
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}
