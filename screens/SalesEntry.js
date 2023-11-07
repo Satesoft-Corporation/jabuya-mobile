@@ -113,7 +113,6 @@ function SalesEntry({ route, navigation }) {
         }
         setShowConfirmed(true);
         setTimeout(() => setLoading(false), 1000);
-
       })
       .catch((error) => {
         Alert.alert("Failed to confirm purchases!", error?.message);
@@ -129,8 +128,8 @@ function SalesEntry({ route, navigation }) {
       .then((d) => d.json())
       .then((d) => {
         if (d.status === "Success") {
-          setShowConfirmed(false)
-          Alert.alert("Sale Confirmed Successfully");
+          setShowConfirmed(false);
+          Alert.alert("Sale confirmed successfully");
           setLoading(false);
           clearEverything();
         }
@@ -168,7 +167,7 @@ function SalesEntry({ route, navigation }) {
 
   useEffect(() => getTotalItems(), [qntyList]);
   return (
-    <BlackAndWhiteScreen flex={1.15}>
+    <BlackAndWhiteScreen flex={1.1} bgColor={Colors.light_2}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
       <OrientationLoadingOverlay
@@ -190,121 +189,159 @@ function SalesEntry({ route, navigation }) {
         transID={returnedId}
         amountPaid={amountPaid}
         balanceGivenOut={balanceGivenOut}
-        length={length}
+        length={a}
         resetList={() => setLineItems([])}
       />
-<View style={{paddingHorizontal:10}}>
-      <DropdownComponent
-        products={products}
-        handleChange={(t) => handleChange(t)}
-        setLoading={() => setLoading(false)}
-        makeSelection={makeSelection}
-      />
-      <View
-        style={{
-          backgroundColor: Colors.light,
-          borderRadius: 5,
-          padding: 10,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          
-        }}
-      >
+      <View style={{ paddingHorizontal: 10, marginTop: 25 }}>
+        <DropdownComponent
+          products={products}
+          handleChange={(t) => handleChange(t)}
+          setLoading={() => setLoading(false)}
+          makeSelection={makeSelection}
+        />
         <View
           style={{
+            backgroundColor: Colors.light,
+            borderRadius: 5,
+            padding: 10,
+            paddingVertical: 8,
             flexDirection: "row",
-            alignItems: "center",
-            elevation: 10,
-            shadowOffset: { width: 0, height: 25 },
-            shadowOpacity: 0.8,
-          }}
-        >
-          <FontAwesome5 name="money-bill" size={24} color="black" />
-          <View
-            style={{
-              marginLeft: 10,
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Recieved Amt</Text>
-          </View>
-        </View>
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "flex-end",
+            justifyContent: "space-between",
           }}
         >
           <View
             style={{
               flexDirection: "row",
-              justifyContent: "center",
+              alignItems: "center",
+              elevation: 10,
+              shadowOffset: { width: 0, height: 25 },
+              shadowOpacity: 0.8,
             }}
           >
-            <Text
+            <FontAwesome5 name="money-bill" size={24} color="black" />
+            <View
               style={{
-                alignSelf: "center",
-                color: Colors.gray,
-                fontSize: 17,
-                marginEnd: 5,
+                marginLeft: 10,
               }}
             >
-              UGX
-            </Text>
-            <TextInput
-              value={recievedAmount}
-              inputMode="numeric"
-              onChangeText={(text) => setRecievedAmount(text)}
+              <Text style={{ fontWeight: "bold" }}>Recieved Amt</Text>
+            </View>
+          </View>
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "flex-end",
+            }}
+          >
+            <View
               style={{
-                backgroundColor: Colors.light,
-                borderRadius: 8,
-                padding: 5,
-                width: 120,
-                fontSize: 17,
+                flexDirection: "row",
+                justifyContent: "center",
               }}
-              placeholder="Enter Amount"
-            />
+            >
+              <Text
+                style={{
+                  alignSelf: "center",
+                  color: Colors.gray,
+                  fontSize: 10,
+                  marginEnd: 5,
+                }}
+              >
+                UGX
+              </Text>
+              <TextInput
+                value={recievedAmount}
+                inputMode="numeric"
+                onChangeText={(text) => setRecievedAmount(text)}
+                style={{
+                  backgroundColor: Colors.light,
+                  borderRadius: 5,
+                  padding: 5,
+                  width: 120,
+                  fontSize: 17,
+                }}
+                placeholder="Enter Amount"
+              />
+            </View>
           </View>
         </View>
-      </View>
 
-      <View
-        style={{
-          backgroundColor: Colors.light,
-          borderRadius: 5,
-          padding: 10,
-          marginTop: 10,
-        }}
-      >
-        <Table>
-          <Row
-            data={tableHead}
-            style={{ height: 40 }}
-            textStyle={{
-              fontWeight: 600,
+        <View
+          style={{
+            backgroundColor: Colors.light,
+            borderRadius: 5,
+            padding: 10,
+            marginTop: 8,
+          }}
+        >
+          <Table>
+            <Row
+              data={tableHead}
+              style={{ height: 40 }}
+              textStyle={{
+                fontWeight: 600,
+              }}
+              flexArr={[2.5, 1.3, 0.6, 1]}
+            />
+
+            <TableWrapper style={{ flexDirection: "row" }}>
+              <ScrollView
+                style={{ height: 150 }}
+                showsVerticalScrollIndicator={false}
+              >
+                <Rows
+                  style={{
+                    borderTopColor: Colors.gray,
+                    borderTopWidth: 0.3,
+                  }}
+                  data={selections}
+                  textStyle={{
+                    margin: 5,
+                    textAlign: "left",
+                  }}
+                  flexArr={[2.5, 1.3, 0.6, 1]}
+                />
+              </ScrollView>
+            </TableWrapper>
+          </Table>
+          <View
+            style={{
+              backgroundColor: Colors.light,
+              borderRadius: 5,
+              padding: 10,
+              flexDirection: "row",
+              justifyContent: "space-between",
             }}
-            flexArr={[2.5, 1.3, 0.6, 1]}
-          />
-
-          <TableWrapper style={{ flexDirection: "row" }}>
-            <ScrollView
-              style={{ height: 150 }}
-              showsVerticalScrollIndicator={false}
+          >
+            <View>
+              <Text style={{ fontWeight: "bold", marginTop: 5, fontSize: 17 }}>
+                Sold{" "}
+                {a >= 1 && (
+                  <Text>
+                    {a}
+                    {a > 1 ? <Text> items</Text> : <Text> item</Text>}
+                  </Text>
+                )}
+              </Text>
+            </View>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "flex-end",
+              }}
             >
-              <Rows
+              <Text
                 style={{
-                  borderTopColor: Colors.gray,
-                  borderTopWidth: 0.3,
+                  fontWeight: 700,
+                  fontSize: 17,
                 }}
-                data={selections}
-                textStyle={{
-                  margin: 5,
-                  textAlign: "left",
-                }}
-                flexArr={[2.5, 1.3, 0.6, 1]}
-              />
-            </ScrollView>
-          </TableWrapper>
-        </Table>
+              >
+                <Text style={{ fontSize: 10 }}>UGX</Text> {totalCost}
+              </Text>
+            </View>
+          </View>
+        </View>
+
         <View
           style={{
             backgroundColor: Colors.light,
@@ -312,18 +349,23 @@ function SalesEntry({ route, navigation }) {
             padding: 10,
             flexDirection: "row",
             justifyContent: "space-between",
+            marginTop: 8,
           }}
         >
-          <View>
-            <Text style={{ fontWeight: "bold", marginTop: 5, fontSize: 17 }}>
-              Purchased{" "}
-              {a >= 1 && (
-                <Text>
-                  {a}
-                  {a > 1 ? <Text> items</Text> : <Text> item</Text>}
-                </Text>
-              )}
-            </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <FontAwesome5 name="money-bill" size={24} color="black" />
+            <View
+              style={{
+                marginLeft: 10,
+              }}
+            >
+              <Text style={{ fontWeight: "bold" }}>Balance</Text>
+            </View>
           </View>
           <View
             style={{
@@ -334,200 +376,158 @@ function SalesEntry({ route, navigation }) {
             <Text
               style={{
                 fontWeight: 700,
-                fontSize: 17,
               }}
             >
-              UGX {totalCost}
+              <Text style={{ fontSize: 10 }}>UGX</Text>{" "}
+              {recievedAmount === 0 ? 0 : recievedAmount - totalCost}
             </Text>
           </View>
         </View>
-      </View>
 
-      <View
-        style={{
-          backgroundColor: Colors.light,
-          borderRadius: 5,
-          padding: 10,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 10,
-        }}
-      >
-        <View
+        <IconsComponent clear={clearEverything} />
+
+        <TouchableOpacity
           style={{
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <FontAwesome5 name="money-bill" size={24} color="black" />
-          <View
-            style={{
-              marginLeft: 10,
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Balance</Text>
-          </View>
-        </View>
-        <View
-          style={{
+            backgroundColor: Colors.dark,
+            borderRadius: 5,
+            height: 40,
             justifyContent: "center",
-            alignItems: "flex-end",
+            marginTop: 8,
+          }}
+          onPress={() => {
+            if (recievedAmount !== 0 && selections.length > 0) {
+              setLoading(true);
+              postSales();
+            }
           }}
         >
           <Text
             style={{
-              fontWeight: 700,
+              color: Colors.primary,
+              alignSelf: "center",
+              fontSize: 17,
             }}
           >
-            UGX {recievedAmount === 0 ? 0 : recievedAmount - totalCost}
+            Confirm Purchase
           </Text>
-        </View>
-      </View>
+        </TouchableOpacity>
 
-      <IconsComponent clear={clearEverything} />
-
-      <TouchableOpacity
-        style={{
-          backgroundColor: Colors.dark,
-          borderRadius: 3,
-          height: 40,
-          justifyContent: "center",
-          marginTop: 8,
-        }}
-        onPress={() => {
-          if (recievedAmount !== 0 && selections.length > 0) {
-            setLoading(true);
-            postSales();
-          }
-        }}
-      >
-        <Text
-          style={{
-            color: Colors.primary,
-            alignSelf: "center",
-            fontSize: 17,
-          }}
-        >
-          Confirm Purchase
-        </Text>
-      </TouchableOpacity>
-
-      <ModalContent visible={showMoodal} style={{ padding: 35 }}>
-        <Card
-          style={{
-            paddingHorizontal: 15,
-          }}
-        >
-          <View
+        <ModalContent visible={showMoodal} style={{ padding: 35 }}>
+          <Card
             style={{
-              backgroundColor: "white",
-              padding: 2,
+              paddingHorizontal: 15,
             }}
           >
-            <Text
-              style={{
-                marginTop: 10,
-                fontWeight: "500",
-                fontSize: 18,
-                marginBottom: 5,
-                marginStart: 10,
-                marginTop: 20,
-              }}
-            >
-              Input quantity
-            </Text>
-
-            <TextInput
-              inputMode="numeric"
-              onChangeText={(text) => setQuantity(text)}
-              maxLength={3}
-              style={{
-                backgroundColor: Colors.light_3,
-                borderRadius: 8,
-                padding: 6,
-              }}
-            />
             <View
               style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
+                backgroundColor: "white",
+                padding: 2,
               }}
             >
-              <MaterialButton
-                title="Cancel"
+              <Text
                 style={{
-                  backgroundColor: "transparent",
+                  marginTop: 10,
+                  fontWeight: "500",
+                  fontSize: 18,
+                  marginBottom: 5,
+                  marginStart: 10,
+                  marginTop: 20,
+                }}
+              >
+                Input quantity
+              </Text>
+
+              <TextInput
+                inputMode="numeric"
+                onChangeText={(text) => setQuantity(text)}
+                maxLength={3}
+                style={{
+                  backgroundColor: Colors.light_3,
                   borderRadius: 5,
-                  borderWidth: 1,
-                  borderColor: Colors.dark,
-                  marginStart: -2,
-                  margin: 10,
-                  height: 40,
-                }}
-                titleStyle={{
-                  fontWeight: "bold",
-                  color: Colors.dark,
-                }}
-                buttonPress={() => {
-                  setShowModal(false);
+                  padding: 6,
                 }}
               />
-              <MaterialButton
-                title="Confirm"
+              <View
                 style={{
-                  backgroundColor: Colors.dark,
-                  borderRadius: 5,
-                  borderWidth: 1,
-                  borderColor: Colors.dark,
-                  marginStart: 2,
-                  marginEnd: -2,
-                  margin: 10,
-                  height: 40,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
                 }}
-                titleStyle={{
-                  fontWeight: "bold",
-                  color: Colors.primary,
-                }}
-                buttonPress={() => {
-                  const parsedQuantity = parseInt(quantity, 10);
+              >
+                <MaterialButton
+                  title="Cancel"
+                  style={{
+                    backgroundColor: "transparent",
+                    borderRadius: 5,
+                    borderWidth: 1,
+                    borderColor: Colors.dark,
+                    marginStart: -2,
+                    margin: 10,
+                    height: 40,
+                  }}
+                  titleStyle={{
+                    fontWeight: "bold",
+                    color: Colors.dark,
+                  }}
+                  buttonPress={() => {
+                    setShowModal(false);
+                  }}
+                />
+                <MaterialButton
+                  title="Confirm"
+                  style={{
+                    backgroundColor: Colors.dark,
+                    borderRadius: 5,
+                    borderWidth: 1,
+                    borderColor: Colors.dark,
+                    marginStart: 2,
+                    marginEnd: -2,
+                    margin: 10,
+                    height: 40,
+                  }}
+                  titleStyle={{
+                    fontWeight: "bold",
+                    color: Colors.primary,
+                  }}
+                  buttonPress={() => {
+                    const parsedQuantity = parseInt(quantity, 10);
 
-                  if (isNaN(parsedQuantity)) {
-                    Alert.alert("Quantity is not a valid number");
-                    return;
-                  }
+                    if (isNaN(parsedQuantity)) {
+                      Alert.alert("Quantity is not a valid number");
+                      return;
+                    }
 
-                  let cost = selection.salesPrice * parsedQuantity;
-                  setTotalCost(totalCost + cost);
+                    let cost = selection.salesPrice * parsedQuantity;
+                    setTotalCost(totalCost + cost);
 
-                  setQntyList((prev) => [...prev, parsedQuantity]);
+                    setQntyList((prev) => [...prev, parsedQuantity]);
 
-                  selectedProducts.push({
-                    id: selection.id,
-                    shopProductId: selection.id,
-                    quantity: parsedQuantity, // Use the parsed quantity
-                  });
-                  setSelections((prev) => [
-                    ...prev,
-                    [
-                      selection.productName,
-                      selection.salesPrice,
-                      parsedQuantity, // Use the parsed quantity
-                      cost,
-                    ],
-                  ]);
+                    selectedProducts.push({
+                      id: selection.id,
+                      shopProductId: selection.id,
+                      quantity: parsedQuantity, // Use the parsed quantity
+                    });
+                    setSelections((prev) => [
+                      ...prev,
+                      [
+                        selection.productName,
+                        selection.salesPrice,
+                        parsedQuantity, // Use the parsed quantity
+                        cost,
+                      ],
+                    ]);
 
-                  setShowModal(false);
-                  setLoading(true);
-                  setQuantity(null);
-                  setTimeout(() => {
-                    setLoading(false);
-                  }, 1000);
-                }}
-              />
+                    setShowModal(false);
+                    setLoading(true);
+                    setQuantity(null);
+                    setTimeout(() => {
+                      setLoading(false);
+                    }, 1000);
+                  }}
+                />
+              </View>
             </View>
-          </View>
-        </Card>
-      </ModalContent>
+          </Card>
+        </ModalContent>
       </View>
     </BlackAndWhiteScreen>
   );
@@ -551,7 +551,7 @@ const DropdownComponent = ({
         iconStyle={styles.iconStyle}
         data={products}
         search
-        maxHeight={300}
+        maxHeight={250}
         labelField="productName"
         valueField="productName"
         placeholder={!isFocus ? "Select Product" : "..."}
@@ -567,6 +567,32 @@ const DropdownComponent = ({
         }}
         onChangeText={(text) => handleChange(text)}
       />
+      <View style={{ flexDirection: "row" }}>
+        <TouchableOpacity
+          style={{
+            borderColor: Colors.primary,
+            borderWidth: 1,
+            height: 40,
+            alignSelf: "center",
+            marginStart: 8,
+            padding: 10,
+            justifyContent: "center",
+            borderRadius: 5,
+            paddingVertical: 24,
+            marginBottom: 8,
+          }}
+        >
+          <Image
+            source={require("../assets/icons/icons8-barcode-24.png")}
+            style={{
+              width: 35,
+              height: 35,
+              tintColor: Colors.primary,
+              alignSelf: "center",
+            }}
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -577,7 +603,7 @@ const IconsComponent = ({ clear }) => {
       style={{
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: 10,
+        marginTop: 8,
       }}
     >
       <TouchableOpacity
@@ -586,9 +612,11 @@ const IconsComponent = ({ clear }) => {
           backgroundColor: Colors.light,
           borderRadius: 5,
           alignItems: "center",
+          width: 63,
+          height: 63,
         }}
       >
-        <FontAwesome name="credit-card" size={30} color="black" />
+        <FontAwesome name="credit-card" size={25} color="black" />
         <Text style={{ alignSelf: "center" }}>Card</Text>
       </TouchableOpacity>
 
@@ -598,9 +626,11 @@ const IconsComponent = ({ clear }) => {
           backgroundColor: Colors.light,
           borderRadius: 5,
           alignItems: "center",
+          width: 63,
+          height: 63,
         }}
       >
-        <FontAwesome name="mobile" size={30} color="black" />
+        <FontAwesome name="mobile" size={25} color="black" />
         <Text style={{ alignSelf: "center" }}>Mobile</Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -609,9 +639,11 @@ const IconsComponent = ({ clear }) => {
           backgroundColor: Colors.light,
           borderRadius: 5,
           alignItems: "center",
+          width: 63,
+          height: 63,
         }}
       >
-        <FontAwesome name="wechat" size={30} color="black" />
+        <FontAwesome name="wechat" size={25} color="black" />
         <Text style={{ alignSelf: "center" }}>Fap</Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -620,9 +652,15 @@ const IconsComponent = ({ clear }) => {
           backgroundColor: Colors.light,
           borderRadius: 5,
           alignItems: "center",
+          width: 63,
+          height: 63,
         }}
       >
-        <FontAwesome name="credit-card" size={30} color="black" />
+        <MaterialCommunityIcons
+          name="hand-extended-outline"
+          size={24}
+          color="black"
+        />
         <Text style={{ alignSelf: "center" }}>Credit</Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -631,11 +669,13 @@ const IconsComponent = ({ clear }) => {
           backgroundColor: Colors.primary,
           borderRadius: 5,
           alignItems: "center",
+          width: 63,
+          height: 63,
         }}
       >
         <MaterialCommunityIcons
           name="broom"
-          size={30}
+          size={25}
           color="black"
           onPress={() => {
             clear();
@@ -651,16 +691,19 @@ export default SalesEntry;
 const styles = StyleSheet.create({
   container: {
     marginTop: 10,
-    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
   },
   dropdown: {
     height: 50,
     borderColor: Colors.primary,
     borderWidth: 0.5,
-    borderRadius: 8,
+    borderRadius: 5,
     paddingHorizontal: 8,
     backgroundColor: Colors.primary,
-    marginBottom: 10,
+    marginBottom: 8,
+    width: "80%",
+    alignSelf: "center",
   },
   icon: {
     marginRight: 5,
