@@ -103,59 +103,8 @@ export default function LandingScreen({ navigation }) {
       />
      
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 20,
-        }}
-      >
-        <View>
-          <Text style={{ color: Colors.primary_light }}>Shop Name</Text>
-          <Text style={{ color: Colors.primary, fontSize: 16 }}>
-            {shopName}
-          </Text>
-        </View>
-        <View>
-          <Text style={{ color: Colors.primary_light }}>Shop Id</Text>
-          <Text
-            style={{
-              color: Colors.primary,
-              fontSize: 16,
-              alignSelf: "flex-end",
-            }}
-          >
-            {shopId}
-          </Text>
-        </View>
-      </View>
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 20,
-        }}
-      >
-        <View>
-          <Text style={{ color: Colors.primary_light }}>Join Date</Text>
-          <Text style={{ color: Colors.primary, fontSize: 16 }}>
-            {joinDate}
-          </Text>
-        </View>
-        <View>
-          <Text style={{ color: Colors.primary_light }}>Active period</Text>
-          <Text
-            style={{
-              color: Colors.primary,
-              fontSize: 16,
-              alignSelf: "flex-end",
-            }}
-          >
-            21 Days
-          </Text>
-        </View>
-      </View>
+    
       <View
         style={{
           flex: 1,
