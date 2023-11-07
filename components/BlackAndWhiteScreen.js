@@ -1,18 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, TouchableOpacity, Image, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Text,
+  Dimensions,
+} from "react-native";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Colors from "../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 
-const BlackAndWhiteScreen = ({ children, flex = 1.5, showProfile = true }) => {
+// const screenWidth = Dimensions.get('window').width;
+
+const BlackAndWhiteScreen = ({
+  children,
+  flex = 1.5,
+  showProfile = true,
+  bgColor = Colors.light,
+}) => {
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
+  const [shopName, setShopName] = useState("");
 
   useEffect(() => {
     UserSessionUtils.getFullSessionObject().then((data) => {
-      const { roles, firstName, lastName } = data.user;
+      const { roles, firstName, lastName, attendantShopName } = data.user;
       setRole(roles[0].name);
       setName(firstName + " " + lastName);
+      setShopName(attendantShopName);
     });
   }, []);
 
@@ -20,7 +36,9 @@ const BlackAndWhiteScreen = ({ children, flex = 1.5, showProfile = true }) => {
     <View style={styles.container}>
       <View style={styles.background}>
         <View style={{ flex: flex, backgroundColor: "black" }} />
-        <View style={styles.whiteThreeQuarters}></View>
+        <View
+          style={[styles.whiteThreeQuarters, { backgroundColor: bgColor }]}
+        ></View>
       </View>
       <View style={styles.content}>
         {showProfile && ( //render user info if true
@@ -30,42 +48,37 @@ const BlackAndWhiteScreen = ({ children, flex = 1.5, showProfile = true }) => {
               justifyContent: "space-between",
               marginTop: 10,
               alignItems: "center",
-              paddingHorizontal:10
+              paddingHorizontal: 10,
             }}
           >
-            <TouchableOpacity>
-              <Image
-                source={require("../assets/icons/menu2.png")}
-                style={{
-                  width: 30,
-                  height: 25,
-                }}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={{ marginStart: 75 }}>
-              <Ionicons
-                name="notifications-outline"
-                size={24}
-                color={Colors.primary_light}
-              />
-            </TouchableOpacity>
-            {/* </View> */}
             <View
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
-                paddingStart: 15,
                 alignItems: "center",
                 marginTop: 10,
               }}
             >
-              <View>
+              <Image
+                source={require("../assets/images/man_placeholder.jpg")}
+                style={{
+                  width: 45,
+                  height: 45,
+                  resizeMode: "cover",
+                  borderRadius: 3,
+                  marginStart: 5,
+                }}
+              />
+              <View
+                style={{
+                  marginHorizontal: 5,
+                }}
+              >
                 <Text
                   style={{
                     color: Colors.primary,
-                    fontWeight: "bold",
-                    fontSize: 15,
+                    fontWeight: 400,
+                    fontSize: 12,
                   }}
                 >
                   {name}
@@ -73,25 +86,31 @@ const BlackAndWhiteScreen = ({ children, flex = 1.5, showProfile = true }) => {
                 <Text
                   style={{
                     color: Colors.primary,
-                    fontWeight: "bold",
-                    alignSelf: "flex-end",
+                    fontWeight: 300,
+                    fontSize: 11,
                   }}
                 >
                   {role}
                 </Text>
+                <Text
+                  style={{
+                    color: Colors.primary,
+                    fontWeight: 300,
+                    fontSize: 11,
+                  }}
+                >
+                  {shopName}
+                </Text>
               </View>
-
-              <Image
-                source={require("../assets/images/man_placeholder.jpg")}
-                style={{
-                  width: 50,
-                  height: 50,
-                  resizeMode: "cover",
-                  borderRadius: 50,
-                  marginStart: 5,
-                }}
-              />
             </View>
+
+            <TouchableOpacity style={{ marginEnd: 10 }}>
+              <Ionicons
+                name="notifications-outline"
+                size={20}
+                color={Colors.primary_light}
+              />
+            </TouchableOpacity>
           </View>
         )}
 
