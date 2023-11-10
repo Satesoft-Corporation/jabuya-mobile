@@ -73,7 +73,7 @@ const ShopSummary = () => {
       <View style={{ paddingHorizontal: 10, marginTop: 25 }}>
         <View
           style={{
-            backgroundColor: Colors.light,
+            backgroundColor: Colors.primary,
             flexDirection: "row",
             alignItems: "center",
             padding: 6,
@@ -156,7 +156,18 @@ const ShopSummary = () => {
             </View>
           </View>
 
-          <View style={{ width: 10 }}></View>
+          
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: 10,
+            borderRadius: 3,
+            justifyContent: "space-between",
+          }}
+        >
           <View
             style={{
               backgroundColor: Colors.light,
@@ -182,6 +193,50 @@ const ShopSummary = () => {
               <Text
                 style={{
                   fontWeight: 500,
+                  alignSelf: "flex-end",
+                  fontSize: 16,
+                }}
+              >
+                4,500,200
+              </Text>
+              <Text
+                style={{
+                  fontWeight: 300,
+                  fontSize: 10,
+                  alignSelf: "flex-end",
+                }}
+              >
+                Sold capital value
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ width: 10 }}></View>
+          <View
+            style={{
+              backgroundColor: Colors.light,
+              flexDirection: "row",
+              alignItems: "center",
+              padding: 6,
+              borderRadius: 3,
+              justifyContent: "space-between",
+              flex: 1,
+            }}
+          >
+            <Image
+              source={require("../assets/icons/icons8-box-502.png")}
+              style={{
+                width: 40,
+                height: 40,
+                tintColor: Colors.dark,
+                marginEnd: 10,
+              }}
+            />
+
+            <View>
+              <Text
+                style={{
+                  fontWeight: 500,
                   fontSize: 16,
                   alignSelf: "flex-end",
                 }}
@@ -195,12 +250,11 @@ const ShopSummary = () => {
                   alignSelf: "flex-end",
                 }}
               >
-                Sales value
+                Restocking
               </Text>
             </View>
           </View>
         </View>
-
         <View
           style={{
             backgroundColor: Colors.light,
@@ -238,6 +292,8 @@ const ShopSummary = () => {
             </Text>
           </View>
         </View>
+
+       
 
         <View
           style={{
