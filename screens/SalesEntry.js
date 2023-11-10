@@ -5,10 +5,10 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   TextInput,
   Alert,
   Image,
+  Dimensions,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../constants/Colors";
@@ -25,6 +25,7 @@ import Card from "../components/Card";
 import ConfirmSalesDialog from "../components/ConfirmSalesDialog";
 import { Ionicons } from "@expo/vector-icons";
 import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
+import { BarCodeScanner } from "expo-barcode-scanner";
 
 const tableHead = ["Item", "Price", "Qnty", "Amount"];
 
@@ -56,6 +57,11 @@ function SalesEntry({ route, navigation }) {
   const [length, setLength] = useState(null);
   const [amountPaid, setAmountPaid] = useState(null);
   const [balanceGivenOut, setBalanceGivenOut] = useState(null);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+  const [scanBarCode, setScanBarCode] = useState(false);
+  const screenWidth = Dimensions.get("window").width;
+  const screenHeight = Dimensions.get("window").height;
 
   useEffect(() => {
     fetchProducts();
@@ -161,12 +167,107 @@ function SalesEntry({ route, navigation }) {
     setQntyList([]);
   };
 
+  useEffect(() => {
+    const getBarCodeScannerPermissions = async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === "granted");
+    };
+
+    getBarCodeScannerPermissions();
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScanned(true);
+    Alert.alert(
+      `Bar code with type ${type} and data ${data} has been scanned!`
+    );
+    setScanned(false);
+  };
+
   const getTotalItems = () => {
     b(qntyList.reduce((a, b) => a + b, 0));
   };
 
   useEffect(() => getTotalItems(), [qntyList]);
-  return (
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    overlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    },
+    unfocusedContainer: {
+      //the blured section
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.7)",
+    },
+
+    focusedContainer: {
+      //scan area
+      flex: 9,
+      borderColor: Colors.primary,
+      borderWidth: 1,
+      height: 150,
+      borderRadius:5
+    },
+  });
+  return scanBarCode ? (
+    <View style={styles.container}>
+      <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
+
+      <BarCodeScanner
+        height={screenHeight}
+        width={screenWidth}
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={{ marginTop: -20 }}
+      />
+      <View style={styles.overlay}>
+        <View style={styles.unfocusedContainer}></View>
+        <View style={{ flexDirection: "row" }}>
+          <View style={styles.unfocusedContainer}></View>
+          <View style={styles.focusedContainer}></View>
+          <View style={styles.unfocusedContainer}></View>
+        </View>
+        <View style={styles.unfocusedContainer}></View>
+        <View
+          style={{
+            backgroundColor: "black",
+            justifyContent: "center",
+            width: screenWidth,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => setScanBarCode(false)}
+            style={{
+              alignSelf: "center",
+              justifyContent: "center",
+              backgroundColor: Colors.primary,
+              borderRadius: 5,
+              borderWidth: 1,
+              borderColor: Colors.dark,
+              height: 40,
+              width: 300,
+              marginBottom: 10,
+            }}
+          >
+            <Text
+              style={{
+                fontWeight: "bold",
+                color: Colors.dark,
+                alignSelf: "center",
+              }}
+            >
+              Done
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  ) : (
     <BlackAndWhiteScreen flex={1.1} bgColor={Colors.light_2}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
@@ -192,12 +293,14 @@ function SalesEntry({ route, navigation }) {
         length={a}
         resetList={() => setLineItems([])}
       />
+
       <View style={{ paddingHorizontal: 10, marginTop: 25 }}>
         <DropdownComponent
           products={products}
           handleChange={(t) => handleChange(t)}
           setLoading={() => setLoading(false)}
           makeSelection={makeSelection}
+          setScanned={() => setScanBarCode(true)}
         />
         <View
           style={{
@@ -537,6 +640,7 @@ const DropdownComponent = ({
   handleChange,
   setLoading,
   makeSelection,
+  setScanned,
 }) => {
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
@@ -569,6 +673,7 @@ const DropdownComponent = ({
       />
       <View style={{ flexDirection: "row" }}>
         <TouchableOpacity
+          onPress={() => setScanned()}
           style={{
             borderColor: Colors.primary,
             borderWidth: 1,
