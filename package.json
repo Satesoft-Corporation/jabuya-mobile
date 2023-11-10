@@ -26,7 +26,8 @@
     "react-native-screens": "~3.22.0",
     "react-native-splash-screen": "^3.3.0",
     "react-native-table-component": "^1.2.2",
-    "react-native-web": "^0.19.8"
+    "react-native-web": "^0.19.8",
+    "expo-barcode-scanner": "~12.5.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
