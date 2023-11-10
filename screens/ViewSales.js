@@ -159,7 +159,7 @@ export default function ViewSales({ navigation }) {
         />
         <AppStatusBar bgColor="black" content="light-content" />
 
-        <View style={{ marginTop: 33 }}>
+        <View style={{ marginTop: 10 }}>
           <FlatList
             containerStyle={{ padding: 5 }}
             showsHorizontalScrollIndicator={false}
