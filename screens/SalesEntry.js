@@ -4,11 +4,11 @@ import {
   Text,
   View,
   TouchableOpacity,
-  ScrollView,
   TextInput,
   Alert,
   Image,
   Dimensions,
+  FlatList,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../constants/Colors";
@@ -16,18 +16,14 @@ import AppStatusBar from "../components/AppStatusBar";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { Table, Row, Rows, TableWrapper } from "react-native-table-component";
 import MaterialButton from "../components/MaterialButton";
 import { BaseApiService } from "../utils/BaseApiService";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import ModalContent from "../components/ModalContent";
 import Card from "../components/Card";
 import ConfirmSalesDialog from "../components/ConfirmSalesDialog";
-import { Ionicons } from "@expo/vector-icons";
 import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
 import { BarCodeScanner } from "expo-barcode-scanner";
-
-const tableHead = ["Item", "Price", "Qnty", "Amount"];
 
 function SalesEntry({ route, navigation }) {
   const [products, setProducts] = useState([]);
@@ -40,8 +36,7 @@ function SalesEntry({ route, navigation }) {
   const [showMoodal, setShowModal] = useState(false);
   const [selection, setSelection] = useState(null);
   const [totalCost, setTotalCost] = useState(0);
-  const [recievedAmount, setRecievedAmount] = useState("");
-  const [showMoodal_1, setShowModal_1] = useState(false);
+  const [recievedAmount, setRecievedAmount] = useState(null);
   const [shopId, setShopId] = useState(route.params.shopOwnerId);
   const [attendantShopId, setAttendantShopId] = useState(
     route.params.attendantShopId
@@ -59,13 +54,10 @@ function SalesEntry({ route, navigation }) {
   const [balanceGivenOut, setBalanceGivenOut] = useState(null);
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
-  const [scanBarCode, setScanBarCode] = useState(false);
+  const [scanBarCode, setScanBarCode] = useState(false); // barcode scanner trigger
+
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
-
-  useEffect(() => {
-    fetchProducts();
-  }, [searchTerm]);
 
   const fetchProducts = async () => {
     let searchParameters = { offset: 0, limit: limit, shopId: attendantShopId };
@@ -155,6 +147,108 @@ function SalesEntry({ route, navigation }) {
     setSelection(item);
   };
 
+  const saveSelection = () => {
+    // saving the item into the data table
+    const parsedQuantity = parseInt(quantity, 10);
+
+    let cost = selection.salesPrice * parsedQuantity; // get total cost
+
+    if (isNaN(parsedQuantity)) {
+      Alert.alert("Quantity is not a valid number");
+      return;
+    }
+
+    setTotalCost(totalCost + cost);
+
+    setQntyList((prev) => [...prev, parsedQuantity]); //updating total items purchased
+
+    const productIndex = selections.findIndex(
+      //locating the duplicate item in selection array
+      (product) => product.productName === selection.productName
+    );
+
+    const productIndex2 = selectedProducts.findIndex(
+      //locating the duplicate item in selected pdts array
+      (product) => product.id === selection.id
+    );
+
+    if (productIndex !== -1) {
+      //if the already exists, update quantity and total cost
+      let prevQty = selections[productIndex].quantity;
+      let prevTotalCost = selections[productIndex].totalCost;
+
+      selections[productIndex].quantity = Number(quantity) + prevQty;
+      selections[productIndex].totalCost = prevTotalCost + cost;
+      selectedProducts[productIndex2].quantity = Number(quantity) + prevQty;
+
+      return true; // Indicates successful update and I'm a genius
+    } else {
+      selectedProducts.push({
+        // data set to be used in posting the sale to the server
+        id: selection.id,
+        shopProductId: selection.id,
+        quantity: parsedQuantity,
+      });
+
+      setSelections((prev) => [
+        ...prev,
+        {
+          id: selection.id,
+          productName: selection.productName,
+          salesPrice: selection.salesPrice,
+          quantity: parsedQuantity, // Use the parsed quantity
+          totalCost: cost,
+        },
+      ]);
+    }
+
+    setSelection(null);
+  };
+
+  const handleBarCodeScanned = ({ data }) => {
+    setScanned(true);
+    fetchProductByBarCode(data);
+  };
+
+  const fetchProductByBarCode = (barcode) => {
+    setLoading(true);
+
+    let searchParameters = {
+      offset: 0,
+      limit: 0,
+      shopId: attendantShopId,
+      barCode: barcode,
+    };
+
+    new BaseApiService("/shop-products")
+      .getRequestWithJsonResponse(searchParameters)
+      .then(async (response) => {
+        if (response.records.length === 0) {
+          Alert.alert("Cannot find product in your shop", "", [
+            {
+              text: "Ok",
+              onPress: () => setScanned(false),
+              style: "cancel",
+            },
+          ]);
+          setLoading(false);
+        } else {
+          setSelection(response.records[0]);
+          setShowModal(true);
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        Alert.alert("Error!", error?.message);
+        setLoading(false);
+        setScanned(false);
+      });
+  };
+
+  const getTotalItems = () => {
+    b(qntyList.reduce((a, b) => a + b, 0));
+  };
+
   const clearEverything = () => {
     setSelectedProducts([]);
     setQuantity(null);
@@ -168,6 +262,10 @@ function SalesEntry({ route, navigation }) {
   };
 
   useEffect(() => {
+    fetchProducts();
+  }, [searchTerm]);
+
+  useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
@@ -176,19 +274,8 @@ function SalesEntry({ route, navigation }) {
     getBarCodeScannerPermissions();
   }, []);
 
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-    Alert.alert(
-      `Bar code with type ${type} and data ${data} has been scanned!`
-    );
-    setScanned(false);
-  };
-
-  const getTotalItems = () => {
-    b(qntyList.reduce((a, b) => a + b, 0));
-  };
-
   useEffect(() => getTotalItems(), [qntyList]);
+
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -212,13 +299,131 @@ function SalesEntry({ route, navigation }) {
       borderColor: Colors.primary,
       borderWidth: 1,
       height: 150,
-      borderRadius:5
+      borderRadius: 5,
     },
   });
+
   return scanBarCode ? (
     <View style={styles.container}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
+      <OrientationLoadingOverlay
+        visible={loading}
+        color={Colors.primary}
+        indicatorSize="large"
+        messageFontSize={24}
+        message=""
+      />
+      <ModalContent visible={showMoodal} style={{ padding: 35 }}>
+        <Card
+          style={{
+            paddingHorizontal: 15,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              padding: 2,
+            }}
+          >
+            <View
+              style={{
+                marginTop: 10,
+                marginBottom: 5,
+                marginStart: 10,
+                marginTop: 20,
+              }}
+            >
+              <Text
+                style={{
+                  fontWeight: "500",
+                  fontSize: 20,
+                  marginBottom: 5,
+                }}
+              >
+                Successfull
+              </Text>
+              <Text>
+                {selection && selection.productName} has been scanned.
+              </Text>
+              <Text
+                style={{
+                  fontWeight: "600",
+                  fontSize: 16,
+                  marginTop: 10,
+                }}
+              >
+                Input quantity
+              </Text>
+            </View>
+
+            <TextInput
+              inputMode="numeric"
+              onChangeText={(text) => setQuantity(text)}
+              maxLength={3}
+              style={{
+                backgroundColor: Colors.light_3,
+                borderRadius: 5,
+                padding: 6,
+              }}
+            />
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <MaterialButton
+                title="Cancel"
+                style={{
+                  backgroundColor: "transparent",
+                  borderRadius: 5,
+                  borderWidth: 1,
+                  borderColor: Colors.dark,
+                  marginStart: -2,
+                  margin: 10,
+                  height: 40,
+                }}
+                titleStyle={{
+                  fontWeight: "bold",
+                  color: Colors.dark,
+                }}
+                buttonPress={() => {
+                  setShowModal(false);
+                  setScanned(false);
+                }}
+              />
+              <MaterialButton
+                title="Confirm"
+                style={{
+                  backgroundColor: Colors.dark,
+                  borderRadius: 5,
+                  borderWidth: 1,
+                  borderColor: Colors.dark,
+                  marginStart: 2,
+                  marginEnd: -2,
+                  margin: 10,
+                  height: 40,
+                }}
+                titleStyle={{
+                  fontWeight: "bold",
+                  color: Colors.primary,
+                }}
+                buttonPress={() => {
+                  saveSelection();
+                  setShowModal(false);
+                  setLoading(true);
+                  setQuantity(null);
+                  setTimeout(() => {
+                    setLoading(false);
+                  }, 1000);
+                  setScanned(false);
+                }}
+              />
+            </View>
+          </View>
+        </Card>
+      </ModalContent>
       <BarCodeScanner
         height={screenHeight}
         width={screenWidth}
@@ -327,7 +532,7 @@ function SalesEntry({ route, navigation }) {
                 marginLeft: 10,
               }}
             >
-              <Text style={{ fontWeight: "bold" }}>Recieved Amt</Text>
+              <Text style={{ fontWeight: "bold" }}>Recieved amt</Text>
             </View>
           </View>
           <View
@@ -353,6 +558,7 @@ function SalesEntry({ route, navigation }) {
                 UGX
               </Text>
               <TextInput
+                textAlign="right"
                 value={recievedAmount}
                 inputMode="numeric"
                 onChangeText={(text) => setRecievedAmount(text)}
@@ -363,7 +569,7 @@ function SalesEntry({ route, navigation }) {
                   width: 120,
                   fontSize: 17,
                 }}
-                placeholder="Enter Amount"
+                placeholder="Enter amount"
               />
             </View>
           </View>
@@ -375,38 +581,34 @@ function SalesEntry({ route, navigation }) {
             borderRadius: 5,
             padding: 10,
             marginTop: 8,
+            height: 250,
           }}
         >
-          <Table>
-            <Row
-              data={tableHead}
-              style={{ height: 40 }}
-              textStyle={{
-                fontWeight: 600,
-              }}
-              flexArr={[2.5, 1.3, 0.6, 1]}
-            />
-
-            <TableWrapper style={{ flexDirection: "row" }}>
-              <ScrollView
-                style={{ height: 150 }}
-                showsVerticalScrollIndicator={false}
-              >
-                <Rows
-                  style={{
-                    borderTopColor: Colors.gray,
-                    borderTopWidth: 0.3,
-                  }}
-                  data={selections}
-                  textStyle={{
-                    margin: 5,
-                    textAlign: "left",
-                  }}
-                  flexArr={[2.5, 1.3, 0.6, 1]}
-                />
-              </ScrollView>
-            </TableWrapper>
-          </Table>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              height: 25,
+              paddingEnd: 10,
+              borderBottomColor: Colors.gray,
+              borderBottomWidth: 0.3,
+            }}
+          >
+            <Text style={{ flex: 2.5, fontWeight: 600 }}>Item</Text>
+            <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
+              Price
+            </Text>
+            <Text style={{ flex: 0.5, textAlign: "center", fontWeight: 600 }}>
+              Qnty
+            </Text>
+            <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
+              Amount
+            </Text>
+          </View>
+          <FlatList
+            data={selections}
+            renderItem={({ item }) => <SaleItem data={item} />}
+          />
           <View
             style={{
               backgroundColor: Colors.light,
@@ -417,7 +619,7 @@ function SalesEntry({ route, navigation }) {
             }}
           >
             <View>
-              <Text style={{ fontWeight: "bold", marginTop: 5, fontSize: 17 }}>
+              <Text style={{ fontWeight: "bold", marginTop: 5 }}>
                 Sold{" "}
                 {a >= 1 && (
                   <Text>
@@ -436,7 +638,6 @@ function SalesEntry({ route, navigation }) {
               <Text
                 style={{
                   fontWeight: 700,
-                  fontSize: 17,
                 }}
               >
                 <Text style={{ fontSize: 10 }}>UGX</Text> {totalCost}
@@ -467,7 +668,7 @@ function SalesEntry({ route, navigation }) {
                 marginLeft: 10,
               }}
             >
-              <Text style={{ fontWeight: "bold" }}>Balance</Text>
+              <Text style={{ fontWeight: "bold", fontSize: 17 }}>Balance</Text>
             </View>
           </View>
           <View
@@ -481,8 +682,11 @@ function SalesEntry({ route, navigation }) {
                 fontWeight: 700,
               }}
             >
-              <Text style={{ fontSize: 10 }}>UGX</Text>{" "}
-              {recievedAmount === 0 ? 0 : recievedAmount - totalCost}
+              <Text style={{ fontSize: 10 }}>UGX</Text>
+              <Text style={{ fontSize: 17 }}>
+                {" "}
+                {recievedAmount === 0 ? 0 : recievedAmount - totalCost}
+              </Text>
             </Text>
           </View>
         </View>
@@ -498,7 +702,15 @@ function SalesEntry({ route, navigation }) {
             marginTop: 8,
           }}
           onPress={() => {
-            if (recievedAmount !== 0 && selections.length > 0) {
+            if (recievedAmount === null && selections.length > 0) {
+              Alert.alert("Please enter recieved amount");
+            }
+            if (recievedAmount - totalCost < 0) {
+              Alert.alert(
+                `Recieved amount should be greater that ${totalCost}`
+              );
+            }
+            if (Number(recievedAmount) >= totalCost && selections.length > 0) {
               setLoading(true);
               postSales();
             }
@@ -527,18 +739,36 @@ function SalesEntry({ route, navigation }) {
                 padding: 2,
               }}
             >
-              <Text
+              <View
                 style={{
                   marginTop: 10,
-                  fontWeight: "500",
-                  fontSize: 18,
                   marginBottom: 5,
                   marginStart: 10,
                   marginTop: 20,
                 }}
               >
-                Input quantity
-              </Text>
+                <Text
+                  style={{
+                    fontWeight: "600",
+                    fontSize: 20,
+                    marginBottom: 5,
+                  }}
+                >
+                  Successfull
+                </Text>
+                <Text>
+                  {selection && selection.productName} has been selected.
+                </Text>
+                <Text
+                  style={{
+                    fontWeight: "600",
+                    fontSize: 16,
+                    marginTop: 10,
+                  }}
+                >
+                  Input quantity
+                </Text>
+              </View>
 
               <TextInput
                 inputMode="numeric"
@@ -592,33 +822,7 @@ function SalesEntry({ route, navigation }) {
                     color: Colors.primary,
                   }}
                   buttonPress={() => {
-                    const parsedQuantity = parseInt(quantity, 10);
-
-                    if (isNaN(parsedQuantity)) {
-                      Alert.alert("Quantity is not a valid number");
-                      return;
-                    }
-
-                    let cost = selection.salesPrice * parsedQuantity;
-                    setTotalCost(totalCost + cost);
-
-                    setQntyList((prev) => [...prev, parsedQuantity]);
-
-                    selectedProducts.push({
-                      id: selection.id,
-                      shopProductId: selection.id,
-                      quantity: parsedQuantity, // Use the parsed quantity
-                    });
-                    setSelections((prev) => [
-                      ...prev,
-                      [
-                        selection.productName,
-                        selection.salesPrice,
-                        parsedQuantity, // Use the parsed quantity
-                        cost,
-                      ],
-                    ]);
-
+                    saveSelection();
                     setShowModal(false);
                     setLoading(true);
                     setQuantity(null);
@@ -635,6 +839,7 @@ function SalesEntry({ route, navigation }) {
     </BlackAndWhiteScreen>
   );
 }
+
 const DropdownComponent = ({
   products,
   handleChange,
@@ -787,6 +992,33 @@ const IconsComponent = ({ clear }) => {
           }}
         />
         <Text style={{ alignSelf: "center" }}>Clear</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const SaleItem = ({ data }) => {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        borderBottomColor: Colors.gray,
+        borderBottomWidth: 0.3,
+        alignItems: "center",
+        height: "fit-content",
+        paddingVertical: 8,
+      }}
+    >
+      <Text style={{ flex: 2.5, justifyContent: "center" }}>
+        {data.productName}
+      </Text>
+      <Text style={{ flex: 1, textAlign: "center" }}>{data.salesPrice}</Text>
+      <Text style={{ flex: 0.5, textAlign: "center" }}>{data.quantity}</Text>
+      <Text style={{ flex: 1, textAlign: "center" }}>{data.totalCost}</Text>
+
+      <TouchableOpacity>
+        <Text style={{ fontWeight: 600 }}>X</Text>
       </TouchableOpacity>
     </View>
   );
