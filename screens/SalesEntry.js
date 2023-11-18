@@ -45,16 +45,15 @@ function SalesEntry({ route, navigation }) {
   const [postedPdts, setPostedPdts] = useState([]);
   const [lineItems, setLineItems] = useState([]);
   const [returnCost, setReturnedCost] = useState(0);
-  const [qntyList, setQntyList] = useState([]);
   const [a, b] = useState(0); // responsible for updating the total items in a cart
   const [returnedList, setReturnedList] = useState([]);
   const [returnedId, setReturnedId] = useState(null);
-  const [length, setLength] = useState(null);
   const [amountPaid, setAmountPaid] = useState(null);
   const [balanceGivenOut, setBalanceGivenOut] = useState(null);
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [scanBarCode, setScanBarCode] = useState(false); // barcode scanner trigger
+  const [totalQty, setTotalQty] = useState(0);
 
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
@@ -98,7 +97,6 @@ function SalesEntry({ route, navigation }) {
         setReturnedCost(totalCost_1);
         setReturnedList(items);
         setReturnedId(id);
-        setLength(items.length);
         setAmountPaid(info.amountPaid);
         setBalanceGivenOut(info.balanceGivenOut);
         for (let item of items) {
@@ -160,7 +158,7 @@ function SalesEntry({ route, navigation }) {
 
     setTotalCost(totalCost + cost);
 
-    setQntyList((prev) => [...prev, parsedQuantity]); //updating total items purchased
+    setTotalQty(totalQty + parsedQuantity); //updating total items purchased
 
     const productIndex = selections.findIndex(
       //locating the duplicate item in selection array
@@ -245,9 +243,6 @@ function SalesEntry({ route, navigation }) {
       });
   };
 
-  const getTotalItems = () => {
-    b(qntyList.reduce((a, b) => a + b, 0));
-  };
 
   const clearEverything = () => {
     setSelectedProducts([]);
@@ -258,7 +253,7 @@ function SalesEntry({ route, navigation }) {
     setShowConfirmed(false);
     setSelections([]);
     setLineItems([]);
-    setQntyList([]);
+    setTotalQty(0);
   };
 
   useEffect(() => {
@@ -274,7 +269,6 @@ function SalesEntry({ route, navigation }) {
     getBarCodeScannerPermissions();
   }, []);
 
-  useEffect(() => getTotalItems(), [qntyList]);
 
   const styles = StyleSheet.create({
     container: {
@@ -495,7 +489,7 @@ function SalesEntry({ route, navigation }) {
         transID={returnedId}
         amountPaid={amountPaid}
         balanceGivenOut={balanceGivenOut}
-        length={a}
+        length={totalQty}
         resetList={() => setLineItems([])}
       />
 
@@ -621,10 +615,10 @@ function SalesEntry({ route, navigation }) {
             <View>
               <Text style={{ fontWeight: "bold", marginTop: 5 }}>
                 Sold{" "}
-                {a >= 1 && (
+                {totalQty >= 1 && (
                   <Text>
-                    {a}
-                    {a > 1 ? <Text> items</Text> : <Text> item</Text>}
+                    {totalQty}
+                    {totalQty > 1 ? <Text> items</Text> : <Text> item</Text>}
                   </Text>
                 )}
               </Text>
