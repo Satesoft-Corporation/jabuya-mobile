@@ -6,16 +6,15 @@ import Icon from "../components/Icon";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
+import { BaseApiService } from "../utils/BaseApiService";
+import { Alert } from "react-native";
 
 export default function LandingScreen({ navigation }) {
   const [tab, setTab] = useState("home");
-  const [role, setRole] = useState("");
-  const [joinDate, setJoinDate] = useState("");
-  const [shopName, setShopName] = useState("");
+
   const [loading, setLoading] = useState(true);
-  const [name, setName] = useState("");
-  const [shopId, setShopId] = useState("");
   const [routeParams, setRouteParams] = useState(null);
+  const [shopId, setShopId] = useState(null); //for the case of shopowners
 
   const categoryIcons = [
     {
@@ -41,58 +40,34 @@ export default function LandingScreen({ navigation }) {
       title: "Chat",
     },
   ];
+
   useEffect(() => {
     UserSessionUtils.getFullSessionObject().then((data) => {
-      const {
-        dateCreated,
-        roles,
-        attendantShopName,
-        firstName,
-        lastName,
-        attendantShopId,
-      } = data.user;
-      setRole(roles[0].name);
-      setJoinDate(formatDate(dateCreated));
-      setShopId(attendantShopId);
-      setShopName(attendantShopName);
-      setName(firstName + " " + lastName);
+      if (data.user.isShopOwner) {
+        let searchParameters = {
+          searchTerm: "",
+          offset: 0,
+          limit: 0,
+          shopOwnerId: data.user.shopOwnerId,
+        };
+        new BaseApiService("/shops")
+          .getRequestWithJsonResponse(searchParameters)
+          .then((response) => {
+            setShopId(response.records[0].id);
+          })
+          .catch((error) => {
+            Alert.alert("Error!", error?.message);
+          });
+      }
       setRouteParams(data.user);
       setTimeout(() => {
         setLoading(false);
-      }, 1500);
+      }, 100);
     });
   }, []);
-  function formatDate(inputDate) {
-    const date = new Date(inputDate);
-
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
-    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-    const formattedDay = dayNames[date.getUTCDay()];
-    const formattedMonth = monthNames[date.getUTCMonth()];
-    const formattedYear = date.getUTCFullYear();
-
-    const formattedDate = `${formattedDay}, ${formattedMonth} ${date.getUTCDate()}, ${formattedYear}`;
-
-    return formattedDate;
-  }
 
   return (
-    <BlackAndWhiteScreen >
+    <BlackAndWhiteScreen>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
       <OrientationLoadingOverlay
         visible={loading}
@@ -101,10 +76,7 @@ export default function LandingScreen({ navigation }) {
         messageFontSize={24}
         message=""
       />
-     
 
-
-    
       <View
         style={{
           flex: 1,
@@ -120,7 +92,7 @@ export default function LandingScreen({ navigation }) {
               icon={item}
               onPress={() =>
                 item.target
-                  ? navigation.navigate(item.target, routeParams)
+                  ? navigation.navigate(item.target, { ...routeParams, myShopId:shopId })
                   : null
               }
             />

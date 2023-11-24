@@ -1,15 +1,58 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
-import React from "react";
+import { View, Text, TouchableOpacity, Image, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
 import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
 import AppStatusBar from "../components/AppStatusBar";
 import Colors from "../constants/Colors";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { BaseApiService } from "../utils/BaseApiService";
+import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 
-const ShopSummary = () => {
+const ShopSummary = ({ navigation, route }) => {
+  const [performanceSummary, setPerformanceSummary] = useState({});
+  const [initialCapital, setInitialCapital] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const {
+    isShopOwner,
+    isShopAttendant,
+    attendantShopId,
+    shopOwnerId,
+    myShopId,
+  } = route.params;
+
+  let id = isShopAttendant ? attendantShopId : isShopOwner ? myShopId : id;
+
+  const fetchSumarry = () => {
+    new BaseApiService(`/shops/${id}`)
+      .getRequestWithJsonResponse()
+      .then((response) => {
+        setInitialCapital(formatNumberWithCommas(response.data.initialCapital));
+        setPerformanceSummary(response.data.performanceSummary);
+        setTimeout(() => {
+          setLoading(false);
+        }, 100);
+      })
+      .catch((error) => {
+        Alert.alert("Cannot get summary!", error?.message);
+        setLoading(false);
+      });
+  };
+
+  function formatNumberWithCommas(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+  useEffect(() => fetchSumarry(), []);
+
+  let arr = { attendantShopId: 2163, shopOwnerId: 0 };
   return (
     <BlackAndWhiteScreen flex={1} bgColor={Colors.light_2}>
       <AppStatusBar bgColor="black" content="light-content" />
-
+      <OrientationLoadingOverlay
+        visible={loading}
+        color={Colors.primary}
+        indicatorSize="large"
+        messageFontSize={24}
+        message=""
+      />
       <View
         style={{
           flexDirection: "row",
@@ -19,7 +62,7 @@ const ShopSummary = () => {
         }}
       >
         <View>
-          <Text style={{ color: Colors.primary }}>UGX 16,000,000</Text>
+          <Text style={{ color: Colors.primary }}>UGX {initialCapital}</Text>
           <Text
             style={{ color: Colors.primary, fontSize: 13, fontWeight: 300 }}
           >
@@ -155,8 +198,6 @@ const ShopSummary = () => {
               </Text>
             </View>
           </View>
-
-          
         </View>
 
         <View
@@ -292,8 +333,6 @@ const ShopSummary = () => {
             </Text>
           </View>
         </View>
-
-       
 
         <View
           style={{
