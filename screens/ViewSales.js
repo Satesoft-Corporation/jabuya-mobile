@@ -1,49 +1,105 @@
-import {
-  View,
-  Text,
-  Alert,
-  SafeAreaView,
-  Dimensions,
-  TouchableOpacity,
-  FlatList,
-  ScrollView,
-} from "react-native";
+import { View, Text, Alert, TouchableOpacity, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
 import { BaseApiService } from "../utils/BaseApiService";
 import { Table, Row, Rows, TableWrapper } from "react-native-table-component";
 import Colors from "../constants/Colors";
-
+import DateRangePicker from "../components/DateRangePicker";
 import AppStatusBar from "../components/AppStatusBar";
-import HeaderOneButton from "../components/HeaderOneButton";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
-import { UserSessionUtils } from "../utils/UserSessionUtils";
 import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
 import { TextInput } from "react-native";
+import { Calendar } from "react-native-calendars";
+import MaterialButton from "../components/MaterialButton";
+import ModalContent from "../components/ModalContent";
 
 const tableHead = ["Item", "Price", "Qty", "Amount"];
 
-export default function ViewSales({ navigation }) {
+export default function ViewSales({ navigation, route }) {
   const [sales, setSales] = useState([]); // sales got from the server
   const [totalSales, setTotalSales] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [visible, setVisible] = useState(false);
   const [offset, setOffset] = useState(0);
+  const [visible, setVisible] = useState(false);
+  const [filtering, setFiltering] = useState(false);
+  const [selectedStartDate, setSelectedStartDate] = useState(null);
+  const [selectedEndDate, setSelectedEndDate] = useState(null);
+  const [allSales, setAllSales] = useState([]);
 
-  let shopId = null;
+  const handleDayPress = (day) => {
+    if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+      setSelectedStartDate(day.dateString);
+      setSelectedEndDate(null);
+    } else if (
+      selectedStartDate &&
+      !selectedEndDate &&
+      day.dateString !== selectedStartDate
+    ) {
+      setSelectedEndDate(day.dateString);
+    } else {
+      setSelectedStartDate(day.dateString);
+      setSelectedEndDate(null);
+    }
+  };
+
+  const calendarTheme = {
+    calendarBackground: "black",
+    arrowColor: Colors.primary,
+    todayTextColor: Colors.primary,
+    monthTextColor: Colors.light,
+    selectedDayBackgroundColor: Colors.primary,
+    textDisabledColor: Colors.gray, //other months dates
+    textSectionTitleColor: Colors.light, // days
+    dayTextColor: Colors.light,
+    selectedDayTextColor: "black",
+  };
+
+  const {
+    isShopOwner,
+    isShopAttendant,
+    isSuperAdmin,
+    attendantShopId,
+    shopOwnerId,
+    myShopId,
+  } = route.params;
+
+  function compareDates(date1, date2) {
+    const formattedDate1 = new Date(date1).toISOString().slice(0, 10);
+    const formattedDate2 = new Date(date2).toISOString().slice(0, 10);
+
+    return formattedDate1 === formattedDate2;
+  }
+
+  function convertDateFormat(dateString) {
+    const date = new Date(dateString);
+
+    // Remove time information
+    const formattedDate = date.toISOString().slice(0, 10);
+
+    return formattedDate;
+  }
+
   const getSales = async () => {
-    shopId = await UserSessionUtils.getShopId();
     let searchParameters = {
       searchTerm: "",
       offset: offset,
-      limit: 20,
-      shopId: shopId,
+      limit: 2,
     };
+
+    setLoading(true);
+
+    if (isShopOwner) {
+      searchParameters.shopOwnerId = shopOwnerId;
+    }
+    if (isShopAttendant) {
+      searchParameters.shopId = attendantShopId;
+    }
+
     new BaseApiService("/shop-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
-        setSales((prev) => [...prev, ...response.records]);
-        setOffset(offset + 1);
         setTotalSales(response.totalItems);
+        setAllSales(response.records);
+
         setTimeout(() => {
           setLoading(false);
         }, 100);
@@ -54,102 +110,153 @@ export default function ViewSales({ navigation }) {
       });
   };
 
+  const filterSales = () => {
+    let startDate = selectedStartDate ? new Date(selectedStartDate) : null;
+    let endDate = selectedEndDate ? new Date(selectedEndDate) : null;
+    let arr;
+
+    setLoading(true);
+
+    if (startDate > endDate) {
+      // if the start date is greater than the end date
+      [startDate, endDate] = [endDate, startDate]; // Swap the dates using destructuring assignment
+    }
+
+    if (selectedEndDate === null) {
+      //filtering a single day
+      arr = allSales.filter((item) =>
+        compareDates(convertDateFormat(item.dateCreated), selectedStartDate)
+      );
+    }
+
+    if (startDate && endDate) {
+      arr = allSales.filter((item) => {
+        const itemDate = new Date(item.dateCreated);
+        return itemDate >= startDate && itemDate <= endDate;
+      });
+    }
+    setSales(arr);
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  };
+
   useEffect(() => {
     getSales();
   }, []);
 
   return (
-    <BlackAndWhiteScreen flex={1.1} bgColor={Colors.light_2}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingHorizontal: 10,
-          marginVertical: 10,
-        }}
-      >
-        <View>
-          <Text
-            style={{ color: Colors.primary, fontSize: 16, fontWeight: 600 }}
-          >
-            Day's sales
-          </Text>
-        </View>
-
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <TextInput
-            style={{
-              backgroundColor: Colors.light,
-              height: 25,
-              borderRadius: 3,
-              marginHorizontal: 5,
-              width: 100,
-            }}
-            placeholder="Search text"
-          />
-          <TouchableOpacity
-            style={{
-              backgroundColor: Colors.primary,
-              borderRadius: 3,
-              height: 25,
-              justifyContent: "center",
-            }}
-            onPress={() => navigation.navigate("shopSummary")}
-          >
+    <BlackAndWhiteScreen flex={1.3} bgColor={Colors.light_2}>
+      <View style={{ flex: 0.8 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingHorizontal: 10,
+            marginVertical: 10,
+          }}
+        >
+          <View>
             <Text
+              style={{ color: Colors.primary, fontSize: 16, fontWeight: 600 }}
+            >
+              Day's sales
+            </Text>
+          </View>
+
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <TextInput
               style={{
-                color: Colors.dark,
-                paddingHorizontal: 6,
-                alignSelf: "center",
+                backgroundColor: Colors.light,
+                height: 25,
+                borderRadius: 3,
+                marginHorizontal: 5,
+                width: 100,
+              }}
+              placeholder="Search text"
+            />
+            <TouchableOpacity
+              style={{
+                backgroundColor: Colors.primary,
+                borderRadius: 3,
+                height: 25,
                 justifyContent: "center",
               }}
+              onPress={() =>
+                navigation.navigate("shopSummary", {
+                  isShopOwner,
+                  isShopAttendant,
+                  isSuperAdmin,
+                  attendantShopId,
+                  shopOwnerId,
+                  myShopId
+                })
+              }
             >
-              Investment
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={{
+                  color: Colors.dark,
+                  paddingHorizontal: 6,
+                  alignSelf: "center",
+                  justifyContent: "center",
+                }}
+              >
+                Investment
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            marginTop: 15,
+            justifyContent: "space-between",
+            paddingHorizontal: 12,
+          }}
+        >
+          <ItemHeader title="Items" value="450" unit="Qty" />
+          <View
+            style={{
+              width: 1,
+              height: "inherit",
+              backgroundColor: Colors.primary,
+            }}
+          />
+          <ItemHeader title="Sales" value="16,000,000" />
+          <View
+            style={{
+              width: 1,
+              height: "inherit",
+              backgroundColor: Colors.primary,
+            }}
+          />
+          <ItemHeader title="Capital" value="16,000,000" />
+          <View
+            style={{
+              width: 1,
+              height: "inherit",
+              backgroundColor: Colors.primary,
+            }}
+          />
+          <ItemHeader title="Profit" value="16,0000,000" />
         </View>
       </View>
       <View
         style={{
-          flexDirection: "row",
-          marginTop: 15,
-          justifyContent: "space-between",
-          paddingHorizontal: 12,
-        }}
-      >
-        <ItemHeader title="Items" value="450" unit="Qty" />
-        <View
-          style={{
-            width: 1,
-            height: "inherit",
-            backgroundColor: Colors.primary,
-          }}
-        />
-        <ItemHeader title="Sales" value="16,000,000" />
-        <View
-          style={{
-            width: 1,
-            height: "inherit",
-            backgroundColor: Colors.primary,
-          }}
-        />
-        <ItemHeader title="Capital" value="16,000,000" />
-        <View
-          style={{
-            width: 1,
-            height: "inherit",
-            backgroundColor: Colors.primary,
-          }}
-        />
-        <ItemHeader title="Profit" value="16,0000,000" />
-      </View>
-      <View
-        style={{
-          flex: 1,
+          flex: 3,
           // backgroundColor: Colors.light_2,
           paddingBottom: 20,
         }}
       >
+        <DateRangePicker
+          visible={visible}
+          hide={() => setVisible(false)}
+          setStart={(start) => setSelectedStartDate(start)}
+          setEnd={(end) => setSelectedEndDate(end)}
+          applyFilter={() => console.log(selectedEndDate, selectedStartDate)}
+        />
         <OrientationLoadingOverlay
           visible={loading}
           color={Colors.primary}
@@ -159,7 +266,7 @@ export default function ViewSales({ navigation }) {
         />
         <AppStatusBar bgColor="black" content="light-content" />
 
-        <View style={{ marginTop: 10 }}>
+        <View style={{ marginTop: 1 }}>
           <FlatList
             containerStyle={{ padding: 5 }}
             showsHorizontalScrollIndicator={false}
@@ -169,6 +276,73 @@ export default function ViewSales({ navigation }) {
           />
         </View>
       </View>
+      <ModalContent visible={visible} style={{ padding: 10 }}>
+        <Calendar
+          theme={calendarTheme}
+          onDayPress={handleDayPress}
+          markedDates={{
+            [selectedStartDate]: {
+              selected: true,
+              startingDay: true,
+              endingDay: selectedEndDate === selectedStartDate,
+            },
+            [selectedEndDate]: {
+              selected: true,
+              endingDay: true,
+            },
+          }}
+        />
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <MaterialButton
+            title="Cancel"
+            style={{
+              backgroundColor: "transparent",
+              borderRadius: 5,
+              borderWidth: 1,
+              borderColor: Colors.dark,
+              marginStart: -2,
+              margin: 10,
+              height: 40,
+            }}
+            titleStyle={{
+              fontWeight: "bold",
+              color: Colors.dark,
+            }}
+            buttonPress={() => hide()}
+          />
+          <MaterialButton
+            title="Apply"
+            style={{
+              backgroundColor: Colors.dark,
+              borderRadius: 5,
+              borderWidth: 1,
+              borderColor: Colors.dark,
+              marginStart: 2,
+              marginEnd: -2,
+              margin: 10,
+              height: 40,
+            }}
+            titleStyle={{
+              fontWeight: "bold",
+              color: Colors.primary,
+            }}
+            buttonPress={() => {
+              setFiltering(true);
+              setVisible(false);
+              filterSales();
+              setSelectedEndDate(null);
+              setSelectedStartDate(null);
+            }}
+            disabled={!selectedStartDate && !selectedEndDate}
+          />
+        </View>
+      </ModalContent>
     </BlackAndWhiteScreen>
   );
 }
