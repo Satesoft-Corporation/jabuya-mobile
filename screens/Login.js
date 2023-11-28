@@ -6,10 +6,11 @@ import AppStatusBar from "../components/AppStatusBar";
 import { BaseApiService } from "../utils/BaseApiService";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Constants from "expo-constants";
-
+import CircularProgress from "../components/CircularProgress";
 export default function Login({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [disabled, setDisabled] = useState(false);
 
   let loginInfo = {
     username,
@@ -17,6 +18,7 @@ export default function Login({ navigation }) {
   };
 
   const onLogin = () => {
+    setDisabled(true);
     new BaseApiService("/auth/login")
       .postRequest(loginInfo)
       .then(async (response) => {
@@ -35,12 +37,15 @@ export default function Login({ navigation }) {
           navigation.navigate("welcome");
           setPassword("");
           setUsername("");
+          setDisabled(false);
         } else if (status === 400) {
           Alert.alert("Invalid username or password");
+          setDisabled(false);
         }
       })
       .catch((error) => {
         Alert.alert("Login Failed!", error?.message);
+        setDisabled(false);
       });
   };
   return (
@@ -121,6 +126,7 @@ export default function Login({ navigation }) {
       />
 
       <TouchableOpacity
+        disabled={disabled}
         onPress={() => onLogin()}
         style={{
           backgroundColor: Colors.dark,
@@ -132,16 +138,20 @@ export default function Login({ navigation }) {
           justifyContent: "center",
         }}
       >
-        <Text
-          style={{
-            fontWeight: "bold",
-            color: Colors.primary,
-            alignSelf: "center",
-            fontSize: 16,
-          }}
-        >
-          Login
-        </Text>
+        {!disabled ? (
+          <Text
+            style={{
+              fontWeight: "bold",
+              color: Colors.primary,
+              alignSelf: "center",
+              fontSize: 16,
+            }}
+          >
+            Login
+          </Text>
+        ) : (
+          <CircularProgress />
+        )}
       </TouchableOpacity>
 
       <View
