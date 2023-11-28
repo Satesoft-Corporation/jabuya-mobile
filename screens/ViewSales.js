@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { BaseApiService } from "../utils/BaseApiService";
 import { Table, Row, Rows, TableWrapper } from "react-native-table-component";
 import Colors from "../constants/Colors";
-import DateRangePicker from "../components/DateRangePicker";
 import AppStatusBar from "../components/AppStatusBar";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
@@ -11,6 +10,7 @@ import { TextInput } from "react-native";
 import { Calendar } from "react-native-calendars";
 import MaterialButton from "../components/MaterialButton";
 import ModalContent from "../components/ModalContent";
+import { formatNumberWithCommas } from "../utils/Utils";
 
 const tableHead = ["Item", "Price", "Qty", "Amount"];
 
@@ -24,6 +24,28 @@ export default function ViewSales({ navigation, route }) {
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [allSales, setAllSales] = useState([]);
+  const [performanceSummary, setPerformanceSummary] = useState(null);
+  const [initialCapital, setInitialCapital] = useState(null);
+
+  const calendarTheme = {
+    calendarBackground: "black",
+    arrowColor: Colors.primary,
+    todayTextColor: Colors.primary,
+    monthTextColor: Colors.light,
+    selectedDayBackgroundColor: Colors.primary,
+    textDisabledColor: Colors.gray, //other months dates
+    textSectionTitleColor: Colors.light, // days
+    dayTextColor: Colors.light,
+    selectedDayTextColor: "black",
+  };
+
+  const {
+    isShopOwner,
+    isShopAttendant,
+    attendantShopId,
+    shopOwnerId,
+    myShopId,
+  } = route.params;
 
   const handleDayPress = (day) => {
     if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
@@ -41,27 +63,6 @@ export default function ViewSales({ navigation, route }) {
     }
   };
 
-  const calendarTheme = {
-    calendarBackground: "black",
-    arrowColor: Colors.primary,
-    todayTextColor: Colors.primary,
-    monthTextColor: Colors.light,
-    selectedDayBackgroundColor: Colors.primary,
-    textDisabledColor: Colors.gray, //other months dates
-    textSectionTitleColor: Colors.light, // days
-    dayTextColor: Colors.light,
-    selectedDayTextColor: "black",
-  };
-
-  const {
-    isShopOwner,
-    isShopAttendant,
-    isSuperAdmin,
-    attendantShopId,
-    shopOwnerId,
-    myShopId,
-  } = route.params;
-
   function compareDates(date1, date2) {
     const formattedDate1 = new Date(date1).toISOString().slice(0, 10);
     const formattedDate2 = new Date(date2).toISOString().slice(0, 10);
@@ -78,14 +79,56 @@ export default function ViewSales({ navigation, route }) {
     return formattedDate;
   }
 
-  const getSales = async () => {
+  function getProfit() {
+    if (performanceSummary && initialCapital) {
+      let profits = performanceSummary.totalSalesValue - initialCapital;
+
+      return profits > 0 ? formatNumberWithCommas(profits) : 0;
+    }
+    return 0;
+  }
+  let id = isShopAttendant ? attendantShopId : isShopOwner ? myShopId : id;
+
+  function getCurrentDay() {
+    let currentDate = new Date();
+    let year = currentDate.getFullYear();
+    let month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+    let day = ("0" + currentDate.getDate()).slice(-2);
+
+    return `${year}-${month}-${day}`;
+  }
+
+  const fetchSumarry = () => {
+    new BaseApiService(`/shops/${id}`)
+      .getRequestWithJsonResponse()
+      .then((response) => {
+        setInitialCapital(response.data.initialCapital);
+        setPerformanceSummary(response.data.performanceSummary);
+        setTimeout(() => {
+          setLoading(false);
+        }, 100);
+      })
+      .catch((error) => {
+        Alert.alert("Cannot get summary!", error?.message);
+        setLoading(false);
+      });
+  };
+
+  const getSales = async (startDate, endDate) => {
     let searchParameters = {
-      searchTerm: "",
       offset: offset,
-      limit: 2,
+      limit: 50,
+      // startDate: getCurrentDay(),
     };
 
     setLoading(true);
+
+    if (startDate) {
+      searchParameters.startDate = startDate;
+    }
+    if (endDate) {
+      searchParameters.endDate = endDate;
+    }
 
     if (isShopOwner) {
       searchParameters.shopOwnerId = shopOwnerId;
@@ -99,7 +142,7 @@ export default function ViewSales({ navigation, route }) {
       .then((response) => {
         setTotalSales(response.totalItems);
         setAllSales(response.records);
-
+        setSales(response.records);
         setTimeout(() => {
           setLoading(false);
         }, 100);
@@ -143,6 +186,7 @@ export default function ViewSales({ navigation, route }) {
 
   useEffect(() => {
     getSales();
+    fetchSumarry();
   }, []);
 
   return (
@@ -184,15 +228,16 @@ export default function ViewSales({ navigation, route }) {
                 height: 25,
                 justifyContent: "center",
               }}
-              onPress={() =>
-                navigation.navigate("shopSummary", {
-                  isShopOwner,
-                  isShopAttendant,
-                  isSuperAdmin,
-                  attendantShopId,
-                  shopOwnerId,
-                  myShopId
-                })
+              onPress={
+                () =>
+                  navigation.navigate("shopSummary", {
+                    isShopOwner,
+                    isShopAttendant,
+                    attendantShopId,
+                    shopOwnerId,
+                    myShopId,
+                  })
+                // setVisible(true)
               }
             >
               <Text
@@ -216,7 +261,7 @@ export default function ViewSales({ navigation, route }) {
             paddingHorizontal: 12,
           }}
         >
-          <ItemHeader title="Items" value="450" unit="Qty" />
+          <ItemHeader title="Items" value={totalSales || ""} unit="Qty" />
           <View
             style={{
               width: 1,
@@ -224,7 +269,13 @@ export default function ViewSales({ navigation, route }) {
               backgroundColor: Colors.primary,
             }}
           />
-          <ItemHeader title="Sales" value="16,000,000" />
+          <ItemHeader
+            title="Sales"
+            value={
+              performanceSummary &&
+              formatNumberWithCommas(performanceSummary?.totalSalesValue)
+            }
+          />
           <View
             style={{
               width: 1,
@@ -232,7 +283,10 @@ export default function ViewSales({ navigation, route }) {
               backgroundColor: Colors.primary,
             }}
           />
-          <ItemHeader title="Capital" value="16,000,000" />
+          <ItemHeader
+            title="Capital"
+            value={initialCapital && formatNumberWithCommas(initialCapital)}
+          />
           <View
             style={{
               width: 1,
@@ -240,7 +294,7 @@ export default function ViewSales({ navigation, route }) {
               backgroundColor: Colors.primary,
             }}
           />
-          <ItemHeader title="Profit" value="16,0000,000" />
+          <ItemHeader title="Profit" value={getProfit()} />
         </View>
       </View>
       <View
@@ -250,13 +304,6 @@ export default function ViewSales({ navigation, route }) {
           paddingBottom: 20,
         }}
       >
-        <DateRangePicker
-          visible={visible}
-          hide={() => setVisible(false)}
-          setStart={(start) => setSelectedStartDate(start)}
-          setEnd={(end) => setSelectedEndDate(end)}
-          applyFilter={() => console.log(selectedEndDate, selectedStartDate)}
-        />
         <OrientationLoadingOverlay
           visible={loading}
           color={Colors.primary}
