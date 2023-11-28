@@ -25,9 +25,12 @@ import ConfirmSalesDialog from "../components/ConfirmSalesDialog";
 import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
 import { BarCodeScanner } from "expo-barcode-scanner";
 
-function SalesEntry({ route, navigation }) {
+const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
+
+function SalesEntry({ route }) {
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [limit, setLimit] = useState(20);
   const [loading, setLoading] = useState(true);
   const [selectedProducts, setSelectedProducts] = useState([]); //unfiltered selections array
@@ -37,15 +40,10 @@ function SalesEntry({ route, navigation }) {
   const [selection, setSelection] = useState(null);
   const [totalCost, setTotalCost] = useState(0);
   const [recievedAmount, setRecievedAmount] = useState(null);
-  const [shopId, setShopId] = useState(route.params.shopOwnerId);
-  const [attendantShopId, setAttendantShopId] = useState(
-    route.params.attendantShopId
-  );
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
   const [postedPdts, setPostedPdts] = useState([]);
   const [lineItems, setLineItems] = useState([]);
   const [returnCost, setReturnedCost] = useState(0);
-  const [a, b] = useState(0); // responsible for updating the total items in a cart
   const [returnedList, setReturnedList] = useState([]);
   const [returnedId, setReturnedId] = useState(null);
   const [amountPaid, setAmountPaid] = useState(null);
@@ -55,15 +53,22 @@ function SalesEntry({ route, navigation }) {
   const [scanBarCode, setScanBarCode] = useState(false); // barcode scanner trigger
   const [totalQty, setTotalQty] = useState(0);
 
-  const screenWidth = Dimensions.get("window").width;
-  const screenHeight = Dimensions.get("window").height;
+  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+    route.params;
 
   const fetchProducts = async () => {
-    let searchParameters = { offset: 0, limit: limit, shopId: attendantShopId };
-    // if (query != undefined && query != null) {
-    //   searchParameters.searchTerm = query;
-    // }
+    let searchParameters = {
+      offset: 0,
+      limit: limit,
+      searchTerm,
+    };
 
+    if (isShopOwner) {
+      searchParameters.shopOwnerId = shopOwnerId;
+    }
+    if (isShopAttendant) {
+      searchParameters.shopId = attendantShopId;
+    }
     new BaseApiService("/shop-products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
@@ -78,7 +83,7 @@ function SalesEntry({ route, navigation }) {
 
   const postSales = () => {
     let payLoad = {
-      id: shopId,
+      id: shopOwnerId,
       shopId: attendantShopId,
       amountPaid: totalCost,
       lineItems: selectedProducts,
@@ -137,7 +142,7 @@ function SalesEntry({ route, navigation }) {
   };
 
   const handleChange = (value) => {
-    fetchProducts(value);
+    setSearchTerm(value);
   };
 
   const makeSelection = (item) => {
@@ -243,7 +248,6 @@ function SalesEntry({ route, navigation }) {
       });
   };
 
-
   const clearEverything = () => {
     setSelectedProducts([]);
     setQuantity(null);
@@ -268,7 +272,6 @@ function SalesEntry({ route, navigation }) {
 
     getBarCodeScannerPermissions();
   }, []);
-
 
   const styles = StyleSheet.create({
     container: {
@@ -854,7 +857,7 @@ const DropdownComponent = ({
         iconStyle={styles.iconStyle}
         data={products}
         search
-        maxHeight={250}
+        maxHeight={screenHeight / 2}
         labelField="productName"
         valueField="productName"
         placeholder={!isFocus ? "Select Product" : "..."}
