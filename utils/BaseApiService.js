@@ -1,11 +1,16 @@
 import { INTERNAL_SERVER_ERROR } from "../constants/ErrorMessages";
 import { UserSessionUtils } from "./UserSessionUtils";
 import { BASE_URL } from "./BaseUrl";
+import { Platform } from "react-native";
+import Constants from "expo-constants";
 
 export class BaseApiService {
   apiEndpoint;
   authToken = UserSessionUtils.getBearerToken();
-  requestHeaders = {};
+  requestHeaders = {
+    PLATFORM_TYPE: Platform.OS,
+    VERSION_CODE: Constants.expoConfig.version,
+  };
 
   /**
    * This is constructor is used to initialize the API service endpoint to be used for this call.

@@ -5,6 +5,7 @@ import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
 import { BaseApiService } from "../utils/BaseApiService";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
+import Constants from "expo-constants";
 
 export default function Login({ navigation }) {
   const [username, setUsername] = useState("");
@@ -184,7 +185,7 @@ export default function Login({ navigation }) {
         <Text
           style={{ color: Colors.primary, alignSelf: "center", fontSize: 12 }}
         >
-          V 1.0.5
+          V {Constants.expoConfig.version}
         </Text>
       </View>
     </View>
