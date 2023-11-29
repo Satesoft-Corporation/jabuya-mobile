@@ -37,7 +37,7 @@ export default function Login({ navigation }) {
           navigation.navigate("welcome");
           setPassword("");
           setUsername("");
-          setDisabled(false);
+          setTimeout(() => setDisabled(false), 1000);
         } else if (status === 400) {
           Alert.alert("Invalid username or password");
           setDisabled(false);
@@ -125,20 +125,20 @@ export default function Login({ navigation }) {
         }}
       />
 
-      <TouchableOpacity
-        disabled={disabled}
-        onPress={() => onLogin()}
-        style={{
-          backgroundColor: Colors.dark,
-          marginTop: 30,
-          borderRadius: 5,
-          borderWidth: 1,
-          borderColor: Colors.primary,
-          paddingVertical: 10,
-          justifyContent: "center",
-        }}
-      >
-        {!disabled ? (
+      {!disabled ? (
+        <TouchableOpacity
+          disabled={disabled}
+          onPress={() => onLogin()}
+          style={{
+            backgroundColor: Colors.dark,
+            marginTop: 30,
+            borderRadius: 5,
+            borderWidth: 1,
+            borderColor: Colors.primary,
+            paddingVertical: 10,
+            justifyContent: "center",
+          }}
+        >
           <Text
             style={{
               fontWeight: "bold",
@@ -149,10 +149,10 @@ export default function Login({ navigation }) {
           >
             Login
           </Text>
-        ) : (
-          <CircularProgress />
-        )}
-      </TouchableOpacity>
+        </TouchableOpacity>
+      ) : (
+        <CircularProgress />
+      )}
 
       <View
         style={{
