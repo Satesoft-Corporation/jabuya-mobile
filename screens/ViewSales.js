@@ -11,6 +11,7 @@ import { Calendar } from "react-native-calendars";
 import MaterialButton from "../components/MaterialButton";
 import ModalContent from "../components/ModalContent";
 import { formatNumberWithCommas } from "../utils/Utils";
+import { Image } from "react-native";
 
 const tableHead = ["Item", "Price", "Qty", "Amount"];
 
@@ -59,7 +60,7 @@ export default function ViewSales({ navigation, route }) {
       setSelectedEndDate(day.dateString);
     } else {
       setSelectedStartDate(day.dateString);
-      setSelectedEndDate(null);
+      setSelectedEndDate(day.dateString); // Set both start and end dates to the single selected date
     }
   };
 
@@ -70,13 +71,15 @@ export default function ViewSales({ navigation, route }) {
     return formattedDate1 === formattedDate2;
   }
 
-  function convertDateFormat(dateString) {
-    const date = new Date(dateString);
+  function convertDateFormat(dateString, getTomorrowDate = false) {
+    const date = new Date(dateString); // Create a Date object from the input string
 
-    // Remove time information
-    const formattedDate = date.toISOString().slice(0, 10);
+    if (getTomorrowDate === true) {
+      date.setDate(date.getDate() + 1); // Increment the date by 1 to get tomorrow's date
+    }
 
-    return formattedDate;
+    const isoDateString = date.toISOString(); // Convert Date object to ISO string
+    return isoDateString;
   }
 
   function getProfit() {
@@ -90,12 +93,16 @@ export default function ViewSales({ navigation, route }) {
   let id = isShopAttendant ? attendantShopId : isShopOwner ? myShopId : id;
 
   function getCurrentDay() {
-    let currentDate = new Date();
-    let year = currentDate.getFullYear();
-    let month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
-    let day = ("0" + currentDate.getDate()).slice(-2);
+    const now = new Date();
+    const year = now.getUTCFullYear();
+    const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(now.getUTCDate()).padStart(2, "0");
+    let hours = ("0" + now.getHours()).slice(-2);
+    let minutes = "00";
+    let seconds = "00";
+    let milliseconds = "00";
 
-    return `${year}-${month}-${day}`;
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
   }
 
   const fetchSumarry = () => {
@@ -117,19 +124,27 @@ export default function ViewSales({ navigation, route }) {
   const getSales = async (startDate, endDate) => {
     let searchParameters = {
       offset: offset,
-      limit: 50,
-      // startDate: getCurrentDay(),
+      limit: 0,
     };
 
     setLoading(true);
 
-    if (startDate) {
-      searchParameters.startDate = startDate;
-    }
-    if (endDate) {
-      searchParameters.endDate = endDate;
+    if (!startDate && !endDate) {
+      searchParameters.startDate = getCurrentDay();
+      searchParameters.endDate = getCurrentDay();
     }
 
+    if (startDate) {
+      searchParameters.startDate = convertDateFormat(startDate);
+    }
+
+    if (endDate) {
+      searchParameters.endDate = convertDateFormat(endDate, true);
+    }
+    if (endDate === null && startDate) {
+      //specific day setting
+      searchParameters.endDate = convertDateFormat(startDate, true);
+    }
     if (isShopOwner) {
       searchParameters.shopOwnerId = shopOwnerId;
     }
@@ -156,32 +171,11 @@ export default function ViewSales({ navigation, route }) {
   const filterSales = () => {
     let startDate = selectedStartDate ? new Date(selectedStartDate) : null;
     let endDate = selectedEndDate ? new Date(selectedEndDate) : null;
-    let arr;
-
-    setLoading(true);
-
-    if (startDate > endDate) {
+    if (startDate > endDate && endDate) {
       // if the start date is greater than the end date
       [startDate, endDate] = [endDate, startDate]; // Swap the dates using destructuring assignment
     }
-
-    if (selectedEndDate === null) {
-      //filtering a single day
-      arr = allSales.filter((item) =>
-        compareDates(convertDateFormat(item.dateCreated), selectedStartDate)
-      );
-    }
-
-    if (startDate && endDate) {
-      arr = allSales.filter((item) => {
-        const itemDate = new Date(item.dateCreated);
-        return itemDate >= startDate && itemDate <= endDate;
-      });
-    }
-    setSales(arr);
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    getSales(startDate, endDate);
   };
 
   useEffect(() => {
@@ -211,16 +205,17 @@ export default function ViewSales({ navigation, route }) {
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <TextInput
-              style={{
-                backgroundColor: Colors.light,
-                height: 25,
-                borderRadius: 3,
-                marginHorizontal: 5,
-                width: 100,
-              }}
-              placeholder="Search text"
-            />
+            <TouchableOpacity onPress={() => setVisible(true)}>
+              <Image
+                source={require("../assets/icons/icons8-calendar-26.png")}
+                style={{
+                  width: 25,
+                  height: 25,
+                  tintColor: Colors.primary,
+                  marginEnd: 10,
+                }}
+              />
+            </TouchableOpacity>
             <TouchableOpacity
               style={{
                 backgroundColor: Colors.primary,
@@ -228,16 +223,14 @@ export default function ViewSales({ navigation, route }) {
                 height: 25,
                 justifyContent: "center",
               }}
-              onPress={
-                () =>
-                  navigation.navigate("shopSummary", {
-                    isShopOwner,
-                    isShopAttendant,
-                    attendantShopId,
-                    shopOwnerId,
-                    myShopId,
-                  })
-                // setVisible(true)
+              onPress={() =>
+                navigation.navigate("shopSummary", {
+                  isShopOwner,
+                  isShopAttendant,
+                  attendantShopId,
+                  shopOwnerId,
+                  myShopId,
+                })
               }
             >
               <Text
@@ -261,7 +254,7 @@ export default function ViewSales({ navigation, route }) {
             paddingHorizontal: 12,
           }}
         >
-          <ItemHeader title="Items" value={totalSales || ""} unit="Qty" />
+          <ItemHeader title="Items" value={totalSales || 0} unit="Qty" />
           <View
             style={{
               width: 1,
@@ -313,14 +306,28 @@ export default function ViewSales({ navigation, route }) {
         />
         <AppStatusBar bgColor="black" content="light-content" />
 
-        <View style={{ marginTop: 1 }}>
-          <FlatList
-            containerStyle={{ padding: 5 }}
-            showsHorizontalScrollIndicator={false}
-            data={sales}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => <TransactionItem data={item} />}
-          />
+        <View style={{ marginTop: 1, flex: 1 }}>
+          {sales.length > 0 ? (
+            <FlatList
+              containerStyle={{ padding: 5 }}
+              showsHorizontalScrollIndicator={false}
+              data={sales}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => <TransactionItem data={item} />}
+            />
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: "black", textAlign: "center" }}>
+                No sales made on this today
+              </Text>
+            </View>
+          )}
         </View>
       </View>
       <ModalContent visible={visible} style={{ padding: 10 }}>
@@ -344,6 +351,7 @@ export default function ViewSales({ navigation, route }) {
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
+            marginHorizontal:15
           }}
         >
           <MaterialButton
@@ -361,7 +369,11 @@ export default function ViewSales({ navigation, route }) {
               fontWeight: "bold",
               color: Colors.dark,
             }}
-            buttonPress={() => hide()}
+            buttonPress={() => {
+              setVisible(false);
+              setSelectedEndDate(null);
+              setSelectedStartDate(null);
+            }}
           />
           <MaterialButton
             title="Apply"
