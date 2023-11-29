@@ -1,107 +1,63 @@
 import React, { useEffect, useState } from "react";
-import { Animated, Easing } from "react-native";
+import { Animated, Easing, View, Text } from "react-native";
 import Colors from "../constants/Colors";
+import { TouchableOpacity } from "react-native";
 
-function CircularProgress({
-  size = 23,
-  thickness = 3,
-  bgColor = Colors.dark,
-  progressColor = Colors.primary,
-}) {
-  const [anim] = useState(new Animated.Value(0));
+export default function CircularProgress() {
+  const [item, setItem] = useState(1);
+
+  const tick = () => {
+    let nextItem = item === 3 ? 1 : item + 1;
+    setItem(nextItem);
+  };
 
   useEffect(() => {
-    Animated.loop(
-      Animated.timing(anim, {
-        toValue: 1100,
-        duration: 1500,
-        easing: Easing.linear,
-      })
-    ).start();
-  }, []);
-
-  const spinContainer = anim.interpolate({
-    inputRange: [0, 625, 800, 1100],
-    outputRange: ["0deg", "180deg", "360deg", "720deg"],
-  });
-
-  const spin = anim.interpolate({
-    inputRange: [0, 20, 250, 750, 980, 1000],
-    outputRange: ["245deg", "245deg", "405deg", "405deg", "245deg", "245deg"],
-  });
-
-  const spin2 = anim.interpolate({
-    inputRange: [0, 250, 375, 625, 750, 1000],
-    outputRange: ["225deg", "225deg", "315deg", "315deg", "225deg", "225deg"],
-  });
-
-  const color = anim.interpolate({
-    inputRange: [0, 249, 250, 750, 751, 1000],
-    outputRange: [
-      bgColor,
-      bgColor,
-      "transparent",
-      "transparent",
-      bgColor,
-      bgColor,
-    ],
-  });
-
-  const color2 = anim.interpolate({
-    inputRange: [0, 249, 250, 750, 751, 1000],
-    outputRange: [
-      "transparent",
-      "transparent",
-      progressColor,
-      progressColor,
-      "transparent",
-      "transparent",
-    ],
-  });
+    const interval = setInterval(tick, 120);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [item]);
 
   return (
-    <Animated.View
+    <TouchableOpacity
+      disabled
       style={{
-        width: size,
-        height: size,
-        borderWidth: thickness,
-        borderRadius: size / 2,
-        borderColor: bgColor,
+        backgroundColor: Colors.dark,
+        marginTop: 30,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: Colors.primary,
+        paddingVertical: 15,
         justifyContent: "center",
         alignItems: "center",
-        transform: [{ rotate: spinContainer }],
-        alignSelf: "center",
+        justifyContent: "center",
       }}
     >
-      <Animated.View
+      <View
         style={{
-          width: size,
-          height: size,
-          borderWidth: thickness,
-          borderRadius: size / 2,
-          position: "absolute",
-          borderLeftColor: "transparent",
-          borderBottomColor: "transparent",
-          borderRightColor: progressColor,
-          borderTopColor: progressColor,
-          transform: [{ rotate: spin }],
+          width: 70,
+          alignItems: "center",
+          flexDirection: "row",
+          justifyContent: "space-around",
         }}
-      />
-      <Animated.View
-        style={{
-          width: size,
-          height: size,
-          borderWidth: thickness,
-          borderRadius: size / 2,
-          borderRightColor: color,
-          borderTopColor: color,
-          borderLeftColor: color2,
-          borderBottomColor: color2,
-          transform: [{ rotate: spin2 }],
-        }}
-      />
-    </Animated.View>
+      >
+        <DotItem isActive={item === 1} />
+        <DotItem isActive={item === 2} />
+        <DotItem isActive={item === 3} />
+      </View>
+    </TouchableOpacity>
   );
 }
 
-export default CircularProgress;
+function DotItem({ isActive }) {
+  return (
+    <View
+      style={{
+        width: isActive ? 10 : 6,
+        height: isActive ? 10 : 6,
+        borderRadius: isActive ? 5 : 3,
+        backgroundColor: Colors.primary,
+      }}
+    />
+  );
+}
