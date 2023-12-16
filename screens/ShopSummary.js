@@ -5,6 +5,7 @@ import AppStatusBar from "../components/AppStatusBar";
 import Colors from "../constants/Colors";
 import { BaseApiService } from "../utils/BaseApiService";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
+import { ItemHeader } from "./ViewSales";
 
 const ShopSummary = ({ navigation, route }) => {
   const [performanceSummary, setPerformanceSummary] = useState({});
@@ -44,7 +45,7 @@ const ShopSummary = ({ navigation, route }) => {
 
   let arr = { attendantShopId: 2163, shopOwnerId: 0 };
   return (
-    <BlackAndWhiteScreen flex={1} bgColor={Colors.light_2}>
+    <BlackAndWhiteScreen flex={0.9} bgColor={Colors.light_2}>
       <AppStatusBar bgColor="black" content="light-content" />
       <OrientationLoadingOverlay
         visible={loading}
@@ -62,11 +63,27 @@ const ShopSummary = ({ navigation, route }) => {
         }}
       >
         <View>
-          <Text style={{ color: Colors.primary }}>UGX {initialCapital}</Text>
           <Text
-            style={{ color: Colors.primary, fontSize: 13, fontWeight: 300 }}
+            style={{
+              fontSize: 12,
+              color: Colors.primary,
+              opacity: 0.6,
+              marginBottom: 3,
+            }}
           >
             Investment
+          </Text>
+          <Text
+            style={{ fontSize: 15, color: Colors.primary, fontWeight: "600" }}
+          >
+            <Text
+              style={{
+                fontSize: 10,
+              }}
+            >
+              UGX
+            </Text>{" "}
+            {initialCapital}
           </Text>
         </View>
         <View
@@ -77,17 +94,19 @@ const ShopSummary = ({ navigation, route }) => {
           }}
         />
         <View>
-          <Text style={{ color: Colors.primary, alignSelf: "flex-end" }}>
-            01
-          </Text>
           <Text
             style={{
+              fontSize: 12,
               color: Colors.primary,
+              opacity: 0.6,
+              marginBottom: 3,
               alignSelf: "flex-end",
-              fontWeight: 300,
             }}
           >
             Shops
+          </Text>
+          <Text style={{ color: Colors.primary, alignSelf: "flex-end" }}>
+            01
           </Text>
         </View>
 
