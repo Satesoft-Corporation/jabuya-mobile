@@ -6,11 +6,10 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
-  Image,
+  SafeAreaView,
   Dimensions,
   FlatList,
 } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -22,8 +21,11 @@ import OrientationLoadingOverlay from "react-native-orientation-loading-overlay"
 import ModalContent from "../components/ModalContent";
 import Card from "../components/Card";
 import ConfirmSalesDialog from "../components/ConfirmSalesDialog";
-import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
 import { BarCodeScanner } from "expo-barcode-scanner";
+import UserProfile from "../components/UserProfile";
+import MaterialInput from "../components/MaterialInput";
+import { SaleListItem } from "../components/TransactionItems";
+import { SalesDropdownComponent } from "../components/DropdownComponents";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -52,7 +54,9 @@ function SalesEntry({ route }) {
   const [scanned, setScanned] = useState(false);
   const [scanBarCode, setScanBarCode] = useState(false); // barcode scanner trigger
   const [totalQty, setTotalQty] = useState(0);
-
+  const [unitCost, setUnitCost] = useState(null);
+  const [initialUnitCost, setInitialUnitCost] = useState(null);
+  const [errors, setErrors] = useState(null);
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
     route.params;
 
@@ -76,10 +80,13 @@ function SalesEntry({ route }) {
         setLoading(false);
       })
       .catch((error) => {
-        console.log(error);
         setLoading(false);
       });
   };
+
+  useEffect(() => {
+    setInitialUnitCost(selection?.salesPrice);
+  }, [selection]);
 
   const postSales = () => {
     let payLoad = {
@@ -146,66 +153,101 @@ function SalesEntry({ route }) {
   };
 
   const makeSelection = (item) => {
+    setUnitCost(String(item?.salesPrice));
+
     setShowModal(true);
     setSelection(item);
   };
 
   const saveSelection = () => {
     // saving the item into the data table
-    const parsedQuantity = parseInt(quantity, 10);
 
-    let cost = selection.salesPrice * parsedQuantity; // get total cost
+    const parsedQuantity = Number(quantity);
+    const itemUnitCost = Number(unitCost);
 
-    if (isNaN(parsedQuantity)) {
-      Alert.alert("Quantity is not a valid number");
-      return;
-    }
+    let cost = itemUnitCost * parsedQuantity;
 
-    setTotalCost(totalCost + cost);
+    const isValidQuantity = !isNaN(parsedQuantity) && parsedQuantity > 0;
+    const isValidCost = !isNaN(itemUnitCost) && itemUnitCost >= initialUnitCost;
 
-    setTotalQty(totalQty + parsedQuantity); //updating total items purchased
-
-    const productIndex = selections.findIndex(
-      //locating the duplicate item in selection array
-      (product) => product.productName === selection.productName
-    );
-
-    const productIndex2 = selectedProducts.findIndex(
-      //locating the duplicate item in selected pdts array
-      (product) => product.id === selection.id
-    );
-
-    if (productIndex !== -1) {
-      //if the already exists, update quantity and total cost
-      let prevQty = selections[productIndex].quantity;
-      let prevTotalCost = selections[productIndex].totalCost;
-
-      selections[productIndex].quantity = Number(quantity) + prevQty;
-      selections[productIndex].totalCost = prevTotalCost + cost;
-      selectedProducts[productIndex2].quantity = Number(quantity) + prevQty;
-
-      return true; // Indicates successful update and I'm a genius
-    } else {
-      selectedProducts.push({
-        // data set to be used in posting the sale to the server
-        id: selection.id,
-        shopProductId: selection.id,
-        quantity: parsedQuantity,
+    if (itemUnitCost < initialUnitCost) {
+      setErrors((prevErrors) => {
+        return {
+          ...prevErrors,
+          lessPriceError: `Unit cost for ${selection.productName} should be greater than ${initialUnitCost}`,
+        };
       });
-
-      setSelections((prev) => [
-        ...prev,
-        {
-          id: selection.id,
-          productName: selection.productName,
-          salesPrice: selection.salesPrice,
-          quantity: parsedQuantity, // Use the parsed quantity
-          totalCost: cost,
-        },
-      ]);
     }
 
-    setSelection(null);
+    if (parsedQuantity === 0) {
+      setErrors((prevErrors) => {
+        return {
+          ...prevErrors,
+          qtyZeroError: "Quantity should be greater than 0",
+        };
+      });
+    }
+
+    const isValidSubmition = () => {
+      return isValidQuantity && isValidCost;
+    };
+
+    if (isValidSubmition()) {
+      setLoading(true);
+
+      setTotalCost(totalCost + cost);
+
+      setTotalQty(totalQty + parsedQuantity); //updating total items purchased
+
+      const productIndex = selections.findIndex(
+        //locating the duplicate item in selection array
+        (product) => product.productName === selection.productName
+      );
+
+      const productIndex2 = selectedProducts.findIndex(
+        //locating the duplicate item in selected pdts array
+        (product) => product.id === selection.id
+      );
+
+      if (productIndex !== -1) {
+        //if the already exists, update quantity and total cost
+        let prevQty = selections[productIndex].quantity;
+        let prevTotalCost = selections[productIndex].totalCost;
+
+        selections[productIndex].quantity = Number(quantity) + prevQty;
+        selections[productIndex].totalCost = prevTotalCost + cost;
+        selectedProducts[productIndex2].quantity = Number(quantity) + prevQty;
+
+        return true; // Indicates successful update and I'm a genius
+      } else {
+        selectedProducts.push({
+          // data set to be used in posting the sale to the server
+          id: selection.id,
+          shopProductId: selection.id,
+          quantity: parsedQuantity,
+          unitCost: unitCost,
+        });
+
+        setSelections((prev) => [
+          ...prev,
+          {
+            id: selection.id,
+            productName: selection.productName,
+            salesPrice: unitCost,
+            quantity: parsedQuantity, // Use the parsed quantity
+            totalCost: cost,
+          },
+        ]);
+      }
+      setSelection(null);
+      setQuantity(null);
+      setShowModal(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+
+    setLoading(false);
   };
 
   const handleBarCodeScanned = ({ data }) => {
@@ -258,6 +300,7 @@ function SalesEntry({ route }) {
     setSelections([]);
     setLineItems([]);
     setTotalQty(0);
+    setErrors({});
   };
 
   useEffect(() => {
@@ -408,12 +451,6 @@ function SalesEntry({ route }) {
                 }}
                 buttonPress={() => {
                   saveSelection();
-                  setShowModal(false);
-                  setLoading(true);
-                  setQuantity(null);
-                  setTimeout(() => {
-                    setLoading(false);
-                  }, 1000);
                   setScanned(false);
                 }}
               />
@@ -470,7 +507,7 @@ function SalesEntry({ route }) {
       </View>
     </View>
   ) : (
-    <BlackAndWhiteScreen flex={1.1} bgColor={Colors.light_2}>
+    <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
       <OrientationLoadingOverlay
@@ -495,117 +532,160 @@ function SalesEntry({ route }) {
         length={totalQty}
         resetList={() => setLineItems([])}
       />
-
-      <View style={{ paddingHorizontal: 10, marginTop: 25 }}>
-        <DropdownComponent
-          products={products}
-          handleChange={(t) => handleChange(t)}
-          setLoading={() => setLoading(false)}
-          makeSelection={makeSelection}
-          setScanned={() => setScanBarCode(true)}
-        />
-        <View
-          style={{
-            backgroundColor: Colors.light,
-            borderRadius: 5,
-            padding: 10,
-            paddingVertical: 8,
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
+      <View style={{ flex: 1, backgroundColor: "black" }}>
+        <UserProfile />
+        <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
+          <SalesDropdownComponent
+            value={selection}
+            products={products}
+            handleChange={(t) => handleChange(t)}
+            setLoading={() => setLoading(false)}
+            makeSelection={makeSelection}
+            setScanned={() => setScanBarCode(true)}
+          />
+        </View>
+      </View>
+      <View style={{ backgroundColor: Colors.light_2, flex: 3 }}>
+        <View style={{ paddingHorizontal: 10, marginTop: -10 }}>
           <View
             style={{
+              backgroundColor: Colors.light,
+              borderRadius: 5,
+              padding: 10,
+              paddingVertical: 8,
               flexDirection: "row",
-              alignItems: "center",
-              elevation: 10,
-              shadowOffset: { width: 0, height: 25 },
-              shadowOpacity: 0.8,
-            }}
-          >
-            <FontAwesome5 name="money-bill" size={24} color="black" />
-            <View
-              style={{
-                marginLeft: 10,
-              }}
-            >
-              <Text style={{ fontWeight: "bold" }}>Recieved amt</Text>
-            </View>
-          </View>
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "flex-end",
+              justifyContent: "space-between",
             }}
           >
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "center",
+                alignItems: "center",
+                elevation: 10,
+                shadowOffset: { width: 0, height: 25 },
+                shadowOpacity: 0.8,
               }}
             >
-              <Text
+              <FontAwesome5 name="money-bill" size={24} color="black" />
+              <View
                 style={{
-                  alignSelf: "center",
-                  color: Colors.gray,
-                  fontSize: 10,
-                  marginEnd: 5,
+                  marginLeft: 10,
                 }}
               >
-                UGX
-              </Text>
-              <TextInput
-                textAlign="right"
-                value={recievedAmount}
-                inputMode="numeric"
-                onChangeText={(text) => setRecievedAmount(text)}
+                <Text style={{ fontWeight: "bold" }}>Recieved amt</Text>
+              </View>
+            </View>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "flex-end",
+              }}
+            >
+              <View
                 style={{
-                  backgroundColor: Colors.light,
-                  borderRadius: 5,
-                  padding: 5,
-                  width: 120,
-                  fontSize: 17,
+                  flexDirection: "row",
+                  justifyContent: "center",
                 }}
-                placeholder="Enter amount"
-              />
+              >
+                <Text
+                  style={{
+                    alignSelf: "center",
+                    color: Colors.gray,
+                    fontSize: 10,
+                    marginEnd: 5,
+                  }}
+                >
+                  UGX
+                </Text>
+                <TextInput
+                  textAlign="right"
+                  value={recievedAmount}
+                  inputMode="numeric"
+                  onChangeText={(text) => setRecievedAmount(text)}
+                  style={{
+                    backgroundColor: Colors.light,
+                    borderRadius: 5,
+                    padding: 5,
+                    width: 120,
+                    fontSize: 17,
+                  }}
+                  placeholder="Enter amount"
+                />
+              </View>
             </View>
           </View>
-        </View>
 
-        <View
-          style={{
-            backgroundColor: Colors.light,
-            borderRadius: 5,
-            padding: 10,
-            marginTop: 8,
-            height: 250,
-          }}
-        >
           <View
             style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              height: 25,
-              paddingEnd: 10,
-              borderBottomColor: Colors.gray,
-              borderBottomWidth: 0.3,
+              backgroundColor: Colors.light,
+              borderRadius: 5,
+              padding: 10,
+              marginTop: 8,
+              height: 250,
             }}
           >
-            <Text style={{ flex: 2.5, fontWeight: 600 }}>Item</Text>
-            <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
-              Price
-            </Text>
-            <Text style={{ flex: 0.5, textAlign: "center", fontWeight: 600 }}>
-              Qnty
-            </Text>
-            <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
-              Amount
-            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                height: 25,
+                paddingEnd: 10,
+                borderBottomColor: Colors.gray,
+                borderBottomWidth: 0.3,
+              }}
+            >
+              <Text style={{ flex: 2.5, fontWeight: 600 }}>Item</Text>
+              <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
+                Price
+              </Text>
+              <Text style={{ flex: 0.5, textAlign: "center", fontWeight: 600 }}>
+                Qnty
+              </Text>
+              <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
+                Amount
+              </Text>
+            </View>
+            <FlatList
+              data={selections}
+              renderItem={({ item }) => <SaleListItem data={item} />}
+            />
+            <View
+              style={{
+                backgroundColor: Colors.light,
+                borderRadius: 5,
+                padding: 10,
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <View>
+                <Text style={{ fontWeight: "bold", marginTop: 5 }}>
+                  Sold{" "}
+                  {totalQty >= 1 && (
+                    <Text>
+                      {totalQty}
+                      {totalQty > 1 ? <Text> items</Text> : <Text> item</Text>}
+                    </Text>
+                  )}
+                </Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "flex-end",
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: 700,
+                  }}
+                >
+                  <Text style={{ fontSize: 10 }}>UGX</Text> {totalCost}
+                </Text>
+              </View>
+            </View>
           </View>
-          <FlatList
-            data={selections}
-            renderItem={({ item }) => <SaleItem data={item} />}
-          />
+
           <View
             style={{
               backgroundColor: Colors.light,
@@ -613,18 +693,25 @@ function SalesEntry({ route }) {
               padding: 10,
               flexDirection: "row",
               justifyContent: "space-between",
+              marginTop: 8,
             }}
           >
-            <View>
-              <Text style={{ fontWeight: "bold", marginTop: 5 }}>
-                Sold{" "}
-                {totalQty >= 1 && (
-                  <Text>
-                    {totalQty}
-                    {totalQty > 1 ? <Text> items</Text> : <Text> item</Text>}
-                  </Text>
-                )}
-              </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <FontAwesome5 name="money-bill" size={24} color="black" />
+              <View
+                style={{
+                  marginLeft: 10,
+                }}
+              >
+                <Text style={{ fontWeight: "bold", fontSize: 17 }}>
+                  Balance
+                </Text>
+              </View>
             </View>
             <View
               style={{
@@ -637,272 +724,215 @@ function SalesEntry({ route }) {
                   fontWeight: 700,
                 }}
               >
-                <Text style={{ fontSize: 10 }}>UGX</Text> {totalCost}
+                <Text style={{ fontSize: 10 }}>UGX</Text>
+                <Text style={{ fontSize: 17 }}>
+                  {" "}
+                  {recievedAmount === 0 ? 0 : recievedAmount - totalCost}
+                </Text>
               </Text>
             </View>
           </View>
-        </View>
 
-        <View
-          style={{
-            backgroundColor: Colors.light,
-            borderRadius: 5,
-            padding: 10,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 8,
-          }}
-        >
-          <View
+          <IconsComponent clear={clearEverything} />
+
+          <TouchableOpacity
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <FontAwesome5 name="money-bill" size={24} color="black" />
-            <View
-              style={{
-                marginLeft: 10,
-              }}
-            >
-              <Text style={{ fontWeight: "bold", fontSize: 17 }}>Balance</Text>
-            </View>
-          </View>
-          <View
-            style={{
+              backgroundColor: Colors.dark,
+              borderRadius: 5,
+              height: 40,
               justifyContent: "center",
-              alignItems: "flex-end",
+              marginTop: 8,
+            }}
+            onPress={() => {
+              if (recievedAmount === null && selections.length > 0) {
+                Alert.alert("Please enter recieved amount");
+              }
+              if (recievedAmount - totalCost < 0) {
+                Alert.alert(
+                  `Recieved amount should be greater that ${totalCost}`
+                );
+              }
+              if (
+                Number(recievedAmount) >= totalCost &&
+                selections.length > 0
+              ) {
+                setLoading(true);
+                postSales();
+              }
             }}
           >
             <Text
               style={{
-                fontWeight: 700,
+                color: Colors.primary,
+                alignSelf: "center",
+                fontSize: 17,
               }}
             >
-              <Text style={{ fontSize: 10 }}>UGX</Text>
-              <Text style={{ fontSize: 17 }}>
-                {" "}
-                {recievedAmount === 0 ? 0 : recievedAmount - totalCost}
-              </Text>
+              Confirm Purchase
             </Text>
-          </View>
-        </View>
+          </TouchableOpacity>
 
-        <IconsComponent clear={clearEverything} />
-
-        <TouchableOpacity
-          style={{
-            backgroundColor: Colors.dark,
-            borderRadius: 5,
-            height: 40,
-            justifyContent: "center",
-            marginTop: 8,
-          }}
-          onPress={() => {
-            if (recievedAmount === null && selections.length > 0) {
-              Alert.alert("Please enter recieved amount");
-            }
-            if (recievedAmount - totalCost < 0) {
-              Alert.alert(
-                `Recieved amount should be greater that ${totalCost}`
-              );
-            }
-            if (Number(recievedAmount) >= totalCost && selections.length > 0) {
-              setLoading(true);
-              postSales();
-            }
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.primary,
-              alignSelf: "center",
-              fontSize: 17,
-            }}
-          >
-            Confirm Purchase
-          </Text>
-        </TouchableOpacity>
-
-        <ModalContent visible={showMoodal} style={{ padding: 35 }}>
-          <Card
-            style={{
-              paddingHorizontal: 15,
-            }}
-          >
-            <View
+          <ModalContent visible={showMoodal} style={{ padding: 35 }}>
+            <Card
               style={{
-                backgroundColor: "white",
-                padding: 2,
+                paddingHorizontal: 15,
               }}
             >
               <View
                 style={{
-                  marginTop: 10,
-                  marginBottom: 5,
-                  marginStart: 10,
-                  marginTop: 20,
+                  backgroundColor: "white",
+                  padding: 2,
                 }}
               >
+                <View
+                  style={{
+                    marginTop: 10,
+                    marginBottom: 5,
+                    marginTop: 20,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "600",
+                      fontSize: 20,
+                      marginBottom: 5,
+                    }}
+                  >
+                    Successfull
+                  </Text>
+                  <Text>
+                    {selection && selection.productName} has been selected.
+                  </Text>
+                  <Text
+                    style={{
+                      fontWeight: "600",
+                      fontSize: 13,
+                      marginTop: 10,
+                    }}
+                  >
+                    Quantity
+                  </Text>
+                </View>
+
+                <TextInput
+                  onFocus={() => setErrors(null)}
+                  onBlur={() => setErrors(null)}
+                  textAlign="right"
+                  inputMode="numeric"
+                  value={quantity}
+                  onChangeText={(text) => setQuantity(text)}
+                  maxLength={3}
+                  style={{
+                    backgroundColor: Colors.light_3,
+                    borderRadius: 5,
+                    padding: 6,
+                    borderWidth: 1,
+                    borderColor: errors?.qtyZeroError
+                      ? Colors.error
+                      : "transparent",
+                  }}
+                />
+                {errors?.qtyZeroError && (
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: Colors.error,
+                    }}
+                  >
+                    {errors?.qtyZeroError}
+                  </Text>
+                )}
                 <Text
                   style={{
                     fontWeight: "600",
-                    fontSize: 20,
+                    fontSize: 13,
+                    marginTop: 10,
                     marginBottom: 5,
                   }}
                 >
-                  Successfull
+                  Unit cost
                 </Text>
-                <Text>
-                  {selection && selection.productName} has been selected.
-                </Text>
-                <Text
+                <TextInput
+                  textAlign="right"
+                  value={unitCost}
+                  inputMode="numeric"
+                  onChangeText={(e) => setUnitCost(e)}
                   style={{
-                    fontWeight: "600",
-                    fontSize: 16,
-                    marginTop: 10,
+                    backgroundColor: Colors.light_3,
+                    borderRadius: 5,
+                    padding: 6,
+                    borderColor: errors?.lessPriceError
+                      ? Colors.error
+                      : "transparent",
+                  }}
+                />
+                {errors?.lessPriceError && (
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: Colors.error,
+                    }}
+                  >
+                    {errors?.lessPriceError}
+                  </Text>
+                )}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginTop: 15,
+                    marginBottom: 5,
                   }}
                 >
-                  Input quantity
-                </Text>
+                  <MaterialButton
+                    title="Cancel"
+                    style={{
+                      backgroundColor: "transparent",
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: Colors.dark,
+                      marginStart: -2,
+                      margin: 10,
+                      height: 40,
+                    }}
+                    titleStyle={{
+                      fontWeight: "bold",
+                      color: Colors.dark,
+                    }}
+                    buttonPress={() => {
+                      setShowModal(false);
+                      setErrors({});
+                    }}
+                  />
+                  <MaterialButton
+                    title="Confirm"
+                    style={{
+                      backgroundColor: Colors.dark,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: Colors.dark,
+                      marginStart: 2,
+                      marginEnd: -2,
+                      margin: 10,
+                      height: 40,
+                    }}
+                    titleStyle={{
+                      fontWeight: "bold",
+                      color: Colors.primary,
+                    }}
+                    buttonPress={() => {
+                      saveSelection();
+                    }}
+                  />
+                </View>
               </View>
-
-              <TextInput
-                inputMode="numeric"
-                onChangeText={(text) => setQuantity(text)}
-                maxLength={3}
-                style={{
-                  backgroundColor: Colors.light_3,
-                  borderRadius: 5,
-                  padding: 6,
-                }}
-              />
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <MaterialButton
-                  title="Cancel"
-                  style={{
-                    backgroundColor: "transparent",
-                    borderRadius: 5,
-                    borderWidth: 1,
-                    borderColor: Colors.dark,
-                    marginStart: -2,
-                    margin: 10,
-                    height: 40,
-                  }}
-                  titleStyle={{
-                    fontWeight: "bold",
-                    color: Colors.dark,
-                  }}
-                  buttonPress={() => {
-                    setShowModal(false);
-                  }}
-                />
-                <MaterialButton
-                  title="Confirm"
-                  style={{
-                    backgroundColor: Colors.dark,
-                    borderRadius: 5,
-                    borderWidth: 1,
-                    borderColor: Colors.dark,
-                    marginStart: 2,
-                    marginEnd: -2,
-                    margin: 10,
-                    height: 40,
-                  }}
-                  titleStyle={{
-                    fontWeight: "bold",
-                    color: Colors.primary,
-                  }}
-                  buttonPress={() => {
-                    saveSelection();
-                    setShowModal(false);
-                    setLoading(true);
-                    setQuantity(null);
-                    setTimeout(() => {
-                      setLoading(false);
-                    }, 1000);
-                  }}
-                />
-              </View>
-            </View>
-          </Card>
-        </ModalContent>
-      </View>
-    </BlackAndWhiteScreen>
-  );
-}
-
-const DropdownComponent = ({
-  products,
-  handleChange,
-  setLoading,
-  makeSelection,
-  setScanned,
-}) => {
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
-
-  return (
-    <View style={styles.container}>
-      <Dropdown
-        style={[styles.dropdown, isFocus && { borderColor: Colors.primary }]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={products}
-        search
-        maxHeight={screenHeight / 2}
-        labelField="productName"
-        valueField="productName"
-        placeholder={!isFocus ? "Select Product" : "..."}
-        searchPlaceholder="Search..."
-        value={value}
-        onFocus={() => setIsFocus(true)}
-        onBlur={() => setIsFocus(false)}
-        onChange={(item) => {
-          setIsFocus(false);
-          setLoading(false);
-          makeSelection(item);
-          setValue(null);
-        }}
-        onChangeText={(text) => handleChange(text)}
-      />
-      <View style={{ flexDirection: "row" }}>
-        <TouchableOpacity
-          onPress={() => setScanned()}
-          style={{
-            borderColor: Colors.primary,
-            borderWidth: 1,
-            height: 40,
-            alignSelf: "center",
-            marginStart: 8,
-            padding: 10,
-            justifyContent: "center",
-            borderRadius: 5,
-            paddingVertical: 24,
-            marginBottom: 8,
-          }}
-        >
-          <Image
-            source={require("../assets/icons/icons8-barcode-24.png")}
-            style={{
-              width: 35,
-              height: 35,
-              tintColor: Colors.primary,
-              alignSelf: "center",
-            }}
-          />
-        </TouchableOpacity>
+            </Card>
+          </ModalContent>
+        </View>
       </View>
     </View>
   );
-};
+}
 
 const IconsComponent = ({ clear }) => {
   return (
@@ -994,76 +1024,4 @@ const IconsComponent = ({ clear }) => {
   );
 };
 
-const SaleItem = ({ data }) => {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        borderBottomColor: Colors.gray,
-        borderBottomWidth: 0.3,
-        alignItems: "center",
-        height: "fit-content",
-        paddingVertical: 8,
-      }}
-    >
-      <Text style={{ flex: 2.5, justifyContent: "center" }}>
-        {data.productName}
-      </Text>
-      <Text style={{ flex: 1, textAlign: "center" }}>{data.salesPrice}</Text>
-      <Text style={{ flex: 0.5, textAlign: "center" }}>{data.quantity}</Text>
-      <Text style={{ flex: 1, textAlign: "center" }}>{data.totalCost}</Text>
-
-      <TouchableOpacity>
-        <Text style={{ fontWeight: 600 }}>X</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
 export default SalesEntry;
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 10,
-    flexDirection: "row",
-    justifyContent: "center",
-  },
-  dropdown: {
-    height: 50,
-    borderColor: Colors.primary,
-    borderWidth: 0.5,
-    borderRadius: 5,
-    paddingHorizontal: 8,
-    backgroundColor: Colors.primary,
-    marginBottom: 8,
-    width: "80%",
-    alignSelf: "center",
-  },
-  icon: {
-    marginRight: 5,
-  },
-
-  label: {
-    position: "absolute",
-    // backgroundColor: "white",
-    left: 22,
-    top: 8,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
-});
