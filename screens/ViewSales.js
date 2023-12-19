@@ -522,7 +522,7 @@ function TransactionItem({ data }) {
           >
             <View style={{ alignItems: "center" }}>
               <Text>Items</Text>
-              <Text>{(lineItems && lineItems.length) || 0}</Text>
+              <Text>{itemCount}</Text>
             </View>
             <View style={{ alignItems: "center" }}>
               <Text>Amount</Text>
