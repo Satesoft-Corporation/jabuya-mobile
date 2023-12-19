@@ -64,13 +64,6 @@ export default function ViewSales({ navigation, route }) {
     }
   };
 
-  function compareDates(date1, date2) {
-    const formattedDate1 = new Date(date1).toISOString().slice(0, 10);
-    const formattedDate2 = new Date(date2).toISOString().slice(0, 10);
-
-    return formattedDate1 === formattedDate2;
-  }
-
   function convertDateFormat(dateString, getTomorrowDate = false) {
     const date = new Date(dateString); // Create a Date object from the input string
 
@@ -159,7 +152,6 @@ export default function ViewSales({ navigation, route }) {
       .then((response) => {
         setAllSales(response.records);
         for (let item of response.records) {
-          setTotalSales((i) => i + item.lineItems.length);
           setSalesValue((i) => i + item.amountPaid);
         }
         setSales(response.records);
@@ -183,6 +175,10 @@ export default function ViewSales({ navigation, route }) {
     getSales(startDate, endDate);
   };
 
+  const setCount = (count) => {
+    setTotalSales((i) => i + count);
+    // console.log(count);
+  };
   useEffect(() => {
     getSales();
     fetchSumarry();
@@ -325,7 +321,9 @@ export default function ViewSales({ navigation, route }) {
                 showsHorizontalScrollIndicator={false}
                 data={sales}
                 keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => <TransactionItem data={item} />}
+                renderItem={({ item }) => (
+                  <TransactionItem data={item} setCount={(a) => setCount(a)} />
+                )}
               />
             ) : (
               <View
@@ -420,7 +418,7 @@ export default function ViewSales({ navigation, route }) {
   );
 }
 
-function TransactionItem({ data }) {
+function TransactionItem({ data, setCount }) {
   function formatDate(inputDate) {
     const options = {
       weekday: "short",
@@ -458,6 +456,7 @@ function TransactionItem({ data }) {
             item.totalCost,
           ]);
           setItemCount((count) => count + item.quantity);
+          setCount(item.quantity);
         }
       }
     }
