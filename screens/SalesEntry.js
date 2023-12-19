@@ -26,6 +26,7 @@ import UserProfile from "../components/UserProfile";
 import MaterialInput from "../components/MaterialInput";
 import { SaleListItem } from "../components/TransactionItems";
 import { SalesDropdownComponent } from "../components/DropdownComponents";
+import { SalesInfoDialog } from "../components/Dialogs";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -92,7 +93,7 @@ function SalesEntry({ route }) {
     let payLoad = {
       id: shopOwnerId,
       shopId: attendantShopId,
-      amountPaid: totalCost,
+      amountPaid: recievedAmount,
       lineItems: selectedProducts,
     };
     new BaseApiService("/shop-sales")
@@ -217,8 +218,8 @@ function SalesEntry({ route }) {
         selections[productIndex].quantity = Number(quantity) + prevQty;
         selections[productIndex].totalCost = prevTotalCost + cost;
         selectedProducts[productIndex2].quantity = Number(quantity) + prevQty;
+        setLoading(false);
 
-        return true; // Indicates successful update and I'm a genius
       } else {
         selectedProducts.push({
           // data set to be used in posting the sale to the server
@@ -277,8 +278,10 @@ function SalesEntry({ route }) {
             },
           ]);
           setLoading(false);
+          setQuantity(null);
         } else {
           setSelection(response.records[0]);
+          setUnitCost(String(response.records[0]?.salesPrice));
           setShowModal(true);
           setLoading(false);
         }
@@ -346,7 +349,6 @@ function SalesEntry({ route }) {
   return scanBarCode ? (
     <View style={styles.container}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
-
       <OrientationLoadingOverlay
         visible={loading}
         color={Colors.primary}
@@ -370,13 +372,12 @@ function SalesEntry({ route }) {
               style={{
                 marginTop: 10,
                 marginBottom: 5,
-                marginStart: 10,
                 marginTop: 20,
               }}
             >
               <Text
                 style={{
-                  fontWeight: "500",
+                  fontWeight: "600",
                   fontSize: 20,
                   marginBottom: 5,
                 }}
@@ -384,33 +385,87 @@ function SalesEntry({ route }) {
                 Successfull
               </Text>
               <Text>
-                {selection && selection.productName} has been scanned.
+                {selection && selection.productName} has been selected.
               </Text>
               <Text
                 style={{
                   fontWeight: "600",
-                  fontSize: 16,
+                  fontSize: 13,
                   marginTop: 10,
                 }}
               >
-                Input quantity
+                Quantity
               </Text>
             </View>
 
             <TextInput
+              onFocus={() => setErrors(null)}
+              onBlur={() => setErrors(null)}
+              textAlign="right"
               inputMode="numeric"
+              value={quantity}
               onChangeText={(text) => setQuantity(text)}
               maxLength={3}
               style={{
                 backgroundColor: Colors.light_3,
                 borderRadius: 5,
                 padding: 6,
+                borderWidth: 1,
+                borderColor: errors?.qtyZeroError
+                  ? Colors.error
+                  : "transparent",
               }}
             />
+            {errors?.qtyZeroError && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: Colors.error,
+                }}
+              >
+                {errors?.qtyZeroError}
+              </Text>
+            )}
+            <Text
+              style={{
+                fontWeight: "600",
+                fontSize: 13,
+                marginTop: 10,
+                marginBottom: 5,
+              }}
+            >
+              Unit cost
+            </Text>
+            <TextInput
+              textAlign="right"
+              value={unitCost}
+              inputMode="numeric"
+              onChangeText={(e) => setUnitCost(e)}
+              style={{
+                backgroundColor: Colors.light_3,
+                borderRadius: 5,
+                padding: 6,
+                borderColor: errors?.lessPriceError
+                  ? Colors.error
+                  : "transparent",
+              }}
+            />
+            {errors?.lessPriceError && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: Colors.error,
+                }}
+              >
+                {errors?.lessPriceError}
+              </Text>
+            )}
             <View
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
+                marginTop: 15,
+                marginBottom: 5,
               }}
             >
               <MaterialButton
@@ -429,8 +484,9 @@ function SalesEntry({ route }) {
                   color: Colors.dark,
                 }}
                 buttonPress={() => {
-                  setShowModal(false);
                   setScanned(false);
+                  setShowModal(false);
+                  setErrors({});
                 }}
               />
               <MaterialButton
@@ -450,14 +506,16 @@ function SalesEntry({ route }) {
                   color: Colors.primary,
                 }}
                 buttonPress={() => {
-                  saveSelection();
                   setScanned(false);
+                  saveSelection();
+                  setShowModal(false);
                 }}
               />
             </View>
           </View>
         </Card>
       </ModalContent>
+
       <BarCodeScanner
         height={screenHeight}
         width={screenWidth}
@@ -614,7 +672,6 @@ function SalesEntry({ route }) {
               </View>
             </View>
           </View>
-
           <View
             style={{
               backgroundColor: Colors.light,
@@ -685,7 +742,6 @@ function SalesEntry({ route }) {
               </View>
             </View>
           </View>
-
           <View
             style={{
               backgroundColor: Colors.light,
@@ -726,15 +782,12 @@ function SalesEntry({ route }) {
               >
                 <Text style={{ fontSize: 10 }}>UGX</Text>
                 <Text style={{ fontSize: 17 }}>
-                  {" "}
                   {recievedAmount === 0 ? 0 : recievedAmount - totalCost}
                 </Text>
               </Text>
             </View>
           </View>
-
           <IconsComponent clear={clearEverything} />
-
           <TouchableOpacity
             style={{
               backgroundColor: Colors.dark,
@@ -771,7 +824,6 @@ function SalesEntry({ route }) {
               Confirm Purchase
             </Text>
           </TouchableOpacity>
-
           <ModalContent visible={showMoodal} style={{ padding: 35 }}>
             <Card
               style={{
