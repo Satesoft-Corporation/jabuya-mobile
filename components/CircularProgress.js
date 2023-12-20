@@ -22,7 +22,7 @@ export default function CircularProgress() {
     <TouchableOpacity
       disabled
       style={{
-        backgroundColor: Colors.dark,
+        backgroundColor: Colors.primary,
         marginTop: 30,
         borderRadius: 5,
         borderWidth: 1,
@@ -56,7 +56,7 @@ function DotItem({ isActive }) {
         width: isActive ? 10 : 6,
         height: isActive ? 10 : 6,
         borderRadius: isActive ? 5 : 3,
-        backgroundColor: Colors.primary,
+        backgroundColor: Colors.dark,
       }}
     />
   );
