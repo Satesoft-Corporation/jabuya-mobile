@@ -12,7 +12,7 @@ const StockListing = memo(({ params }) => {
 
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } = params;
 
-  const fetchStockLevels = async () => {
+  const fetchStockListing = async () => {
     setLoading(true);
     let searchParameters = {
       offset: 0,
@@ -37,7 +37,7 @@ const StockListing = memo(({ params }) => {
       });
   };
   useEffect(() => {
-    fetchStockLevels();
+    fetchStockListing();
   }, []);
   return (
     <View

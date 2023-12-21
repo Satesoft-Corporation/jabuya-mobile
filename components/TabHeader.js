@@ -7,7 +7,7 @@ function TabHeader({
   icons = [],
   bgColor = Colors.dark,
   stripColor = Colors.primary,
-  activeIndex ,
+  activeIndex,
   onActiveChanged,
   defaultTitleColor = "white",
   activeTitleColor = Colors.primary,
@@ -75,6 +75,7 @@ function TabTextItem({
         alignItems: "center",
         borderBottomWidth: 2,
         borderBottomColor: selected ? stripColor : "transparent",
+        opacity: selected ? 1 : 0.6,
       }}
       onPress={onPress}
     >

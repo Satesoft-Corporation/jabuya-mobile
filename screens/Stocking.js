@@ -1,19 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from "react";
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  TextInput,
-  Alert,
-  SafeAreaView,
-  Dimensions,
-  FlatList,
-  Animated,
-} from "react-native";
+import { View, Dimensions, FlatList } from "react-native";
 import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
 
-import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import UserProfile from "../components/UserProfile";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import TabHeader from "../components/TabHeader";
@@ -22,7 +11,7 @@ import { FloatingButton } from "../components/FloatingButton";
 import StockLevel from "./StockLevels";
 import StockListing from "./StockListing";
 
-const Stocking = ({ route }) => {
+const Stocking = ({ route, navigation }) => {
   const tabTitles = ["Stock purchase", "Stock level", "Stock listing"];
   const params = route.params;
 
@@ -37,7 +26,7 @@ const Stocking = ({ route }) => {
     },
     {
       id: 2,
-      page: <StockListing params={params}/>,
+      page: <StockListing params={params} />,
     },
   ];
 
@@ -66,7 +55,7 @@ const Stocking = ({ route }) => {
         style={{
           width: Dimensions.get("window").width - 2,
           marginHorizontal: 1,
-          paddingTop: 0,
+          paddingTop: 10,
         }}
       >
         {item.page}
@@ -81,7 +70,7 @@ const Stocking = ({ route }) => {
         <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
         <BlackScreen flex={0.14}>
-          <UserProfile  navigation={navigation}/>
+          <UserProfile navigation={navigation} />
 
           <TabHeader
             titles={tabTitles}

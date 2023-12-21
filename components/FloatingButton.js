@@ -1,8 +1,13 @@
-import React, { useContext, useRef, useState, Component } from "react";
+import React, { useState } from "react";
 import { TouchableOpacity, Text, View, Image, Animated } from "react-native";
 import Colors from "../constants/Colors";
 
-export function FloatingButton({ children, with_text = true, opacity = 0.6 }) {
+export function FloatingButton({
+  children,
+  with_text = true,
+  opacity = 0.8,
+  handlePress,
+}) {
   const [visible] = useState(new Animated.Value(50));
   const [opc] = useState(new Animated.Value(0));
   const [visible_] = useState(new Animated.Value(50));
@@ -28,6 +33,7 @@ export function FloatingButton({ children, with_text = true, opacity = 0.6 }) {
           Animated.timing(opc, {
             toValue: opacity,
             duration: 200,
+            useNativeDriver: true,
           }),
           Animated.timing(visible, {
             toValue: 130,
@@ -53,6 +59,7 @@ export function FloatingButton({ children, with_text = true, opacity = 0.6 }) {
           Animated.timing(opc, {
             toValue: 0,
             duration: 200,
+            useNativeDriver: true,
           }),
           Animated.timing(visible, {
             toValue: 50,
@@ -80,7 +87,7 @@ export function FloatingButton({ children, with_text = true, opacity = 0.6 }) {
           style={{
             flex: 1,
             opacity: opc,
-            backgroundColor: "#4a4a4a",
+            backgroundColor: Colors.dark,
             position: "absolute",
             top: 0,
             bottom: 0,
@@ -94,32 +101,74 @@ export function FloatingButton({ children, with_text = true, opacity = 0.6 }) {
         style={{
           width: 136,
           height: 46,
-          // backgroundColor: 'blue',
           position: "absolute",
-          right: 20,
+          right: 10,
           alignItems: "center",
           bottom: visible,
           flexDirection: "row",
+          marginBottom: -15,
+          opacity: isOpen ? 1 : 0,
         }}
       >
         {with_text && (
           <Animated.View
             style={{
-              width: width,
+              width: 80,
               backgroundColor: "#FFF",
-              height: 30,
+              height: 25,
               borderRadius: 3,
               position: "absolute",
               right: right,
-              alignItems: "center",
               justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            <Text style={{ fontSize: 12, color: "#4a4a4a" }}>Add</Text>
+            <TouchableOpacity onPress={() => console.log(888)}>
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: "#4a4a4a",
+                  textAlign: "right",
+                }}
+              >
+                Restock
+              </Text>
+            </TouchableOpacity>
           </Animated.View>
         )}
+        <Animated.View
+          style={{
+            borderRadius: 50,
+            width: 40,
+            height: 40,
+            bottom: 3,
+            backgroundColor: "#FFF",
+            position: "absolute",
+            right: 20,
 
-      
+            borderWidth: 0,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.5,
+            shadowRadius: 3,
+            elevation: isBg ? 5 : 0,
+            margin: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <TouchableOpacity onPress={() => console.log(7777)}>
+            <Image
+              style={{
+                width: 15,
+                height: 15,
+                tintColor: "#4a4a4a",
+                alignSelf: "center",
+              }}
+              source={require("../assets/icons/ic_close.png")}
+            />
+          </TouchableOpacity>
+        </Animated.View>
       </Animated.View>
 
       <Animated.View
@@ -127,18 +176,20 @@ export function FloatingButton({ children, with_text = true, opacity = 0.6 }) {
           width: 136,
           height: 46,
           position: "absolute",
-          right: 20,
+          right: 10,
           alignItems: "center",
           bottom: visible_,
           flexDirection: "row",
+          marginBottom: -25,
+          opacity: isOpen ? 1 : 0,
         }}
       >
         {with_text && (
           <Animated.View
             style={{
-              width: width,
+              width: 80,
               backgroundColor: "#FFF",
-              height: 30,
+              height: 25,
               borderRadius: 3,
               position: "absolute",
               right: right,
@@ -146,18 +197,27 @@ export function FloatingButton({ children, with_text = true, opacity = 0.6 }) {
               justifyContent: "center",
             }}
           >
-            <Text style={{ fontSize: 12, color: "#4a4a4a" }}>Close</Text>
+            <Text
+              style={{
+                fontSize: 13,
+                color: "#4a4a4a",
+                textAlign: "right",
+                opacity: isOpen ? 1 : 0,
+              }}
+            >
+              List product
+            </Text>
           </Animated.View>
         )}
         <Animated.View
           style={{
             borderRadius: 50,
-            width: 46,
-            height: 46,
-            bottom: 0,
+            width: 40,
+            height: 40,
+            bottom: 3,
             backgroundColor: "#FFF",
             position: "absolute",
-            right: 0,
+            right: 20,
 
             borderWidth: 0,
             shadowColor: "#000",
@@ -171,12 +231,17 @@ export function FloatingButton({ children, with_text = true, opacity = 0.6 }) {
           }}
         >
           <Image
-            style={{ width: 20, height: 20, tintColor: "#4a4a4a" }}
+            style={{
+              width: 15,
+              height: 15,
+              tintColor: "#4a4a4a",
+              alignSelf: "center",
+            }}
             source={require("../assets/icons/ic_close.png")}
           />
         </Animated.View>
       </Animated.View>
-      
+
       <TouchableOpacity
         onPress={show()}
         style={{

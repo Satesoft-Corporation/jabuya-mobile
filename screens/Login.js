@@ -8,8 +8,8 @@ import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Constants from "expo-constants";
 import CircularProgress from "../components/CircularProgress";
 export default function Login({ navigation }) {
-  const [username, setUsername] = useState("mosestest");
-  const [password, setPassword] = useState("0712345667");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [disabled, setDisabled] = useState(false);
 
   let loginInfo = {
@@ -130,7 +130,7 @@ export default function Login({ navigation }) {
           disabled={disabled}
           onPress={() => onLogin()}
           style={{
-            backgroundColor: Colors.dark,
+            backgroundColor: Colors.primary,
             marginTop: 30,
             borderRadius: 5,
             borderWidth: 1,
@@ -142,7 +142,7 @@ export default function Login({ navigation }) {
           <Text
             style={{
               fontWeight: "bold",
-              color: Colors.primary,
+              color: Colors.dark,
               alignSelf: "center",
               fontSize: 16,
             }}

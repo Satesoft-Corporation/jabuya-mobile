@@ -1,8 +1,9 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import Colors from "../constants/Colors";
 import { formatDate, formatNumberWithCommas } from "../utils/Utils";
 import { useEffect, useState } from "react";
 import { FlatList } from "react-native-gesture-handler";
+const screenWidth = Dimensions.get("window").width;
 
 export function SaleTransactionItem({ data, setCount, isShopOwner }) {
   const { lineItems, totalCost, amountPaid, balanceGivenOut, shopName } = data;
@@ -91,19 +92,19 @@ export function SaleTransactionItem({ data, setCount, isShopOwner }) {
             }}
           >
             <View style={{ alignItems: "center" }}>
-              <Text>Items</Text>
+              <Text style={{ fontWeight: 600 }}>Items</Text>
               <Text>{itemCount}</Text>
             </View>
             <View style={{ alignItems: "center" }}>
-              <Text>Amount</Text>
+              <Text style={{ fontWeight: 600 }}>Amount</Text>
               <Text>{formatNumberWithCommas(totalCost)}</Text>
             </View>
             <View style={{ alignItems: "center" }}>
-              <Text>Recieved</Text>
+              <Text style={{ fontWeight: 600 }}>Recieved</Text>
               <Text>{formatNumberWithCommas(amountPaid)}</Text>
             </View>
             <View style={{ alignItems: "center" }}>
-              <Text>Balance</Text>
+              <Text style={{ fontWeight: 600 }}>Balance</Text>
               <Text>{formatNumberWithCommas(balanceGivenOut)}</Text>
             </View>
           </View>
@@ -116,7 +117,7 @@ export function SaleTransactionItem({ data, setCount, isShopOwner }) {
             <View>
               <Text
                 style={{
-                  fontWeight: 400,
+                  fontWeight: 600,
                   fontSize: 12,
                 }}
               >
@@ -292,7 +293,7 @@ export function SaleTransactionItem({ data, setCount, isShopOwner }) {
               Served by:{" "}
               <Text
                 style={{
-                  fontWeight: 400,
+                  fontWeight: 600,
                 }}
               >
                 {data?.createdByFullName}
@@ -443,7 +444,7 @@ export function StockPurchaseTransactionItem({ data }) {
           <View style={{ alignItems: "left" }}>
             <Text
               style={{
-                fontWeight: 500,
+                fontWeight: 600,
                 marginBottom: 3,
               }}
             >
@@ -454,7 +455,7 @@ export function StockPurchaseTransactionItem({ data }) {
           <View style={{ alignItems: "center" }}>
             <Text
               style={{
-                fontWeight: 500,
+                fontWeight: 600,
                 marginBottom: 3,
               }}
             >
@@ -466,7 +467,7 @@ export function StockPurchaseTransactionItem({ data }) {
           <View style={{ alignItems: "center" }}>
             <Text
               style={{
-                fontWeight: 500,
+                fontWeight: 600,
                 marginBottom: 3,
               }}
             >
@@ -511,20 +512,23 @@ export function StockPurchaseTransactionItem({ data }) {
             </View>
 
             <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginVertical: 2,
+              }}
             >
               <Text
                 style={{
                   fontWeight: 400,
                   fontSize: 12,
-                  marginVertical: 2,
                 }}
               >
                 Expiry date:{" "}
               </Text>
               <Text
                 style={{
-                  fontWeight: 300,
+                  fontWeight: 600,
                   fontSize: 12,
                 }}
               >
@@ -564,7 +568,7 @@ export function StockPurchaseTransactionItem({ data }) {
           <View>
             <Text
               style={{
-                fontWeight: 400,
+                fontWeight: 600,
                 fontSize: 12,
               }}
             >
@@ -665,14 +669,13 @@ export function StockLevelTransactionItem({ data }) {
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "space-between",
             marginVertical: 10,
           }}
         >
-          <View style={{ alignItems: "left" }}>
+          <View style={{ alignItems: "left", flex: 2 }}>
             <Text
               style={{
-                fontWeight: 500,
+                fontWeight: 600,
                 marginBottom: 3,
               }}
             >
@@ -680,52 +683,36 @@ export function StockLevelTransactionItem({ data }) {
             </Text>
             <Text>{data?.productName}</Text>
           </View>
-          <View style={{ alignItems: "center" }}>
-            <Text
-              style={{
-                fontWeight: 500,
-                marginBottom: 3,
-              }}
-            >
-               Stocked
-            </Text>
-            <Text>{performanceSummary?.totalQuantityStocked}</Text>
-          </View>
 
-          <View style={{ alignItems: "center" }}>
+          <View style={{ alignItems: "center", flex: 1 }}>
             <Text
               style={{
-                fontWeight: 500,
+                fontWeight: 600,
                 marginBottom: 3,
               }}
             >
-               Sold
+              Sold
             </Text>
             <Text
               style={{
-                alignSelf: "flex-end",
+                alignSelf: "center",
                 marginEnd: 2,
               }}
             >
-              {performanceSummary?.totalQuantitySold}
+              {performanceSummary?.totalQuantitySoldThisMonth || 0}
             </Text>
           </View>
-          <View style={{ alignItems: "center" }}>
+          <View style={{ alignItems: "center", flex: 1 }}>
             <Text
               style={{
-                fontWeight: 500,
+                fontWeight: 600,
                 marginBottom: 3,
               }}
             >
               In stock
             </Text>
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                marginEnd: 2,
-              }}
-            >
-              {performanceSummary?.totalQuantityStocked}
+            <Text style={{ fontWeight: 600 }}>
+              {performanceSummary?.totalQuantityStocked || 0}
             </Text>
           </View>
         </View>
@@ -757,7 +744,7 @@ export function StockLevelTransactionItem({ data }) {
               </Text>
             </View>
 
-            <View
+            {/* <View
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
               <Text
@@ -777,10 +764,14 @@ export function StockLevelTransactionItem({ data }) {
               >
                 {formatDate(data?.expiryDate, true)}
               </Text>
-            </View>
+            </View> */}
 
             <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginVertical: 2,
+              }}
             >
               <Text
                 style={{
@@ -789,7 +780,7 @@ export function StockLevelTransactionItem({ data }) {
                   marginBottom: 10,
                 }}
               >
-                Supplier:{" "}
+                Manufacturer:{" "}
               </Text>
               <Text
                 style={{
@@ -797,7 +788,7 @@ export function StockLevelTransactionItem({ data }) {
                   fontSize: 12,
                 }}
               >
-                {data?.supplierName}
+                {data?.manufacturerName}
               </Text>
             </View>
           </View>
@@ -811,7 +802,7 @@ export function StockLevelTransactionItem({ data }) {
           <View>
             <Text
               style={{
-                fontWeight: 400,
+                fontWeight: 600,
                 fontSize: 12,
               }}
             >
@@ -912,14 +903,13 @@ export function StockListingTransactionItem({ data }) {
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "space-between",
             marginVertical: 10,
           }}
         >
-          <View style={{ alignItems: "left" }}>
+          <View style={{ alignItems: "left", flex: 2 }}>
             <Text
               style={{
-                fontWeight: 500,
+                fontWeight: 600,
                 marginBottom: 3,
               }}
             >
@@ -927,34 +917,39 @@ export function StockListingTransactionItem({ data }) {
             </Text>
             <Text>{data?.productName}</Text>
           </View>
-          <View style={{ alignItems: "center" }}>
+          <View style={{ alignItems: "center", flex: 2 }}>
             <Text
               style={{
-                fontWeight: 500,
+                fontWeight: 600,
                 marginBottom: 3,
               }}
             >
-              Qty
+              Category
             </Text>
-            <Text>{data?.packedQuantity * data?.purchasedQuantity}</Text>
+            <Text style={{ alignSelf: "center" }}>
+              {data?.categoryName || "None"}
+            </Text>
           </View>
 
-          <View style={{ alignItems: "center" }}>
+          <View style={{ alignItems: "center", flex: 1 }}>
             <Text
               style={{
-                fontWeight: 500,
+                fontWeight: 600,
                 marginBottom: 3,
+                alignSelf: "center",
               }}
             >
-              Amount
+              Status
             </Text>
             <Text
               style={{
-                alignSelf: "flex-end",
+                alignSelf: "center",
                 marginEnd: 2,
               }}
             >
-              {formatNumberWithCommas(data?.purchasePrice)}
+              {data?.recordStatus
+                .toLowerCase()
+                .replace(/(^|\s)\S/g, (L) => L.toUpperCase())}
             </Text>
           </View>
         </View>
@@ -993,32 +988,10 @@ export function StockListingTransactionItem({ data }) {
                 style={{
                   fontWeight: 400,
                   fontSize: 12,
-                  marginVertical: 2,
-                }}
-              >
-                Expiry date:{" "}
-              </Text>
-              <Text
-                style={{
-                  fontWeight: 300,
-                  fontSize: 12,
-                }}
-              >
-                {formatDate(data?.expiryDate, true)}
-              </Text>
-            </View>
-
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <Text
-                style={{
-                  fontWeight: 400,
-                  fontSize: 12,
                   marginBottom: 10,
                 }}
               >
-                Supplier:{" "}
+                Manufacturer:{" "}
               </Text>
               <Text
                 style={{
@@ -1026,7 +999,7 @@ export function StockListingTransactionItem({ data }) {
                   fontSize: 12,
                 }}
               >
-                {data?.supplierName}
+                {data?.manufacturerName}
               </Text>
             </View>
           </View>
@@ -1040,11 +1013,11 @@ export function StockListingTransactionItem({ data }) {
           <View>
             <Text
               style={{
-                fontWeight: 400,
+                fontWeight: 600,
                 fontSize: 12,
               }}
             >
-              Restock by:{" "}
+              Listed by:{" "}
               <Text
                 style={{
                   fontWeight: 300,
