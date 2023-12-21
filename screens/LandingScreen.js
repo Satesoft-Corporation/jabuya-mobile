@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
+import { View, FlatList, Image, TouchableOpacity } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
@@ -7,15 +7,12 @@ import { UserSessionUtils } from "../utils/UserSessionUtils";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import UserProfile from "../components/UserProfile";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
-import SwipeMenu from "../components/SwipeMenu";
-import DrawerContent from "../components/DrawerContent";
 
 export default function LandingScreen({ navigation }) {
   const [tab, setTab] = useState("home");
 
   const [loading, setLoading] = useState(false);
   const [routeParams, setRouteParams] = useState(null);
-  const leftMenuRef = useRef(null);
 
   const categoryIcons = [
     {
@@ -42,10 +39,6 @@ export default function LandingScreen({ navigation }) {
       title: "Chat",
     },
   ];
-
-  const onMenuPress = () => {
-    leftMenuRef.current.navigateMenu();
-  };
 
   useEffect(() => {
     UserSessionUtils.getFullSessionObject().then((data) => {
