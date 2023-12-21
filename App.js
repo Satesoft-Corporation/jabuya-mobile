@@ -8,6 +8,7 @@ import ViewSales from "./screens/ViewSales";
 import ShopSummary from "./screens/ShopSummary";
 import Stocking from "./screens/Stocking";
 import { UserSessionUtils } from "./utils/UserSessionUtils";
+import StockPurchaseForm from "./forms/StockPurchaseForm";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -18,7 +19,7 @@ export default function App() {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="login" component={Login} />
+        {/* <Stack.Screen name="login" component={Login} /> */}
 
         <Stack.Screen name="welcome" component={LandingScreen} />
 
@@ -29,6 +30,8 @@ export default function App() {
         <Stack.Screen name="shopSummary" component={ShopSummary} />
 
         <Stack.Screen name="stocking" component={Stocking} />
+
+        <Stack.Screen name="stockPurchaseForm" component={StockPurchaseForm} />
       </Stack.Navigator>
     </NavigationContainer>
   );
