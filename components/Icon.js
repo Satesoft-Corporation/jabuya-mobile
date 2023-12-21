@@ -2,7 +2,13 @@ import { TouchableOpacity, Image, View, Text } from "react-native";
 import React from "react";
 import Colors from "../constants/Colors";
 
-export default function ({ icon, containerStyle, onPress, iconStyle, titleStyle }) {
+export default function ({
+  icon,
+  containerStyle,
+  onPress,
+  iconStyle,
+  titleStyle,
+}) {
   return (
     <TouchableOpacity
       key={icon.id}
@@ -12,10 +18,10 @@ export default function ({ icon, containerStyle, onPress, iconStyle, titleStyle 
         alignItems: "center",
         marginVertical: 2,
         paddingVertical: 5,
-        backgroundColor:Colors.light,
-        margin:10,
-        marginBottom:10
-
+        backgroundColor: Colors.light,
+        margin: 10,
+        marginBottom: 10,
+        borderRadius: 5,
       }}
       onPress={onPress}
     >
@@ -38,7 +44,7 @@ export default function ({ icon, containerStyle, onPress, iconStyle, titleStyle 
             {
               width: 35,
               height: 35,
-              tintColor:Colors.dark
+              tintColor: Colors.dark,
             },
             iconStyle,
           ]}
@@ -51,7 +57,6 @@ export default function ({ icon, containerStyle, onPress, iconStyle, titleStyle 
             fontSize: 15,
             margin: 10,
             fontWeight: "500",
-            
           },
           titleStyle,
         ]}
