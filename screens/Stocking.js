@@ -37,7 +37,8 @@ const Stocking = ({ route, navigation }) => {
   const flatlistRef = useRef(null);
 
   const handleFormDestination = () => {
-    navigation.navigate("stockPurchaseForm");
+    // navigation.navigate("stockPurchaseForm");
+    return true;
   };
 
   const handleTabChange = (index) => {

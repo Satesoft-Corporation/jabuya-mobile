@@ -679,8 +679,10 @@ function SalesEntry({ route, navigation }) {
         </View>
       </BlackScreen>
 
-      <View style={{ backgroundColor: Colors.light_2 }}>
-        <ScrollView style={{ paddingHorizontal: 10, marginTop: 7 }}>
+      <View style={{ backgroundColor: Colors.light_2, flex: 1 }}>
+        <ScrollView
+          style={{ paddingHorizontal: 10, marginTop: 7 }}
+        >
           <View
             style={{
               //m was -10
@@ -755,7 +757,6 @@ function SalesEntry({ route, navigation }) {
               borderRadius: 5,
               padding: 10,
               marginTop: 8,
-              height: screenHeight / 3,
             }}
           >
             <View
@@ -780,9 +781,15 @@ function SalesEntry({ route, navigation }) {
                 Amount
               </Text>
             </View>
-            {selections.map((item) => (
-              <SaleListItem data={item} />
-            ))}
+            <View
+              style={{
+                height: screenHeight / 4,
+              }}
+            >
+              {selections.map((item) => (
+                <SaleListItem data={item} />
+              ))}
+            </View>
             <View
               style={{
                 backgroundColor: Colors.light,
