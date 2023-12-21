@@ -6,46 +6,98 @@ import Colors from "../constants/Colors";
 import { BaseApiService } from "../utils/BaseApiService";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import { ItemHeader } from "./ViewSales";
-
+import { BlackScreen } from "../components/BlackAndWhiteScreen";
+import UserProfile from "../components/UserProfile";
 const ShopSummary = ({ navigation, route }) => {
   const [performanceSummary, setPerformanceSummary] = useState({});
   const [initialCapital, setInitialCapital] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const {
-    isShopOwner,
-    isShopAttendant,
-    attendantShopId,
-    shopOwnerId,
-    myShopId,
-  } = route.params;
+  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+    route.params;
 
-  let id = isShopAttendant ? attendantShopId : isShopOwner ? myShopId : id;
-
-  const fetchSumarry = () => {
-    new BaseApiService(`/shops/${id}`)
-      .getRequestWithJsonResponse()
-      .then((response) => {
-        setInitialCapital(formatNumberWithCommas(response.data.initialCapital));
-        setPerformanceSummary(response.data.performanceSummary);
-        setTimeout(() => {
-          setLoading(false);
-        }, 100);
-      })
-      .catch((error) => {
-        Alert.alert("Cannot get summary!", error?.message);
-        setLoading(false);
-      });
-  };
-
-  function formatNumberWithCommas(number) {
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-  useEffect(() => fetchSumarry(), []);
-
-  let arr = { attendantShopId: 2163, shopOwnerId: 0 };
   return (
-    <BlackAndWhiteScreen flex={0.9} bgColor={Colors.light_2}>
+    <View style={{ backgroundColor: Colors.light_2, flex: 1 }}>
+      <BlackScreen flex={0.45}>
+        <UserProfile navigation={navigation} />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginVertical: 20,
+            paddingHorizontal: 13,
+          }}
+        >
+          <View>
+            <Text
+              style={{
+                fontSize: 12,
+                color: Colors.primary,
+                opacity: 0.6,
+                marginBottom: 3,
+              }}
+            >
+              Investment
+            </Text>
+            <Text
+              style={{ fontSize: 15, color: Colors.primary, fontWeight: "600" }}
+            >
+              <Text
+                style={{
+                  fontSize: 10,
+                }}
+              >
+                UGX
+              </Text>{" "}
+              {initialCapital}
+            </Text>
+          </View>
+          <View
+            style={{
+              width: 1,
+              height: "inherit",
+              backgroundColor: Colors.primary,
+            }}
+          />
+          <View>
+            <Text
+              style={{
+                fontSize: 12,
+                color: Colors.primary,
+                opacity: 0.6,
+                marginBottom: 3,
+                alignSelf: "flex-end",
+              }}
+            >
+              Shops
+            </Text>
+            <Text style={{ color: Colors.primary, alignSelf: "flex-end" }}>
+              01
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: Colors.primary,
+              borderRadius: 3,
+              height: 25,
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.dark,
+                paddingHorizontal: 6,
+                alignSelf: "center",
+                justifyContent: "center",
+                fontSize: 12,
+              }}
+            >
+              ADD CAPITAL
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </BlackScreen>
       <AppStatusBar bgColor="black" content="light-content" />
       <OrientationLoadingOverlay
         visible={loading}
@@ -54,85 +106,8 @@ const ShopSummary = ({ navigation, route }) => {
         messageFontSize={24}
         message=""
       />
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginVertical: 20,
-          paddingHorizontal: 13,
-        }}
-      >
-        <View>
-          <Text
-            style={{
-              fontSize: 12,
-              color: Colors.primary,
-              opacity: 0.6,
-              marginBottom: 3,
-            }}
-          >
-            Investment
-          </Text>
-          <Text
-            style={{ fontSize: 15, color: Colors.primary, fontWeight: "600" }}
-          >
-            <Text
-              style={{
-                fontSize: 10,
-              }}
-            >
-              UGX
-            </Text>{" "}
-            {initialCapital}
-          </Text>
-        </View>
-        <View
-          style={{
-            width: 1,
-            height: "inherit",
-            backgroundColor: Colors.primary,
-          }}
-        />
-        <View>
-          <Text
-            style={{
-              fontSize: 12,
-              color: Colors.primary,
-              opacity: 0.6,
-              marginBottom: 3,
-              alignSelf: "flex-end",
-            }}
-          >
-            Shops
-          </Text>
-          <Text style={{ color: Colors.primary, alignSelf: "flex-end" }}>
-            01
-          </Text>
-        </View>
 
-        <TouchableOpacity
-          style={{
-            backgroundColor: Colors.primary,
-            borderRadius: 3,
-            height: 25,
-            justifyContent: "center",
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.dark,
-              paddingHorizontal: 6,
-              alignSelf: "center",
-              justifyContent: "center",
-              fontSize: 12,
-            }}
-          >
-            ADD CAPITAL
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={{ paddingHorizontal: 10, marginTop: 25 }}>
+      <View style={{ paddingHorizontal: 10, marginTop: -25 }}>
         <View
           style={{
             backgroundColor: Colors.primary,
@@ -438,7 +413,7 @@ const ShopSummary = ({ navigation, route }) => {
           </View>
         </View>
       </View>
-    </BlackAndWhiteScreen>
+    </View>
   );
 };
 

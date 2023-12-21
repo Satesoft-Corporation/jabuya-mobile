@@ -1,20 +1,21 @@
 import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
 import Icon from "../components/Icon";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
-import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
-import { BaseApiService } from "../utils/BaseApiService";
-import { Alert } from "react-native";
+import UserProfile from "../components/UserProfile";
+import { BlackScreen } from "../components/BlackAndWhiteScreen";
+import SwipeMenu from "../components/SwipeMenu";
+import DrawerContent from "../components/DrawerContent";
 
 export default function LandingScreen({ navigation }) {
   const [tab, setTab] = useState("home");
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [routeParams, setRouteParams] = useState(null);
-  const [shopId, setShopId] = useState(null); //for the case of shopowners
+  const leftMenuRef = useRef(null);
 
   const categoryIcons = [
     {
@@ -33,6 +34,7 @@ export default function LandingScreen({ navigation }) {
       id: 3,
       icon: require("../assets/icons/icons8-box-50.png"),
       title: "Stocking",
+      target: "stocking",
     },
     {
       id: 4,
@@ -41,24 +43,12 @@ export default function LandingScreen({ navigation }) {
     },
   ];
 
+  const onMenuPress = () => {
+    leftMenuRef.current.navigateMenu();
+  };
+
   useEffect(() => {
     UserSessionUtils.getFullSessionObject().then((data) => {
-      if (data.user.isShopOwner) {
-        let searchParameters = {
-          searchTerm: "",
-          offset: 0,
-          limit: 0,
-          shopOwnerId: data.user.shopOwnerId,
-        };
-        new BaseApiService("/shops")
-          .getRequestWithJsonResponse(searchParameters)
-          .then((response) => {
-            setShopId(response.records[0].id);
-          })
-          .catch((error) => {
-            Alert.alert("Error!", error?.message);
-          });
-      }
       setRouteParams(data.user);
       setTimeout(() => {
         setLoading(false);
@@ -67,7 +57,7 @@ export default function LandingScreen({ navigation }) {
   }, []);
 
   return (
-    <BlackAndWhiteScreen>
+    <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
       <OrientationLoadingOverlay
         visible={loading}
@@ -76,31 +66,26 @@ export default function LandingScreen({ navigation }) {
         messageFontSize={24}
         message=""
       />
+      <BlackScreen>
+        <UserProfile navigation={navigation} />
+      </BlackScreen>
 
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: Colors.light_2,
-          marginTop: 25,
-        }}
-      >
-        <FlatList
-          style={{ flex: 1, marginTop: 10 }}
-          data={categoryIcons}
-          renderItem={({ item }) => (
-            <Icon
-              icon={item}
-              onPress={() =>
-                item.target
-                  ? navigation.navigate(item.target, { ...routeParams, myShopId:shopId })
-                  : null
-              }
-            />
-          )}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-        />
-      </View>
+      <FlatList
+        style={{ flex: 1, marginTop: 20 }}
+        data={categoryIcons}
+        renderItem={({ item }) => (
+          <Icon
+            icon={item}
+            onPress={() =>
+              navigation.navigate(item.target, {
+                ...routeParams,
+              })
+            }
+          />
+        )}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={2}
+      />
 
       <View // bottom nav
         style={{
@@ -118,7 +103,11 @@ export default function LandingScreen({ navigation }) {
       >
         <TouchableOpacity
           onPress={() => setTab("cash")}
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <Image
             style={{
@@ -132,7 +121,11 @@ export default function LandingScreen({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setTab("box")}
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <Image
             style={{
@@ -146,7 +139,11 @@ export default function LandingScreen({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setTab("home")}
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <Image
             style={{
@@ -160,7 +157,11 @@ export default function LandingScreen({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setTab("wallet")}
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <Image
             style={{
@@ -174,7 +175,11 @@ export default function LandingScreen({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setTab("check")}
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <Image
             style={{
@@ -187,6 +192,6 @@ export default function LandingScreen({ navigation }) {
           />
         </TouchableOpacity>
       </View>
-    </BlackAndWhiteScreen>
+    </View>
   );
 }

@@ -8,25 +8,34 @@ import OrientationLoadingOverlay from "react-native-orientation-loading-overlay"
 import { Calendar } from "react-native-calendars";
 import MaterialButton from "../components/MaterialButton";
 import ModalContent from "../components/ModalContent";
-import { formatNumberWithCommas } from "../utils/Utils";
+import {
+  formatDate,
+  formatDateToDDMMYY,
+  formatNumberWithCommas,
+} from "../utils/Utils";
 import { Image } from "react-native";
 import UserProfile from "../components/UserProfile";
-
-const tableHead = ["Item", "Price", "Qty", "Amount"];
+import { SaleItem, SaleTransactionItem } from "../components/TransactionItems";
 
 export default function ViewSales({ navigation, route }) {
   const [sales, setSales] = useState([]); // sales got from the server
   const [totalSales, setTotalSales] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [offset, setOffset] = useState(0);
   const [visible, setVisible] = useState(false);
   const [filtering, setFiltering] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
-  const [allSales, setAllSales] = useState([]);
-  const [performanceSummary, setPerformanceSummary] = useState(null);
-  const [initialCapital, setInitialCapital] = useState(null);
   const [salesValue, setSalesValue] = useState(0);
+  const [searchPeriod, setSearchPeriod] = useState("Today");
+
+  const {
+    isShopOwner,
+    isShopAttendant,
+    attendantShopId,
+    shopOwnerId,
+    myShopId,
+  } = route.params;
 
   const calendarTheme = {
     calendarBackground: "black",
@@ -39,14 +48,6 @@ export default function ViewSales({ navigation, route }) {
     dayTextColor: Colors.light,
     selectedDayTextColor: "black",
   };
-
-  const {
-    isShopOwner,
-    isShopAttendant,
-    attendantShopId,
-    shopOwnerId,
-    myShopId,
-  } = route.params;
 
   const handleDayPress = (day) => {
     if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
@@ -76,14 +77,8 @@ export default function ViewSales({ navigation, route }) {
   }
 
   function getProfit() {
-    if (performanceSummary && initialCapital) {
-      let profits = performanceSummary.totalSalesValue - initialCapital;
-
-      return profits > 0 ? formatNumberWithCommas(profits) : 0;
-    }
-    return 0;
+    return formatNumberWithCommas(3720800);
   }
-  let id = isShopAttendant ? attendantShopId : isShopOwner ? myShopId : id;
 
   function getCurrentDay(getTomorrowDate = false) {
     const now = new Date();
@@ -101,22 +96,6 @@ export default function ViewSales({ navigation, route }) {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
   }
 
-  const fetchSumarry = () => {
-    new BaseApiService(`/shops/${id}`)
-      .getRequestWithJsonResponse()
-      .then((response) => {
-        setInitialCapital(response.data.initialCapital);
-        setPerformanceSummary(response.data.performanceSummary);
-        setTimeout(() => {
-          setLoading(false);
-        }, 100);
-      })
-      .catch((error) => {
-        Alert.alert("Cannot get summary!", error?.message);
-        setLoading(false);
-      });
-  };
-
   const getSales = async (startDate, endDate) => {
     let searchParameters = {
       offset: offset,
@@ -126,6 +105,7 @@ export default function ViewSales({ navigation, route }) {
     setLoading(true);
     setSalesValue(0);
     setTotalSales(0);
+
     if (!startDate && !endDate) {
       searchParameters.startDate = getCurrentDay();
     }
@@ -140,6 +120,9 @@ export default function ViewSales({ navigation, route }) {
     if (endDate === null && startDate) {
       //specific day setting
       searchParameters.endDate = convertDateFormat(startDate, true);
+      // if (formatDateToDDMMYY(startDate) === formatDateToDDMMYY(getCurrentDay())){
+      //   console.log('same dates')
+      // }
     }
     if (isShopOwner) {
       searchParameters.shopOwnerId = shopOwnerId;
@@ -150,9 +133,8 @@ export default function ViewSales({ navigation, route }) {
     new BaseApiService("/shop-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
-        setAllSales(response.records);
         for (let item of response.records) {
-          setSalesValue((i) => i + item.amountPaid);
+          setSalesValue((i) => i + item.totalCost);
         }
         setSales(response.records);
         setTimeout(() => {
@@ -161,6 +143,7 @@ export default function ViewSales({ navigation, route }) {
       })
       .catch((error) => {
         Alert.alert("Cannot get sales!", error?.message);
+        console.log(error, "bksvbsvbsvhbsvj");
         setLoading(false);
       });
   };
@@ -176,12 +159,11 @@ export default function ViewSales({ navigation, route }) {
   };
 
   const setCount = (count) => {
-    setTotalSales((i) => i + count);
-    // console.log(count);
+    setTotalSales((prevCount) => prevCount + count);
   };
+
   useEffect(() => {
     getSales();
-    fetchSumarry();
   }, []);
 
   return (
@@ -196,7 +178,7 @@ export default function ViewSales({ navigation, route }) {
       <AppStatusBar bgColor="black" content="light-content" />
 
       <View style={{ flex: 1.2, backgroundColor: "black" }}>
-        <UserProfile />
+        <UserProfile  navigation={navigation}/>
         <View style={{ flex: 0.8, marginTop: 5 }}>
           <View
             style={{
@@ -212,11 +194,20 @@ export default function ViewSales({ navigation, route }) {
                   color: Colors.primary,
                   fontSize: 16,
                   fontWeight: 600,
-                  alignSelf: "center",
                   marginTop: 8,
                 }}
               >
-                Day's sales
+                Sales summary
+              </Text>
+              <Text
+                style={{
+                  color: Colors.primary,
+                  fontSize: 16,
+                  fontWeight: 400,
+                  marginTop: 3,
+                }}
+              >
+                Period : {searchPeriod}
               </Text>
             </View>
 
@@ -234,34 +225,36 @@ export default function ViewSales({ navigation, route }) {
                   }}
                 />
               </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  backgroundColor: Colors.primary,
-                  borderRadius: 3,
-                  height: 25,
-                  justifyContent: "center",
-                }}
-                onPress={() =>
-                  navigation.navigate("shopSummary", {
-                    isShopOwner,
-                    isShopAttendant,
-                    attendantShopId,
-                    shopOwnerId,
-                    myShopId,
-                  })
-                }
-              >
-                <Text
+              {isShopAttendant !== true && (
+                <TouchableOpacity
                   style={{
-                    color: Colors.dark,
-                    paddingHorizontal: 6,
-                    alignSelf: "center",
+                    backgroundColor: Colors.primary,
+                    borderRadius: 3,
+                    height: 25,
                     justifyContent: "center",
                   }}
+                  onPress={() =>
+                    navigation.navigate("shopSummary", {
+                      isShopOwner,
+                      isShopAttendant,
+                      attendantShopId,
+                      shopOwnerId,
+                      myShopId,
+                    })
+                  }
                 >
-                  Investment
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      color: Colors.dark,
+                      paddingHorizontal: 6,
+                      alignSelf: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    Investment
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
           <View
@@ -293,7 +286,7 @@ export default function ViewSales({ navigation, route }) {
             />
             <ItemHeader
               title="Capital "
-              value={initialCapital && formatNumberWithCommas(initialCapital)}
+              value={formatNumberWithCommas(500000)}
             />
             <View
               style={{
@@ -322,7 +315,11 @@ export default function ViewSales({ navigation, route }) {
                 data={sales}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                  <TransactionItem data={item} setCount={(a) => setCount(a)} />
+                  <SaleTransactionItem
+                    data={item}
+                    setCount={(a) => setCount(a)}
+                    isShopOwner={isShopOwner}
+                  />
                 )}
               />
             ) : (
@@ -418,356 +415,8 @@ export default function ViewSales({ navigation, route }) {
   );
 }
 
-function TransactionItem({ data, setCount }) {
-  function formatDate(inputDate) {
-    const options = {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    const date = new Date(inputDate);
 
-    // Format the date
-    const formattedDate = date.toLocaleDateString("en-US", options);
 
-    return formattedDate;
-  }
-
-  const { lineItems, totalCost, amountPaid, balanceGivenOut } = data;
-
-  const [expanded, setExpanded] = useState(false);
-  const [list, setList] = useState([]); //to be rendered in the table
-  const [itemCount, setItemCount] = useState(0);
-
-  const toggleExpand = () => {
-    setExpanded(!expanded);
-  };
-  useEffect(() => {
-    if (lineItems !== undefined) {
-      if (list.length === 0) {
-        for (let item of lineItems) {
-          list.push([
-            item.shopProductName,
-            item.unitCost,
-            item.quantity,
-            item.totalCost,
-          ]);
-          setItemCount((count) => count + item.quantity);
-          setCount(item.quantity);
-        }
-      }
-    }
-  }, []);
-  return (
-    <View
-      style={{
-        flex: 1,
-        marginTop: 10,
-        marginHorizontal: 10,
-        borderRadius: 3,
-        backgroundColor: "white",
-        paddingVertical: 15,
-        paddingHorizontal: 10,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 12,
-            fontWeight: "bold",
-            color: Colors.dark,
-            marginBottom: 2,
-          }}
-        >
-          Txn ID: {data.id}
-        </Text>
-
-        <View>
-          <Text
-            style={{
-              alignSelf: "flex-end",
-              fontSize: 12,
-            }}
-          >
-            Currency : UGX
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              color: Colors.gray,
-              alignSelf: "flex-end",
-            }}
-          >
-            {formatDate(data.dateCreated)}
-          </Text>
-        </View>
-      </View>
-      {!expanded && (
-        <>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              margin: 10,
-            }}
-          >
-            <View style={{ alignItems: "center" }}>
-              <Text>Items</Text>
-              <Text>{itemCount}</Text>
-            </View>
-            <View style={{ alignItems: "center" }}>
-              <Text>Amount</Text>
-              <Text>{totalCost}</Text>
-            </View>
-            <View style={{ alignItems: "center" }}>
-              <Text>Recieved</Text>
-              <Text>{amountPaid}</Text>
-            </View>
-            <View style={{ alignItems: "center" }}>
-              <Text>Balance</Text>
-              <Text>{balanceGivenOut}</Text>
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text
-              style={{
-                fontWeight: 300,
-                fontSize: 12,
-              }}
-            >
-              Served by:{" "}
-              <Text
-                style={{
-                  fontWeight: 400,
-                }}
-              >
-                {data.createdByFullName}
-              </Text>
-            </Text>
-            <TouchableOpacity
-              onPress={toggleExpand}
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: Colors.dark,
-                borderRadius: 3,
-                paddingHorizontal: 10,
-                paddingVertical: 4,
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.primary,
-                  fontSize: 13,
-                  fontWeight: 300,
-                }}
-              >
-                More
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
-
-      {expanded && (
-        <View style={{ flex: 1 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              height: 25,
-              paddingEnd: 10,
-              borderBottomColor: Colors.gray,
-              borderBottomWidth: 0.3,
-              marginTop: 10,
-            }}
-          >
-            <Text style={{ flex: 2.5, fontWeight: 600 }}>Item</Text>
-            <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
-              Price
-            </Text>
-            <Text style={{ flex: 0.5, textAlign: "center", fontWeight: 600 }}>
-              Qnty
-            </Text>
-            <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
-              Amount
-            </Text>
-          </View>
-          <FlatList
-            data={lineItems}
-            renderItem={({ item }) => (
-              <SaleItem data={item} itemCount={itemCount} total={totalCost} />
-            )}
-          />
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingEnd: 5,
-              marginTop: 5,
-              marginBottom: 10,
-            }}
-          >
-            <Text style={{ fontWeight: 600 }}>Total</Text>
-
-            <Text style={{ textAlign: "center", fontWeight: 600 }}>
-              {formatNumberWithCommas(totalCost)}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Recieved </Text>
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                fontWeight: "bold",
-                marginEnd: 4,
-              }}
-            >
-              {formatNumberWithCommas(amountPaid)}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginVertical: 3,
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>
-              Purchased{" "}
-              <Text style={{ fontWeight: "400" }}>
-                {itemCount >= 1 && (
-                  <Text>
-                    {itemCount}
-                    {itemCount > 1 ? <Text> items</Text> : <Text> item</Text>}
-                  </Text>
-                )}
-              </Text>
-            </Text>
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                fontWeight: "bold",
-                marginEnd: 4,
-              }}
-            >
-              {formatNumberWithCommas(totalCost)}
-            </Text>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Balance</Text>
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                fontWeight: "bold",
-                marginEnd: 4,
-              }}
-            >
-              {formatNumberWithCommas(balanceGivenOut)}
-            </Text>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 10,
-            }}
-          >
-            <Text
-              style={{
-                fontWeight: 300,
-                fontSize: 12,
-              }}
-            >
-              Served by:{" "}
-              <Text
-                style={{
-                  fontWeight: 400,
-                }}
-              >
-                {data.createdByFullName}
-              </Text>
-            </Text>
-            <TouchableOpacity
-              onPress={toggleExpand}
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: Colors.dark,
-                borderRadius: 3,
-                paddingHorizontal: 10,
-                paddingVertical: 4,
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.primary,
-                  fontSize: 13,
-                  fontWeight: 300,
-                }}
-              >
-                Hide
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
-    </View>
-  );
-}
-const SaleItem = ({ data }) => {
-  return (
-    <>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          borderBottomColor: Colors.gray,
-          borderBottomWidth: 0.3,
-          alignItems: "center",
-          height: "fit-content",
-          paddingVertical: 8,
-        }}
-      >
-        <Text style={{ flex: 2.5, justifyContent: "center" }}>
-          {data.shopProductName}
-        </Text>
-        <Text style={{ flex: 1, textAlign: "center" }}>
-          {formatNumberWithCommas(data.unitCost)}
-        </Text>
-        <Text style={{ flex: 0.5, textAlign: "center" }}>{data.quantity}</Text>
-        <Text style={{ flex: 1, textAlign: "center" }}>
-          {formatNumberWithCommas(data.totalCost)}
-        </Text>
-      </View>
-    </>
-  );
-};
 export function ItemHeader({ title, value, ugx = true }) {
   return (
     <View style={{ alignItems: "center" }}>

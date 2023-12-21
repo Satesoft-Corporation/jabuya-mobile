@@ -1,10 +1,18 @@
-import { Text, View, TouchableOpacity, Image, ScrollView } from "react-native";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  FlatList,
+} from "react-native";
 import React from "react";
 import ModalContent from "./ModalContent";
 import Card from "./Card";
 import Colors from "../constants/Colors";
 import MaterialButton from "./MaterialButton";
-import { Table, Row, Rows, TableWrapper } from "react-native-table-component";
+import { SaleItem } from "./TransactionItems";
+import { formatDate, formatNumberWithCommas } from "../utils/Utils";
 
 function ConfirmSalesDialog({
   visible,
@@ -12,14 +20,12 @@ function ConfirmSalesDialog({
   sales,
   total,
   setVisible,
-  transID,
   length,
   balanceGivenOut,
   amountPaid,
   resetList,
+  dateCreated,
 }) {
-  const tableHead = ["Item", "Qty", "Price", "Amount"];
-
   return (
     <ModalContent visible={visible} style={{ padding: 10 }}>
       <Card
@@ -28,7 +34,7 @@ function ConfirmSalesDialog({
           minHeight: 120,
           maxHeight: 490,
           width: 315,
-          paddingBottom:7
+          paddingBottom: 7,
         }}
       >
         <View
@@ -77,116 +83,113 @@ function ConfirmSalesDialog({
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text>
-              Txn ID : <Text> {transID}</Text>
+            <Text
+              style={{
+                fontSize: 12,
+                color: Colors.gray,
+                alignSelf: "flex-end",
+              }}
+            >
+              {formatDate(dateCreated)}
             </Text>
-
             <Text>Currency : UGX</Text>
           </View>
 
-          <Table>
-            <Row
-              data={tableHead}
-              style={{ height: 40 }}
-              textStyle={{
-                fontWeight: "bold",
-              }}
-              flexArr={[2, 1, 1, 1]}
-            />
-            <ScrollView style={{ height: 200 }}>
-              <Rows
-                data={sales}
-                textStyle={{
-                  margin: 5,
-                  textAlign: "left",
-                }}
-                flexArr={[2, 1, 1, 1]}
-              />
-            </ScrollView>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              height: 25,
+              paddingEnd: 10,
+              borderBottomColor: Colors.gray,
+              borderBottomWidth: 0.3,
+              marginTop: 10,
+            }}
+          >
+            <Text style={{ flex: 2.5, fontWeight: 600 }}>Item</Text>
+            <Text style={{ flex: 0.5, textAlign: "center", fontWeight: 600 }}>
+              Qty
+            </Text>
+            <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
+              Cost
+            </Text>
 
-            <View
+            <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
+              Amount
+            </Text>
+          </View>
+          <FlatList
+            data={sales}
+            renderItem={({ item }) => (
+              <SaleItem data={item} itemCount={length} total={total} />
+            )}
+          />
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: 10,
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>Recieved </Text>
+            <Text
               style={{
-                marginTop: 10,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 5,
+                alignSelf: "flex-end",
+                fontWeight: "bold",
+                marginEnd: 4,
+              }}
+            >
+              {formatNumberWithCommas(amountPaid)}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginVertical: 3,
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>
+              Sold{" "}
+              <Text style={{ fontWeight: "400" }}>
+                {length >= 1 && (
+                  <Text>
+                    {length}
+                    {length > 1 ? <Text> items</Text> : <Text> item</Text>}
+                  </Text>
+                )}
+              </Text>
+            </Text>
+
+            <Text
+              style={{
+                alignSelf: "flex-end",
+                fontWeight: "bold",
+                marginEnd: 4,
+              }}
+            >
+              {formatNumberWithCommas(total)}
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>Balance</Text>
+            <Text
+              style={{
+                alignSelf: "flex-end",
+                fontWeight: "bold",
+                marginEnd: 4,
                 fontSize: 15,
               }}
             >
-              <Text style={{ fontWeight: "bold" }}>Total </Text>
-              <Text
-                style={{
-                  alignSelf: "flex-end",
-                  fontWeight: "bold",
-                  marginEnd: 4,
-                }}
-              >
-                {length}
-              </Text>
-              <Text
-                style={{
-                  alignSelf: "flex-end",
-                  fontWeight: "bold",
-                  marginEnd: 4,
-                }}
-              >
-                {total}
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={{ fontWeight: "bold" }}>Recieved </Text>
-              <Text
-                style={{
-                  alignSelf: "flex-end",
-                  fontWeight: "bold",
-                  marginEnd: 4,
-                }}
-              >
-                {amountPaid}
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={{ fontWeight: "bold" }}>Purchased </Text>
-              <Text
-                style={{
-                  alignSelf: "flex-end",
-                  fontWeight: "bold",
-                  marginEnd: 4,
-                }}
-              >
-                {total}
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={{ fontWeight: "bold" }}>Balance</Text>
-              <Text
-                style={{
-                  alignSelf: "flex-end",
-                  fontWeight: "bold",
-                  marginEnd: 4,
-                  fontSize: 15,
-                }}
-              >
-                {balanceGivenOut}
-              </Text>
-            </View>
-          </Table>
+              {formatNumberWithCommas(balanceGivenOut)}
+            </Text>
+          </View>
 
           <View
             style={{

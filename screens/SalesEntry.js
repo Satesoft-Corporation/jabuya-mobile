@@ -25,13 +25,18 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import UserProfile from "../components/UserProfile";
 import MaterialInput from "../components/MaterialInput";
 import { SaleListItem } from "../components/TransactionItems";
-import { SalesDropdownComponent } from "../components/DropdownComponents";
+import {
+  SalesDropdownComponent,
+  ShopSelectionDropdown,
+} from "../components/DropdownComponents";
 import { SalesInfoDialog } from "../components/Dialogs";
+import { formatNumberWithCommas } from "../utils/Utils";
+import { BlackScreen } from "../components/BlackAndWhiteScreen";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
-function SalesEntry({ route }) {
+function SalesEntry({ route, navigation }) {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [limit, setLimit] = useState(20);
@@ -58,18 +63,22 @@ function SalesEntry({ route }) {
   const [unitCost, setUnitCost] = useState(null);
   const [initialUnitCost, setInitialUnitCost] = useState(null);
   const [errors, setErrors] = useState(null);
+  const [date, setDate] = useState(null); // sale time stamp
+  const [shops, setShops] = useState([]);
+  const [selectedShop, setSelectedShop] = useState(null);
+
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
     route.params;
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (shopId) => {
     let searchParameters = {
       offset: 0,
       limit: limit,
       searchTerm,
     };
-
-    if (isShopOwner) {
-      searchParameters.shopOwnerId = shopOwnerId;
+    setLoading(true);
+    if (shopId !== null) {
+      searchParameters.shopId = shopId;
     }
     if (isShopAttendant) {
       searchParameters.shopId = attendantShopId;
@@ -85,17 +94,28 @@ function SalesEntry({ route }) {
       });
   };
 
-  useEffect(() => {
-    setInitialUnitCost(selection?.salesPrice);
-  }, [selection]);
+  const fetchShops = async () => {
+    let searchParameters = { offset: 0, limit: 0, shopOwnerId: shopOwnerId };
+    if (isShopOwner) {
+      new BaseApiService("/shops")
+        .getRequestWithJsonResponse(searchParameters)
+        .then(async (response) => {
+          setShops(response.records);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
 
   const postSales = () => {
     let payLoad = {
-      id: shopOwnerId,
-      shopId: attendantShopId,
+      id: isShopAttendant ? shopOwnerId : null,
+      shopId: isShopAttendant ? attendantShopId : selectedShop?.id,
       amountPaid: recievedAmount,
       lineItems: selectedProducts,
     };
+
     new BaseApiService("/shop-sales")
       .postRequest(payLoad)
       .then(async (response) => {
@@ -104,24 +124,22 @@ function SalesEntry({ route }) {
       })
       .then(async (d) => {
         let { info, status } = d;
-        let items = info.lineItems;
         let id = info.id;
         let totalCost_1 = info.totalCost;
-        setReturnedCost(totalCost_1);
-        setReturnedList(items);
-        setReturnedId(id);
-        setAmountPaid(info.amountPaid);
-        setBalanceGivenOut(info.balanceGivenOut);
-        for (let item of items) {
-          lineItems.push([
-            item.shopProductName,
-            item.quantity,
-            item.unitCost,
-            item.totalCost,
-          ]);
+        if (status === 200) {
+          setReturnedCost(totalCost_1);
+          setReturnedList(info.lineItems);
+          setReturnedId(id);
+          setAmountPaid(info.amountPaid);
+          setBalanceGivenOut(info.balanceGivenOut);
+          setLineItems(info.lineItems);
+          setDate(info.dateCreated);
+          setShowConfirmed(true);
+          setTimeout(() => setLoading(false), 1000);
+        } else {
+          Alert.alert("Failed to confirm purchases!", error?.message);
+          setTimeout(() => setLoading(false), 1000);
         }
-        setShowConfirmed(true);
-        setTimeout(() => setLoading(false), 1000);
       })
       .catch((error) => {
         Alert.alert("Failed to confirm purchases!", error?.message);
@@ -158,6 +176,11 @@ function SalesEntry({ route }) {
 
     setShowModal(true);
     setSelection(item);
+  };
+
+  const makeShopSelection = (shop) => {
+    setSelectedShop(shop);
+    fetchProducts(shop.id);
   };
 
   const saveSelection = () => {
@@ -219,7 +242,6 @@ function SalesEntry({ route }) {
         selections[productIndex].totalCost = prevTotalCost + cost;
         selectedProducts[productIndex2].quantity = Number(quantity) + prevQty;
         setLoading(false);
-
       } else {
         selectedProducts.push({
           // data set to be used in posting the sale to the server
@@ -262,7 +284,7 @@ function SalesEntry({ route }) {
     let searchParameters = {
       offset: 0,
       limit: 0,
-      shopId: attendantShopId,
+      shopId: isShopAttendant ? attendantShopId : selectedShop?.id,
       barCode: barcode,
     };
 
@@ -304,6 +326,7 @@ function SalesEntry({ route }) {
     setLineItems([]);
     setTotalQty(0);
     setErrors({});
+    setSelectedShop(null);
   };
 
   useEffect(() => {
@@ -319,9 +342,18 @@ function SalesEntry({ route }) {
     getBarCodeScannerPermissions();
   }, []);
 
+  useEffect(() => {
+    fetchShops();
+  }, []);
+
+  useEffect(() => {
+    setInitialUnitCost(selection?.salesPrice);
+  }, [selection]);
+
   const styles = StyleSheet.create({
     container: {
       flex: 1,
+      backgroundColor: Colors.dark,
     },
     overlay: {
       position: "absolute",
@@ -334,15 +366,17 @@ function SalesEntry({ route }) {
       //the blured section
       flex: 1,
       backgroundColor: "rgba(0,0,0,0.7)",
+      justifyContent: "center",
+      alignItems: "center",
     },
 
     focusedContainer: {
       //scan area
-      flex: 9,
       borderColor: Colors.primary,
-      borderWidth: 1,
+      borderWidth: 2,
       height: 150,
       borderRadius: 5,
+      width: screenWidth / 1.2,
     },
   });
 
@@ -508,7 +542,6 @@ function SalesEntry({ route }) {
                 buttonPress={() => {
                   setScanned(false);
                   saveSelection();
-                  setShowModal(false);
                 }}
               />
             </View>
@@ -546,16 +579,17 @@ function SalesEntry({ route }) {
               borderRadius: 5,
               borderWidth: 1,
               borderColor: Colors.dark,
-              height: 40,
+              height: 50,
               width: 300,
               marginBottom: 10,
             }}
           >
             <Text
               style={{
-                fontWeight: "bold",
+                fontWeight: 500,
                 color: Colors.dark,
                 alignSelf: "center",
+                fontSize: 20,
               }}
             >
               Done
@@ -589,11 +623,51 @@ function SalesEntry({ route }) {
         balanceGivenOut={balanceGivenOut}
         length={totalQty}
         resetList={() => setLineItems([])}
+        dateCreated={date}
       />
-      <View style={{ flex: 1, backgroundColor: "black" }}>
-        <UserProfile />
-        <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
+      <BlackScreen flex={isShopAttendant ? 0.6 : 0.73}>
+        <UserProfile navigation={navigation}/>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("viewSales", {
+              ...route.params,
+            });
+          }}
+          style={{
+            backgroundColor: Colors.primary,
+            borderRadius: 3,
+            height: 25,
+            justifyContent: "center",
+            alignSelf: "flex-end",
+            marginEnd: 10,
+            marginBottom: 7,
+            paddingHorizontal:5
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.dark,
+              paddingHorizontal: 6,
+              alignSelf: "center",
+              justifyContent: "center",
+            }}
+          >
+            Report
+          </Text>
+        </TouchableOpacity>
+        <View style={{ paddingHorizontal: 10, marginTop: 0 }}>
+          {isShopOwner && (
+            <>
+              <ShopSelectionDropdown
+                value={selectedShop} // flex is .75 for owner
+                makeShopSelection={makeShopSelection}
+                shops={shops}
+                disable={selections.length > 0}
+              />
+            </>
+          )}
           <SalesDropdownComponent
+            disable={isShopOwner && selectedShop === null}
             value={selection}
             products={products}
             handleChange={(t) => handleChange(t)}
@@ -602,11 +676,13 @@ function SalesEntry({ route }) {
             setScanned={() => setScanBarCode(true)}
           />
         </View>
-      </View>
-      <View style={{ backgroundColor: Colors.light_2, flex: 3 }}>
+      </BlackScreen>
+
+      <View style={{ backgroundColor: Colors.light_2 }}>
         <View style={{ paddingHorizontal: 10, marginTop: -10 }}>
           <View
             style={{
+              //m was -10
               backgroundColor: Colors.light,
               borderRadius: 5,
               padding: 10,
@@ -678,7 +754,7 @@ function SalesEntry({ route }) {
               borderRadius: 5,
               padding: 10,
               marginTop: 8,
-              height: 250,
+              height: screenHeight / 3,
             }}
           >
             <View
@@ -692,13 +768,14 @@ function SalesEntry({ route }) {
               }}
             >
               <Text style={{ flex: 2.5, fontWeight: 600 }}>Item</Text>
-              <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
-                Price
-              </Text>
               <Text style={{ flex: 0.5, textAlign: "center", fontWeight: 600 }}>
-                Qnty
+                Qty
               </Text>
-              <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
+              <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
+                Cost
+              </Text>
+
+              <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
                 Amount
               </Text>
             </View>
@@ -737,7 +814,8 @@ function SalesEntry({ route }) {
                     fontWeight: 700,
                   }}
                 >
-                  <Text style={{ fontSize: 10 }}>UGX</Text> {totalCost}
+                  <Text style={{ fontSize: 10, fontWeight: 400 }}>UGX</Text>{" "}
+                  {formatNumberWithCommas(totalCost)}
                 </Text>
               </View>
             </View>
@@ -780,9 +858,11 @@ function SalesEntry({ route }) {
                   fontWeight: 700,
                 }}
               >
-                <Text style={{ fontSize: 10 }}>UGX</Text>
+                <Text style={{ fontSize: 10, fontWeight: 400 }}>UGX </Text>
                 <Text style={{ fontSize: 17 }}>
-                  {recievedAmount === 0 ? 0 : recievedAmount - totalCost}
+                  {recievedAmount === 0
+                    ? 0
+                    : formatNumberWithCommas(recievedAmount - totalCost)}
                 </Text>
               </Text>
             </View>
@@ -792,7 +872,7 @@ function SalesEntry({ route }) {
             style={{
               backgroundColor: Colors.dark,
               borderRadius: 5,
-              height: 40,
+              height: 50,
               justifyContent: "center",
               marginTop: 8,
             }}
@@ -818,10 +898,11 @@ function SalesEntry({ route }) {
               style={{
                 color: Colors.primary,
                 alignSelf: "center",
-                fontSize: 17,
+                fontSize: 18,
+                fontWeight: 500,
               }}
             >
-              Confirm Purchase
+              Confirm purchase
             </Text>
           </TouchableOpacity>
           <ModalContent visible={showMoodal} style={{ padding: 35 }}>
@@ -987,6 +1068,7 @@ function SalesEntry({ route }) {
 }
 
 const IconsComponent = ({ clear }) => {
+  let color = Colors.gray;
   return (
     <View
       style={{
@@ -1003,10 +1085,11 @@ const IconsComponent = ({ clear }) => {
           alignItems: "center",
           width: 63,
           height: 63,
+          opacity: 0.7,
         }}
       >
-        <FontAwesome name="credit-card" size={25} color="black" />
-        <Text style={{ alignSelf: "center" }}>Card</Text>
+        <FontAwesome name="credit-card" size={25} color={color} />
+        <Text style={{ alignSelf: "center", color }}>Card</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -1017,10 +1100,11 @@ const IconsComponent = ({ clear }) => {
           alignItems: "center",
           width: 63,
           height: 63,
+          opacity: 0.7,
         }}
       >
-        <FontAwesome name="mobile" size={25} color="black" />
-        <Text style={{ alignSelf: "center" }}>Mobile</Text>
+        <FontAwesome name="mobile" size={25} color={color} />
+        <Text style={{ alignSelf: "center", color }}>Mobile</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={{
@@ -1030,10 +1114,11 @@ const IconsComponent = ({ clear }) => {
           alignItems: "center",
           width: 63,
           height: 63,
+          opacity: 0.7,
         }}
       >
-        <FontAwesome name="wechat" size={25} color="black" />
-        <Text style={{ alignSelf: "center" }}>Fap</Text>
+        <FontAwesome name="wechat" size={25} color={color} />
+        <Text style={{ alignSelf: "center", color }}>Fap</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={{
@@ -1043,14 +1128,15 @@ const IconsComponent = ({ clear }) => {
           alignItems: "center",
           width: 63,
           height: 63,
+          opacity: 0.7,
         }}
       >
         <MaterialCommunityIcons
           name="hand-extended-outline"
           size={24}
-          color="black"
+          color={color}
         />
-        <Text style={{ alignSelf: "center" }}>Credit</Text>
+        <Text style={{ alignSelf: "center", color }}>Credit</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={{

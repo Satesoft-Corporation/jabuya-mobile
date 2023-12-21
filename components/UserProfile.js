@@ -3,18 +3,39 @@ import { View, TouchableOpacity, Image, Text } from "react-native";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Colors from "../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { BaseApiService } from "../utils/BaseApiService";
 
-const UserProfile = () => {
+const UserProfile = ({ navigation }) => {
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
   const [shopName, setShopName] = useState("");
+  const [shops, setShops] = useState([]);
 
   useEffect(() => {
     UserSessionUtils.getFullSessionObject().then((data) => {
-      const { roles, firstName, lastName, attendantShopName } = data.user;
+      const {
+        roles,
+        firstName,
+        lastName,
+        attendantShopName,
+        shopOwnerId,
+        shopOwner,
+      } = data.user;
+      let searchParameters = { offset: 0, limit: 0, shopOwnerId: shopOwnerId };
+
       setRole(roles[0].name);
       setName(firstName + " " + lastName);
       setShopName(attendantShopName);
+      if (shopOwner) {
+        new BaseApiService("/shops")
+          .getRequestWithJsonResponse(searchParameters)
+          .then(async (response) => {
+            setShops(response.records);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     });
   }, []);
   return (
@@ -35,16 +56,18 @@ const UserProfile = () => {
           marginTop: 10,
         }}
       >
-        <Image
-          source={require("../assets/images/man_placeholder.jpg")}
-          style={{
-            width: 45,
-            height: 45,
-            resizeMode: "cover",
-            borderRadius: 3,
-            marginStart: 5,
-          }}
-        />
+        <TouchableOpacity onPress={() => console.log(navigation)}>
+          <Image
+            source={require("../assets/images/man_placeholder.jpg")}
+            style={{
+              width: 45,
+              height: 45,
+              resizeMode: "cover",
+              borderRadius: 3,
+              marginStart: 5,
+            }}
+          />
+        </TouchableOpacity>
         <View
           style={{
             marginHorizontal: 5,
@@ -75,7 +98,7 @@ const UserProfile = () => {
               fontSize: 11,
             }}
           >
-            {shopName}
+            {shopName || `Shops: ${shops.length}`}
           </Text>
         </View>
       </View>
