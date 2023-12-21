@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
-  SafeAreaView,
+  ScrollView,
   Dimensions,
   FlatList,
 } from "react-native";
@@ -136,13 +136,14 @@ function SalesEntry({ route, navigation }) {
           setDate(info.dateCreated);
           setShowConfirmed(true);
           setTimeout(() => setLoading(false), 1000);
-        } else {
-          Alert.alert("Failed to confirm purchases!", error?.message);
+        } else if (status === 400) {
+          Alert.alert("Failed to confirm purchases!", info?.message);
           setTimeout(() => setLoading(false), 1000);
         }
       })
       .catch((error) => {
-        Alert.alert("Failed to confirm purchases!", error?.message);
+        Alert.alert("An unexpected error occurred!");
+
         setLoading(false);
       });
   };
@@ -625,8 +626,8 @@ function SalesEntry({ route, navigation }) {
         resetList={() => setLineItems([])}
         dateCreated={date}
       />
-      <BlackScreen flex={isShopAttendant ? 0.6 : 0.73}>
-        <UserProfile navigation={navigation}/>
+      <BlackScreen flex={isShopAttendant ? 12 : 10}>
+        <UserProfile />
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("viewSales", {
@@ -641,7 +642,7 @@ function SalesEntry({ route, navigation }) {
             alignSelf: "flex-end",
             marginEnd: 10,
             marginBottom: 7,
-            paddingHorizontal:5
+            paddingHorizontal: 5,
           }}
         >
           <Text
@@ -679,14 +680,14 @@ function SalesEntry({ route, navigation }) {
       </BlackScreen>
 
       <View style={{ backgroundColor: Colors.light_2 }}>
-        <View style={{ paddingHorizontal: 10, marginTop: -10 }}>
+        <ScrollView style={{ paddingHorizontal: 10, marginTop: 7 }}>
           <View
             style={{
               //m was -10
               backgroundColor: Colors.light,
               borderRadius: 5,
               padding: 10,
-              paddingVertical: 8,
+              paddingVertical: 4,
               flexDirection: "row",
               justifyContent: "space-between",
             }}
@@ -779,10 +780,9 @@ function SalesEntry({ route, navigation }) {
                 Amount
               </Text>
             </View>
-            <FlatList
-              data={selections}
-              renderItem={({ item }) => <SaleListItem data={item} />}
-            />
+            {selections.map((item) => (
+              <SaleListItem data={item} />
+            ))}
             <View
               style={{
                 backgroundColor: Colors.light,
@@ -869,6 +869,7 @@ function SalesEntry({ route, navigation }) {
           </View>
           <IconsComponent clear={clearEverything} />
           <TouchableOpacity
+            disabled={selections.length < 1}
             style={{
               backgroundColor: Colors.dark,
               borderRadius: 5,
@@ -905,6 +906,7 @@ function SalesEntry({ route, navigation }) {
               Confirm purchase
             </Text>
           </TouchableOpacity>
+
           <ModalContent visible={showMoodal} style={{ padding: 35 }}>
             <Card
               style={{
@@ -1061,7 +1063,7 @@ function SalesEntry({ route, navigation }) {
               </View>
             </Card>
           </ModalContent>
-        </View>
+        </ScrollView>
       </View>
     </View>
   );

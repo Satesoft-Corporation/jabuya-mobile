@@ -1,8 +1,7 @@
-import { Dimensions, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Text, TouchableOpacity, View ,FlatList} from "react-native";
 import Colors from "../constants/Colors";
 import { formatDate, formatNumberWithCommas } from "../utils/Utils";
 import { useEffect, useState } from "react";
-import { FlatList } from "react-native-gesture-handler";
 const screenWidth = Dimensions.get("window").width;
 
 export function SaleTransactionItem({ data, setCount, isShopOwner }) {
@@ -284,21 +283,34 @@ export function SaleTransactionItem({ data, setCount, isShopOwner }) {
               marginTop: 10,
             }}
           >
-            <Text
-              style={{
-                fontWeight: 300,
-                fontSize: 12,
-              }}
-            >
-              Served by:{" "}
+           <View>
               <Text
                 style={{
                   fontWeight: 600,
+                  fontSize: 12,
                 }}
               >
-                {data?.createdByFullName}
+                Served by:{" "}
+                <Text
+                  style={{
+                    fontWeight: 300,
+                    fontSize: 12,
+                  }}
+                >
+                  {data?.createdByFullName}
+                </Text>
               </Text>
-            </Text>
+              {isShopOwner && (
+                <Text
+                  style={{
+                    fontWeight: 300,
+                    fontSize: 12,
+                  }}
+                >
+                  {shopName}
+                </Text>
+              )}
+            </View>
             <TouchableOpacity
               onPress={toggleExpand}
               style={{

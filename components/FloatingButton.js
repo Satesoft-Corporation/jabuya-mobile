@@ -7,6 +7,7 @@ export function FloatingButton({
   with_text = true,
   opacity = 0.8,
   handlePress,
+  isAttendant,
 }) {
   const [visible] = useState(new Animated.Value(50));
   const [opc] = useState(new Animated.Value(0));
@@ -16,6 +17,8 @@ export function FloatingButton({
   const [isOpen, setOpen] = useState(false);
   const [isBg, setBg] = useState(false);
 
+  let buttonBg = Colors.dark;
+  let iconTint = Colors.primary;
   const show = () => {
     return () => {
       if (!isOpen) {
@@ -97,7 +100,8 @@ export function FloatingButton({
         ></Animated.View>
       )}
 
-      <Animated.View
+      {isAttendant===false && <>
+        <Animated.View
         style={{
           width: 136,
           height: 46,
@@ -123,12 +127,13 @@ export function FloatingButton({
               alignItems: "center",
             }}
           >
-            <TouchableOpacity onPress={() => console.log(888)}>
+            <TouchableOpacity onPress={handlePress}>
               <Text
                 style={{
                   fontSize: 13,
                   color: "#4a4a4a",
                   textAlign: "right",
+                  fontWeight: 600,
                 }}
               >
                 Restock
@@ -142,7 +147,7 @@ export function FloatingButton({
             width: 40,
             height: 40,
             bottom: 3,
-            backgroundColor: "#FFF",
+            backgroundColor: buttonBg,
             position: "absolute",
             right: 20,
 
@@ -157,15 +162,16 @@ export function FloatingButton({
             justifyContent: "center",
           }}
         >
-          <TouchableOpacity onPress={() => console.log(7777)}>
+          <TouchableOpacity onPress={handlePress}>
             <Image
               style={{
-                width: 15,
-                height: 15,
-                tintColor: "#4a4a4a",
+                width: 25,
+                height: 25,
+                tintColor: iconTint,
                 alignSelf: "center",
+                resizeMode: "cover",
               }}
-              source={require("../assets/icons/ic_close.png")}
+              source={require("../assets/icons/icons8-stock-rotation-32.png")}
             />
           </TouchableOpacity>
         </Animated.View>
@@ -197,16 +203,19 @@ export function FloatingButton({
               justifyContent: "center",
             }}
           >
-            <Text
-              style={{
-                fontSize: 13,
-                color: "#4a4a4a",
-                textAlign: "right",
-                opacity: isOpen ? 1 : 0,
-              }}
-            >
-              List product
-            </Text>
+            <TouchableOpacity onPress={handlePress}>
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: "#4a4a4a",
+                  textAlign: "right",
+                  opacity: isOpen ? 1 : 0,
+                  fontWeight: 600,
+                }}
+              >
+                List product
+              </Text>
+            </TouchableOpacity>
           </Animated.View>
         )}
         <Animated.View
@@ -215,7 +224,7 @@ export function FloatingButton({
             width: 40,
             height: 40,
             bottom: 3,
-            backgroundColor: "#FFF",
+            backgroundColor: buttonBg,
             position: "absolute",
             right: 20,
 
@@ -230,15 +239,17 @@ export function FloatingButton({
             justifyContent: "center",
           }}
         >
-          <Image
-            style={{
-              width: 15,
-              height: 15,
-              tintColor: "#4a4a4a",
-              alignSelf: "center",
-            }}
-            source={require("../assets/icons/ic_close.png")}
-          />
+          <TouchableOpacity onPress={handlePress}>
+            <Image
+              style={{
+                width: 25,
+                height: 25,
+                tintColor: iconTint,
+                alignSelf: "center",
+              }}
+              source={require("../assets/icons/icons8-box-50.png")}
+            />
+          </TouchableOpacity>
         </Animated.View>
       </Animated.View>
 
@@ -265,7 +276,7 @@ export function FloatingButton({
           }}
           source={require("../assets/icons/ic_plus.png")}
         />
-      </TouchableOpacity>
+      </TouchableOpacity></>}
     </View>
   );
 }

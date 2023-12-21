@@ -2,9 +2,17 @@ import React from "react";
 import { View } from "react-native";
 import Colors from "../constants/Colors";
 
-export const BlackScreen = ({ children, flex = 0.18 }) => {
+export const BlackScreen = ({ children, flex = 12 }) => {
   return (
-    <View style={{ flex: flex, backgroundColor: "black" }}>{children}</View>
+    <View
+      style={{
+        backgroundColor: "black",
+        height: "fit-content",
+        paddingBottom: flex,
+      }}
+    >
+      {children}
+    </View>
   );
 };
 

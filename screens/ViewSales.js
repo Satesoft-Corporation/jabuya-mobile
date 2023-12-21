@@ -178,7 +178,7 @@ export default function ViewSales({ navigation, route }) {
       <AppStatusBar bgColor="black" content="light-content" />
 
       <View style={{ flex: 1.2, backgroundColor: "black" }}>
-        <UserProfile  navigation={navigation}/>
+        <UserProfile />
         <View style={{ flex: 0.8, marginTop: 5 }}>
           <View
             style={{
@@ -199,7 +199,7 @@ export default function ViewSales({ navigation, route }) {
               >
                 Sales summary
               </Text>
-              <Text
+              {/* <Text
                 style={{
                   color: Colors.primary,
                   fontSize: 16,
@@ -208,7 +208,7 @@ export default function ViewSales({ navigation, route }) {
                 }}
               >
                 Period : {searchPeriod}
-              </Text>
+              </Text> */}
             </View>
 
             <View

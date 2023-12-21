@@ -36,6 +36,10 @@ const Stocking = ({ route, navigation }) => {
 
   const flatlistRef = useRef(null);
 
+  const handleFormDestination = () => {
+    navigation.navigate("stockPurchaseForm");
+  };
+
   const handleTabChange = (index) => {
     setCurrentIndex(index);
     const windowWidth = Dimensions.get("window").width;
@@ -66,7 +70,10 @@ const Stocking = ({ route, navigation }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <FloatingButton>
+      <FloatingButton
+        handlePress={handleFormDestination}
+        isAttendant={params.isShopAttendant}
+      >
         <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
         <BlackScreen flex={0.14}>
@@ -78,7 +85,7 @@ const Stocking = ({ route, navigation }) => {
             activeIndex={currentIndex}
           />
         </BlackScreen>
-        <View style={{ flex: 1, marginTop: 30 }}>
+        <View style={{ flex: 1, marginTop: 0 }}>
           <FlatList
             scrollEnabled={false}
             ref={flatlistRef}
