@@ -1,36 +1,43 @@
-import React, { useState, useEffect, useRef, useCallback, memo } from "react";
+import React, { useState, useRef, useCallback, memo } from "react";
 import { View, Dimensions, FlatList } from "react-native";
-import Colors from "../constants/Colors";
-import AppStatusBar from "../components/AppStatusBar";
 
+import Colors from "../constants/Colors";
+import { StockingTabTitles } from "../constants/Constants";
+
+import AppStatusBar from "../components/AppStatusBar";
 import UserProfile from "../components/UserProfile";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import TabHeader from "../components/TabHeader";
-import StockPurchase from "./StockPurchase";
 import { FloatingButton } from "../components/FloatingButton";
+
+import StockPurchase from "./StockPurchase";
 import StockLevel from "./StockLevels";
 import StockListing from "./StockListing";
 
 const Stocking = ({ route, navigation }) => {
-  const tabTitles = ["Stock purchase", "Stock level", "Stock listing"];
+  const { PurchaseTitle, LevelsTitle, ListingTitle } = StockingTabTitles;
+
+  const tabTitles = [PurchaseTitle, LevelsTitle, ListingTitle];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentPage, setCurrentPage] = useState(tabTitles[0]);
+
   const params = route.params;
 
   const pages = [
     {
       id: 0,
-      page: <StockPurchase params={params} />,
+      page: <StockPurchase params={params} currentPage={currentPage} />,
     },
     {
       id: 1,
-      page: <StockLevel params={params} />,
+      page: <StockLevel params={params} currentPage={currentPage} />,
     },
     {
       id: 2,
-      page: <StockListing params={params} />,
+      page: <StockListing params={params} currentPage={currentPage} />,
     },
   ];
-
-  const [currentIndex, setCurrentIndex] = useState(0);
 
   const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 50 });
 
@@ -43,6 +50,7 @@ const Stocking = ({ route, navigation }) => {
 
   const handleTabChange = (index) => {
     setCurrentIndex(index);
+    setCurrentPage(tabTitles[index]);
     const windowWidth = Dimensions.get("window").width;
     const offset = index * windowWidth;
     flatlistRef.current.scrollToOffset({ offset, animated: true });

@@ -8,6 +8,7 @@ import OrientationLoadingOverlay from "react-native-orientation-loading-overlay"
 import { ItemHeader } from "./ViewSales";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import UserProfile from "../components/UserProfile";
+import Loader from "../components/Loader";
 const ShopSummary = ({ navigation, route }) => {
   const [performanceSummary, setPerformanceSummary] = useState({});
   const [initialCapital, setInitialCapital] = useState("");
@@ -99,13 +100,8 @@ const ShopSummary = ({ navigation, route }) => {
         </View>
       </BlackScreen>
       <AppStatusBar bgColor="black" content="light-content" />
-      <OrientationLoadingOverlay
-        visible={loading}
-        color={Colors.primary}
-        indicatorSize="large"
-        messageFontSize={24}
-        message=""
-      />
+      <Loader loading={loading} />
+
 
       <View style={{ paddingHorizontal: 10, marginTop: -25 }}>
         <View

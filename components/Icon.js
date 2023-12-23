@@ -1,14 +1,12 @@
 import { TouchableOpacity, Image, View, Text } from "react-native";
 import React from "react";
+
 import Colors from "../constants/Colors";
 
-export default function ({
-  icon,
-  containerStyle,
-  onPress,
-  iconStyle,
-  titleStyle,
-}) {
+import { FontAwesome } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+export function Icon({ icon, containerStyle, onPress, iconStyle, titleStyle }) {
   return (
     <TouchableOpacity
       key={icon.id}
@@ -66,3 +64,98 @@ export default function ({
     </TouchableOpacity>
   );
 }
+
+export const IconsComponent = ({ clear }) => {
+  let color = Colors.gray;
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: 8,
+      }}
+    >
+      <TouchableOpacity
+        style={{
+          padding: 10,
+          backgroundColor: Colors.light,
+          borderRadius: 5,
+          alignItems: "center",
+          width: 63,
+          height: 63,
+          opacity: 0.7,
+        }}
+      >
+        <FontAwesome name="credit-card" size={25} color={color} />
+        <Text style={{ alignSelf: "center", color }}>Card</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={{
+          padding: 10,
+          backgroundColor: Colors.light,
+          borderRadius: 5,
+          alignItems: "center",
+          width: 63,
+          height: 63,
+          opacity: 0.7,
+        }}
+      >
+        <FontAwesome name="mobile" size={25} color={color} />
+        <Text style={{ alignSelf: "center", color }}>Mobile</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{
+          padding: 10,
+          backgroundColor: Colors.light,
+          borderRadius: 5,
+          alignItems: "center",
+          width: 63,
+          height: 63,
+          opacity: 0.7,
+        }}
+      >
+        <FontAwesome name="wechat" size={25} color={color} />
+        <Text style={{ alignSelf: "center", color }}>Fap</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{
+          padding: 10,
+          backgroundColor: Colors.light,
+          borderRadius: 5,
+          alignItems: "center",
+          width: 63,
+          height: 63,
+          opacity: 0.7,
+        }}
+      >
+        <MaterialCommunityIcons
+          name="hand-extended-outline"
+          size={24}
+          color={color}
+        />
+        <Text style={{ alignSelf: "center", color }}>Credit</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{
+          padding: 10,
+          backgroundColor: Colors.primary,
+          borderRadius: 5,
+          alignItems: "center",
+          width: 63,
+          height: 63,
+        }}
+      >
+        <MaterialCommunityIcons
+          name="broom"
+          size={25}
+          color="black"
+          onPress={() => {
+            clear();
+          }}
+        />
+        <Text style={{ alignSelf: "center" }}>Clear</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};

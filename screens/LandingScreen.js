@@ -2,11 +2,12 @@ import { View, FlatList, Image, TouchableOpacity } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
-import Icon from "../components/Icon";
+import { Icon } from "../components/Icon";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import UserProfile from "../components/UserProfile";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
+import Loader from "../components/Loader";
 
 export default function LandingScreen({ navigation }) {
   const [tab, setTab] = useState("home");
@@ -52,13 +53,9 @@ export default function LandingScreen({ navigation }) {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
-      <OrientationLoadingOverlay
-        visible={loading}
-        color={Colors.primary}
-        indicatorSize="large"
-        messageFontSize={24}
-        message=""
-      />
+
+      <Loader loading={loading} />
+
       <BlackScreen>
         <UserProfile navigation={navigation} />
       </BlackScreen>

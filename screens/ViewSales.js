@@ -1,21 +1,23 @@
-import { View, Text, Alert, TouchableOpacity, FlatList } from "react-native";
-import React, { useEffect, useState } from "react";
-import { BaseApiService } from "../utils/BaseApiService";
-import { Table, Row, Rows, TableWrapper } from "react-native-table-component";
-import Colors from "../constants/Colors";
-import AppStatusBar from "../components/AppStatusBar";
-import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
-import { Calendar } from "react-native-calendars";
-import MaterialButton from "../components/MaterialButton";
-import ModalContent from "../components/ModalContent";
 import {
-  formatDate,
-  formatDateToDDMMYY,
-  formatNumberWithCommas,
-} from "../utils/Utils";
-import { Image } from "react-native";
+  View,
+  Text,
+  Alert,
+  TouchableOpacity,
+  FlatList,
+  Image,
+} from "react-native";
+import React, { useEffect, useState } from "react";
+
+import { BaseApiService } from "../utils/BaseApiService";
+
+import Colors from "../constants/Colors";
+
+import AppStatusBar from "../components/AppStatusBar";
+import { formatNumberWithCommas } from "../utils/Utils";
 import UserProfile from "../components/UserProfile";
-import { SaleItem, SaleTransactionItem } from "../components/TransactionItems";
+import { SaleTransactionItem } from "../components/TransactionItems";
+import Loader from "../components/Loader";
+import { SalesDateRangePicker } from "../components/Dialogs";
 
 export default function ViewSales({ navigation, route }) {
   const [sales, setSales] = useState([]); // sales got from the server
@@ -36,18 +38,6 @@ export default function ViewSales({ navigation, route }) {
     shopOwnerId,
     myShopId,
   } = route.params;
-
-  const calendarTheme = {
-    calendarBackground: "black",
-    arrowColor: Colors.primary,
-    todayTextColor: Colors.primary,
-    monthTextColor: Colors.light,
-    selectedDayBackgroundColor: Colors.primary,
-    textDisabledColor: Colors.gray, //other months dates
-    textSectionTitleColor: Colors.light, // days
-    dayTextColor: Colors.light,
-    selectedDayTextColor: "black",
-  };
 
   const handleDayPress = (day) => {
     if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
@@ -168,13 +158,8 @@ export default function ViewSales({ navigation, route }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <OrientationLoadingOverlay
-        visible={loading}
-        color={Colors.primary}
-        indicatorSize="large"
-        messageFontSize={24}
-        message=""
-      />
+      <Loader loading={loading} />
+
       <AppStatusBar bgColor="black" content="light-content" />
 
       <View style={{ flex: 1.2, backgroundColor: "black" }}>
@@ -299,6 +284,7 @@ export default function ViewSales({ navigation, route }) {
           </View>
         </View>
       </View>
+
       <View style={{ backgroundColor: Colors.light_2, flex: 3 }}>
         <View
           style={{
@@ -339,83 +325,20 @@ export default function ViewSales({ navigation, route }) {
         </View>
       </View>
 
-      <ModalContent visible={visible} style={{ padding: 10 }}>
-        <Calendar
-          theme={calendarTheme}
-          onDayPress={handleDayPress}
-          markedDates={{
-            [selectedStartDate]: {
-              selected: true,
-              startingDay: true,
-              endingDay: selectedEndDate === selectedStartDate,
-            },
-            [selectedEndDate]: {
-              selected: true,
-              endingDay: true,
-            },
-          }}
-        />
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginHorizontal: 15,
-          }}
-        >
-          <MaterialButton
-            title="Cancel"
-            style={{
-              backgroundColor: "transparent",
-              borderRadius: 5,
-              borderWidth: 1,
-              borderColor: Colors.dark,
-              marginStart: -2,
-              margin: 10,
-              height: 40,
-            }}
-            titleStyle={{
-              fontWeight: "bold",
-              color: Colors.dark,
-            }}
-            buttonPress={() => {
-              setVisible(false);
-              setSelectedEndDate(null);
-              setSelectedStartDate(null);
-            }}
-          />
-          <MaterialButton
-            title="Apply"
-            style={{
-              backgroundColor: Colors.dark,
-              borderRadius: 5,
-              borderWidth: 1,
-              borderColor: Colors.dark,
-              marginStart: 2,
-              marginEnd: -2,
-              margin: 10,
-              height: 40,
-            }}
-            titleStyle={{
-              fontWeight: "bold",
-              color: Colors.primary,
-            }}
-            buttonPress={() => {
-              setFiltering(true);
-              setVisible(false);
-              filterSales();
-              setSelectedEndDate(null);
-              setSelectedStartDate(null);
-            }}
-            disabled={!selectedStartDate && !selectedEndDate}
-          />
-        </View>
-      </ModalContent>
+      <SalesDateRangePicker
+        selectedEndDate={selectedEndDate}
+        visible={visible}
+        selectedStartDate={selectedStartDate}
+        handleDayPress={handleDayPress}
+        setFiltering={setFiltering}
+        setVisible={setVisible}
+        filterSales={filterSales}
+        setSelectedEndDate={setSelectedEndDate}
+        setSelectedStartDate={setSelectedStartDate}
+      />
     </View>
   );
 }
-
-
 
 export function ItemHeader({ title, value, ugx = true }) {
   return (

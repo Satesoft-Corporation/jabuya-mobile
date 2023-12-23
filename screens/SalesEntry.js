@@ -8,30 +8,25 @@ import {
   Alert,
   ScrollView,
   Dimensions,
-  FlatList,
 } from "react-native";
-import Colors from "../constants/Colors";
-import AppStatusBar from "../components/AppStatusBar";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
-import MaterialButton from "../components/MaterialButton";
-import { BaseApiService } from "../utils/BaseApiService";
-import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
-import ModalContent from "../components/ModalContent";
-import Card from "../components/Card";
-import ConfirmSalesDialog from "../components/ConfirmSalesDialog";
 import { BarCodeScanner } from "expo-barcode-scanner";
+import { FontAwesome5 } from "@expo/vector-icons";
+
+import { BaseApiService } from "../utils/BaseApiService";
+
+import Colors from "../constants/Colors";
+
+import AppStatusBar from "../components/AppStatusBar";
 import UserProfile from "../components/UserProfile";
-import MaterialInput from "../components/MaterialInput";
 import { SaleListItem } from "../components/TransactionItems";
-import {
-  SalesDropdownComponent,
-  ShopSelectionDropdown,
-} from "../components/DropdownComponents";
-import { SalesInfoDialog } from "../components/Dialogs";
+import { SalesDropdownComponent } from "../components/DropdownComponents";
+import { ShopSelectionDropdown } from "../components/DropdownComponents";
+import { SalesQtyInputDialog } from "../components/Dialogs";
 import { formatNumberWithCommas } from "../utils/Utils";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
+import { IconsComponent } from "../components/Icon";
+import Loader from "../components/Loader";
+import { ConfirmSalesDialog } from "../components/Dialogs";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -115,7 +110,6 @@ function SalesEntry({ route, navigation }) {
       amountPaid: recievedAmount,
       lineItems: selectedProducts,
     };
-
     new BaseApiService("/shop-sales")
       .postRequest(payLoad)
       .then(async (response) => {
@@ -384,171 +378,21 @@ function SalesEntry({ route, navigation }) {
   return scanBarCode ? (
     <View style={styles.container}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
-      <OrientationLoadingOverlay
-        visible={loading}
-        color={Colors.primary}
-        indicatorSize="large"
-        messageFontSize={24}
-        message=""
-      />
-      <ModalContent visible={showMoodal} style={{ padding: 35 }}>
-        <Card
-          style={{
-            paddingHorizontal: 15,
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 2,
-            }}
-          >
-            <View
-              style={{
-                marginTop: 10,
-                marginBottom: 5,
-                marginTop: 20,
-              }}
-            >
-              <Text
-                style={{
-                  fontWeight: "600",
-                  fontSize: 20,
-                  marginBottom: 5,
-                }}
-              >
-                Successfull
-              </Text>
-              <Text>
-                {selection && selection.productName} has been selected.
-              </Text>
-              <Text
-                style={{
-                  fontWeight: "600",
-                  fontSize: 13,
-                  marginTop: 10,
-                }}
-              >
-                Quantity
-              </Text>
-            </View>
 
-            <TextInput
-              onFocus={() => setErrors(null)}
-              onBlur={() => setErrors(null)}
-              textAlign="right"
-              inputMode="numeric"
-              value={quantity}
-              onChangeText={(text) => setQuantity(text)}
-              maxLength={3}
-              style={{
-                backgroundColor: Colors.light_3,
-                borderRadius: 5,
-                padding: 6,
-                borderWidth: 1,
-                borderColor: errors?.qtyZeroError
-                  ? Colors.error
-                  : "transparent",
-              }}
-            />
-            {errors?.qtyZeroError && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: Colors.error,
-                }}
-              >
-                {errors?.qtyZeroError}
-              </Text>
-            )}
-            <Text
-              style={{
-                fontWeight: "600",
-                fontSize: 13,
-                marginTop: 10,
-                marginBottom: 5,
-              }}
-            >
-              Unit cost
-            </Text>
-            <TextInput
-              textAlign="right"
-              value={unitCost}
-              inputMode="numeric"
-              onChangeText={(e) => setUnitCost(e)}
-              style={{
-                backgroundColor: Colors.light_3,
-                borderRadius: 5,
-                padding: 6,
-                borderColor: errors?.lessPriceError
-                  ? Colors.error
-                  : "transparent",
-              }}
-            />
-            {errors?.lessPriceError && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: Colors.error,
-                }}
-              >
-                {errors?.lessPriceError}
-              </Text>
-            )}
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginTop: 15,
-                marginBottom: 5,
-              }}
-            >
-              <MaterialButton
-                title="Cancel"
-                style={{
-                  backgroundColor: "transparent",
-                  borderRadius: 5,
-                  borderWidth: 1,
-                  borderColor: Colors.dark,
-                  marginStart: -2,
-                  margin: 10,
-                  height: 40,
-                }}
-                titleStyle={{
-                  fontWeight: "bold",
-                  color: Colors.dark,
-                }}
-                buttonPress={() => {
-                  setScanned(false);
-                  setShowModal(false);
-                  setErrors({});
-                }}
-              />
-              <MaterialButton
-                title="Confirm"
-                style={{
-                  backgroundColor: Colors.dark,
-                  borderRadius: 5,
-                  borderWidth: 1,
-                  borderColor: Colors.dark,
-                  marginStart: 2,
-                  marginEnd: -2,
-                  margin: 10,
-                  height: 40,
-                }}
-                titleStyle={{
-                  fontWeight: "bold",
-                  color: Colors.primary,
-                }}
-                buttonPress={() => {
-                  setScanned(false);
-                  saveSelection();
-                }}
-              />
-            </View>
-          </View>
-        </Card>
-      </ModalContent>
+      <Loader loading={loading} />
+
+      <SalesQtyInputDialog
+        showMoodal={showMoodal}
+        selection={selection}
+        errors={errors}
+        setErrors={setErrors}
+        setShowModal={setShowModal}
+        quantity={quantity}
+        setQuantity={setQuantity}
+        saveSelection={saveSelection}
+        setUnitCost={setUnitCost}
+        unitCost={unitCost}
+      />
 
       <BarCodeScanner
         height={screenHeight}
@@ -603,13 +447,8 @@ function SalesEntry({ route, navigation }) {
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
-      <OrientationLoadingOverlay
-        visible={loading}
-        color="white"
-        indicatorSize="large"
-        messageFontSize={24}
-        message=""
-      />
+      <Loader loading={loading} />
+
       <ConfirmSalesDialog
         visible={showConfirmed}
         addSale={() => {
@@ -626,6 +465,20 @@ function SalesEntry({ route, navigation }) {
         resetList={() => setLineItems([])}
         dateCreated={date}
       />
+
+      <SalesQtyInputDialog
+        showMoodal={showMoodal}
+        selection={selection}
+        errors={errors}
+        setErrors={setErrors}
+        setShowModal={setShowModal}
+        quantity={quantity}
+        setQuantity={setQuantity}
+        saveSelection={saveSelection}
+        setUnitCost={setUnitCost}
+        unitCost={unitCost}
+      />
+
       <BlackScreen flex={isShopAttendant ? 12 : 10}>
         <UserProfile />
         <TouchableOpacity
@@ -680,9 +533,7 @@ function SalesEntry({ route, navigation }) {
       </BlackScreen>
 
       <View style={{ backgroundColor: Colors.light_2, flex: 1 }}>
-        <ScrollView
-          style={{ paddingHorizontal: 10, marginTop: 7 }}
-        >
+        <ScrollView style={{ paddingHorizontal: 10, marginTop: 7 }}>
           <View
             style={{
               //m was -10
@@ -751,6 +602,7 @@ function SalesEntry({ route, navigation }) {
               </View>
             </View>
           </View>
+
           <View
             style={{
               backgroundColor: Colors.light,
@@ -827,7 +679,8 @@ function SalesEntry({ route, navigation }) {
               </View>
             </View>
           </View>
-          <View
+
+          <View // selections table
             style={{
               backgroundColor: Colors.light,
               borderRadius: 5,
@@ -874,6 +727,7 @@ function SalesEntry({ route, navigation }) {
               </Text>
             </View>
           </View>
+
           <IconsComponent clear={clearEverything} />
           <TouchableOpacity
             disabled={selections.length < 1}
@@ -913,262 +767,10 @@ function SalesEntry({ route, navigation }) {
               Confirm purchase
             </Text>
           </TouchableOpacity>
-
-          <ModalContent visible={showMoodal} style={{ padding: 35 }}>
-            <Card
-              style={{
-                paddingHorizontal: 15,
-              }}
-            >
-              <View
-                style={{
-                  backgroundColor: "white",
-                  padding: 2,
-                }}
-              >
-                <View
-                  style={{
-                    marginTop: 10,
-                    marginBottom: 5,
-                    marginTop: 20,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontWeight: "600",
-                      fontSize: 20,
-                      marginBottom: 5,
-                    }}
-                  >
-                    Successfull
-                  </Text>
-                  <Text>
-                    {selection && selection.productName} has been selected.
-                  </Text>
-                  <Text
-                    style={{
-                      fontWeight: "600",
-                      fontSize: 13,
-                      marginTop: 10,
-                    }}
-                  >
-                    Quantity
-                  </Text>
-                </View>
-
-                <TextInput
-                  onFocus={() => setErrors(null)}
-                  onBlur={() => setErrors(null)}
-                  textAlign="right"
-                  inputMode="numeric"
-                  value={quantity}
-                  onChangeText={(text) => setQuantity(text)}
-                  maxLength={3}
-                  style={{
-                    backgroundColor: Colors.light_3,
-                    borderRadius: 5,
-                    padding: 6,
-                    borderWidth: 1,
-                    borderColor: errors?.qtyZeroError
-                      ? Colors.error
-                      : "transparent",
-                  }}
-                />
-                {errors?.qtyZeroError && (
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      color: Colors.error,
-                    }}
-                  >
-                    {errors?.qtyZeroError}
-                  </Text>
-                )}
-                <Text
-                  style={{
-                    fontWeight: "600",
-                    fontSize: 13,
-                    marginTop: 10,
-                    marginBottom: 5,
-                  }}
-                >
-                  Unit cost
-                </Text>
-                <TextInput
-                  textAlign="right"
-                  value={unitCost}
-                  inputMode="numeric"
-                  onChangeText={(e) => setUnitCost(e)}
-                  style={{
-                    backgroundColor: Colors.light_3,
-                    borderRadius: 5,
-                    padding: 6,
-                    borderColor: errors?.lessPriceError
-                      ? Colors.error
-                      : "transparent",
-                  }}
-                />
-                {errors?.lessPriceError && (
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      color: Colors.error,
-                    }}
-                  >
-                    {errors?.lessPriceError}
-                  </Text>
-                )}
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    marginTop: 15,
-                    marginBottom: 5,
-                  }}
-                >
-                  <MaterialButton
-                    title="Cancel"
-                    style={{
-                      backgroundColor: "transparent",
-                      borderRadius: 5,
-                      borderWidth: 1,
-                      borderColor: Colors.dark,
-                      marginStart: -2,
-                      margin: 10,
-                      height: 40,
-                    }}
-                    titleStyle={{
-                      fontWeight: "bold",
-                      color: Colors.dark,
-                    }}
-                    buttonPress={() => {
-                      setShowModal(false);
-                      setErrors({});
-                    }}
-                  />
-                  <MaterialButton
-                    title="Confirm"
-                    style={{
-                      backgroundColor: Colors.dark,
-                      borderRadius: 5,
-                      borderWidth: 1,
-                      borderColor: Colors.dark,
-                      marginStart: 2,
-                      marginEnd: -2,
-                      margin: 10,
-                      height: 40,
-                    }}
-                    titleStyle={{
-                      fontWeight: "bold",
-                      color: Colors.primary,
-                    }}
-                    buttonPress={() => {
-                      saveSelection();
-                    }}
-                  />
-                </View>
-              </View>
-            </Card>
-          </ModalContent>
         </ScrollView>
       </View>
     </View>
   );
 }
-
-const IconsComponent = ({ clear }) => {
-  let color = Colors.gray;
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginTop: 8,
-      }}
-    >
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          backgroundColor: Colors.light,
-          borderRadius: 5,
-          alignItems: "center",
-          width: 63,
-          height: 63,
-          opacity: 0.7,
-        }}
-      >
-        <FontAwesome name="credit-card" size={25} color={color} />
-        <Text style={{ alignSelf: "center", color }}>Card</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          backgroundColor: Colors.light,
-          borderRadius: 5,
-          alignItems: "center",
-          width: 63,
-          height: 63,
-          opacity: 0.7,
-        }}
-      >
-        <FontAwesome name="mobile" size={25} color={color} />
-        <Text style={{ alignSelf: "center", color }}>Mobile</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          backgroundColor: Colors.light,
-          borderRadius: 5,
-          alignItems: "center",
-          width: 63,
-          height: 63,
-          opacity: 0.7,
-        }}
-      >
-        <FontAwesome name="wechat" size={25} color={color} />
-        <Text style={{ alignSelf: "center", color }}>Fap</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          backgroundColor: Colors.light,
-          borderRadius: 5,
-          alignItems: "center",
-          width: 63,
-          height: 63,
-          opacity: 0.7,
-        }}
-      >
-        <MaterialCommunityIcons
-          name="hand-extended-outline"
-          size={24}
-          color={color}
-        />
-        <Text style={{ alignSelf: "center", color }}>Credit</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          backgroundColor: Colors.primary,
-          borderRadius: 5,
-          alignItems: "center",
-          width: 63,
-          height: 63,
-        }}
-      >
-        <MaterialCommunityIcons
-          name="broom"
-          size={25}
-          color="black"
-          onPress={() => {
-            clear();
-          }}
-        />
-        <Text style={{ alignSelf: "center" }}>Clear</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
 
 export default SalesEntry;

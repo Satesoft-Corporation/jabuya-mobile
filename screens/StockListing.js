@@ -1,11 +1,14 @@
-import { View, FlatList, Text } from "react-native";
+import { View, FlatList } from "react-native";
 import React, { useState, useEffect, memo } from "react";
-import { StockListingTransactionItem } from "../components/TransactionItems";
-import { BaseApiService } from "../utils/BaseApiService";
-import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
-import Colors from "../constants/Colors";
 
-const StockListing = memo(({ params }) => {
+import { StockListingTransactionItem } from "../components/TransactionItems";
+import Loader from "../components/Loader";
+
+import { BaseApiService } from "../utils/BaseApiService";
+
+import { StockingTabTitles } from "../constants/Constants";
+
+const StockListing = memo(({ params, currentPage }) => {
   const [stockListing, setStockListing] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -37,21 +40,21 @@ const StockListing = memo(({ params }) => {
       });
   };
   useEffect(() => {
-    fetchStockListing();
-  }, []);
+    if (
+      currentPage === StockingTabTitles.ListingTitle &&
+      stockListing.length === 0
+    ) {
+      fetchStockListing();
+    }
+  }, [currentPage]);
   return (
     <View
       style={{
         justifyContent: "center",
       }}
     >
-      <OrientationLoadingOverlay
-        visible={loading}
-        color={Colors.primary}
-        indicatorSize="large"
-        messageFontSize={24}
-        message=""
-      />
+      <Loader visible={loading} />
+
       <FlatList
         containerStyle={{ padding: 5 }}
         showsHorizontalScrollIndicator={false}
