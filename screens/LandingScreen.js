@@ -4,7 +4,6 @@ import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
 import { Icon } from "../components/Icon";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
-import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import UserProfile from "../components/UserProfile";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import Loader from "../components/Loader";
@@ -40,10 +39,9 @@ export default function LandingScreen({ navigation }) {
       title: "Chat",
     },
   ];
-
   useEffect(() => {
     UserSessionUtils.getFullSessionObject().then((data) => {
-      setRouteParams(data.user);
+      setRouteParams(data?.user);
       setTimeout(() => {
         setLoading(false);
       }, 100);
@@ -57,7 +55,7 @@ export default function LandingScreen({ navigation }) {
       <Loader loading={loading} />
 
       <BlackScreen>
-        <UserProfile/>
+        <UserProfile />
       </BlackScreen>
 
       <FlatList
@@ -67,9 +65,11 @@ export default function LandingScreen({ navigation }) {
           <Icon
             icon={item}
             onPress={() =>
-              navigation.navigate(item.target, {
-                ...routeParams,
-              })
+              item.target
+                ? navigation.navigate(item.target, {
+                    ...routeParams,
+                  })
+                : null
             }
           />
         )}
