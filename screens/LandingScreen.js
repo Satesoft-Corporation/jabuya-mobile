@@ -57,7 +57,7 @@ export default function LandingScreen({ navigation }) {
       <Loader loading={loading} />
 
       <BlackScreen>
-        <UserProfile navigation={navigation} />
+        <UserProfile/>
       </BlackScreen>
 
       <FlatList

@@ -4,13 +4,15 @@ import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Colors from "../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { BaseApiService } from "../utils/BaseApiService";
+import { useNavigation } from "@react-navigation/native";
 
-const UserProfile = ({ navigation }) => {
+const UserProfile = () => {
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
   const [shopName, setShopName] = useState("");
   const [shops, setShops] = useState([]);
 
+  const navigation = useNavigation();
   useEffect(() => {
     UserSessionUtils.getFullSessionObject().then((data) => {
       const {
@@ -56,7 +58,7 @@ const UserProfile = ({ navigation }) => {
           marginTop: 10,
         }}
       >
-        <TouchableOpacity onPress={() => console.log(navigation)}>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
           <Image
             source={require("../assets/images/man_placeholder.jpg")}
             style={{

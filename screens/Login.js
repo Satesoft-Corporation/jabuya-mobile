@@ -41,6 +41,9 @@ export default function Login({ navigation }) {
         } else if (status === 400) {
           Alert.alert("Invalid username or password");
           setDisabled(false);
+        } else {
+          Alert.alert("Login failed!", info.message);
+          setDisabled(false);
         }
       })
       .catch((error) => {

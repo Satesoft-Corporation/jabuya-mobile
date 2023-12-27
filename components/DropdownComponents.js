@@ -92,6 +92,7 @@ export const ShopSelectionDropdown = ({
   makeShopSelection,
   value,
   disable,
+  style = {},
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -110,6 +111,7 @@ export const ShopSelectionDropdown = ({
             width: "100%",
           },
           isFocus && { borderColor: Colors.primary },
+          style,
         ]}
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
@@ -127,6 +129,57 @@ export const ShopSelectionDropdown = ({
         onChange={(item) => {
           setIsFocus(false);
           makeShopSelection(item);
+        }}
+      />
+    </View>
+  );
+};
+export const MyDropDown = ({
+  onChange,
+  style = {},
+  data,
+  labelField,
+  valueField,
+  value,
+  placeholder = "Select item",
+  disable = false,
+  onChangeText,
+}) => {
+  const [isFocus, setIsFocus] = useState(false);
+
+  return (
+    <View style={{ marginBottom: 1 }}>
+      <Dropdown
+        disable={disable}
+        style={[
+          {
+            height: 40,
+            borderColor: Colors.primary,
+            borderWidth: 0.5,
+            borderRadius: 5,
+            paddingHorizontal: 13,
+            backgroundColor: Colors.primary,
+            width: "100%",
+          },
+          isFocus && { borderColor: Colors.primary },
+          style,
+        ]}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={data}
+        maxHeight={screenHeight / 2}
+        labelField={labelField}
+        valueField={valueField}
+        placeholder={!isFocus ? placeholder : "..."}
+        searchPlaceholder="Search..."
+        value={value}
+        onFocus={() => setIsFocus(true)}
+        onBlur={() => setIsFocus(false)}
+        onChange={(item) => {
+          setIsFocus(false);
+          onChange(item);
         }}
       />
     </View>
@@ -163,10 +216,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   placeholderStyle: {
-    fontSize: 16,
+    fontSize: 15,
   },
   selectedTextStyle: {
-    fontSize: 16,
+    fontSize: 15,
   },
   iconStyle: {
     width: 20,
