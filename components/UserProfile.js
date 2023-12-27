@@ -22,7 +22,7 @@ const UserProfile = () => {
         attendantShopName,
         shopOwnerId,
         shopOwner,
-      } = data.user;
+      } = data?.user;
       let searchParameters = { offset: 0, limit: 0, shopOwnerId: shopOwnerId };
 
       setRole(roles[0].name);
@@ -40,6 +40,7 @@ const UserProfile = () => {
       }
     });
   }, []);
+
   return (
     <View
       style={{

@@ -19,6 +19,7 @@ export default function Login({ navigation }) {
 
   const onLogin = () => {
     setDisabled(true);
+
     new BaseApiService("/auth/login")
       .postRequest(loginInfo)
       .then(async (response) => {
@@ -34,7 +35,6 @@ export default function Login({ navigation }) {
           await UserSessionUtils.setUserRefreshToken(info.refreshToken);
           await UserSessionUtils.setFullSessionObject(info);
           await UserSessionUtils.setShopid(String(info.user.attendantShopId));
-          navigation.navigate("welcome");
           setPassword("");
           setUsername("");
           setTimeout(() => setDisabled(false), 1000);

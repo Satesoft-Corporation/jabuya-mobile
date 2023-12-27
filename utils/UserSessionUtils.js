@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StorageParams from "../constants/StorageParams";
+import { CommonActions } from "@react-navigation/native";
 export class UserSessionUtils {
   /**
    * This is used to get the user's bearer token.
@@ -21,10 +22,16 @@ export class UserSessionUtils {
   /**
    * This method is used to clear the localstorage and redirect the user to the login screen
    */
-  static async clearLocalStorageAndLogout(pageContext) {
+  static async clearLocalStorageAndLogout(navigation) {
     // remove all
     await AsyncStorage.clear();
-    pageContext?.pageDispatch({ page: "appTour" });
+    const { dispatch } = navigation;
+    dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "login" }],
+      })
+    );
   }
 
   /**

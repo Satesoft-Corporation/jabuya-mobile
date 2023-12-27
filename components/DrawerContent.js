@@ -1,29 +1,66 @@
-import { View, Text, Image, TouchableOpacity, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import Colors from "../constants/Colors";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 
-const DrawerContent = () => {
+// const isLoggedIn = await UserSessionUtils.isLoggedIn();
+
+const DrawerContent = ({ ...props }) => {
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
   const [shopName, setShopName] = useState("");
+  const [isLoggedIn, setIsloggedIn] = useState(false);
+
+  const { navigation } = props;
+
+  const logOut = () => {
+    navigation.closeDrawer();
+    UserSessionUtils.clearLocalStorageAndLogout(navigation);
+  };
 
   const MENU_ITEM = [
     {
       id: "1",
       title: "Update",
+      func: () => Alert.alert("No updates available"),
     },
-    { id: "2", title: "Logout" },
+    {
+      id: "2",
+      title: "Logout",
+      func: logOut,
+    },
   ];
 
+  const handlePress = (item) => {
+    item.func();
+  };
+
+  const getLogInStatus = async () => {
+    let status = await UserSessionUtils.isLoggedIn();
+    setIsloggedIn(status);
+  };
+
   useEffect(() => {
-    UserSessionUtils.getFullSessionObject().then((data) => {
-      const { roles, firstName, lastName, attendantShopName } = data.user;
-      setRole(roles[0].name);
-      setName(firstName + " " + lastName);
-      setShopName(attendantShopName);
-    });
+    getLogInStatus();
   }, []);
+
+  useEffect(() => {
+    if (isLoggedIn === true) {
+      UserSessionUtils.getFullSessionObject().then((data) => {
+        const { roles, firstName, lastName, attendantShopName } = data?.user;
+        setRole(roles[0].name);
+        setName(firstName + " " + lastName);
+        setShopName(attendantShopName);
+      });
+    }
+  }, [isLoggedIn]);
   return (
     <View style={{ flex: 1, backgroundColor: Colors.dark }}>
       <View style={{ flex: 1, alignItems: "center" }}>
@@ -63,7 +100,9 @@ const DrawerContent = () => {
         <View style={{ width: "100%", paddingHorizontal: 15 }}>
           <FlatList
             data={MENU_ITEM}
-            renderItem={({ item }) => <ItemMenu item={item} />}
+            renderItem={({ item }) => (
+              <ItemMenu item={item} onPress={() => handlePress(item)} />
+            )}
             keyExtractor={(item) => item.id}
           />
         </View>
@@ -71,10 +110,11 @@ const DrawerContent = () => {
     </View>
   );
 };
-function ItemMenu({ item }) {
+function ItemMenu({ item, onPress }) {
   return (
     <View>
       <TouchableOpacity
+        onPress={onPress}
         style={{
           flexDirection: "row",
           alignItems: "center",
