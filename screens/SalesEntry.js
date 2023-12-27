@@ -737,6 +737,7 @@ function SalesEntry({ route, navigation }) {
               height: 50,
               justifyContent: "center",
               marginTop: 8,
+              marginBottom:20
             }}
             onPress={() => {
               if (recievedAmount === null && selections.length > 0) {

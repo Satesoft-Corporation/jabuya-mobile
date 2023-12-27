@@ -3,3 +3,8 @@ export const StockingTabTitles = {
   LevelsTitle: "Stock level",
   ListingTitle: "Stock listing",
 };
+
+export const packageOptions = [
+  { value: "Packed", type: true },
+  { value: "Unpacked", type: false },
+];

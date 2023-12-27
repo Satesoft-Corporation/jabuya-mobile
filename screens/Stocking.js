@@ -43,8 +43,8 @@ const Stocking = ({ route, navigation }) => {
 
   const flatlistRef = useRef(null);
 
-  const handleFormDestination = () => {
-    // navigation.navigate("stockPurchaseForm");
+  const handleFormDestination = (form) => {
+    navigation.navigate(form, params);
     return true;
   };
 

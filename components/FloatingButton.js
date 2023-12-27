@@ -100,183 +100,192 @@ export function FloatingButton({
         ></Animated.View>
       )}
 
-      {isAttendant===false && <>
-        <Animated.View
-        style={{
-          width: 136,
-          height: 46,
-          position: "absolute",
-          right: 10,
-          alignItems: "center",
-          bottom: visible,
-          flexDirection: "row",
-          marginBottom: -15,
-          opacity: isOpen ? 1 : 0,
-        }}
-      >
-        {with_text && (
+      {isAttendant === false && (
+        <>
           <Animated.View
             style={{
-              width: 80,
-              backgroundColor: "#FFF",
-              height: 25,
-              borderRadius: 3,
+              width: 136,
+              height: 46,
               position: "absolute",
-              right: right,
-              justifyContent: "center",
+              right: 10,
               alignItems: "center",
+              bottom: visible,
+              flexDirection: "row",
+              marginBottom: -15,
+              opacity: isOpen ? 1 : 0,
             }}
           >
-            <TouchableOpacity onPress={handlePress}>
-              <Text
+            {with_text && (
+              <Animated.View
                 style={{
-                  fontSize: 13,
-                  color: "#4a4a4a",
-                  textAlign: "right",
-                  fontWeight: 600,
+                  width: 80,
+                  backgroundColor: "#FFF",
+                  height: 25,
+                  borderRadius: 3,
+                  position: "absolute",
+                  right: right,
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
-                Restock
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-        )}
-        <Animated.View
-          style={{
-            borderRadius: 50,
-            width: 40,
-            height: 40,
-            bottom: 3,
-            backgroundColor: buttonBg,
-            position: "absolute",
-            right: 20,
+                <TouchableOpacity
+                  onPress={() => handlePress("stockPurchaseForm")}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      color: "#4a4a4a",
+                      textAlign: "right",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Restock
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+            <Animated.View
+              style={{
+                borderRadius: 50,
+                width: 40,
+                height: 40,
+                bottom: 3,
+                backgroundColor: buttonBg,
+                position: "absolute",
+                right: 20,
 
-            borderWidth: 0,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.5,
-            shadowRadius: 3,
-            elevation: isBg ? 5 : 0,
-            margin: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <TouchableOpacity onPress={handlePress}>
+                borderWidth: 0,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.5,
+                shadowRadius: 3,
+                elevation: isBg ? 5 : 0,
+                margin: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => handlePress("stockPurchaseForm")}
+              >
+                <Image
+                  style={{
+                    width: 25,
+                    height: 25,
+                    tintColor: iconTint,
+                    alignSelf: "center",
+                    resizeMode: "cover",
+                  }}
+                  source={require("../assets/icons/icons8-stock-rotation-32.png")}
+                />
+              </TouchableOpacity>
+            </Animated.View>
+          </Animated.View>
+
+          <Animated.View
+            style={{
+              width: 136,
+              height: 46,
+              position: "absolute",
+              right: 10,
+              alignItems: "center",
+              bottom: visible_,
+              flexDirection: "row",
+              marginBottom: -25,
+              opacity: isOpen ? 1 : 0,
+            }}
+          >
+            {with_text && (
+              <Animated.View
+                style={{
+                  width: 80,
+                  backgroundColor: "#FFF",
+                  height: 25,
+                  borderRadius: 3,
+                  position: "absolute",
+                  right: right,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => handlePress("stockListingForm")}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      color: "#4a4a4a",
+                      textAlign: "right",
+                      opacity: isOpen ? 1 : 0,
+                      fontWeight: 600,
+                    }}
+                  >
+                    List product
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+            <Animated.View
+              style={{
+                borderRadius: 50,
+                width: 40,
+                height: 40,
+                bottom: 3,
+                backgroundColor: buttonBg,
+                position: "absolute",
+                right: 20,
+
+                borderWidth: 0,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.5,
+                shadowRadius: 3,
+                elevation: isBg ? 5 : 0,
+                margin: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <TouchableOpacity onPress={() => handlePress("stockListingForm")}>
+                <Image
+                  style={{
+                    width: 25,
+                    height: 25,
+                    tintColor: iconTint,
+                    alignSelf: "center",
+                  }}
+                  source={require("../assets/icons/icons8-box-50.png")}
+                />
+              </TouchableOpacity>
+            </Animated.View>
+          </Animated.View>
+
+          <TouchableOpacity
+            onPress={show()}
+            style={{
+              width: 56,
+              height: 56,
+              backgroundColor: Colors.dark,
+              borderRadius: 60,
+              position: "absolute",
+              bottom: 50,
+              right: 15,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Image
               style={{
-                width: 25,
-                height: 25,
-                tintColor: iconTint,
-                alignSelf: "center",
+                width: 40,
+                height: 40,
+                tintColor: Colors.primary,
                 resizeMode: "cover",
               }}
-              source={require("../assets/icons/icons8-stock-rotation-32.png")}
+              source={require("../assets/icons/ic_plus.png")}
             />
           </TouchableOpacity>
-        </Animated.View>
-      </Animated.View>
-
-      <Animated.View
-        style={{
-          width: 136,
-          height: 46,
-          position: "absolute",
-          right: 10,
-          alignItems: "center",
-          bottom: visible_,
-          flexDirection: "row",
-          marginBottom: -25,
-          opacity: isOpen ? 1 : 0,
-        }}
-      >
-        {with_text && (
-          <Animated.View
-            style={{
-              width: 80,
-              backgroundColor: "#FFF",
-              height: 25,
-              borderRadius: 3,
-              position: "absolute",
-              right: right,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <TouchableOpacity onPress={handlePress}>
-              <Text
-                style={{
-                  fontSize: 13,
-                  color: "#4a4a4a",
-                  textAlign: "right",
-                  opacity: isOpen ? 1 : 0,
-                  fontWeight: 600,
-                }}
-              >
-                List product
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-        )}
-        <Animated.View
-          style={{
-            borderRadius: 50,
-            width: 40,
-            height: 40,
-            bottom: 3,
-            backgroundColor: buttonBg,
-            position: "absolute",
-            right: 20,
-
-            borderWidth: 0,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.5,
-            shadowRadius: 3,
-            elevation: isBg ? 5 : 0,
-            margin: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <TouchableOpacity onPress={handlePress}>
-            <Image
-              style={{
-                width: 25,
-                height: 25,
-                tintColor: iconTint,
-                alignSelf: "center",
-              }}
-              source={require("../assets/icons/icons8-box-50.png")}
-            />
-          </TouchableOpacity>
-        </Animated.View>
-      </Animated.View>
-
-      <TouchableOpacity
-        onPress={show()}
-        style={{
-          width: 56,
-          height: 56,
-          backgroundColor: Colors.dark,
-          borderRadius: 60,
-          position: "absolute",
-          bottom: 50,
-          right: 15,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Image
-          style={{
-            width: 40,
-            height: 40,
-            tintColor: Colors.primary,
-            resizeMode: "cover",
-          }}
-          source={require("../assets/icons/ic_plus.png")}
-        />
-      </TouchableOpacity></>}
+        </>
+      )}
     </View>
   );
 }
