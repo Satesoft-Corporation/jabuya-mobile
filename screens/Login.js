@@ -37,6 +37,7 @@ export default function Login({ navigation }) {
           await UserSessionUtils.setShopid(String(info.user.attendantShopId));
           setPassword("");
           setUsername("");
+          navigation.navigate('welcome')
           setTimeout(() => setDisabled(false), 1000);
         } else if (status === 400) {
           Alert.alert("Invalid username or password");
