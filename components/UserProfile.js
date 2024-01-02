@@ -59,7 +59,7 @@ const UserProfile = () => {
           marginTop: 10,
         }}
       >
-        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+        <TouchableOpacity onPress={() => true}>
           <Image
             source={require("../assets/images/man_placeholder.jpg")}
             style={{
