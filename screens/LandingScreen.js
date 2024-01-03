@@ -31,7 +31,7 @@ export default function LandingScreen({ navigation }) {
       id: 3,
       icon: require("../assets/icons/icons8-box-50.png"),
       title: "Stocking",
-      target: "stocking",
+      // target: "stocking",
     },
     {
       id: 4,
