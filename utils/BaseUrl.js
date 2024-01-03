@@ -1,8 +1,5 @@
-let resolveBackendEndpoint =
-  "https://duqact-backend-dev.azurewebsites.net/api/v1";
+//"https://duqact-backend-dev.azurewebsites.net/api/v1";
 
-if (window.location.hostname.includes("duqact.com")) {
-  resolveBackendEndpoint = "https://backend.duqact.com/api/v1";
-}
+//https://blue-mud-0b1a19e10.4.azurestaticapps.net
 
-export const BASE_URL = resolveBackendEndpoint;
+export const BASE_URL = "https://duqact-backend-dev.azurewebsites.net/api/v1";

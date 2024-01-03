@@ -289,7 +289,6 @@ export default function ViewSales({ navigation, route }) {
         <View
           style={{
             flex: 3,
-            // backgroundColor: Colors.light_2,
             paddingBottom: 20,
           }}
         >
@@ -300,8 +299,9 @@ export default function ViewSales({ navigation, route }) {
                 showsHorizontalScrollIndicator={false}
                 data={sales}
                 keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
+                renderItem={({ item, i }) => (
                   <SaleTransactionItem
+                    key={i}
                     data={item}
                     setCount={(a) => setCount(a)}
                     isShopOwner={isShopOwner}
