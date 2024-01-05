@@ -28,6 +28,7 @@ export function SalesQtyInputDialog({
   saveSelection,
   setUnitCost,
   unitCost,
+  setSelection
 }) {
   return (
     <ModalContent visible={showMoodal} style={{ padding: 35 }}>
@@ -156,6 +157,7 @@ export function SalesQtyInputDialog({
               buttonPress={() => {
                 setShowModal(false);
                 setErrors({});
+                setSelection(null)
               }}
             />
             <MaterialButton

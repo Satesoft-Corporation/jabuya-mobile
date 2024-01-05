@@ -33,7 +33,7 @@ const screenHeight = Dimensions.get("window").height;
 
 function SalesEntry({ route, navigation }) {
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(null);
   const [limit, setLimit] = useState(20);
   const [loading, setLoading] = useState(true);
   const [selectedProducts, setSelectedProducts] = useState([]); //unfiltered selections array
@@ -69,15 +69,20 @@ function SalesEntry({ route, navigation }) {
     let searchParameters = {
       offset: 0,
       limit: limit,
-      searchTerm,
     };
-    setLoading(true);
+
+    if (searchTerm !== null) {
+      searchParameters.searchTerm = searchTerm;
+    }
+
     if (shopId !== null) {
       searchParameters.shopId = shopId;
     }
+
     if (isShopAttendant) {
       searchParameters.shopId = attendantShopId;
     }
+
     new BaseApiService("/shop-products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
@@ -86,6 +91,7 @@ function SalesEntry({ route, navigation }) {
       })
       .catch((error) => {
         setLoading(false);
+        return false;
       });
   };
 
@@ -96,9 +102,14 @@ function SalesEntry({ route, navigation }) {
         .getRequestWithJsonResponse(searchParameters)
         .then(async (response) => {
           setShops(response.records);
+          if (response.records.length === 1) {
+            setSelectedShop(response.records[0]);
+            fetchProducts(response.records[0].id);
+          }
         })
         .catch((error) => {
           console.log(error);
+          setLoading(false);
         });
     }
   };
@@ -164,6 +175,7 @@ function SalesEntry({ route, navigation }) {
 
   const handleChange = (value) => {
     setSearchTerm(value);
+    fetchProducts(selectedShop?.id);
   };
 
   const makeSelection = (item) => {
@@ -175,6 +187,7 @@ function SalesEntry({ route, navigation }) {
 
   const makeShopSelection = (shop) => {
     setSelectedShop(shop);
+    setLoading(true);
     fetchProducts(shop.id);
   };
 
@@ -325,8 +338,8 @@ function SalesEntry({ route, navigation }) {
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, [searchTerm]);
+    isShopAttendant && fetchProducts();
+  }, []);
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
@@ -477,6 +490,7 @@ function SalesEntry({ route, navigation }) {
         saveSelection={saveSelection}
         setUnitCost={setUnitCost}
         unitCost={unitCost}
+        setSelection={setSelection}
       />
 
       <BlackScreen flex={isShopAttendant ? 12 : 10}>
@@ -737,7 +751,7 @@ function SalesEntry({ route, navigation }) {
               height: 50,
               justifyContent: "center",
               marginTop: 8,
-              marginBottom:20
+              marginBottom: 20,
             }}
             onPress={() => {
               if (recievedAmount === null && selections.length > 0) {
