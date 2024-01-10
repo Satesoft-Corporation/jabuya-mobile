@@ -15,28 +15,34 @@ const UserProfile = () => {
   const navigation = useNavigation();
   useEffect(() => {
     UserSessionUtils.getFullSessionObject().then((data) => {
-      const {
-        roles,
-        firstName,
-        lastName,
-        attendantShopName,
-        shopOwnerId,
-        shopOwner,
-      } = data?.user;
-      let searchParameters = { offset: 0, limit: 0, shopOwnerId: shopOwnerId };
+      if (data) {
+        const {
+          roles,
+          firstName,
+          lastName,
+          attendantShopName,
+          shopOwnerId,
+          shopOwner,
+        } = data?.user;
+        let searchParameters = {
+          offset: 0,
+          limit: 0,
+          shopOwnerId: shopOwnerId,
+        };
 
-      setRole(roles[0].name);
-      setName(firstName + " " + lastName);
-      setShopName(attendantShopName);
-      if (shopOwner) {
-        new BaseApiService("/shops")
-          .getRequestWithJsonResponse(searchParameters)
-          .then(async (response) => {
-            setShops(response.records);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        setRole(roles[0].name);
+        setName(firstName + " " + lastName);
+        setShopName(attendantShopName);
+        if (shopOwner) {
+          new BaseApiService("/shops")
+            .getRequestWithJsonResponse(searchParameters)
+            .then(async (response) => {
+              setShops(response.records);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
       }
     });
   }, []);

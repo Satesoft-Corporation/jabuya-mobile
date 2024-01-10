@@ -31,7 +31,7 @@ export default function LandingScreen({ navigation }) {
       id: 3,
       icon: require("../assets/icons/icons8-box-50.png"),
       title: "Stocking",
-      // target: "stocking",
+      target: "stocking",
     },
     {
       id: 4,
@@ -40,12 +40,17 @@ export default function LandingScreen({ navigation }) {
     },
   ];
   useEffect(() => {
-    UserSessionUtils.getFullSessionObject().then((data) => {
-      setRouteParams(data?.user);
-      setTimeout(() => {
-        setLoading(false);
-      }, 100);
-    });
+    UserSessionUtils.getFullSessionObject()
+      .then((data) => {
+        setRouteParams(data.user);
+        setTimeout(() => {
+          setLoading(false);
+        }, 100);
+      })
+      .catch((error) => {
+        //looging the user out if the object is missing
+        UserSessionUtils.clearLocalStorageAndLogout(navigation);
+      });
   }, []);
 
   return (
@@ -164,7 +169,9 @@ export default function LandingScreen({ navigation }) {
           />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => setTab("check")}
+          onPress={() =>
+            UserSessionUtils.clearLocalStorageAndLogout(navigation)
+          }
           style={{
             flex: 1,
             alignItems: "center",
