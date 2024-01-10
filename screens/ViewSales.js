@@ -332,9 +332,10 @@ export default function ViewSales({ navigation, route }) {
         handleDayPress={handleDayPress}
         setFiltering={setFiltering}
         setVisible={setVisible}
-        filterSales={filterSales}
+        onFinish={filterSales}
         setSelectedEndDate={setSelectedEndDate}
         setSelectedStartDate={setSelectedStartDate}
+        moreCancelActions={()=>{}}
       />
     </View>
   );

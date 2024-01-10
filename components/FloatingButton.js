@@ -17,67 +17,65 @@ export function FloatingButton({
   const [isOpen, setOpen] = useState(false);
   const [isBg, setBg] = useState(false);
 
-  let buttonBg = Colors.dark;
-  let iconTint = Colors.primary;
+  let buttonBg = Colors.primary;
+  let iconTint = Colors.dark;
   const show = () => {
-    return () => {
-      if (!isOpen) {
-        setBg(true);
+    if (!isOpen) {
+      setBg(true);
 
-        Animated.parallel([
-          Animated.timing(width, {
-            toValue: 70,
-            duration: 200,
-          }),
-          Animated.timing(right, {
-            toValue: 66,
-            duration: 200,
-          }),
-          Animated.timing(opc, {
-            toValue: opacity,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-          Animated.timing(visible, {
-            toValue: 130,
-            duration: 200,
-          }),
-          Animated.timing(visible_, {
-            toValue: 200,
-            duration: 200,
-          }),
-        ]).start(() => {
-          setOpen(true);
-        });
-      } else {
-        Animated.parallel([
-          Animated.timing(width, {
-            toValue: 46,
-            duration: 200,
-          }),
-          Animated.timing(right, {
-            toValue: 4,
-            duration: 200,
-          }),
-          Animated.timing(opc, {
-            toValue: 0,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-          Animated.timing(visible, {
-            toValue: 50,
-            duration: 200,
-          }),
-          Animated.timing(visible_, {
-            toValue: 50,
-            duration: 200,
-          }),
-        ]).start(() => {
-          setOpen(false);
-          setBg(false);
-        });
-      }
-    };
+      Animated.parallel([
+        Animated.timing(width, {
+          toValue: 70,
+          duration: 200,
+        }),
+        Animated.timing(right, {
+          toValue: 66,
+          duration: 200,
+        }),
+        Animated.timing(opc, {
+          toValue: opacity,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(visible, {
+          toValue: 130,
+          duration: 200,
+        }),
+        Animated.timing(visible_, {
+          toValue: 200,
+          duration: 200,
+        }),
+      ]).start(() => {
+        setOpen(true);
+      });
+    } else {
+      Animated.parallel([
+        Animated.timing(width, {
+          toValue: 46,
+          duration: 200,
+        }),
+        Animated.timing(right, {
+          toValue: 4,
+          duration: 200,
+        }),
+        Animated.timing(opc, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(visible, {
+          toValue: 50,
+          duration: 200,
+        }),
+        Animated.timing(visible_, {
+          toValue: 50,
+          duration: 200,
+        }),
+      ]).start(() => {
+        setOpen(false);
+        setBg(false);
+      });
+    }
   };
 
   return (
@@ -129,7 +127,10 @@ export function FloatingButton({
                 }}
               >
                 <TouchableOpacity
-                  onPress={() => handlePress("stockPurchaseForm")}
+                  onPress={() => {
+                    handlePress("stockPurchaseForm");
+                    show();
+                  }}
                 >
                   <Text
                     style={{
@@ -166,7 +167,10 @@ export function FloatingButton({
               }}
             >
               <TouchableOpacity
-                onPress={() => handlePress("stockPurchaseForm")}
+                onPress={() => {
+                  handlePress("stockPurchaseForm");
+                  show();
+                }}
               >
                 <Image
                   style={{
@@ -209,7 +213,10 @@ export function FloatingButton({
                 }}
               >
                 <TouchableOpacity
-                  onPress={() => handlePress("stockListingForm")}
+                  onPress={() => {
+                    handlePress("stockPurchaseForm");
+                    show();
+                  }}
                 >
                   <Text
                     style={{
@@ -246,7 +253,12 @@ export function FloatingButton({
                 justifyContent: "center",
               }}
             >
-              <TouchableOpacity onPress={() => handlePress("stockListingForm")}>
+              <TouchableOpacity
+                onPress={() => {
+                  handlePress("stockPurchaseForm");
+                  show();
+                }}
+              >
                 <Image
                   style={{
                     width: 25,
@@ -261,11 +273,11 @@ export function FloatingButton({
           </Animated.View>
 
           <TouchableOpacity
-            onPress={show()}
+            onPress={show}
             style={{
               width: 56,
               height: 56,
-              backgroundColor: Colors.dark,
+              backgroundColor: Colors.primary,
               borderRadius: 60,
               position: "absolute",
               bottom: 50,
@@ -278,7 +290,7 @@ export function FloatingButton({
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.primary,
+                tintColor: Colors.dark,
                 resizeMode: "cover",
               }}
               source={require("../assets/icons/ic_plus.png")}

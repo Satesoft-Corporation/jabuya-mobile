@@ -28,7 +28,7 @@ export function SalesQtyInputDialog({
   saveSelection,
   setUnitCost,
   unitCost,
-  setSelection
+  setSelection,
 }) {
   return (
     <ModalContent visible={showMoodal} style={{ padding: 35 }}>
@@ -157,7 +157,7 @@ export function SalesQtyInputDialog({
               buttonPress={() => {
                 setShowModal(false);
                 setErrors({});
-                setSelection(null)
+                setSelection(null);
               }}
             />
             <MaterialButton
@@ -423,9 +423,12 @@ export function SalesDateRangePicker({
   handleDayPress,
   setFiltering,
   setVisible,
-  filterSales,
+  onFinish,
   setSelectedEndDate,
   setSelectedStartDate,
+  singleSelection = false,
+  titles = ["Cancel", "Apply"],
+  moreCancelActions
 }) {
   const calendarTheme = {
     calendarBackground: "black",
@@ -438,22 +441,35 @@ export function SalesDateRangePicker({
     dayTextColor: Colors.light,
     selectedDayTextColor: "black",
   };
+
+  const markedDates = () => {
+    if (singleSelection === true) {
+      return {
+        [selectedStartDate]: {
+          selected: true,
+          startingDay: true,
+          endingDay: true,
+        },
+      };
+    }
+    return {
+      [selectedStartDate]: {
+        selected: true,
+        startingDay: true,
+        endingDay: selectedEndDate === selectedStartDate,
+      },
+      [selectedEndDate]: {
+        selected: true,
+        endingDay: true,
+      },
+    };
+  };
   return (
     <ModalContent visible={visible} style={{ padding: 10 }}>
       <Calendar
         theme={calendarTheme}
         onDayPress={handleDayPress}
-        markedDates={{
-          [selectedStartDate]: {
-            selected: true,
-            startingDay: true,
-            endingDay: selectedEndDate === selectedStartDate,
-          },
-          [selectedEndDate]: {
-            selected: true,
-            endingDay: true,
-          },
-        }}
+        markedDates={markedDates()}
       />
 
       <View
@@ -464,7 +480,7 @@ export function SalesDateRangePicker({
         }}
       >
         <MaterialButton
-          title="Cancel"
+          title={titles[0]}
           style={{
             backgroundColor: "transparent",
             borderRadius: 5,
@@ -479,13 +495,14 @@ export function SalesDateRangePicker({
             color: Colors.dark,
           }}
           buttonPress={() => {
+            moreCancelActions()
             setVisible(false);
             setSelectedEndDate(null);
             setSelectedStartDate(null);
           }}
         />
         <MaterialButton
-          title="Apply"
+          title={titles[1]}
           style={{
             backgroundColor: Colors.dark,
             borderRadius: 5,
@@ -503,7 +520,7 @@ export function SalesDateRangePicker({
           buttonPress={() => {
             setFiltering(true);
             setVisible(false);
-            filterSales();
+            onFinish();
             setSelectedEndDate(null);
             setSelectedStartDate(null);
           }}

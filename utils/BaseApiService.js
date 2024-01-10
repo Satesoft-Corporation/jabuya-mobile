@@ -131,4 +131,52 @@ export class BaseApiService {
       body: JSON.stringify(requestBody),
     });
   }
+
+  /**
+   * This method is used to make a POST API request to the provided constructor endpoint.
+   *
+   * @param requestBody
+   * @returns
+   */
+  async putRequest(requestBody) {
+    let token = UserSessionUtils.getBearerToken();
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    };
+    return fetch(this.apiEndpoint, {
+      method: "PUT",
+      headers: headers,
+      body: requestBody !== null ? JSON.stringify(requestBody) : "",
+    });
+  }
+
+  /**
+   * This method is used to make a POST/PUT  API request to the provided constructor endpoint.
+   * This returns a JSON response or redirects to the login screen if a 401 is detected.
+   *
+   * @param requestBody
+   * @returns
+   */
+  async saveRequestWithJsonResponse(requestBody, update) {
+    const response =
+      update && update === true
+        ? await this.putRequest(requestBody)
+        : await this.postRequest(requestBody);
+    if (response.ok) {
+      return response.json();
+    } else if (
+      response.status === 400 ||
+      response.status === 403 ||
+      response.status === 500
+    ) {
+      let data = await response.json();
+      let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
+      throw new TypeError(errorMessage);
+    } else if (response.status === 401) {
+      UserSessionUtils.clearLocalStorageAndLogout();
+    } else {
+      throw new TypeError(INTERNAL_SERVER_ERROR);
+    }
+  }
 }

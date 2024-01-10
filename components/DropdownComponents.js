@@ -154,7 +154,7 @@ export const MyDropDown = ({
         style={[
           {
             height: 40,
-            borderColor: Colors.primary,
+            borderColor: Colors.dark,
             borderWidth: 0.5,
             borderRadius: 5,
             paddingHorizontal: 13,
@@ -175,6 +175,7 @@ export const MyDropDown = ({
         placeholder={!isFocus ? placeholder : "..."}
         searchPlaceholder="Search..."
         value={value}
+        search
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
