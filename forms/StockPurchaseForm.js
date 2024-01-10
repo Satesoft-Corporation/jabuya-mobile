@@ -435,7 +435,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                     borderWidth: 0.6,
                     borderColor: Colors.dark,
                     paddingHorizontal: 10,
-                    textAlign:'center'
+                    textAlign: "center",
                   }}
                 />
               </View>
@@ -464,7 +464,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                     borderWidth: 0.6,
                     borderColor: Colors.dark,
                     paddingHorizontal: 10,
-                    textAlign:'right'
+                    textAlign: "right",
                   }}
                 />
               </View>

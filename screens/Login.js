@@ -7,6 +7,7 @@ import { BaseApiService } from "../utils/BaseApiService";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Constants from "expo-constants";
 import CircularProgress from "../components/CircularProgress";
+import { CommonActions } from "@react-navigation/native";
 export default function Login({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -19,6 +20,7 @@ export default function Login({ navigation }) {
 
   const onLogin = () => {
     setDisabled(true);
+    const { dispatch } = navigation;
 
     new BaseApiService("/auth/login")
       .postRequest(loginInfo)
@@ -37,8 +39,14 @@ export default function Login({ navigation }) {
           await UserSessionUtils.setShopid(String(info.user.attendantShopId));
           setPassword("");
           setUsername("");
-          navigation.navigate('welcome')
+          navigation.navigate("welcome");
           setTimeout(() => setDisabled(false), 1000);
+          dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: "welcome" }],
+            })
+          );
         } else if (status === 400) {
           Alert.alert("Invalid username or password");
           setDisabled(false);
@@ -52,6 +60,7 @@ export default function Login({ navigation }) {
         setDisabled(false);
       });
   };
+
   return (
     <View
       style={{
@@ -102,7 +111,7 @@ export default function Login({ navigation }) {
           borderRadius: 5,
           borderColor: Colors.primary,
           marginBottom: 5,
-          color: Colors.light,
+          color: Colors.primary,
         }}
       />
 
@@ -125,7 +134,7 @@ export default function Login({ navigation }) {
         style={{
           borderRadius: 5,
           borderColor: Colors.primary,
-          color: Colors.light,
+          color: Colors.primary,
         }}
       />
 
