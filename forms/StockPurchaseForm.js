@@ -152,6 +152,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
     setSelectedSupplier(null);
     setRemarks(null);
     setUnpackedPurchasedQty(null);
+    setProducts([]);
   };
 
   const handleDayPress = (day) => {
@@ -311,6 +312,17 @@ const StockPurchaseForm = ({ navigation, route }) => {
               labelField="name"
               valueField="id"
             />
+            {submitted && !selectedShop && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginStart: 6,
+                  color: Colors.error,
+                }}
+              >
+                Shop selection is required
+              </Text>
+            )}
           </View>
 
           <View>
@@ -330,6 +342,17 @@ const StockPurchaseForm = ({ navigation, route }) => {
               labelField="companyOrBusinessName"
               valueField="id"
             />
+            {submitted && !selectedSupplier && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginStart: 6,
+                  color: Colors.error,
+                }}
+              >
+                Supplier is required
+              </Text>
+            )}
           </View>
 
           <View style={{ marginVertical: 8 }}>
@@ -349,6 +372,17 @@ const StockPurchaseForm = ({ navigation, route }) => {
               labelField="name"
               valueField="id"
             />
+            {submitted && !selectedManufacturer && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginStart: 6,
+                  color: Colors.error,
+                }}
+              >
+                Manufacturer is required
+              </Text>
+            )}
           </View>
 
           <View style={{}}>
@@ -369,6 +403,17 @@ const StockPurchaseForm = ({ navigation, route }) => {
               labelField="productName"
               valueField="id"
             />
+            {submitted && !selectedProduct && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginStart: 6,
+                  color: Colors.error,
+                }}
+              >
+                Product is required
+              </Text>
+            )}
           </View>
 
           <View style={{ marginVertical: 8 }}>
@@ -391,6 +436,17 @@ const StockPurchaseForm = ({ navigation, route }) => {
               labelField="value"
               valueField="type"
             />
+            {submitted && !isPackedProduct && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginStart: 6,
+                  color: Colors.error,
+                }}
+              >
+                Package type is required
+              </Text>
+            )}
           </View>
 
           {isPackedProduct !== null && (
@@ -438,6 +494,18 @@ const StockPurchaseForm = ({ navigation, route }) => {
                     textAlign: "center",
                   }}
                 />
+                {submitted &&
+                  (!unpackedPurchasedQty || !packedPurchasedQuantity) && (
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        marginStart: 6,
+                        color: Colors.error,
+                      }}
+                    >
+                      Quantity is required
+                    </Text>
+                  )}
               </View>
 
               <View style={{ flex: 1 }}>
@@ -467,6 +535,17 @@ const StockPurchaseForm = ({ navigation, route }) => {
                     textAlign: "right",
                   }}
                 />
+                {submitted && !purchasePrice && (
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      marginStart: 6,
+                      color: Colors.error,
+                    }}
+                  >
+                    Price is required
+                  </Text>
+                )}
               </View>
             </View>
           )}
@@ -502,6 +581,17 @@ const StockPurchaseForm = ({ navigation, route }) => {
                   textAlign: "center",
                 }}
               />
+              {submitted && !batchNo && (
+                <Text
+                  style={{
+                    fontSize: 12,
+                    marginStart: 6,
+                    color: Colors.error,
+                  }}
+                >
+                  Batch number is required
+                </Text>
+              )}
             </View>
 
             <View style={{ flex: 1 }}>
@@ -537,6 +627,17 @@ const StockPurchaseForm = ({ navigation, route }) => {
                   {toReadableDate(expiryDate)}
                 </Text>
               </TouchableOpacity>
+              {submitted && !expiryDate && (
+                <Text
+                  style={{
+                    fontSize: 12,
+                    marginStart: 6,
+                    color: Colors.error,
+                  }}
+                >
+                  Expiry date is required
+                </Text>
+              )}
             </View>
           </View>
 
@@ -604,6 +705,17 @@ const StockPurchaseForm = ({ navigation, route }) => {
                   {toReadableDate(purchaseDate)}
                 </Text>
               </TouchableOpacity>
+              {submitted && !purchaseDate && (
+                <Text
+                  style={{
+                    fontSize: 12,
+                    marginStart: 6,
+                    color: Colors.error,
+                  }}
+                >
+                  Purchase date is required
+                </Text>
+              )}
             </View>
           </View>
 
