@@ -129,10 +129,10 @@ export default function ViewSales({ navigation, route }) {
     new BaseApiService("/shop-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
-        for (let item of response.records) {
+        for (let item of response?.records) {
           setSalesValue((i) => i + item.totalCost);
         }
-        setSales(response.records);
+        setSales(response?.records);
         setTimeout(() => {
           setLoading(false);
         }, 100);

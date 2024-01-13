@@ -314,6 +314,7 @@ function SalesEntry({ route, navigation }) {
         } else {
           setSelection(response.records[0]);
           setUnitCost(String(response.records[0]?.salesPrice));
+          setScanned(true);
           setShowModal(true);
           setLoading(false);
         }
@@ -336,7 +337,6 @@ function SalesEntry({ route, navigation }) {
     setLineItems([]);
     setTotalQty(0);
     setErrors({});
-    setSelectedShop(null);
   };
 
   useEffect(() => {
@@ -408,6 +408,7 @@ function SalesEntry({ route, navigation }) {
         setUnitCost={setUnitCost}
         unitCost={unitCost}
         setScanned={setScanned}
+        setSelection={setSelection}
       />
 
       <BarCodeScanner
