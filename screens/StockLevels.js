@@ -40,13 +40,8 @@ const StockLevel = memo(({ params, currentPage }) => {
   };
 
   useEffect(() => {
-    if (
-      currentPage === StockingTabTitles.LevelsTitle &&
-      stockLevels.length === 0
-    ) {
-      fetchStockLevels();
-    }
-  }, [currentPage]);
+    fetchStockLevels();
+  }, []);
   return (
     <View
       style={{

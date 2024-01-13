@@ -27,15 +27,15 @@ const Stocking = ({ route, navigation }) => {
   const pages = [
     {
       id: 0,
-      page: <StockPurchase params={params} currentPage={currentPage} />,
+      page: <StockPurchase params={params}  />,
     },
     {
       id: 1,
-      page: <StockLevel params={params} currentPage={currentPage} />,
+      page: <StockLevel params={params}  />,
     },
     {
       id: 2,
-      page: <StockListing params={params} currentPage={currentPage} />,
+      page: <StockListing params={params}  />,
     },
   ];
 
@@ -44,7 +44,7 @@ const Stocking = ({ route, navigation }) => {
   const flatlistRef = useRef(null);
 
   const handleFormDestination = (form) => {
-    // navigation.navigate(form, params);
+    navigation.navigate(form, params);
     return true;
   };
 
@@ -114,4 +114,4 @@ const Stocking = ({ route, navigation }) => {
   );
 };
 
-export default memo(Stocking);
+export default (Stocking);
