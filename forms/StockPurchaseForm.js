@@ -60,6 +60,9 @@ const StockPurchaseForm = ({ navigation, route }) => {
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setShops(response.records);
+        if (response.records.length === 1) {
+          setSelectedShop(response.records[0]);
+        }
         setLoading(false);
       })
       .catch((error) => {});
@@ -139,7 +142,6 @@ const StockPurchaseForm = ({ navigation, route }) => {
   };
 
   const clearForm = () => {
-    setSelectedShop(null);
     setSelectedManufacturer(null);
     setBatchNo(null);
     setErrors(null);
@@ -153,6 +155,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
     setRemarks(null);
     setUnpackedPurchasedQty(null);
     setProducts([]);
+    setSubmitted(false)
   };
 
   const handleDayPress = (day) => {
