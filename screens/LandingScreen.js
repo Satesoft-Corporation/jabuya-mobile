@@ -191,7 +191,7 @@ export default function LandingScreen({ navigation }) {
               tintColor: tab === "check" ? Colors.primary : Colors.light,
             }}
             resizeMode={"contain"}
-            source={require("../assets/icons/icons8-reset-50.png")}
+            source={require("../assets/icons/icons8-logout-24.png")}
           />
         </TouchableOpacity>
       </View>
