@@ -55,6 +55,12 @@ export default function ViewSales({ navigation, route }) {
     }
   };
 
+  const handleRefresh = () => {
+    setSelectedEndDate(null);
+    setSelectedStartDate(null);
+    getSales();
+  };
+
   function convertDateFormat(dateString, getTomorrowDate = false) {
     const date = new Date(dateString); // Create a Date object from the input string
 
@@ -199,6 +205,17 @@ export default function ViewSales({ navigation, route }) {
             <View
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
+              <TouchableOpacity onPress={handleRefresh}>
+                <Image
+                  source={require("../assets/icons/icons8-refresh-50.png")}
+                  style={{
+                    width: 25,
+                    height: 25,
+                    tintColor: Colors.primary,
+                    marginEnd: 10,
+                  }}
+                />
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => setVisible(true)}>
                 <Image
                   source={require("../assets/icons/icons8-calendar-26.png")}
@@ -335,7 +352,7 @@ export default function ViewSales({ navigation, route }) {
         onFinish={filterSales}
         setSelectedEndDate={setSelectedEndDate}
         setSelectedStartDate={setSelectedStartDate}
-        moreCancelActions={()=>{}}
+        moreCancelActions={() => {}}
       />
     </View>
   );
