@@ -250,6 +250,7 @@ function SalesEntry({ route, navigation }) {
         selections[productIndex].totalCost = prevTotalCost + cost;
         selectedProducts[productIndex2].quantity = Number(quantity) + prevQty;
         setLoading(false);
+        setScanned(false);
       } else {
         selectedProducts.push({
           // data set to be used in posting the sale to the server
@@ -270,6 +271,7 @@ function SalesEntry({ route, navigation }) {
           },
         ]);
       }
+      setScanned(false);
       setSelection(null);
       setQuantity(null);
       setShowModal(false);
@@ -405,6 +407,7 @@ function SalesEntry({ route, navigation }) {
         saveSelection={saveSelection}
         setUnitCost={setUnitCost}
         unitCost={unitCost}
+        setScanned={setScanned}
       />
 
       <BarCodeScanner
@@ -491,6 +494,7 @@ function SalesEntry({ route, navigation }) {
         setUnitCost={setUnitCost}
         unitCost={unitCost}
         setSelection={setSelection}
+        setScanned={setScanned}
       />
 
       <BlackScreen flex={isShopAttendant ? 12 : 10}>
