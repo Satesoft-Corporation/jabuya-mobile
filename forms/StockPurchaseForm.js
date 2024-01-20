@@ -65,7 +65,9 @@ const StockPurchaseForm = ({ navigation, route }) => {
         }
         setLoading(false);
       })
-      .catch((error) => {});
+      .catch((error) => {
+        setLoading(false);
+      });
   };
 
   const fetchManufacturers = async () => {
@@ -76,7 +78,9 @@ const StockPurchaseForm = ({ navigation, route }) => {
         setManufacturers(response.records);
         setLoading(false);
       })
-      .catch((error) => {});
+      .catch((error) => {
+        setLoading(false);
+      });
   };
 
   const fetchSuppliers = async () => {
@@ -88,7 +92,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
         setLoading(false);
       })
       .catch((error) => {
-        Alert.alert("Unknown error occured");
+        setLoading(false);
       });
   };
 
@@ -155,7 +159,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
     setRemarks(null);
     setUnpackedPurchasedQty(null);
     setProducts([]);
-    setSubmitted(false)
+    setSubmitted(false);
   };
 
   const handleDayPress = (day) => {
