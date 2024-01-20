@@ -83,7 +83,7 @@ function TabTextItem({
         style={{
           color: selected ? activeTitleColor : defaultTitleColor,
           paddingBottom: 8,
-          paddingTop: 23,
+          paddingTop: 8,
         }}
       >
         {title}

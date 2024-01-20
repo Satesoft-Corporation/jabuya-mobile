@@ -13,6 +13,9 @@ import { FloatingButton } from "../components/FloatingButton";
 import StockPurchase from "./StockPurchase";
 import StockLevel from "./StockLevels";
 import StockListing from "./StockListing";
+import { SearchBar } from "react-native-elements";
+
+const screenWidth = Dimensions.get("window").width;
 
 const Stocking = ({ route, navigation }) => {
   const { PurchaseTitle, LevelsTitle, ListingTitle } = StockingTabTitles;
@@ -21,21 +24,44 @@ const Stocking = ({ route, navigation }) => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState(tabTitles[0]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showLoading, setShowLoading] = useState(false);
 
   const params = route.params;
 
   const pages = [
     {
       id: 0,
-      page: <StockPurchase params={params}  />,
+      page: (
+        <StockPurchase
+          params={params}
+          currentPage={currentPage}
+          searchTerm={searchTerm}
+          setShowLoading={setShowLoading}
+        />
+      ),
     },
     {
       id: 1,
-      page: <StockLevel params={params}  />,
+      page: (
+        <StockLevel
+          params={params}
+          currentPage={currentPage}
+          searchTerm={searchTerm}
+          setShowLoading={setShowLoading}
+        />
+      ),
     },
     {
       id: 2,
-      page: <StockListing params={params}  />,
+      page: (
+        <StockListing
+          params={params}
+          currentPage={currentPage}
+          searchTerm={searchTerm}
+          setShowLoading={setShowLoading}
+        />
+      ),
     },
   ];
 
@@ -54,6 +80,7 @@ const Stocking = ({ route, navigation }) => {
     const windowWidth = Dimensions.get("window").width;
     const offset = index * windowWidth;
     flatlistRef.current.scrollToOffset({ offset, animated: true });
+    setSearchTerm("");
   };
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
@@ -85,9 +112,35 @@ const Stocking = ({ route, navigation }) => {
       >
         <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
-        <BlackScreen flex={0.14}>
+        <BlackScreen>
           <UserProfile navigation={navigation} />
 
+          <SearchBar
+            placeholder="Search..."
+            round
+            showLoading={showLoading}
+            searchIcon
+            value={searchTerm}
+            onChangeText={(text) => {
+              setSearchTerm(text);
+              setShowLoading(true);
+            }}
+            autoCorrect={false}
+            containerStyle={{
+              height: 30,
+              backgroundColor: "transparent",
+              marginBottom: 10,
+              width: (2 * screenWidth) / 3,
+              marginTop: 3,
+            }}
+            inputContainerStyle={{
+              height: 30,
+              backgroundColor: Colors.light_2,
+            }}
+            style={{
+              fontSize: 14,
+            }}
+          />
           <TabHeader
             titles={tabTitles}
             onActiveChanged={handleTabChange}
@@ -114,4 +167,4 @@ const Stocking = ({ route, navigation }) => {
   );
 };
 
-export default (Stocking);
+export default Stocking;
