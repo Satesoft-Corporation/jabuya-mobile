@@ -7,6 +7,8 @@ import { UserSessionUtils } from "../utils/UserSessionUtils";
 import UserProfile from "../components/UserProfile";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import Loader from "../components/Loader";
+import { categoryIcons } from "../constants/Constants";
+import { BaseApiService } from "../utils/BaseApiService";
 
 export default function LandingScreen({ navigation }) {
   const [tab, setTab] = useState("home");
@@ -14,39 +16,32 @@ export default function LandingScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [routeParams, setRouteParams] = useState(null);
 
-  const categoryIcons = [
-    {
-      id: 1,
-      icon: require("../assets/icons/icons8-cash-register-50.png"),
-      title: "Sales Desk",
-      target: "salesEntry",
-    },
-    {
-      id: 2,
-      icon: require("../assets/icons/icons8-report-50.png"),
-      title: "Reports",
-      target: "viewSales",
-    },
-    {
-      id: 3,
-      icon: require("../assets/icons/icons8-box-50.png"),
-      title: "Stocking",
-      target: "stocking",
-    },
-    {
-      id: 4,
-      icon: require("../assets/icons/icons8-chat-50.png"),
-      title: "Chat",
-    },
-  ];
+  const fetchShops = (id) => {
+    new BaseApiService("/shops")
+      .getRequestWithJsonResponse({ limit: 0, offset: 0, shopOwnerId: id })
+      .then(async (response) => {
+        await UserSessionUtils.setShopCount(String(response.totalItems));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   useEffect(() => {
-   
     UserSessionUtils.getFullSessionObject()
-      .then((data) => {
+      .then(async (data) => {
         if (data === null) {
           UserSessionUtils.clearLocalStorageAndLogout(navigation);
         }
         setRouteParams(data.user);
+        const { isShopOwner, shopOwnerId } = data.user;
+
+        let shopCount = await UserSessionUtils.getShopCount();
+        if (isShopOwner) {
+          if (shopCount === null) {
+            fetchShops(shopOwnerId);
+          }
+        }
         setTimeout(() => {
           setLoading(false);
         }, 100);

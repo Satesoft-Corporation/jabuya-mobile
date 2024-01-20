@@ -10,39 +10,22 @@ const UserProfile = () => {
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
   const [shopName, setShopName] = useState("");
-  const [shops, setShops] = useState([]);
+  const [shops, setShops] = useState(1);
 
   const navigation = useNavigation();
+
   useEffect(() => {
+    UserSessionUtils.getShopCount().then((count) => {
+      if (count) {
+        setShops(count);
+      }
+    });
     UserSessionUtils.getFullSessionObject().then((data) => {
       if (data) {
-        const {
-          roles,
-          firstName,
-          lastName,
-          attendantShopName,
-          shopOwnerId,
-          shopOwner,
-        } = data?.user;
-        let searchParameters = {
-          offset: 0,
-          limit: 0,
-          shopOwnerId: shopOwnerId,
-        };
-
+        const { roles, firstName, lastName, attendantShopName } = data?.user;
         setRole(roles[0].name);
         setName(firstName + " " + lastName);
         setShopName(attendantShopName);
-        if (shopOwner) {
-          new BaseApiService("/shops")
-            .getRequestWithJsonResponse(searchParameters)
-            .then(async (response) => {
-              setShops(response.records);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        }
       }
     });
   }, []);
@@ -107,7 +90,7 @@ const UserProfile = () => {
               fontSize: 11,
             }}
           >
-            {shopName || `Shops: ${shops.length}`}
+            {shopName || `Shops: ${shops}`}
           </Text>
         </View>
       </View>

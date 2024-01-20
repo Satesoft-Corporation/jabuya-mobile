@@ -140,4 +140,21 @@ export class UserSessionUtils {
   static async setShopid(id) {
     await AsyncStorage.setItem(StorageParams.SHOP_ID, id);
   }
+
+  /**
+   * This method is used to set the number shops for a shop owner
+   * @param {count} count
+   */
+  static async setShopCount(count) {
+    await AsyncStorage.setItem(StorageParams.SHOP_COUNT, count);
+  }
+
+  /**
+   * This method is used to get the number of shops an owner has
+   * @returns shopcount
+   */
+  static async getShopCount() {
+    let count = await AsyncStorage.getItem(StorageParams.SHOP_COUNT);
+    return count;
+  }
 }
