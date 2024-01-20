@@ -68,7 +68,6 @@ export const SalesDropdownComponent = ({
             justifyContent: "center",
             borderRadius: 5,
             paddingVertical: 18.5,
-            marginBottom: 8,
             opacity: disable ? 0.7 : 1,
           }}
         >
