@@ -21,7 +21,6 @@ const StockListing = memo(
       params;
 
     const fetchStockListing = async () => {
-      setLoading(true);
       let searchParameters = {
         offset: 0,
         limit: 0,
