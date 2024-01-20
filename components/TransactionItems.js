@@ -1,10 +1,18 @@
-import { Dimensions, Text, TouchableOpacity, View ,FlatList} from "react-native";
+import {
+  Dimensions,
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+} from "react-native";
 import Colors from "../constants/Colors";
 import { formatDate, formatNumberWithCommas } from "../utils/Utils";
 import { useEffect, useState } from "react";
 const screenWidth = Dimensions.get("window").width;
 
 export function SaleTransactionItem({ data, setCount, isShopOwner }) {
+  // sales report item card
+
   const { lineItems, totalCost, amountPaid, balanceGivenOut, shopName } = data;
 
   const [expanded, setExpanded] = useState(false);
@@ -283,7 +291,7 @@ export function SaleTransactionItem({ data, setCount, isShopOwner }) {
               marginTop: 10,
             }}
           >
-           <View>
+            <View>
               <Text
                 style={{
                   fontWeight: 600,
@@ -368,6 +376,7 @@ export const SaleListItem = ({ data }) => {
 };
 
 export const SaleItem = ({ data }) => {
+  //part of SaleTransaction item component
   return (
     <>
       <View
@@ -502,6 +511,26 @@ export function StockPurchaseTransactionItem({ data }) {
               justifyContent: "space-between",
             }}
           >
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <Text
+                style={{
+                  fontWeight: 400,
+                  fontSize: 12,
+                }}
+              >
+                Barcode:{" "}
+              </Text>
+              <Text
+                style={{
+                  fontWeight: 300,
+                  fontSize: 12,
+                }}
+              >
+                {data?.barcode}
+              </Text>
+            </View>
             <View
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
@@ -981,6 +1010,27 @@ export function StockListingTransactionItem({ data }) {
                   fontSize: 12,
                 }}
               >
+                Barcode:{" "}
+              </Text>
+              <Text
+                style={{
+                  fontWeight: 300,
+                  fontSize: 12,
+                }}
+              >
+                {data?.barcode}
+              </Text>
+            </View>
+
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <Text
+                style={{
+                  fontWeight: 400,
+                  fontSize: 12,
+                }}
+              >
                 Restock date:{" "}
               </Text>
               <Text
@@ -1000,7 +1050,6 @@ export function StockListingTransactionItem({ data }) {
                 style={{
                   fontWeight: 400,
                   fontSize: 12,
-                  marginBottom: 10,
                 }}
               >
                 Manufacturer:{" "}
@@ -1012,6 +1061,25 @@ export function StockListingTransactionItem({ data }) {
                 }}
               >
                 {data?.manufacturerName}
+              </Text>
+            </View>
+
+            <View style={{ marginBottom: 10 }}>
+              <Text
+                style={{
+                  fontWeight: 400,
+                  fontSize: 12,
+                }}
+              >
+                Remarks:{" "}
+              </Text>
+              <Text
+                style={{
+                  fontWeight: 300,
+                  fontSize: 12,
+                }}
+              >
+                {data?.remarks}
               </Text>
             </View>
           </View>
