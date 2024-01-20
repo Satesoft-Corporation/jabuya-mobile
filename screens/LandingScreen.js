@@ -40,9 +40,7 @@ export default function LandingScreen({ navigation }) {
     },
   ];
   useEffect(() => {
-    if (!navigator.onLine) {
-      UserSessionUtils.clearLocalStorageAndLogout(navigation);
-    }
+   
     UserSessionUtils.getFullSessionObject()
       .then((data) => {
         if (data === null) {

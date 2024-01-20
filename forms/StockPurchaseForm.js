@@ -573,7 +573,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                 value={batchNo}
                 onChangeText={(text) => setBatchNo(text)}
                 cursorColor={Colors.dark}
-                inputMode="numeric"
+                inputMode="text"
                 style={{
                   backgroundColor: Colors.primary,
                   borderRadius: 5,
