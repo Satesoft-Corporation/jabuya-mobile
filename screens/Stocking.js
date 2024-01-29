@@ -82,11 +82,10 @@ const Stocking = ({ route, navigation }) => {
   const handleTabChange = (index) => {
     setCurrentIndex(index);
     setCurrentPage(tabTitles[index]);
-    flatlistRef.current.scrollToIndex({ index, animated: false });
+    flatlistRef.current.scrollToIndex({ index, animated: true });
     setTriggerSearch(false);
   };
 
-  useMemo(() => filterTodos(todos, tab), [todos, tab]);
   const renderItem = useMemo(() => {
     return ({ item }) => (
       <View
