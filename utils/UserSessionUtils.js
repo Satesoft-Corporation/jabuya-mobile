@@ -157,4 +157,21 @@ export class UserSessionUtils {
     let count = await AsyncStorage.getItem(StorageParams.SHOP_COUNT);
     return count;
   }
+
+  /**
+   * This method is used to set the login timestamp
+   * @param {time} time
+   */
+  static async setLoginTime(time) {
+    await AsyncStorage.setItem(StorageParams.LOGIN_TIME, time);
+  }
+
+  /**
+   * This method is used to get the login timestamp
+   * @returns
+   */
+  static async getLoginTime() {
+    let time = await AsyncStorage.getItem(StorageParams.LOGIN_TIME);
+    return time;
+  }
 }

@@ -9,12 +9,18 @@ import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import Loader from "../components/Loader";
 import { categoryIcons } from "../constants/Constants";
 import { BaseApiService } from "../utils/BaseApiService";
+import { getTimeDifference } from "../utils/Utils";
+import DispalyMessage from "../components/Dialogs/DisplayMessage";
 
 export default function LandingScreen({ navigation }) {
   const [tab, setTab] = useState("home");
 
   const [loading, setLoading] = useState(false);
   const [routeParams, setRouteParams] = useState(null);
+  const [showMoodal, setShowModal] = useState(false);
+  const [message, setMessage] = useState("");
+  const [agreeText, setAgreeText] = useState("");
+  const [canCancel, setCanCancel] = useState(false);
 
   const fetchShops = (id) => {
     new BaseApiService("/shops")
@@ -27,16 +33,42 @@ export default function LandingScreen({ navigation }) {
       });
   };
 
+  const logOut = () => {
+    UserSessionUtils.clearLocalStorageAndLogout(navigation);
+  };
+
+  const confirmLogout = () => {
+    setMessage("Are you sure you want to log out?");
+    setAgreeText("Yes");
+    setCanCancel(true);
+    setShowModal(true);
+  };
+
+  const logInPrompt = () => {
+    setMessage("Your session has expired, please login to continue.");
+    setAgreeText("Login");
+    setCanCancel(false);
+    setShowModal(true);
+  };
+
   useEffect(() => {
     UserSessionUtils.getFullSessionObject()
       .then(async (data) => {
         if (data === null) {
-          UserSessionUtils.clearLocalStorageAndLogout(navigation);
+          logOut();
         }
         setRouteParams(data.user);
         const { isShopOwner, shopOwnerId } = data.user;
+        let prevLoginTime = await UserSessionUtils.getLoginTime();
+        let timeDiff = getTimeDifference(prevLoginTime, new Date());
+
+        if (timeDiff.hours >= 2) {
+          //trigger the logout dialog
+          logInPrompt();
+        }
 
         let shopCount = await UserSessionUtils.getShopCount();
+
         if (isShopOwner) {
           if (shopCount === null) {
             fetchShops(shopOwnerId);
@@ -46,9 +78,9 @@ export default function LandingScreen({ navigation }) {
           setLoading(false);
         }, 100);
       })
-      .catch((error) => {
-        //looging the user out if the object is missing
-        UserSessionUtils.clearLocalStorageAndLogout(navigation);
+      .catch(async (error) => {
+        //loging the user out if the object is missing
+        logOut();
       });
   }, []);
 
@@ -168,9 +200,7 @@ export default function LandingScreen({ navigation }) {
           />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() =>
-            UserSessionUtils.clearLocalStorageAndLogout(navigation)
-          }
+          onPress={confirmLogout}
           style={{
             flex: 1,
             alignItems: "center",
@@ -188,6 +218,15 @@ export default function LandingScreen({ navigation }) {
           />
         </TouchableOpacity>
       </View>
+
+      <DispalyMessage
+        showModal={showMoodal}
+        message={message}
+        onAgree={logOut}
+        agreeText={agreeText}
+        setShowModal={setShowModal}
+        canCancel={canCancel}
+      />
     </View>
   );
 }

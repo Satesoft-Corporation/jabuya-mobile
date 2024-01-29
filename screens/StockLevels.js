@@ -7,88 +7,91 @@ import Loader from "../components/Loader";
 import { BaseApiService } from "../utils/BaseApiService";
 
 import { StockingTabTitles } from "../constants/Constants";
+import { Text } from "react-native";
+import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
+import Colors from "../constants/Colors";
 
-const StockLevel = memo(
-  ({ params, currentPage, searchTerm, setShowLoading }) => {
-    const [stockLevels, setStockLevels] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [totalRecords, setTotalRecords] = useState(0);
+const StockLevel = memo(({ params, currentPage, searchTerm, shouldSearch }) => {
+  const [stockLevels, setStockLevels] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [totalRecords, setTotalRecords] = useState(0);
 
-    const { LevelsTitle } = StockingTabTitles;
-    const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-      params;
+  const { LevelsTitle } = StockingTabTitles;
+  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } = params;
 
-    const fetchStockLevels = async () => {
-      setLoading(true);
-      let searchParameters = {
-        offset: 0,
-        limit: 0,
-      };
+  const search = currentPage === LevelsTitle && shouldSearch === true;
 
-      if (searchTerm) {
-        searchParameters.searchTerm = searchTerm;
-      }
-      if (isShopAttendant) {
-        searchParameters.shopId = attendantShopId;
-      }
-      if (isShopOwner) {
-        searchParameters.shopOwnerId = shopOwnerId;
-      }
-      new BaseApiService("/shop-products")
-        .getRequestWithJsonResponse(searchParameters)
-        .then(async (response) => {
-          setStockLevels(response.records);
-          setTotalRecords(response.totalItems);
-          setLoading(false);
-          setShowLoading(false);
-        })
-        .catch((error) => {
-          setLoading(false);
-        });
+  const fetchStockLevels = async () => {
+    setLoading(true);
+    let searchParameters = {
+      offset: 0,
+      limit: 0,
     };
 
-    useEffect(() => {
+    if (search === true) {
+      searchParameters.searchTerm = searchTerm;
+    }
+    if (isShopAttendant) {
+      searchParameters.shopId = attendantShopId;
+    }
+    if (isShopOwner) {
+      searchParameters.shopOwnerId = shopOwnerId;
+    }
+    new BaseApiService("/shop-products")
+      .getRequestWithJsonResponse(searchParameters)
+      .then(async (response) => {
+        setStockLevels(response.records);
+        setTotalRecords(response.totalItems);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchStockLevels();
+  }, []);
+
+  useEffect(() => {
+    if (search === true) {
+      setLoading(true);
       fetchStockLevels();
-    }, []);
+    }
+  }, [shouldSearch]);
 
-    useEffect(() => {
-      if (currentPage === LevelsTitle && searchTerm !== "") {
-        fetchStockLevels();
-      }
-    }, [searchTerm]);
-
-    return (
-      <View
-        style={{
-          justifyContent: "center",
-        }}
-      >
-        <Loader visible={loading} />
-
-        <FlatList
-          containerStyle={{ padding: 5 }}
-          showsHorizontalScrollIndicator={false}
-          data={stockLevels}
-          renderItem={({ item }) => (
-            <StockLevelTransactionItem
-              data={item}
-              ListEmptyComponent={() => (
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text>No stock records found.</Text>
-                </View>
-              )}
-            />
-          )}
+  return (
+    <View
+      style={{
+        justifyContent: "center",
+      }}
+    >
+      <OrientationLoadingOverlay
+          visible={loading}
+          color={Colors.primary}
+          indicatorSize="large"
+          messageFontSize={24}
+          message=""
         />
-      </View>
-    );
-  }
-);
+      <FlatList
+        containerStyle={{ padding: 5 }}
+        showsHorizontalScrollIndicator={false}
+        data={stockLevels}
+        renderItem={({ item }) => <StockLevelTransactionItem data={item} />}
+        ListEmptyComponent={() => (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text>No stock records found.</Text>
+          </View>
+        )}
+      />
+    </View>
+  );
+});
 
 export default StockLevel;

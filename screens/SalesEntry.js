@@ -69,6 +69,7 @@ function SalesEntry({ route, navigation }) {
     let searchParameters = {
       offset: 0,
       limit: limit,
+      showOnlyStocked: true,
     };
 
     if (searchTerm !== null) {
@@ -91,7 +92,6 @@ function SalesEntry({ route, navigation }) {
       })
       .catch((error) => {
         setLoading(false);
-        return false;
       });
   };
 
@@ -340,10 +340,6 @@ function SalesEntry({ route, navigation }) {
   };
 
   useEffect(() => {
-    isShopAttendant && fetchProducts();
-  }, []);
-
-  useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
@@ -353,6 +349,9 @@ function SalesEntry({ route, navigation }) {
   }, []);
 
   useEffect(() => {
+    if (isShopAttendant) {
+      fetchProducts();
+    }
     fetchShops();
   }, []);
 

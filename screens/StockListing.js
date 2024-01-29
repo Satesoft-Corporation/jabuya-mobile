@@ -9,25 +9,33 @@ import { BaseApiService } from "../utils/BaseApiService";
 import { StockingTabTitles } from "../constants/Constants";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import Colors from "../constants/Colors";
+import { Text } from "react-native";
 
 const StockListing = memo(
-  ({ params, searchTerm, currentPage, setShowLoading }) => {
+  ({ params, searchTerm, currentPage, shouldSearch }) => {
     const [stockListing, setStockListing] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [totalRecords, setTotalRecords] = useState(0);
+    const [totalRecords, setTotalRecords] = useState(null);
 
     const { ListingTitle } = StockingTabTitles;
     const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
       params;
+    const search = currentPage === ListingTitle && shouldSearch === true;
 
     const fetchStockListing = async () => {
       let searchParameters = {
         offset: 0,
         limit: 0,
       };
+
+      if (search === true) {
+        searchParameters.searchTerm = searchTerm;
+      }
+
       if (isShopAttendant) {
         searchParameters.shopId = attendantShopId;
       }
+
       if (isShopOwner) {
         searchParameters.shopOwnerId = shopOwnerId;
       }
@@ -38,7 +46,6 @@ const StockListing = memo(
           setStockListing(response.records);
           setTotalRecords(response.totalItems);
           setLoading(false);
-          setShowLoading(false);
         })
         .catch((error) => {
           setLoading(false);
@@ -50,10 +57,11 @@ const StockListing = memo(
     }, []);
 
     useEffect(() => {
-      if (currentPage === ListingTitle && searchTerm !== "") {
+      if (search === true) {
+        setLoading(true);
         fetchStockListing();
       }
-    }, [searchTerm]);
+    }, [shouldSearch]);
 
     return (
       <View
@@ -72,21 +80,17 @@ const StockListing = memo(
           containerStyle={{ padding: 5 }}
           showsHorizontalScrollIndicator={false}
           data={stockListing}
-          renderItem={({ item }) => (
-            <StockListingTransactionItem
-              data={item}
-              ListEmptyComponent={() => (
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text>No listing found.</Text>
-                </View>
-              )}
-            />
+          renderItem={({ item }) => <StockListingTransactionItem data={item} />}
+          ListEmptyComponent={() => (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {totalRecords === 0 && <Text>No products listed yet.</Text>}
+            </View>
           )}
         />
       </View>

@@ -13,11 +13,11 @@ import { BaseApiService } from "../utils/BaseApiService";
 import Colors from "../constants/Colors";
 
 import AppStatusBar from "../components/AppStatusBar";
-import { formatNumberWithCommas } from "../utils/Utils";
+import { convertDateFormat, formatNumberWithCommas, getCurrentDay } from "../utils/Utils";
 import UserProfile from "../components/UserProfile";
 import { SaleTransactionItem } from "../components/TransactionItems";
 import Loader from "../components/Loader";
-import { SalesDateRangePicker } from "../components/Dialogs";
+import { DateCalender } from "../components/Dialogs/DateCalendar";
 
 export default function ViewSales({ navigation, route }) {
   const [sales, setSales] = useState([]); // sales got from the server
@@ -61,35 +61,8 @@ export default function ViewSales({ navigation, route }) {
     getSales();
   };
 
-  function convertDateFormat(dateString, getTomorrowDate = false) {
-    const date = new Date(dateString); // Create a Date object from the input string
-
-    if (getTomorrowDate === true) {
-      date.setDate(date.getDate() + 1); // Increment the date by 1 to get tomorrow's date
-    }
-
-    const isoDateString = date.toISOString(); // Convert Date object to ISO string
-    return isoDateString;
-  }
-
   function getProfit() {
     return formatNumberWithCommas(3720800);
-  }
-
-  function getCurrentDay(getTomorrowDate = false) {
-    const now = new Date();
-    if (getTomorrowDate === true) {
-      now.setDate(now.getDate() - 1);
-    }
-    const year = now.getUTCFullYear();
-    const month = String(now.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(now.getUTCDate()).padStart(2, "0");
-    let hours = "00";
-    let minutes = "00";
-    let seconds = "00";
-    let milliseconds = "00";
-
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
   }
 
   const getSales = async (startDate, endDate) => {
@@ -342,7 +315,7 @@ export default function ViewSales({ navigation, route }) {
         </View>
       </View>
 
-      <SalesDateRangePicker
+      <DateCalender
         selectedEndDate={selectedEndDate}
         visible={visible}
         selectedStartDate={selectedStartDate}

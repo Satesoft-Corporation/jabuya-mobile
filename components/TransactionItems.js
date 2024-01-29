@@ -666,6 +666,16 @@ export function StockLevelTransactionItem({ data }) {
     setExpanded(!expanded);
   };
 
+  let remainingStock =
+    data?.performanceSummary?.totalQuantityStocked -
+    data?.performanceSummary?.totalQuantitySold;
+  if (
+    remainingStock === undefined ||
+    isNaN(remainingStock) ||
+    remainingStock < 1
+  ) {
+    remainingStock = 0;
+  }
   return (
     <View
       style={{
@@ -752,9 +762,7 @@ export function StockLevelTransactionItem({ data }) {
             >
               In stock
             </Text>
-            <Text style={{ fontWeight: 600 }}>
-              {performanceSummary?.totalQuantityStocked || 0}
-            </Text>
+            <Text style={{ fontWeight: 600 }}>{remainingStock}</Text>
           </View>
         </View>
 

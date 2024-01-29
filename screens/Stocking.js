@@ -1,5 +1,5 @@
-import React, { useState, useRef, useCallback, memo } from "react";
-import { View, Dimensions, FlatList } from "react-native";
+import React, { useState, useRef, useCallback, memo, useMemo } from "react";
+import { View, Dimensions, FlatList, Alert } from "react-native";
 
 import Colors from "../constants/Colors";
 import { StockingTabTitles } from "../constants/Constants";
@@ -13,19 +13,24 @@ import { FloatingButton } from "../components/FloatingButton";
 import StockPurchase from "./StockPurchase";
 import StockLevel from "./StockLevels";
 import StockListing from "./StockListing";
-import { SearchBar } from "react-native-elements";
+// import { SearchBar } from "react-native-elements";
+import SearchBar from "../components/SearchBar";
+import SwiperFlatList from "react-native-swiper-flatlist";
 
 const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
+
+let h = screenHeight * -1;
 
 const Stocking = ({ route, navigation }) => {
   const { PurchaseTitle, LevelsTitle, ListingTitle } = StockingTabTitles;
-
   const tabTitles = [PurchaseTitle, LevelsTitle, ListingTitle];
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState(tabTitles[0]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showLoading, setShowLoading] = useState(false);
+  const [triggerSearch, setTriggerSearch] = useState(false); //to fire the search based on the current page
 
   const params = route.params;
 
@@ -37,7 +42,7 @@ const Stocking = ({ route, navigation }) => {
           params={params}
           currentPage={currentPage}
           searchTerm={searchTerm}
-          setShowLoading={setShowLoading}
+          shouldSearch={triggerSearch}
         />
       ),
     },
@@ -48,7 +53,7 @@ const Stocking = ({ route, navigation }) => {
           params={params}
           currentPage={currentPage}
           searchTerm={searchTerm}
-          setShowLoading={setShowLoading}
+          shouldSearch={triggerSearch}
         />
       ),
     },
@@ -59,7 +64,7 @@ const Stocking = ({ route, navigation }) => {
           params={params}
           currentPage={currentPage}
           searchTerm={searchTerm}
-          setShowLoading={setShowLoading}
+          shouldSearch={triggerSearch}
         />
       ),
     },
@@ -77,89 +82,64 @@ const Stocking = ({ route, navigation }) => {
   const handleTabChange = (index) => {
     setCurrentIndex(index);
     setCurrentPage(tabTitles[index]);
-    const windowWidth = Dimensions.get("window").width;
-    const offset = index * windowWidth;
-    flatlistRef.current.scrollToOffset({ offset, animated: true });
-    setSearchTerm("");
+    flatlistRef.current.scrollToIndex({ index, animated: false });
+    setTriggerSearch(false);
   };
 
-  const onViewableItemsChanged = useRef(({ viewableItems }) => {
-    if (viewableItems.length > 0) {
-      setCurrentIndex(viewableItems[0].index || 0);
-    }
-  }).current;
-
-  const renderItem = useCallback(
-    ({ item }) => (
+  useMemo(() => filterTodos(todos, tab), [todos, tab]);
+  const renderItem = useMemo(() => {
+    return ({ item }) => (
       <View
         style={{
-          width: Dimensions.get("window").width - 2,
+          width: Dimensions.get("window").width ,
           marginHorizontal: 1,
           paddingTop: 10,
         }}
       >
         {item.page}
       </View>
-    ),
-    []
-  );
+    );
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <FloatingButton
         handlePress={handleFormDestination}
         isAttendant={params.isShopAttendant}
+        currentPage={currentPage}
       >
         <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
         <BlackScreen>
           <UserProfile navigation={navigation} />
-
           <SearchBar
-            placeholder="Search..."
-            round
-            showLoading={showLoading}
-            searchIcon
             value={searchTerm}
             onChangeText={(text) => {
+              setTriggerSearch(false);
               setSearchTerm(text);
-              setShowLoading(true);
             }}
-            autoCorrect={false}
-            containerStyle={{
-              height: 30,
-              backgroundColor: "transparent",
-              marginBottom: 10,
-              width: (2 * screenWidth) / 3,
-              marginTop: 3,
-            }}
-            inputContainerStyle={{
-              height: 30,
-              backgroundColor: Colors.light_2,
-            }}
-            style={{
-              fontSize: 14,
+            onSearch={() => {
+              setTriggerSearch(true);
             }}
           />
           <TabHeader
             titles={tabTitles}
-            onActiveChanged={handleTabChange}
-            activeIndex={currentIndex}
+            selected={currentIndex}
+            onTabPress={handleTabChange}
+            setSelected={setCurrentIndex}
           />
         </BlackScreen>
         <View style={{ flex: 1, marginTop: 0 }}>
-          <FlatList
-            scrollEnabled={false}
+          <SwiperFlatList
+            onChangeIndex={(obj) => {
+              handleTabChange(obj.index);
+            }}
             ref={flatlistRef}
-            horizontal
-            pagingEnabled={true}
-            showsHorizontalScrollIndicator={false}
-            legacyImplementation={false}
+            autoplay={false}
+            index={currentIndex}
             data={pages}
-            keyExtractor={(item) => item.id}
+            renderAll={true}
             renderItem={renderItem}
-            onViewableItemsChanged={onViewableItemsChanged}
-            viewabilityConfig={viewConfigRef.current}
           />
         </View>
       </FloatingButton>

@@ -11,21 +11,24 @@ import Colors from "../constants/Colors";
 import { Text } from "react-native";
 
 const StockPurchase = memo(
-  ({ params, searchTerm, currentPage, setShowLoading }) => {
+  ({ params, searchTerm, currentPage, shouldSearch }) => {
     const [stockEntries, setStockEntries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [totalRecords, setTotalRecords] = useState(0);
+    const [message, setMessage] = useState(null);
 
     const { PurchaseTitle } = StockingTabTitles;
     const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
       params;
+
+    const search = currentPage === PurchaseTitle && shouldSearch === true;
 
     const fetchStockEntries = async () => {
       let searchParameters = {
         offset: 0,
         limit: 0,
       };
-      if (searchTerm) {
+      if (search === true) {
         searchParameters.searchTerm = searchTerm;
       }
 
@@ -41,8 +44,10 @@ const StockPurchase = memo(
         .then(async (response) => {
           setStockEntries(response.records);
           setTotalRecords(response.totalItems);
+          if (response.totalItems === 0 && searchTerm !== "") {
+            setMessage(`No results found for ${searchTerm}`);
+          }
           setLoading(false);
-          setShowLoading(false);
         })
         .catch((error) => {
           setLoading(false);
@@ -50,10 +55,11 @@ const StockPurchase = memo(
     };
 
     useEffect(() => {
-      if (currentPage === PurchaseTitle && searchTerm !== "") {
+      if (search === true) {
+        setLoading(true);
         fetchStockEntries();
       }
-    }, [searchTerm]);
+    }, [shouldSearch]);
 
     useEffect(() => {
       fetchStockEntries();
@@ -88,7 +94,9 @@ const StockPurchase = memo(
                 alignItems: "center",
               }}
             >
-              <Text>No purchases found.</Text>
+              {totalRecords === 0 && (
+                <Text>{message || "No purchases found."}</Text>
+              )}
             </View>
           )}
         />

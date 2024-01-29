@@ -7,4 +7,5 @@ export default {
   USERNAME: "@username",
   SHOP_ID: "@shop_id",
   SHOP_COUNT: "@shop_count",
+  LOGIN_TIME: "@login_time",
 };

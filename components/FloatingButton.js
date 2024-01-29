@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { TouchableOpacity, Text, View, Image, Animated } from "react-native";
 import Colors from "../constants/Colors";
+import { StockingTabTitles } from "../constants/Constants";
 
 export function FloatingButton({
   children,
@@ -8,6 +9,7 @@ export function FloatingButton({
   opacity = 0.8,
   handlePress,
   isAttendant,
+  currentPage,
 }) {
   const [visible] = useState(new Animated.Value(50));
   const [opc] = useState(new Animated.Value(0));
@@ -19,6 +21,10 @@ export function FloatingButton({
 
   let buttonBg = Colors.primary;
   let iconTint = Colors.dark;
+
+  const shouldDisplay =
+    isAttendant === false && currentPage !== StockingTabTitles.LevelsTitle;
+
   const show = () => {
     if (!isOpen) {
       setBg(true);
@@ -98,7 +104,7 @@ export function FloatingButton({
         ></Animated.View>
       )}
 
-      {isAttendant === false && (
+      {shouldDisplay === true && (
         <>
           <Animated.View
             style={{

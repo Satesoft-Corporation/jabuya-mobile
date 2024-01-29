@@ -16,9 +16,8 @@ import { packageOptions } from "../constants/Constants";
 import MaterialButton from "../components/MaterialButton";
 import Loader from "../components/Loader";
 import { KeyboardAvoidingView } from "react-native";
-import { SalesDateRangePicker } from "../components/Dialogs";
 import { convertToServerDate, toReadableDate, hasNull } from "../utils/Utils";
-
+import { DateCalender } from "../components/Dialogs/DateCalendar";
 const StockPurchaseForm = ({ navigation, route }) => {
   const { isShopOwner, shopOwnerId } = route.params;
   // let shopOwnerId = 2453;
@@ -793,7 +792,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
           </View>
         </ScrollView>
 
-        <SalesDateRangePicker
+        <DateCalender
           singleSelection={true}
           selectedEndDate={selectedEndDate}
           visible={visible}

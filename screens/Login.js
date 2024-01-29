@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Alert,
   KeyboardAvoidingView,
 } from "react-native";
 import MaterialInput from "../components/MaterialInput";
@@ -15,16 +14,22 @@ import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Constants from "expo-constants";
 import CircularProgress from "../components/CircularProgress";
 import { CommonActions } from "@react-navigation/native";
+import { onDummyLogin } from "../utils/Utils";
+import DispalyMessage from "../components/Dialogs/DisplayMessage";
 
 export default function Login({ navigation }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("mosesjespar@gmail.com");
+  const [password, setPassword] = useState("0701807062");
   const [disabled, setDisabled] = useState(false);
+  const [showMoodal, setShowModal] = useState(false);
+  const [message, setMessage] = useState(null);
 
   let loginInfo = {
     username,
     password,
   };
+
+  const date = new Date();
 
   const onLogin = () => {
     setDisabled(true);
@@ -45,10 +50,12 @@ export default function Login({ navigation }) {
           await UserSessionUtils.setUserRefreshToken(info.refreshToken);
           await UserSessionUtils.setFullSessionObject(info);
           await UserSessionUtils.setShopid(String(info.user.attendantShopId));
+          await UserSessionUtils.setLoginTime(String(date));
           setPassword("");
           setUsername("");
           navigation.navigate("welcome");
           setTimeout(() => setDisabled(false), 1000);
+
           dispatch(
             CommonActions.reset({
               index: 0,
@@ -56,16 +63,19 @@ export default function Login({ navigation }) {
             })
           );
         } else if (status === 400) {
-          Alert.alert("Invalid username or password");
+          setMessage("Invalid username or password.");
+          setShowModal(true);
           setDisabled(false);
         } else {
-          Alert.alert("Login failed!", info.message);
+          setMessage(`Login failed!, ${info.message}`);
+          setShowModal(true);
           setDisabled(false);
         }
       })
       .catch((error) => {
-        Alert.alert("Login Failed!", error?.message);
         setDisabled(false);
+        setMessage("An unexpected error happened, please try again.");
+        setShowModal(true);
       });
   };
 
@@ -225,6 +235,12 @@ export default function Login({ navigation }) {
           </Text>
         </View>
       </View>
+      <DispalyMessage
+        showModal={showMoodal}
+        message={message}
+        onAgree={() => setShowModal(false)}
+        agreeText="OK"
+      />
     </KeyboardAvoidingView>
   );
 }
