@@ -62,7 +62,7 @@ export default function LandingScreen({ navigation }) {
         let prevLoginTime = await UserSessionUtils.getLoginTime();
         let timeDiff = getTimeDifference(prevLoginTime, new Date());
 
-        if (timeDiff.hours >= 2) {
+        if (timeDiff.hours >= 4) {
           //trigger the logout dialog
           logInPrompt();
         }

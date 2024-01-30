@@ -102,7 +102,7 @@ const ShopSummary = ({ navigation, route }) => {
       <AppStatusBar bgColor="black" content="light-content" />
       <Loader loading={loading} />
 
-      <View style={{ paddingHorizontal: 10, marginTop: -10 }}>
+      <View style={{ paddingHorizontal: 10, marginTop: 8 }}>
         <View
           style={{
             backgroundColor: Colors.primary,
