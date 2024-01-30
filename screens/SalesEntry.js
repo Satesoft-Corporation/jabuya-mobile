@@ -69,7 +69,6 @@ function SalesEntry({ route, navigation }) {
     let searchParameters = {
       offset: 0,
       limit: limit,
-      showOnlyStocked: true,
     };
 
     if (searchTerm !== null) {
@@ -175,7 +174,6 @@ function SalesEntry({ route, navigation }) {
 
   const handleChange = (value) => {
     setSearchTerm(value);
-    fetchProducts(selectedShop?.id);
   };
 
   const makeSelection = (item) => {
@@ -354,6 +352,10 @@ function SalesEntry({ route, navigation }) {
     }
     fetchShops();
   }, []);
+
+  useEffect(() => {
+    fetchProducts(selectedShop?.id);
+  }, [searchTerm]);
 
   useEffect(() => {
     setInitialUnitCost(selection?.salesPrice);
