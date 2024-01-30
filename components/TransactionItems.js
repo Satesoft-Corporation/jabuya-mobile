@@ -10,34 +10,30 @@ import { formatDate, formatNumberWithCommas } from "../utils/Utils";
 import { useEffect, useState } from "react";
 const screenWidth = Dimensions.get("window").width;
 
-export function SaleTransactionItem({ data, setCount, isShopOwner }) {
+export function SaleTransactionItem({ data, isShopOwner }) {
   // sales report item card
 
   const { lineItems, totalCost, amountPaid, balanceGivenOut, shopName } = data;
 
   const [expanded, setExpanded] = useState(false);
-  const [list, setList] = useState([]); //to be rendered in the table
   const [itemCount, setItemCount] = useState(0);
 
   const toggleExpand = () => {
     setExpanded(!expanded);
   };
+
   useEffect(() => {
     if (lineItems !== undefined) {
-      if (list.length === 0) {
-        for (let item of lineItems) {
-          list.push([
-            item.shopProductName,
-            item.unitCost,
-            item.quantity,
-            item.totalCost,
-          ]);
-          setItemCount((count) => count + item.quantity);
-          setCount(item.quantity);
-        }
-      }
+      let cartQty = lineItems.reduce((a, item) => a + item.quantity, 0);
+      let profit = lineItems.reduce((a, item) => a + item.totalProfit, 0);
+      let cap = lineItems.reduce((a, item) => a + item.totalPurchaseCost, 0);
+
+      setItemCount(cartQty);
+      // setCount(cartQty);
+      // setSaleProfit(profit); //profit made per cart
+      // setSaleCapital(cap);
     }
-  }, []);
+  }, [data]);
   return (
     <View
       style={{

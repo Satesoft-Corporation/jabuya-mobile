@@ -13,23 +13,33 @@ import { BaseApiService } from "../utils/BaseApiService";
 import Colors from "../constants/Colors";
 
 import AppStatusBar from "../components/AppStatusBar";
-import { convertDateFormat, formatNumberWithCommas, getCurrentDay } from "../utils/Utils";
+import {
+  convertDateFormat,
+  formatNumberWithCommas,
+  getCurrentDay,
+} from "../utils/Utils";
 import UserProfile from "../components/UserProfile";
 import { SaleTransactionItem } from "../components/TransactionItems";
 import Loader from "../components/Loader";
 import { DateCalender } from "../components/Dialogs/DateCalendar";
 
 export default function ViewSales({ navigation, route }) {
-  const [sales, setSales] = useState([]); // sales got from the server
-  const [totalSales, setTotalSales] = useState(0);
+  const [sales, setSales] = useState([]);
+  const [totalSalesQty, setTotalSalesQty] = useState(0); //total quantity for all sold items
   const [loading, setLoading] = useState(false);
   const [offset, setOffset] = useState(0);
   const [visible, setVisible] = useState(false);
   const [filtering, setFiltering] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
-  const [salesValue, setSalesValue] = useState(0);
+  const [salesValue, setSalesValue] = useState(0); //total money value sold
   const [searchPeriod, setSearchPeriod] = useState("Today");
+  const [income, setIncome] = useState(0);
+  const [saleCapital, setSaleCapital] = useState([]); //capital list
+  const [profits, setProfits] = useState([]); //profits list
+  const [emptyMsg, setEmptyMsg] = useState(null);
+  const [daysProfit, setDaysProfit] = useState(0);
+  const [daysCapital, setDaysCapital] = useState(0);
 
   const {
     isShopOwner,
@@ -61,19 +71,25 @@ export default function ViewSales({ navigation, route }) {
     getSales();
   };
 
-  function getProfit() {
-    return formatNumberWithCommas(3720800);
-  }
+  const clearFields = () => {
+    //reseting calculatable fields
+    setSales([]);
+    setLoading(true);
+    setSalesValue(0);
+    setTotalSalesQty(0);
+    setProfits([]);
+    setSaleCapital([]);
+    setDaysCapital(0);
+    setDaysProfit(0);
+    setEmptyMsg(null);
+  };
 
   const getSales = async (startDate, endDate) => {
     let searchParameters = {
       offset: offset,
       limit: 0,
     };
-
-    setLoading(true);
-    setSalesValue(0);
-    setTotalSales(0);
+    clearFields();
 
     if (!startDate && !endDate) {
       searchParameters.startDate = getCurrentDay();
@@ -89,9 +105,6 @@ export default function ViewSales({ navigation, route }) {
     if (endDate === null && startDate) {
       //specific day setting
       searchParameters.endDate = convertDateFormat(startDate, true);
-      // if (formatDateToDDMMYY(startDate) === formatDateToDDMMYY(getCurrentDay())){
-      //   console.log('same dates')
-      // }
     }
     if (isShopOwner) {
       searchParameters.shopOwnerId = shopOwnerId;
@@ -102,17 +115,43 @@ export default function ViewSales({ navigation, route }) {
     new BaseApiService("/shop-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
-        for (let item of response?.records) {
-          setSalesValue((i) => i + item.totalCost);
+        let sV = response.records.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
+
+        if (response.totalItems === 0) {
+          setEmptyMsg("No sales made on this today");
         }
+
+        [...response.records].forEach((item) => {
+          const { lineItems } = item;
+          if (lineItems !== undefined) {
+            let cartQty = lineItems.reduce((a, item) => a + item.quantity, 0);
+
+            let cartProfit = lineItems.reduce((a, i) => a + i.totalProfit, 0);
+
+            let cap = lineItems.reduce((a, i) => a + i.totalPurchaseCost, 0); // cart capital
+
+            profits.push(cartProfit);
+            saleCapital.push(cap);
+
+            setCount(cartQty);
+          }
+        });
+
+        let income = profits.reduce((a, b) => a + b, 0); //getting the sum profit in all carts
+        let capital = saleCapital.reduce((a, b) => a + b, 0);
+
+        setDaysProfit(formatNumberWithCommas(Math.round(income)));
+        setDaysCapital(formatNumberWithCommas(Math.round(capital)));
+        setSalesValue(sV);
         setSales(response?.records);
+
         setTimeout(() => {
           setLoading(false);
         }, 100);
       })
       .catch((error) => {
+        console.log(error)
         Alert.alert("Cannot get sales!", error?.message);
-        console.log(error, "bksvbsvbsvhbsvj");
         setLoading(false);
       });
   };
@@ -128,7 +167,7 @@ export default function ViewSales({ navigation, route }) {
   };
 
   const setCount = (count) => {
-    setTotalSales((prevCount) => prevCount + count);
+    setTotalSalesQty((prevCount) => prevCount + count);
   };
 
   useEffect(() => {
@@ -240,7 +279,7 @@ export default function ViewSales({ navigation, route }) {
               paddingHorizontal: 12,
             }}
           >
-            <ItemHeader value={totalSales || 0} title="Qty" ugx={false} />
+            <ItemHeader value={totalSalesQty || 0} title="Qty" ugx={false} />
             <View
               style={{
                 width: 1,
@@ -259,10 +298,7 @@ export default function ViewSales({ navigation, route }) {
                 backgroundColor: Colors.primary,
               }}
             />
-            <ItemHeader
-              title="Capital "
-              value={formatNumberWithCommas(500000)}
-            />
+            <ItemHeader title="Capital " value={daysCapital} />
             <View
               style={{
                 width: 1,
@@ -270,7 +306,7 @@ export default function ViewSales({ navigation, route }) {
                 backgroundColor: Colors.primary,
               }}
             />
-            <ItemHeader title="Profit" value={getProfit()} />
+            <ItemHeader title="Income" value={daysProfit} />
           </View>
         </View>
       </View>
@@ -293,7 +329,6 @@ export default function ViewSales({ navigation, route }) {
                   <SaleTransactionItem
                     key={i}
                     data={item}
-                    setCount={(a) => setCount(a)}
                     isShopOwner={isShopOwner}
                   />
                 )}
@@ -307,7 +342,7 @@ export default function ViewSales({ navigation, route }) {
                 }}
               >
                 <Text style={{ color: "black", textAlign: "center" }}>
-                  No sales made on this today
+                  {emptyMsg}
                 </Text>
               </View>
             )}
