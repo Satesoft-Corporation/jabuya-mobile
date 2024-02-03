@@ -653,15 +653,15 @@ function SalesEntry({ route, navigation }) {
                 Amount
               </Text>
             </View>
-            <View
+            <ScrollView
               style={{
                 height: screenHeight / 4,
               }}
             >
               {selections.map((item) => (
-                <SaleListItem data={item} />
+                <SaleListItem data={item} key={item.id} />
               ))}
-            </View>
+            </ScrollView>
             <View
               style={{
                 backgroundColor: Colors.light,
