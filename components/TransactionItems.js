@@ -197,9 +197,7 @@ export function SaleTransactionItem({ data, isShopOwner }) {
           </View>
           <FlatList
             data={lineItems}
-            renderItem={({ item }) => (
-              <SaleItem data={item} itemCount={itemCount} total={totalCost} />
-            )}
+            renderItem={({ item }) => <SaleItem data={item} />}
           />
           <View
             style={{
@@ -362,7 +360,7 @@ export const SaleListItem = ({ data }) => {
       </Text>
       <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>
       <Text style={{ flex: 1, textAlign: "right" }}>
-        {formatNumberWithCommas(data?.salesPrice)}
+        {formatNumberWithCommas(data?.unitCost)}
       </Text>
       <Text style={{ flex: 1, textAlign: "right", paddingEnd: 10 }}>
         {formatNumberWithCommas(data?.totalCost)}
@@ -373,6 +371,7 @@ export const SaleListItem = ({ data }) => {
 
 export const SaleItem = ({ data }) => {
   //part of SaleTransaction item component
+
   return (
     <>
       <View
@@ -387,7 +386,7 @@ export const SaleItem = ({ data }) => {
         }}
       >
         <Text style={{ flex: 2.5, justifyContent: "center" }}>
-          {data?.shopProductName}
+          {data?.productName || data?.shopProductName}
         </Text>
 
         <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>

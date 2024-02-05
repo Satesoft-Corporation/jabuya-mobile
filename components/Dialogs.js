@@ -80,6 +80,7 @@ export function SalesQtyInputDialog({
             value={quantity}
             onChangeText={(text) => setQuantity(text)}
             maxLength={3}
+            autoFocus
             style={{
               backgroundColor: Colors.light_3,
               borderRadius: 5,
@@ -193,14 +194,14 @@ export function ConfirmSalesDialog({
   visible,
   addSale,
   sales,
-  total,
+  totalCost,
   setVisible,
-  length,
+  cartLength,
   balanceGivenOut,
   amountPaid,
-  resetList,
-  dateCreated,
 }) {
+  const date = new Date();
+
   return (
     <ModalContent visible={visible} style={{ padding: 10 }}>
       <Card
@@ -238,7 +239,6 @@ export function ConfirmSalesDialog({
             <TouchableOpacity
               onPress={() => {
                 setVisible();
-                resetList();
               }}
             >
               <Image
@@ -265,7 +265,7 @@ export function ConfirmSalesDialog({
                 alignSelf: "flex-end",
               }}
             >
-              {formatDate(dateCreated)}
+              {formatDate(date)}
             </Text>
             <Text>Currency : UGX</Text>
           </View>
@@ -295,9 +295,7 @@ export function ConfirmSalesDialog({
           </View>
           <FlatList
             data={sales}
-            renderItem={({ item }) => (
-              <SaleItem data={item} itemCount={length} total={total} />
-            )}
+            renderItem={({ item }) => <SaleItem data={item} key={item.id} />}
           />
           <View
             style={{
@@ -327,10 +325,10 @@ export function ConfirmSalesDialog({
             <Text style={{ fontWeight: "bold" }}>
               Sold{" "}
               <Text style={{ fontWeight: "400" }}>
-                {length >= 1 && (
+                {cartLength >= 1 && (
                   <Text>
-                    {length}
-                    {length > 1 ? <Text> items</Text> : <Text> item</Text>}
+                    {cartLength}
+                    {cartLength > 1 ? <Text> items</Text> : <Text> item</Text>}
                   </Text>
                 )}
               </Text>
@@ -343,7 +341,7 @@ export function ConfirmSalesDialog({
                 marginEnd: 4,
               }}
             >
-              {formatNumberWithCommas(total)}
+              {formatNumberWithCommas(totalCost)}
             </Text>
           </View>
 
@@ -390,7 +388,6 @@ export function ConfirmSalesDialog({
               }}
               buttonPress={() => {
                 setVisible();
-                resetList();
               }}
             />
             <MaterialButton
@@ -409,7 +406,10 @@ export function ConfirmSalesDialog({
                 fontWeight: "bold",
                 color: Colors.primary,
               }}
-              buttonPress={() => addSale()}
+              buttonPress={() => {
+                setVisible();
+                addSale();
+              }}
             />
           </View>
         </View>

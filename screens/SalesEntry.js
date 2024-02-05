@@ -27,6 +27,7 @@ import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import { IconsComponent } from "../components/Icon";
 import Loader from "../components/Loader";
 import { ConfirmSalesDialog } from "../components/Dialogs";
+import DispalyMessage from "../components/Dialogs/DisplayMessage";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -36,21 +37,13 @@ function SalesEntry({ route, navigation }) {
   const [searchTerm, setSearchTerm] = useState(null);
   const [limit, setLimit] = useState(20);
   const [loading, setLoading] = useState(true);
-  const [selectedProducts, setSelectedProducts] = useState([]); //unfiltered selections array
   const [quantity, setQuantity] = useState(null);
   const [selections, setSelections] = useState([]); // products in the table(filtered)
   const [showMoodal, setShowModal] = useState(false);
   const [selection, setSelection] = useState(null);
   const [totalCost, setTotalCost] = useState(0);
-  const [recievedAmount, setRecievedAmount] = useState(null);
+  const [recievedAmount, setRecievedAmount] = useState();
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
-  const [postedPdts, setPostedPdts] = useState([]);
-  const [lineItems, setLineItems] = useState([]);
-  const [returnCost, setReturnedCost] = useState(0);
-  const [returnedList, setReturnedList] = useState([]);
-  const [returnedId, setReturnedId] = useState(null);
-  const [amountPaid, setAmountPaid] = useState(null);
-  const [balanceGivenOut, setBalanceGivenOut] = useState(null);
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [scanBarCode, setScanBarCode] = useState(false); // barcode scanner trigger
@@ -58,9 +51,10 @@ function SalesEntry({ route, navigation }) {
   const [unitCost, setUnitCost] = useState(null);
   const [initialUnitCost, setInitialUnitCost] = useState(null);
   const [errors, setErrors] = useState(null);
-  const [date, setDate] = useState(null); // sale time stamp
   const [shops, setShops] = useState([]);
   const [selectedShop, setSelectedShop] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [displayMessage, setDisplayMssage] = useState(false);
 
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
     route.params;
@@ -115,11 +109,12 @@ function SalesEntry({ route, navigation }) {
 
   const postSales = () => {
     let payLoad = {
-      id: isShopAttendant ? shopOwnerId : null,
+      id: null,
       shopId: isShopAttendant ? attendantShopId : selectedShop?.id,
-      amountPaid: recievedAmount,
-      lineItems: selectedProducts,
+      amountPaid: Number(recievedAmount),
+      lineItems: selections,
     };
+    setLoading(true);
     new BaseApiService("/shop-sales")
       .postRequest(payLoad)
       .then(async (response) => {
@@ -129,45 +124,35 @@ function SalesEntry({ route, navigation }) {
       .then(async (d) => {
         let { info, status } = d;
         let id = info.id;
-        let totalCost_1 = info.totalCost;
+
         if (status === 200) {
-          setReturnedCost(totalCost_1);
-          setReturnedList(info.lineItems);
-          setReturnedId(id);
-          setAmountPaid(info.amountPaid);
-          setBalanceGivenOut(info.balanceGivenOut);
-          setLineItems(info.lineItems);
-          setDate(info.dateCreated);
-          setShowConfirmed(true);
+          new BaseApiService(`/shop-sales/${id}/confirm`)
+            .postRequest()
+            .then((d) => d.json())
+            .then((d) => {
+              if (d.status === "Success") {
+                setShowConfirmed(false);
+                setMessage("Sale confirmed successfully");
+                setLoading(false);
+                setDisplayMssage(true);
+                clearEverything();
+              }
+            })
+            .catch((error) => {
+              setMessage(`Failed to confirm purchases!,${error?.message}`);
+              setLoading(false);
+              setDisplayMssage(true);
+            });
           setTimeout(() => setLoading(false), 1000);
         } else if (status === 400) {
-          Alert.alert("Failed to confirm purchases!", info?.message);
-          setTimeout(() => setLoading(false), 1000);
-        }
-      })
-      .catch((error) => {
-        Alert.alert("An unexpected error occurred!");
-
-        setLoading(false);
-      });
-  };
-
-  const saveSales = (items, id) => {
-    setLoading(true);
-    postedPdts.push(items);
-    new BaseApiService(`/shop-sales/${id}/confirm`)
-      .postRequest()
-      .then((d) => d.json())
-      .then((d) => {
-        if (d.status === "Success") {
-          setShowConfirmed(false);
-          Alert.alert("Sale confirmed successfully");
+          setMessage(`Failed to confirm purchases!,${error?.message}`);
           setLoading(false);
-          clearEverything();
+          setDisplayMssage(true);
         }
       })
       .catch((error) => {
-        Alert.alert("Failed to confirm purchases!", error?.message);
+        setMessage("An unexpected error occurred! Try again later.");
+        setDisplayMssage(true);
         setLoading(false);
       });
   };
@@ -234,11 +219,6 @@ function SalesEntry({ route, navigation }) {
         (product) => product.productName === selection.productName
       );
 
-      const productIndex2 = selectedProducts.findIndex(
-        //locating the duplicate item in selected pdts array
-        (product) => product.id === selection.id
-      );
-
       if (productIndex !== -1) {
         //if the already exists, update quantity and total cost
         let prevQty = selections[productIndex].quantity;
@@ -246,26 +226,18 @@ function SalesEntry({ route, navigation }) {
 
         selections[productIndex].quantity = Number(quantity) + prevQty;
         selections[productIndex].totalCost = prevTotalCost + cost;
-        selectedProducts[productIndex2].quantity = Number(quantity) + prevQty;
         setLoading(false);
         setScanned(false);
       } else {
-        selectedProducts.push({
-          // data set to be used in posting the sale to the server
-          id: selection.id,
-          shopProductId: selection.id,
-          quantity: parsedQuantity,
-          unitCost: unitCost,
-        });
-
         setSelections((prev) => [
           ...prev,
           {
             id: selection.id,
             productName: selection.productName,
-            salesPrice: unitCost,
+            shopProductId: selection.id,
             quantity: parsedQuantity, // Use the parsed quantity
             totalCost: cost,
+            unitCost: unitCost,
           },
         ]);
       }
@@ -325,14 +297,12 @@ function SalesEntry({ route, navigation }) {
   };
 
   const clearEverything = () => {
-    setSelectedProducts([]);
     setQuantity(null);
     setSelection(null);
     setTotalCost(0);
     setRecievedAmount(0);
     setShowConfirmed(false);
     setSelections([]);
-    setLineItems([]);
     setTotalQty(0);
     setErrors({});
   };
@@ -469,19 +439,14 @@ function SalesEntry({ route, navigation }) {
 
       <ConfirmSalesDialog
         visible={showConfirmed}
-        addSale={() => {
-          saveSales(returnedList, returnedId);
-        }}
-        sales={lineItems}
-        total={returnCost}
+        addSale={postSales}
+        sales={selections}
+        totalCost={totalCost}
         setVisible={() => setShowConfirmed(false)}
         clear={clearEverything}
-        transID={returnedId}
-        amountPaid={amountPaid}
-        balanceGivenOut={balanceGivenOut}
-        length={totalQty}
-        resetList={() => setLineItems([])}
-        dateCreated={date}
+        amountPaid={recievedAmount}
+        balanceGivenOut={recievedAmount - totalCost}
+        cartLength={totalQty}
       />
 
       <SalesQtyInputDialog
@@ -499,6 +464,12 @@ function SalesEntry({ route, navigation }) {
         setScanned={setScanned}
       />
 
+      <DispalyMessage
+        showModal={displayMessage}
+        message={message}
+        onAgree={() => setDisplayMssage(false)}
+        setShowModal={setDisplayMssage}
+      />
       <BlackScreen flex={isShopAttendant ? 12 : 10}>
         <UserProfile />
         <TouchableOpacity
@@ -556,7 +527,6 @@ function SalesEntry({ route, navigation }) {
         <ScrollView style={{ paddingHorizontal: 10, marginTop: 7 }}>
           <View
             style={{
-              //m was -10
               backgroundColor: Colors.light,
               borderRadius: 5,
               padding: 10,
@@ -740,9 +710,8 @@ function SalesEntry({ route, navigation }) {
               >
                 <Text style={{ fontSize: 10, fontWeight: 400 }}>UGX </Text>
                 <Text style={{ fontSize: 17 }}>
-                  {recievedAmount === 0
-                    ? 0
-                    : formatNumberWithCommas(recievedAmount - totalCost)}
+                  {recievedAmount &&
+                    formatNumberWithCommas(recievedAmount - totalCost)}
                 </Text>
               </Text>
             </View>
@@ -760,20 +729,28 @@ function SalesEntry({ route, navigation }) {
               marginBottom: 20,
             }}
             onPress={() => {
-              if (recievedAmount === null && selections.length > 0) {
-                Alert.alert("Please enter recieved amount");
+              let shouldConfirm = true;
+
+              if (!recievedAmount) {
+                shouldConfirm = false;
               }
-              if (recievedAmount - totalCost < 0) {
-                Alert.alert(
-                  `Recieved amount should be greater that ${totalCost}`
+
+              if (!(Number(recievedAmount) >= totalCost)) {
+                shouldConfirm = false;
+                setMessage(
+                  `Recieved amount should be greater that UGX ${formatNumberWithCommas(
+                    totalCost
+                  )}`
                 );
+                setDisplayMssage(true);
               }
-              if (
-                Number(recievedAmount) >= totalCost &&
-                selections.length > 0
-              ) {
+
+              if (shouldConfirm === true) {
                 setLoading(true);
-                postSales();
+                setTimeout(() => {
+                  setLoading(false);
+                  setShowConfirmed(true);
+                }, 1000);
               }
             }}
           >
