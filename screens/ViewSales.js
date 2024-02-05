@@ -34,20 +34,14 @@ export default function ViewSales({ navigation, route }) {
   const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [salesValue, setSalesValue] = useState(0); //total money value sold
   const [searchPeriod, setSearchPeriod] = useState("Today");
-  const [income, setIncome] = useState(0);
   const [saleCapital, setSaleCapital] = useState([]); //capital list
   const [profits, setProfits] = useState([]); //profits list
   const [emptyMsg, setEmptyMsg] = useState(null);
   const [daysProfit, setDaysProfit] = useState(0);
   const [daysCapital, setDaysCapital] = useState(0);
 
-  const {
-    isShopOwner,
-    isShopAttendant,
-    attendantShopId,
-    shopOwnerId,
-    myShopId,
-  } = route.params;
+  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+    route.params;
 
   const handleDayPress = (day) => {
     if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
@@ -150,7 +144,7 @@ export default function ViewSales({ navigation, route }) {
         }, 100);
       })
       .catch((error) => {
-        console.log(error)
+        console.log(error);
         Alert.alert("Cannot get sales!", error?.message);
         setLoading(false);
       });
@@ -248,13 +242,7 @@ export default function ViewSales({ navigation, route }) {
                     justifyContent: "center",
                   }}
                   onPress={() =>
-                    navigation.navigate("shopSummary", {
-                      isShopOwner,
-                      isShopAttendant,
-                      attendantShopId,
-                      shopOwnerId,
-                      myShopId,
-                    })
+                    navigation.navigate("shopSummary", route.params)
                   }
                 >
                   <Text

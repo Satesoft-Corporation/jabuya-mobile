@@ -57,8 +57,16 @@ export default function LandingScreen({ navigation }) {
         if (data === null) {
           logOut();
         }
-        setRouteParams(data.user);
-        const { isShopOwner, shopOwnerId } = data.user;
+        const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+          data.user;
+
+        setRouteParams({
+          isShopOwner,
+          isShopAttendant,
+          attendantShopId,
+          shopOwnerId,
+        });
+
         let prevLoginTime = await UserSessionUtils.getLoginTime();
         let timeDiff = getTimeDifference(prevLoginTime, new Date());
 

@@ -1,21 +1,68 @@
-import { View, Text, TouchableOpacity, Image, Alert } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import React, { useEffect, useState } from "react";
-import BlackAndWhiteScreen from "../components/BlackAndWhiteScreen";
 import AppStatusBar from "../components/AppStatusBar";
 import Colors from "../constants/Colors";
 import { BaseApiService } from "../utils/BaseApiService";
-import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import { ItemHeader } from "./ViewSales";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import UserProfile from "../components/UserProfile";
 import Loader from "../components/Loader";
-const ShopSummary = ({ navigation, route }) => {
-  const [performanceSummary, setPerformanceSummary] = useState({});
-  const [initialCapital, setInitialCapital] = useState("");
-  const [loading, setLoading] = useState(false);
+import { formatNumberWithCommas } from "../utils/Utils";
 
-  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-    route.params;
+const ShopSummary = ({ navigation, route }) => {
+  const [initialCapital, setInitialCapital] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [stock, setStock] = useState(null);
+  const [totalSalesValue, setTotalSalesValue] = useState(null); //cash at hand
+  const [expenses, setExpenses] = useState(null);
+  const [grossProfit, setGrossProfit] = useState(null);
+  const [netProfit, setNetProfit] = useState(null);
+
+  const { shopOwnerId } = route.params;
+
+  const fetchShopProducts = () => {
+    let searchParameters = {
+      offset: 0,
+      limit: 0,
+      shopOwnerId: shopOwnerId,
+    };
+    let itemsStockValues = [];
+    let itemsSaleValues = [];
+
+    new BaseApiService("/shop-products")
+      .getRequestWithJsonResponse(searchParameters)
+      .then(async (response) => {
+        response.records.forEach((item) => {
+          const { salesPrice } = item;
+          let summary = item?.performanceSummary;
+
+          let qtyStocked = summary?.totalQuantityStocked || 0;
+          let qtySold = summary?.totalQuantitySold || 0;
+
+          let remainingStock = qtyStocked - qtySold;
+          let soldValue = summary?.totalValueSold || 0;
+
+          const itemValue = salesPrice * remainingStock; //itemstock value
+
+          itemsStockValues.push(itemValue);
+          itemsSaleValues.push(soldValue);
+        });
+
+        let stockValue = itemsStockValues.reduce((a, b) => a + b, 0);
+        let cash = itemsSaleValues.reduce((a, b) => a + b, 0);
+        setStock(stockValue);
+        setTotalSalesValue(cash);
+
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchShopProducts();
+  }, []);
 
   return (
     <View style={{ backgroundColor: Colors.light_2, flex: 1 }}>
@@ -131,7 +178,7 @@ const ShopSummary = ({ navigation, route }) => {
 
           <View>
             <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>
-              12,5000,000
+              {formatNumberWithCommas(stock)}
             </Text>
           </View>
         </View>
@@ -174,7 +221,7 @@ const ShopSummary = ({ navigation, route }) => {
                   fontSize: 16,
                 }}
               >
-                4,500,200
+                {formatNumberWithCommas(totalSalesValue)}
               </Text>
               <Text
                 style={{
@@ -227,7 +274,7 @@ const ShopSummary = ({ navigation, route }) => {
                   fontSize: 16,
                 }}
               >
-                4,500,200
+                0
               </Text>
               <Text
                 style={{
@@ -271,7 +318,7 @@ const ShopSummary = ({ navigation, route }) => {
                   alignSelf: "flex-end",
                 }}
               >
-                3,500,200
+                0
               </Text>
               <Text
                 style={{
@@ -318,7 +365,7 @@ const ShopSummary = ({ navigation, route }) => {
 
           <View>
             <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>
-              1,5000,000
+              {formatNumberWithCommas(grossProfit)}
             </Text>
           </View>
         </View>
@@ -354,7 +401,7 @@ const ShopSummary = ({ navigation, route }) => {
 
           <View>
             <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>
-              120,000
+              {formatNumberWithCommas(expenses)}
             </Text>
           </View>
         </View>
@@ -403,7 +450,7 @@ const ShopSummary = ({ navigation, route }) => {
                 color: Colors.primary,
               }}
             >
-              880,200
+              {formatNumberWithCommas(netProfit)}
             </Text>
           </View>
         </View>

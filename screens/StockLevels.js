@@ -1,5 +1,5 @@
 import { View, FlatList } from "react-native";
-import React, { useState, useEffect, memo } from "react";
+import React, { useState, useEffect, memo, useContext } from "react";
 
 import { StockLevelTransactionItem } from "../components/TransactionItems";
 import Loader from "../components/Loader";
@@ -10,22 +10,25 @@ import { StockingTabTitles } from "../constants/Constants";
 import { Text } from "react-native";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import Colors from "../constants/Colors";
+import { SearchContext } from "../context/SearchContext";
 
-const StockLevel = memo(({ params, currentPage, searchTerm, shouldSearch }) => {
+const StockLevel = memo(({ route }) => {
   const [stockLevels, setStockLevels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
 
-  const { LevelsTitle } = StockingTabTitles;
-  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } = params;
+  const { searchTerm, shouldSearch ,currentTab} = useContext(SearchContext);
 
-  const search = currentPage === LevelsTitle && shouldSearch === true;
+  const { LevelsTitle } = StockingTabTitles;
+  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } = route.params;
+
+  const search = currentTab === LevelsTitle && shouldSearch === true;
 
   const fetchStockLevels = async () => {
     setLoading(true);
     let searchParameters = {
       offset: 0,
-      limit: 0,
+      limit: 6,
     };
 
     if (search === true) {
@@ -55,6 +58,8 @@ const StockLevel = memo(({ params, currentPage, searchTerm, shouldSearch }) => {
 
   useEffect(() => {
     if (search === true) {
+      console.log(search, route.name);
+
       setLoading(true);
       fetchStockLevels();
     }
@@ -67,12 +72,12 @@ const StockLevel = memo(({ params, currentPage, searchTerm, shouldSearch }) => {
       }}
     >
       <OrientationLoadingOverlay
-          visible={loading}
-          color={Colors.primary}
-          indicatorSize="large"
-          messageFontSize={24}
-          message=""
-        />
+        visible={loading}
+        color={Colors.primary}
+        indicatorSize="large"
+        messageFontSize={24}
+        message=""
+      />
       <FlatList
         containerStyle={{ padding: 5 }}
         showsHorizontalScrollIndicator={false}
