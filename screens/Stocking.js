@@ -21,8 +21,13 @@ import { SearchProvider, SearchContext } from "../context/SearchContext";
 const Tab = createMaterialTopTabNavigator();
 
 function MyTabBar({ state, descriptors, navigation }) {
-  const { searchTerm, setSearchTerm, setShouldSearch, setCurrentTab } =
-    useContext(SearchContext);
+  const {
+    searchTerm,
+    setSearchTerm,
+    setShouldSearch,
+    setCurrentTab,
+    setSearchOffset,
+  } = useContext(SearchContext);
 
   return (
     <BlackScreen flex={0.4}>
@@ -57,7 +62,7 @@ function MyTabBar({ state, descriptors, navigation }) {
 
           const onPress = () => {
             setShouldSearch(false);
-
+            setSearchOffset(0);
             const event = navigation.emit({
               type: "tabPress",
               target: route.key,

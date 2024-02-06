@@ -7,19 +7,19 @@ export const SearchProvider = ({ children }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [shouldSearch, setShouldSearch] = useState(false);
   const [currentTab, setCurrentTab] = useState(PurchaseTitle);
+  const [searchOffset, setSearchOffset] = useState(0);
 
+  const data = {
+    searchTerm,
+    setSearchTerm,
+    shouldSearch,
+    setShouldSearch,
+    currentTab,
+    setCurrentTab,
+    searchOffset,
+    setSearchOffset,
+  };
   return (
-    <SearchContext.Provider
-      value={{
-        searchTerm,
-        setSearchTerm,
-        shouldSearch,
-        setShouldSearch,
-        currentTab,
-        setCurrentTab,
-      }}
-    >
-      {children}
-    </SearchContext.Provider>
+    <SearchContext.Provider value={data}>{children}</SearchContext.Provider>
   );
 };
