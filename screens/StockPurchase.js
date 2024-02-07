@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, memo } from "react";
 import { View, FlatList, Text } from "react-native";
 import { BaseApiService } from "../utils/BaseApiService";
 import { StockingTabTitles } from "../constants/Constants";
@@ -6,11 +6,16 @@ import OrientationLoadingOverlay from "react-native-orientation-loading-overlay"
 import Colors from "../constants/Colors";
 import { SearchContext } from "../context/SearchContext";
 import StockPurchaseListComponent from "../components/stocking/StockPurchaseListComponent";
+import { UserContext } from "../context/UserContext";
 
-const StockPurchase = ({ route }) => {
+const StockPurchase = () => {
   const { PurchaseTitle } = StockingTabTitles;
+
+  const { userParams } = useContext(UserContext);
+  console.log(totalRecords,currentTab)
+
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-    route.params;
+    userParams;
 
   const {
     searchTerm,
@@ -24,7 +29,6 @@ const StockPurchase = ({ route }) => {
   const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
   const [message, setMessage] = useState(null);
-  const [offset, setOffset] = useState(0);
   const limit = 6;
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
@@ -71,28 +75,31 @@ const StockPurchase = ({ route }) => {
   };
 
   useEffect(() => {
-    console.log(searchTerm);
+    if (isPurchasesTab) {
+      fetchStockEntries();
+    }
+  }, [searchOffset]);
 
+  useEffect(() => {
     if (canSearch() === true) {
       setSearchOffset(0);
       setStockEntries([]);
       setLoading(true);
+      fetchStockEntries();
     }
-    if (!isPurchasesTab) {
-      setStockEntries([]);
-    }
-    fetchStockEntries();
-  }, [searchOffset, shouldSearch]); // Empty dependency array to fetch stock entries once on component mount
+  }, [shouldSearch]);
 
   const handleEndReached = () => {
-    if (!isFetchingMore && stockEntries.length < totalRecords) {
-      setSearchOffset(searchOffset + limit);
-      console.log("fetching data at offest", searchOffset);
+    if (isPurchasesTab) {
+      if (!isFetchingMore && stockEntries.length < totalRecords) {
+        setSearchOffset(searchOffset + limit);
+        console.log("fetching data at offest", searchOffset);
+      }
     }
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, marginTop: 5 }}>
       <OrientationLoadingOverlay
         visible={loading}
         color={Colors.primary}
@@ -123,4 +130,4 @@ const StockPurchase = ({ route }) => {
   );
 };
 
-export default StockPurchase;
+export default memo(StockPurchase);

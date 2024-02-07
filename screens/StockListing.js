@@ -12,6 +12,7 @@ import Colors from "../constants/Colors";
 import { Text } from "react-native";
 import { SearchContext } from "../context/SearchContext";
 import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
 const StockListing = memo(({ route }) => {
   const { searchTerm, shouldSearch, currentTab } = useContext(SearchContext);
@@ -21,9 +22,12 @@ const StockListing = memo(({ route }) => {
   const [totalRecords, setTotalRecords] = useState(null);
 
   const { ListingTitle } = StockingTabTitles;
-  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-    route.params;
+console.log(totalRecords,currentTab)
   const search = currentTab === ListingTitle && shouldSearch === true;
+  const { userParams } = useContext(UserContext);
+
+  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+    userParams;
 
   const fetchStockListing = async () => {
     let searchParameters = {
@@ -71,7 +75,8 @@ const StockListing = memo(({ route }) => {
   return (
     <View
       style={{
-        justifyContent: "center",
+        flex: 1,
+        marginTop: 5,
       }}
     >
       <OrientationLoadingOverlay

@@ -1,5 +1,5 @@
 import { View, FlatList, Image, TouchableOpacity } from "react-native";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
 import { Icon } from "../components/Icon";
@@ -11,6 +11,7 @@ import { categoryIcons } from "../constants/Constants";
 import { BaseApiService } from "../utils/BaseApiService";
 import { getTimeDifference } from "../utils/Utils";
 import DispalyMessage from "../components/Dialogs/DisplayMessage";
+import { UserContext } from "../context/UserContext";
 
 export default function LandingScreen({ navigation }) {
   const [tab, setTab] = useState("home");
@@ -21,6 +22,8 @@ export default function LandingScreen({ navigation }) {
   const [message, setMessage] = useState("");
   const [agreeText, setAgreeText] = useState("");
   const [canCancel, setCanCancel] = useState(false);
+
+  const { setUserParams } = useContext(UserContext);
 
   const fetchShops = (id) => {
     new BaseApiService("/shops")
@@ -67,6 +70,12 @@ export default function LandingScreen({ navigation }) {
           shopOwnerId,
         });
 
+        setUserParams({
+          isShopOwner,
+          isShopAttendant,
+          attendantShopId,
+          shopOwnerId,
+        });
         let prevLoginTime = await UserSessionUtils.getLoginTime();
         let timeDiff = getTimeDifference(prevLoginTime, new Date());
 

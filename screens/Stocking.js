@@ -7,152 +7,119 @@ import { StockingTabTitles } from "../constants/Constants";
 import AppStatusBar from "../components/AppStatusBar";
 import UserProfile from "../components/UserProfile";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
-import TabHeader from "../components/TabHeader";
 import { FloatingButton } from "../components/FloatingButton";
 
 import StockPurchase from "./StockPurchase";
 import StockLevel from "./StockLevels";
 import StockListing from "./StockListing";
-// import { SearchBar } from "react-native-elements";
 import SearchBar from "../components/SearchBar";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { SearchProvider, SearchContext } from "../context/SearchContext";
+import { SearchContext } from "../context/SearchContext";
+import { UserContext } from "../context/UserContext";
 
-const Tab = createMaterialTopTabNavigator();
+const Stocking = ({ navigation }) => {
+  const { PurchaseTitle, LevelsTitle, ListingTitle } = StockingTabTitles;
+  const tabTitles = [PurchaseTitle, LevelsTitle, ListingTitle];
 
-function MyTabBar({ state, descriptors, navigation }) {
+  const pages = [
+    {
+      id: 0,
+      page: <StockPurchase />,
+    },
+    {
+      id: 1,
+      page: <StockLevel />,
+    },
+    {
+      id: 2,
+      page: <StockListing />,
+    },
+  ];
+  const [currentPage, setCurrentPage] = useState(pages[0]);
+
+  const { userParams } = useContext(UserContext);
+
+  const handleFormDestination = (form) => {
+    navigation.navigate(form, { ...userParams });
+    return true;
+  };
   const {
     searchTerm,
     setSearchTerm,
     setShouldSearch,
-    setCurrentTab,
     setSearchOffset,
+    setCurrentTab,
   } = useContext(SearchContext);
 
   return (
-    <BlackScreen flex={0.4}>
-      <UserProfile navigation={navigation} />
-
-      <SearchBar
-        value={searchTerm}
-        onChangeText={(text) => {
-          setShouldSearch(false);
-          setSearchTerm(text);
-        }}
-        onSearch={() => {
-          setShouldSearch(true);
-        }}
-      />
-
-      <View
-        style={{
-          flexDirection: "row",
-        }}
-      >
-        {state.routes.map((route, index) => {
-          const { options } = descriptors[route.key];
-          const label =
-            options.tabBarLabel !== undefined
-              ? options.tabBarLabel
-              : options.title !== undefined
-              ? options.title
-              : route.name;
-
-          const isFocused = state.index === index;
-
-          const onPress = () => {
-            setShouldSearch(false);
-            setSearchOffset(0);
-            const event = navigation.emit({
-              type: "tabPress",
-              target: route.key,
-            });
-
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
-            }
-            setCurrentTab(route.name);
-          };
-
-          return (
-            <TouchableOpacity
-              key={route.key}
-              accessibilityState={isFocused ? { selected: true } : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
-              testID={options.tabBarTestID}
-              onPress={onPress}
-              style={{
-                flex: 1,
-                alignItems: "center",
-                borderBottomWidth: 2,
-                borderBottomColor: isFocused ? Colors.primary : "transparent",
-                opacity: isFocused ? 1 : 0.6,
-              }}
-            >
-              <Text
-                style={{
-                  color: isFocused ? Colors.primary : Colors.light,
-                  paddingBottom: 8,
-                  paddingTop: 8,
-                }}
-              >
-                {label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    </BlackScreen>
-  );
-}
-
-const Stocking = ({ route, navigation }) => {
-  const { PurchaseTitle, LevelsTitle, ListingTitle } = StockingTabTitles;
-  const tabTitles = [PurchaseTitle, LevelsTitle, ListingTitle];
-
-  const [currentPage, setCurrentPage] = useState(tabTitles[0]);
-
-  // const params = route.params;
-  const params = {
-    isShopAttendant: false,
-    isShopOwner: true,
-    shopOwnerId: 2453,
-  };
-
-  const handleFormDestination = (form) => {
-    navigation.navigate(form, params);
-    return true;
-  };
-  return (
-    <SearchProvider>
+    <FloatingButton
+      handlePress={handleFormDestination}
+      isAttendant={userParams.isShopAttendant}
+      currentPage={currentPage}
+    >
       <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-        <FloatingButton
-          handlePress={handleFormDestination}
-          isAttendant={params.isShopAttendant}
-          currentPage={currentPage}
-        >
-          <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
+        <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
-          <Tab.Navigator tabBar={(props) => <MyTabBar {...props} />}>
-            <Tab.Screen
-              name={PurchaseTitle}
-              component={StockPurchase}
-              initialParams={params}
-            />
-            <Tab.Screen
-              name={LevelsTitle}
-              component={StockLevel}
-              initialParams={params}
-            />
-            <Tab.Screen
-              name={ListingTitle}
-              component={StockListing}
-              initialParams={params}
-            />
-          </Tab.Navigator>
-        </FloatingButton>
+        <BlackScreen flex={0.4}>
+          <UserProfile navigation={navigation} />
+
+          <SearchBar
+            value={searchTerm}
+            onChangeText={(text) => {
+              setShouldSearch(false);
+              setSearchTerm(text);
+            }}
+            onSearch={() => {
+              setShouldSearch(true);
+            }}
+          />
+
+          <View
+            style={{
+              flexDirection: "row",
+            }}
+          >
+            {tabTitles.map((title, index) => {
+              const isFocused = currentPage.id === index;
+
+              const onPress = () => {
+                setShouldSearch(false);
+                setSearchOffset(0);
+                setCurrentTab(tabTitles[index]);
+                setCurrentPage(pages[index]);
+              };
+
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={onPress}
+                  style={{
+                    flex: 1,
+                    alignItems: "center",
+                    borderBottomWidth: 2,
+                    borderBottomColor: isFocused
+                      ? Colors.primary
+                      : "transparent",
+                    opacity: isFocused ? 1 : 0.6,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: isFocused ? Colors.primary : Colors.light,
+                      paddingBottom: 8,
+                      paddingTop: 8,
+                    }}
+                  >
+                    {title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </BlackScreen>
+
+        {currentPage.page}
       </View>
-    </SearchProvider>
+    </FloatingButton>
   );
 };
 

@@ -22,8 +22,7 @@ export function FloatingButton({
   let buttonBg = Colors.primary;
   let iconTint = Colors.dark;
 
-  const shouldDisplay =
-    isAttendant === false && currentPage !== StockingTabTitles.LevelsTitle;
+  const shouldDisplay = isAttendant === false && currentPage.id !== 1;
 
   const show = () => {
     if (!isOpen) {

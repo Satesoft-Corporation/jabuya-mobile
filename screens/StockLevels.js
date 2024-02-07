@@ -2,7 +2,6 @@ import { View, FlatList } from "react-native";
 import React, { useState, useEffect, memo, useContext } from "react";
 
 import { StockLevelTransactionItem } from "../components/TransactionItems";
-import Loader from "../components/Loader";
 
 import { BaseApiService } from "../utils/BaseApiService";
 
@@ -11,40 +10,69 @@ import { Text } from "react-native";
 import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
 import Colors from "../constants/Colors";
 import { SearchContext } from "../context/SearchContext";
+import { UserContext } from "../context/UserContext";
 
 const StockLevel = memo(({ route }) => {
   const [stockLevels, setStockLevels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
-
-  const { searchTerm, shouldSearch ,currentTab} = useContext(SearchContext);
+  const limit = 6;
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  console.log(totalRecords,currentTab)
 
   const { LevelsTitle } = StockingTabTitles;
-  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } = route.params;
+  const { userParams } = useContext(UserContext);
 
-  const search = currentTab === LevelsTitle && shouldSearch === true;
+  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+    userParams;
+
+  const {
+    searchTerm,
+    shouldSearch,
+    currentTab,
+    searchOffset,
+    setSearchOffset,
+  } = useContext(SearchContext);
+
+  const isPurchasesTab = currentTab === LevelsTitle;
+
+  const canSearch = () => {
+    if (shouldSearch === true && isPurchasesTab) {
+      if (searchTerm && searchTerm !== "") {
+        return true;
+      }
+    }
+    return false;
+  };
 
   const fetchStockLevels = async () => {
-    setLoading(true);
     let searchParameters = {
-      offset: 0,
-      limit: 6,
+      offset: searchOffset,
+      limit: limit,
+      ...(canSearch() && { searchTerm }),
+      ...(isShopAttendant && { shopId: attendantShopId }),
+      ...(isShopOwner && { shopOwnerId }),
     };
 
-    if (search === true) {
-      searchParameters.searchTerm = searchTerm;
-    }
     if (isShopAttendant) {
       searchParameters.shopId = attendantShopId;
     }
     if (isShopOwner) {
       searchParameters.shopOwnerId = shopOwnerId;
     }
+    setIsFetchingMore(true);
+
     new BaseApiService("/shop-products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
-        setStockLevels(response.records);
+        setStockLevels((prevEntries) => [...prevEntries, ...response.records]);
+
         setTotalRecords(response.totalItems);
+
+        if (response.totalItems === 0 && searchTerm !== "") {
+          setMessage(`No results found for ${searchTerm}`);
+        }
+        setIsFetchingMore(false);
         setLoading(false);
       })
       .catch((error) => {
@@ -53,22 +81,33 @@ const StockLevel = memo(({ route }) => {
   };
 
   useEffect(() => {
-    fetchStockLevels();
-  }, []);
+    if (isPurchasesTab) {
+      fetchStockLevels();
+    }
+  }, [searchOffset]);
 
   useEffect(() => {
-    if (search === true) {
-      console.log(search, route.name);
-
+    if (canSearch() === true) {
+      setSearchOffset(0);
+      setStockEntries([]);
       setLoading(true);
       fetchStockLevels();
     }
   }, [shouldSearch]);
 
+  const handleEndReached = () => {
+    if (isPurchasesTab) {
+      if (!isFetchingMore && stockLevels.length < totalRecords) {
+        setSearchOffset(searchOffset + limit);
+      }
+    }
+  };
+
   return (
     <View
       style={{
-        justifyContent: "center",
+        flex: 1,
+        marginTop: 5
       }}
     >
       <OrientationLoadingOverlay
@@ -94,9 +133,11 @@ const StockLevel = memo(({ route }) => {
             <Text>No stock records found.</Text>
           </View>
         )}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.1}
       />
     </View>
   );
 });
 
-export default StockLevel;
+export default memo(StockLevel);
