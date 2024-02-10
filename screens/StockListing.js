@@ -1,76 +1,68 @@
 import { View, FlatList } from "react-native";
 import React, { useState, useEffect, memo } from "react";
 
-import { StockListingTransactionItem } from "../components/TransactionItems";
-import Loader from "../components/Loader";
+import {
+  MAXIMUM_RECORDS_PER_FETCH,
+  StockingTabTitles,
+} from "../constants/Constants";
 
-import { BaseApiService } from "../utils/BaseApiService";
-
-import { StockingTabTitles } from "../constants/Constants";
-import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
-import Colors from "../constants/Colors";
 import { Text } from "react-native";
 import { SearchContext } from "../context/SearchContext";
 import { useContext } from "react";
-import { UserContext } from "../context/UserContext";
+import StockListingListComponent from "../components/stocking/StockListingListComponent";
 
-const StockListing = memo(({ route }) => {
-  const { searchTerm, shouldSearch, currentTab } = useContext(SearchContext);
-
-  const [stockListing, setStockListing] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [totalRecords, setTotalRecords] = useState(null);
+const StockListing = ({ getData, setLoading }) => {
+  const {
+    shouldSearch,
+    currentTab,
+    stockListing,
+    setStockListing,
+    stockListRecords,
+    stockListOffset,
+    setStockListOffset,
+    isFetchingMore,
+    searchTerm,
+    message,
+  } = useContext(SearchContext);
 
   const { ListingTitle } = StockingTabTitles;
-console.log(totalRecords,currentTab)
-  const search = currentTab === ListingTitle && shouldSearch === true;
-  const { userParams } = useContext(UserContext);
 
-  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-    userParams;
+  const [shouldFetch, setShoudFetch] = useState(false);
 
-  const fetchStockListing = async () => {
-    let searchParameters = {
-      offset: 0,
-      limit: 6,
-    };
+  const isStockListingTab = currentTab === ListingTitle;
 
-    if (search === true) {
-      searchParameters.searchTerm = searchTerm;
+  const canSearch = () => {
+    if (shouldSearch === true && isStockListingTab) {
+      if (searchTerm && searchTerm !== "") {
+        return true;
+      }
     }
-
-    if (isShopAttendant) {
-      searchParameters.shopId = attendantShopId;
-    }
-
-    if (isShopOwner) {
-      searchParameters.shopOwnerId = shopOwnerId;
-    }
-
-    new BaseApiService("/shop-products")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        setStockListing(response.records);
-        setTotalRecords(response.totalItems);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-      });
+    return false;
   };
 
   useEffect(() => {
-    fetchStockListing();
-  }, []);
-
-  useEffect(() => {
-    if (search === true) {
-      console.log(search, route);
-
+    if (canSearch() === true) {
+      setStockListOffset(0);
+      setStockListing([]);
       setLoading(true);
-      fetchStockListing();
+      getData(0, searchTerm);
+      setLoading(false);
     }
   }, [shouldSearch]);
+
+  useEffect(() => {
+    if (stockListing.length > 0 && shouldFetch === true) {
+      getData(stockListOffset, searchTerm);
+      setShoudFetch(false);
+    }
+  }, [stockListOffset]);
+
+  const handleEndReached = () => {
+    if (!isFetchingMore && stockListing.length < stockListRecords) {
+      setStockListOffset(stockListOffset + MAXIMUM_RECORDS_PER_FETCH);
+      setShoudFetch(true);
+    }
+  };
 
   return (
     <View
@@ -79,18 +71,11 @@ console.log(totalRecords,currentTab)
         marginTop: 5,
       }}
     >
-      <OrientationLoadingOverlay
-        visible={loading}
-        color={Colors.primary}
-        indicatorSize="large"
-        messageFontSize={24}
-        message=""
-      />
       <FlatList
         containerStyle={{ padding: 5 }}
         showsHorizontalScrollIndicator={false}
         data={stockListing}
-        renderItem={({ item }) => <StockListingTransactionItem data={item} />}
+        renderItem={({ item }) => <StockListingListComponent data={item} />}
         ListEmptyComponent={() => (
           <View
             style={{
@@ -99,12 +84,14 @@ console.log(totalRecords,currentTab)
               alignItems: "center",
             }}
           >
-            {totalRecords === 0 && <Text>No products listed yet.</Text>}
+            <Text>{message}</Text>
           </View>
         )}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0}
       />
     </View>
   );
-});
+};
 
-export default StockListing;
+export default memo(StockListing);

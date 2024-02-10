@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { formatDate,formatNumberWithCommas } from "../../utils/Utils";
+import { formatDate, formatNumberWithCommas } from "../../utils/Utils";
 import Colors from "../../constants/Colors";
+import { memo } from "react";
 
 const StockPurchaseListComponent = ({ data }) => {
   const [expanded, setExpanded] = useState(false);

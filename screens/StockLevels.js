@@ -1,43 +1,37 @@
 import { View, FlatList } from "react-native";
 import React, { useState, useEffect, memo, useContext } from "react";
 
-import { StockLevelTransactionItem } from "../components/TransactionItems";
-
-import { BaseApiService } from "../utils/BaseApiService";
-
-import { StockingTabTitles } from "../constants/Constants";
+import {
+  MAXIMUM_RECORDS_PER_FETCH,
+  StockingTabTitles,
+} from "../constants/Constants";
 import { Text } from "react-native";
-import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
-import Colors from "../constants/Colors";
-import { SearchContext } from "../context/SearchContext";
-import { UserContext } from "../context/UserContext";
 
-const StockLevel = memo(({ route }) => {
-  const [stockLevels, setStockLevels] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const limit = 6;
-  const [isFetchingMore, setIsFetchingMore] = useState(false);
-  console.log(totalRecords,currentTab)
+import { SearchContext } from "../context/SearchContext";
+import StockLevelListComponent from "../components/stocking/StockLevelListComponent";
+
+const StockLevel = ({ getData, setLoading }) => {
+  const [shouldFetch, setShoudFetch] = useState(false);
 
   const { LevelsTitle } = StockingTabTitles;
-  const { userParams } = useContext(UserContext);
-
-  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-    userParams;
 
   const {
-    searchTerm,
     shouldSearch,
     currentTab,
-    searchOffset,
-    setSearchOffset,
+    stockLevels,
+    setStockLevels,
+    stockLevelRecords,
+    isFetchingMore,
+    searchTerm,
+    stockLevelOffset,
+    message,
+    setStockLevelOffset,
   } = useContext(SearchContext);
 
-  const isPurchasesTab = currentTab === LevelsTitle;
+  const isStockLevelsTab = currentTab === LevelsTitle;
 
   const canSearch = () => {
-    if (shouldSearch === true && isPurchasesTab) {
+    if (shouldSearch === true && isStockLevelsTab) {
       if (searchTerm && searchTerm !== "") {
         return true;
       }
@@ -45,61 +39,27 @@ const StockLevel = memo(({ route }) => {
     return false;
   };
 
-  const fetchStockLevels = async () => {
-    let searchParameters = {
-      offset: searchOffset,
-      limit: limit,
-      ...(canSearch() && { searchTerm }),
-      ...(isShopAttendant && { shopId: attendantShopId }),
-      ...(isShopOwner && { shopOwnerId }),
-    };
-
-    if (isShopAttendant) {
-      searchParameters.shopId = attendantShopId;
-    }
-    if (isShopOwner) {
-      searchParameters.shopOwnerId = shopOwnerId;
-    }
-    setIsFetchingMore(true);
-
-    new BaseApiService("/shop-products")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        setStockLevels((prevEntries) => [...prevEntries, ...response.records]);
-
-        setTotalRecords(response.totalItems);
-
-        if (response.totalItems === 0 && searchTerm !== "") {
-          setMessage(`No results found for ${searchTerm}`);
-        }
-        setIsFetchingMore(false);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    if (isPurchasesTab) {
-      fetchStockLevels();
-    }
-  }, [searchOffset]);
-
   useEffect(() => {
     if (canSearch() === true) {
-      setSearchOffset(0);
-      setStockEntries([]);
+      setStockLevelOffset(0);
+      setStockLevels([]);
       setLoading(true);
-      fetchStockLevels();
+      getData(0, searchTerm);
+      setLoading(false);
     }
   }, [shouldSearch]);
 
+  useEffect(() => {
+    if (stockLevels.length > 0 && shouldFetch === true) {
+      getData(stockLevelOffset, searchTerm);
+      setShoudFetch(false);
+    }
+  }, [stockLevelOffset]);
+
   const handleEndReached = () => {
-    if (isPurchasesTab) {
-      if (!isFetchingMore && stockLevels.length < totalRecords) {
-        setSearchOffset(searchOffset + limit);
-      }
+    if (!isFetchingMore && stockLevels.length < stockLevelRecords) {
+      setStockLevelOffset(stockLevelOffset + MAXIMUM_RECORDS_PER_FETCH);
+      setShoudFetch(true);
     }
   };
 
@@ -107,21 +67,14 @@ const StockLevel = memo(({ route }) => {
     <View
       style={{
         flex: 1,
-        marginTop: 5
+        marginTop: 5,
       }}
     >
-      <OrientationLoadingOverlay
-        visible={loading}
-        color={Colors.primary}
-        indicatorSize="large"
-        messageFontSize={24}
-        message=""
-      />
       <FlatList
         containerStyle={{ padding: 5 }}
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
-        renderItem={({ item }) => <StockLevelTransactionItem data={item} />}
+        renderItem={({ item }) => <StockLevelListComponent data={item} />}
         ListEmptyComponent={() => (
           <View
             style={{
@@ -130,14 +83,14 @@ const StockLevel = memo(({ route }) => {
               alignItems: "center",
             }}
           >
-            <Text>No stock records found.</Text>
+            <Text>{message}</Text>
           </View>
         )}
         onEndReached={handleEndReached}
-        onEndReachedThreshold={0.1}
+        onEndReachedThreshold={0}
       />
     </View>
   );
-});
+};
 
 export default memo(StockLevel);

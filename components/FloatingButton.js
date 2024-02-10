@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { TouchableOpacity, Text, View, Image, Animated } from "react-native";
 import Colors from "../constants/Colors";
-import { StockingTabTitles } from "../constants/Constants";
 
 export function FloatingButton({
   children,
@@ -31,24 +30,24 @@ export function FloatingButton({
       Animated.parallel([
         Animated.timing(width, {
           toValue: 70,
-          duration: 200,
+          duration: 10,
         }),
         Animated.timing(right, {
           toValue: 66,
-          duration: 200,
+          duration: 10,
         }),
         Animated.timing(opc, {
           toValue: opacity,
-          duration: 200,
+          duration: 10,
           useNativeDriver: true,
         }),
         Animated.timing(visible, {
           toValue: 130,
-          duration: 200,
+          duration: 10,
         }),
         Animated.timing(visible_, {
           toValue: 200,
-          duration: 200,
+          duration: 10,
         }),
       ]).start(() => {
         setOpen(true);

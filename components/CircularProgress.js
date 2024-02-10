@@ -3,7 +3,7 @@ import { Animated, Easing, View, Text } from "react-native";
 import Colors from "../constants/Colors";
 import { TouchableOpacity } from "react-native";
 
-export default function CircularProgress() {
+export default function CircularProgress({ bgColor = Colors.primary }) {
   const [item, setItem] = useState(1);
 
   const tick = () => {
@@ -22,11 +22,11 @@ export default function CircularProgress() {
     <TouchableOpacity
       disabled
       style={{
-        backgroundColor: Colors.primary,
+        backgroundColor: bgColor,
         marginTop: 30,
         borderRadius: 5,
         borderWidth: 1,
-        borderColor: Colors.primary,
+        borderColor: bgColor,
         paddingVertical: 15,
         justifyContent: "center",
         alignItems: "center",
