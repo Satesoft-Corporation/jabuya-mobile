@@ -18,9 +18,17 @@ import Loader from "../components/Loader";
 import { KeyboardAvoidingView } from "react-native";
 import { convertToServerDate, toReadableDate, hasNull } from "../utils/Utils";
 import { DateCalender } from "../components/Dialogs/DateCalendar";
+import { UserContext } from "../context/UserContext";
+import { useContext } from "react";
+import TopHeader from "../components/TopHeader";
+
 const StockPurchaseForm = ({ navigation, route }) => {
-  const { isShopOwner, shopOwnerId } = route.params;
-  // let shopOwnerId = 2453;
+  const { userParams } = useContext(UserContext);
+
+  // const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+  //   userParams;
+
+  let shopOwnerId = 2453;
   // let isShopOwner = true;
   const [shops, setShops] = useState([]);
   const [selectedShop, setSelectedShop] = useState(null);
@@ -83,7 +91,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
   };
 
   const fetchSuppliers = async () => {
-    let searchParameters = { searchTerm: "", offset: 0, limit: 0 };
+    let searchParameters = { offset: 0, limit: 0 };
     new BaseApiService("/suppliers")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
@@ -242,6 +250,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
   };
 
   useEffect(() => {
+    console.log(5576);
     fetchSuppliers();
     fetchShops();
     fetchManufacturers();
@@ -253,49 +262,15 @@ const StockPurchaseForm = ({ navigation, route }) => {
       behavior={"height"}
       style={{ flex: 1 }}
     >
-      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
         <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
-        <Loader loading={loading} />
-        <View
-          style={{
-            height: 50,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            paddingHorizontal: 10,
-            backgroundColor: Colors.dark,
-          }}
-        >
-          <Text style={{ color: Colors.primary, fontSize: 18 }}>
-            Stock purchase
-          </Text>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.goBack();
-            }}
-            style={{
-              backgroundColor: Colors.primary,
-              borderRadius: 3,
-              height: 25,
-              justifyContent: "center",
-              alignSelf: "flex-end",
-              marginEnd: -2,
-              marginBottom: 7,
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.dark,
-                paddingHorizontal: 6,
-                alignSelf: "center",
-                justifyContent: "center",
-              }}
-            >
-              Go back
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {/* <Loader loading={loading} /> */}
+
+        <TopHeader
+          title="Stock purchase details"
+          onPress={() => navigation.goBack()}
+        />
         <ScrollView
           style={{
             paddingHorizontal: 8,
@@ -311,6 +286,10 @@ const StockPurchaseForm = ({ navigation, route }) => {
               Shop
             </Text>
             <MyDropDown
+              style={{
+                backgroundColor: Colors.light,
+                borderColor: Colors.dark,
+              }}
               data={shops}
               onChange={makeShopSelection}
               value={selectedShop}
@@ -341,6 +320,10 @@ const StockPurchaseForm = ({ navigation, route }) => {
               Supplier
             </Text>
             <MyDropDown
+              style={{
+                backgroundColor: Colors.light,
+                borderColor: Colors.dark,
+              }}
               data={suppliers}
               onChange={onSupplierChange}
               value={selectedSupplier}
@@ -371,6 +354,10 @@ const StockPurchaseForm = ({ navigation, route }) => {
               Manufacturer
             </Text>
             <MyDropDown
+              style={{
+                backgroundColor: Colors.light,
+                borderColor: Colors.dark,
+              }}
               data={manufacturers}
               onChange={onManufacturerChange}
               value={selectedManufacturer}
@@ -401,6 +388,10 @@ const StockPurchaseForm = ({ navigation, route }) => {
               Product
             </Text>
             <MyDropDown
+              style={{
+                backgroundColor: Colors.light,
+                borderColor: Colors.dark,
+              }}
               disable={disable}
               data={products}
               onChange={onProductChange}
@@ -432,6 +423,10 @@ const StockPurchaseForm = ({ navigation, route }) => {
               Package type
             </Text>
             <MyDropDown
+              style={{
+                backgroundColor: Colors.light,
+                borderColor: Colors.dark,
+              }}
               data={packageOptions}
               disable={selectedProduct === null}
               value={isPackedProduct}
@@ -491,7 +486,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                   }}
                   inputMode="numeric"
                   style={{
-                    backgroundColor: Colors.primary,
+                    backgroundColor: Colors.light,
                     borderRadius: 5,
                     padding: 6,
                     borderWidth: 0.6,
@@ -532,7 +527,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                   onChangeText={(text) => setPurchasePrice(text)}
                   inputMode="numeric"
                   style={{
-                    backgroundColor: Colors.primary,
+                    backgroundColor: Colors.light,
                     borderRadius: 5,
                     padding: 6,
                     borderWidth: 0.6,
@@ -578,7 +573,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                 cursorColor={Colors.dark}
                 inputMode="text"
                 style={{
-                  backgroundColor: Colors.primary,
+                  backgroundColor: Colors.light,
                   borderRadius: 5,
                   padding: 6,
                   borderWidth: 0.6,
@@ -615,7 +610,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                   setDateToSelect("expiry");
                 }}
                 style={{
-                  backgroundColor: Colors.primary,
+                  backgroundColor: Colors.light,
                   borderRadius: 5,
                   padding: 6,
                   borderWidth: 0.6,
@@ -667,7 +662,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
               <TouchableOpacity
                 disabled
                 style={{
-                  backgroundColor: Colors.primary,
+                  backgroundColor: Colors.light,
                   borderRadius: 5,
                   padding: 6,
                   borderWidth: 0.6,
@@ -693,7 +688,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                   setDateToSelect("purchase");
                 }}
                 style={{
-                  backgroundColor: Colors.primary,
+                  backgroundColor: Colors.light,
                   borderRadius: 5,
                   padding: 6,
                   borderWidth: 0.6,
@@ -740,7 +735,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
               cursorColor={Colors.dark}
               multiline
               style={{
-                backgroundColor: Colors.primary,
+                backgroundColor: Colors.light,
                 borderRadius: 5,
                 padding: 6,
                 borderWidth: 0.6,

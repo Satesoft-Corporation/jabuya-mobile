@@ -16,12 +16,13 @@ import { UserContext } from "../context/UserContext";
 export default function LandingScreen({ navigation }) {
   const [tab, setTab] = useState("home");
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [routeParams, setRouteParams] = useState(null);
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
   const [agreeText, setAgreeText] = useState("");
   const [canCancel, setCanCancel] = useState(false);
+  const [timeDiff, setTimeDiff] = useState(null);
 
   const { setUserParams } = useContext(UserContext);
 
@@ -37,6 +38,7 @@ export default function LandingScreen({ navigation }) {
   };
 
   const logOut = () => {
+    setLoading(false);
     UserSessionUtils.clearLocalStorageAndLogout(navigation);
   };
 
@@ -52,6 +54,19 @@ export default function LandingScreen({ navigation }) {
     setAgreeText("Login");
     setCanCancel(false);
     setShowModal(true);
+  };
+
+  const handleTabPress = (item) => {
+    if (timeDiff?.hours >= 5) {
+      //trigger the logout dialog every after 5 hrs
+      logInPrompt();
+    } else {
+      item.target
+        ? navigation.navigate(item.target, {
+            ...routeParams,
+          })
+        : null;
+    }
   };
 
   useEffect(() => {
@@ -76,13 +91,9 @@ export default function LandingScreen({ navigation }) {
           attendantShopId,
           shopOwnerId,
         });
-        let prevLoginTime = await UserSessionUtils.getLoginTime();
-        let timeDiff = getTimeDifference(prevLoginTime, new Date());
-
-        if (timeDiff.hours >= 4) {
-          //trigger the logout dialog
-          logInPrompt();
-        }
+        let prevTime = await UserSessionUtils.getLoginTime();
+        let timeDifferance = getTimeDifference(prevTime, new Date());
+        setTimeDiff(timeDifferance);
 
         let shopCount = await UserSessionUtils.getShopCount();
 
@@ -91,9 +102,7 @@ export default function LandingScreen({ navigation }) {
             fetchShops(shopOwnerId);
           }
         }
-        setTimeout(() => {
-          setLoading(false);
-        }, 100);
+        setLoading(false);
       })
       .catch(async (error) => {
         //loging the user out if the object is missing
@@ -115,16 +124,7 @@ export default function LandingScreen({ navigation }) {
         style={{ flex: 1, marginTop: 20 }}
         data={categoryIcons}
         renderItem={({ item }) => (
-          <Icon
-            icon={item}
-            onPress={() =>
-              item.target
-                ? navigation.navigate(item.target, {
-                    ...routeParams,
-                  })
-                : null
-            }
-          />
+          <Icon icon={item} onPress={() => handleTabPress(item)} />
         )}
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}

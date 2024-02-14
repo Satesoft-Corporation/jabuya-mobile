@@ -108,4 +108,4 @@ export const dummyLoginResponse = {
   refreshToken: "dummyRefreshToken456",
 };
 
-export const MAXIMUM_RECORDS_PER_FETCH = 10;
+export const MAXIMUM_RECORDS_PER_FETCH = 20;

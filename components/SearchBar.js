@@ -6,24 +6,27 @@ export default function SearchBar({
   value,
   onChangeText,
   placeholder = "Search...",
-  style = { paddingHorizontal: 15 },
+  style,
   onSearch,
   onClear,
 }) {
   return (
     <View
-      style={{
-        flexDirection: "row",
-        backgroundColor: "#f3f3f3",
-        borderRadius: 3,
-        height: 35,
-        marginHorizontal: 10,
-        marginTop:10
-      }}
+      style={[
+        {
+          flexDirection: "row",
+          backgroundColor: "#f3f3f3",
+          borderRadius: 3,
+          height: 35,
+          marginHorizontal: 10,
+          marginTop: 10,
+        },
+        style,
+      ]}
     >
       <View style={{ flex: 1, justifyContent: "center" }}>
         <TextInput
-          style={style}
+          style={{ paddingHorizontal: 15 }}
           placeholder={placeholder}
           onChangeText={onChangeText}
           value={value}
@@ -35,7 +38,7 @@ export default function SearchBar({
       >
         <Image
           source={require("../assets/icons/ic_search_gray.png")}
-          style={{ width: 24, height: 24, tintColor: Colors.gray }}
+          style={{ width: 20, height: 20, tintColor: Colors.gray }}
         />
       </TouchableOpacity>
     </View>
