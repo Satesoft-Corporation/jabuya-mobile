@@ -21,7 +21,9 @@ export default function DispalyMessage({
         }}
       >
         <View style={{ flex: 1, justifyContent: "center", marginTop: 10 }}>
-          <Text style={{ textAlign: "center" }}>{message}</Text>
+          <Text style={{ textAlign: "center", paddingVertical: 10 }}>
+            {message}
+          </Text>
         </View>
         <View
           style={{

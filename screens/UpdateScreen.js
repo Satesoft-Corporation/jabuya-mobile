@@ -1,10 +1,10 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Linking } from "react-native";
 import React from "react";
-import OutlinedButton from "../components/buttons/OutlinedButton";
 import PrimaryButton from "../components/buttons/PrimaryButton";
 import { Dimensions } from "react-native";
 
 const screenWidth = Dimensions.get("window").width;
+let url = "https://play.google.com/store/apps/details?id=com.byaffe.duqact";
 
 const UpdateScreen = () => {
   return (
@@ -22,7 +22,7 @@ const UpdateScreen = () => {
           fontWeight: 500,
         }}
       >
-        Update Duquat
+        Update Duqact
       </Text>
       <Image
         source={require("../assets/icons/icon2.png")}
@@ -41,7 +41,9 @@ const UpdateScreen = () => {
         <PrimaryButton
           title={"Update"}
           width={screenWidth - 30}
-          onPress={() => {}}
+          onPress={() => {
+            Linking.openURL(url);
+          }}
         />
       </View>
     </View>

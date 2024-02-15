@@ -28,6 +28,8 @@ import { IconsComponent } from "../components/Icon";
 import Loader from "../components/Loader";
 import { ConfirmSalesDialog } from "../components/Dialogs";
 import DispalyMessage from "../components/Dialogs/DisplayMessage";
+import Snackbar from "../components/Snackbar";
+import { useRef } from "react";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -55,6 +57,8 @@ function SalesEntry({ route, navigation }) {
   const [selectedShop, setSelectedShop] = useState(null);
   const [message, setMessage] = useState(null);
   const [displayMessage, setDisplayMssage] = useState(false);
+
+  const snackbarRef = useRef(null);
 
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
     route.params;
@@ -151,8 +155,9 @@ function SalesEntry({ route, navigation }) {
         }
       })
       .catch((error) => {
-        setMessage("An unexpected error occurred! Try again later.");
-        setDisplayMssage(true);
+        snackbarRef.current.show(
+          "An unexpected error occurred! Try again later."
+        );
         setLoading(false);
       });
   };
@@ -470,6 +475,7 @@ function SalesEntry({ route, navigation }) {
         onAgree={() => setDisplayMssage(false)}
         setShowModal={setDisplayMssage}
       />
+
       <BlackScreen flex={isShopAttendant ? 12 : 10}>
         <UserProfile />
         <TouchableOpacity
@@ -766,6 +772,7 @@ function SalesEntry({ route, navigation }) {
             </Text>
           </TouchableOpacity>
         </ScrollView>
+        <Snackbar ref={snackbarRef} />
       </View>
     </View>
   );
