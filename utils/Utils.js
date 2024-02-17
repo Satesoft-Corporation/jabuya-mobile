@@ -127,23 +127,24 @@ export function convertDateFormat(dateString, getTomorrowDate = false) {
 }
 
 export function getTimeDifference(date1, date2) {
-  let parsedDate1 = new Date(date1);
-  let parsedDate2 = new Date(date2);
+  let parsedDate1 = date1.getTime();
+  let parsedDate2 = date2.getTime();
 
-  let timeDiff = Math.abs(parsedDate1 - parsedDate2);
+  let timeDifference = Math.abs(parsedDate1 - parsedDate2);
 
-  let milliseconds = timeDiff % 1000;
-  timeDiff = (timeDiff - milliseconds) / 1000;
+  const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+  timeDifference -= days * (1000 * 60 * 60 * 24);
 
-  let seconds = timeDiff % 60;
-  timeDiff = (timeDiff - seconds) / 60;
+  const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+  timeDifference -= hours * (1000 * 60 * 60);
 
-  let minutes = timeDiff % 60;
-  timeDiff = (timeDiff - minutes) / 60;
+  const minutes = Math.floor(timeDifference / (1000 * 60));
+  timeDifference -= minutes * (1000 * 60);
 
-  let hours = timeDiff % 24;
+  const seconds = Math.floor(timeDifference / 1000);
 
   return {
+    days: days,
     hours: hours,
     minutes: minutes,
     seconds: seconds,

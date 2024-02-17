@@ -57,7 +57,10 @@ export default function LandingScreen({ navigation }) {
   };
 
   const handleTabPress = (item) => {
-    if (timeDiff?.hours >= 5) {
+    const { days, hours } = timeDiff;
+    console.log(timeDiff);
+
+    if (hours >= 5 || days > 0) {
       //trigger the logout dialog every after 5 hrs
       logInPrompt();
     } else {
@@ -74,9 +77,10 @@ export default function LandingScreen({ navigation }) {
       .then(async (data) => {
         if (data === null) {
           logOut();
+          return true;
         }
         const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-          data.user;
+          data?.user;
 
         setRouteParams({
           isShopOwner,
@@ -105,6 +109,7 @@ export default function LandingScreen({ navigation }) {
         setLoading(false);
       })
       .catch(async (error) => {
+        console.log(error);
         //loging the user out if the object is missing
         logOut();
       });

@@ -7,10 +7,6 @@ import Constants from "expo-constants";
 export class BaseApiService {
   apiEndpoint;
   authToken = UserSessionUtils.getBearerToken();
-  requestHeaders = {
-    PLATFORM_TYPE: Platform.OS,
-    VERSION_CODE: Constants.expoConfig.version,
-  };
 
   /**
    * This is constructor is used to initialize the API service endpoint to be used for this call.
@@ -32,6 +28,8 @@ export class BaseApiService {
     const headers = {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
+      Version_code: Constants.expoConfig.version,
+      Platform_type: Platform.OS,
     };
     return await fetch(
       this.apiEndpoint + "?" + new URLSearchParams(queryParameters),
@@ -77,6 +75,8 @@ export class BaseApiService {
       Accept: "application/json",
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
+      Version_code: Constants.expoConfig.version,
+      Platform_type: Platform.OS,
     };
     return await fetch(this.apiEndpoint, {
       method: "POST",
@@ -143,6 +143,8 @@ export class BaseApiService {
     const headers = {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
+      Version_code: Constants.expoConfig.version,
+      Platform_type: Platform.OS,
     };
     return fetch(this.apiEndpoint, {
       method: "PUT",

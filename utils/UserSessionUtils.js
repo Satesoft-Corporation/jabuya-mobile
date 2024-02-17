@@ -172,6 +172,6 @@ export class UserSessionUtils {
    */
   static async getLoginTime() {
     let time = await AsyncStorage.getItem(StorageParams.LOGIN_TIME);
-    return time;
+    return new Date(time);
   }
 }

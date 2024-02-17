@@ -26,6 +26,7 @@ const StockingModel = () => {
   const [searchTerm, setSearchTerm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [offset, setOffset] = useState(0);
+  const [showSearch, setShowSearch] = useState(false);
 
   const { userParams } = useContext(UserContext);
 
@@ -83,6 +84,9 @@ const StockingModel = () => {
     }
   };
 
+  const toggleSearch = () => {
+    setShowSearch(!showSearch);
+  };
   const handleEndReached = () => {
     if (!isFetchingMore && stockEntries.length < stockEntryRecords) {
       setOffset(offset + MAXIMUM_RECORDS_PER_FETCH);
@@ -102,24 +106,30 @@ const StockingModel = () => {
   };
 
   return (
-    <View style={{ flex: 1 ,backgroundColor:Colors.light_2}}>
+    <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar content="light-content" bgColor="black" />
 
-      <TopHeader title="Stock entries" />
-
-      <SearchBar
-        style={{
-          borderWidth: 1,
-          borderColor: Colors.gray,
-        }}
-        value={searchTerm}
-        onChangeText={(text) => {
-          setSearchTerm(text);
-        }}
-        // onSearch={() => {
-        //   setShouldSearch(true);
-        // }}
+      <TopHeader
+        title="Stock entries"
+        showSearch={true}
+        toggleSearch={toggleSearch}
       />
+
+      {showSearch && (
+        <SearchBar
+          style={{
+            borderWidth: 1,
+            borderColor: Colors.gray,
+          }}
+          value={searchTerm}
+          onChangeText={(text) => {
+            setSearchTerm(text);
+          }}
+          // onSearch={() => {
+          //   setShouldSearch(true);
+          // }}
+        />
+      )}
       <FlatList
         keyExtractor={(item) => item.id.toString()}
         data={stockEntries}

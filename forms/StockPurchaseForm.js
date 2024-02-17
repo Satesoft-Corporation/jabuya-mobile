@@ -263,7 +263,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
+        <AppStatusBar />
 
         {/* <Loader loading={loading} /> */}
 

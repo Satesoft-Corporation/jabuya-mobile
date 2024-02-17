@@ -1,3 +1,5 @@
+import { Dimensions } from "react-native";
+
 export const StockingTabTitles = {
   PurchaseTitle: "Stock purchase",
   LevelsTitle: "Stock level",
@@ -109,3 +111,6 @@ export const dummyLoginResponse = {
 };
 
 export const MAXIMUM_RECORDS_PER_FETCH = 20;
+
+export const screenWidth = Dimensions.get("window").width;
+export const screenHeight = Dimensions.get("window").height;

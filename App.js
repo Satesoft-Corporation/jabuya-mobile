@@ -10,6 +10,10 @@ import Stocking from "./screens/Stocking";
 import StockPurchaseForm from "./forms/StockPurchaseForm";
 import { SearchProvider } from "./context/SearchContext";
 import { UserProvider } from "./context/UserContext";
+import LandingScreen2 from "./screens/LandingScreen2";
+import Stocking2 from "./screens/Stocking2";
+import UpdateScreen from "./screens/UpdateScreen";
+import StockingModel from "./screens/StockingModel";
 
 const Stack = createNativeStackNavigator();
 
