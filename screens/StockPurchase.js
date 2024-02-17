@@ -1,71 +1,137 @@
-import React, { useState, useEffect, useContext, memo } from "react";
-import { View, FlatList, Text } from "react-native";
-import {
-  MAXIMUM_RECORDS_PER_FETCH,
-  StockingTabTitles,
-} from "../constants/Constants";
-
-import { SearchContext } from "../context/SearchContext";
+import { View, Text, FlatList } from "react-native";
+import React from "react";
+import TopHeader from "../components/TopHeader";
+import AppStatusBar from "../components/AppStatusBar";
+import Colors from "../constants/Colors";
 import StockPurchaseListComponent from "../components/stocking/StockPurchaseListComponent";
+import { useContext } from "react";
+import { useState } from "react";
+import { useEffect } from "react";
+import SearchBar from "../components/SearchBar";
+import { UserContext } from "../context/UserContext";
+import { BaseApiService } from "../utils/BaseApiService";
+import { MAXIMUM_RECORDS_PER_FETCH } from "../constants/Constants";
+import { ActivityIndicator } from "react-native";
+import { PanResponder } from "react-native";
+import { useRef } from "react";
 
-const StockPurchase = ({ getData, setLoading }) => {
-  const { PurchaseTitle } = StockingTabTitles;
+const StockPurchase = ({ navigation }) => {
+  const [stockEntries, setStockEntries] = useState([]);
+  const [stockEntryRecords, setStockEntryRecords] = useState(0);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [offset, setOffset] = useState(0);
+  const [showSearch, setShowSearch] = useState(false);
 
-  const {
-    shouldSearch,
-    currentTab,
-    stockEntries,
-    setStockEntries,
-    stockEntryRecords,
-    isFetchingMore,
-    searchTerm,
-    stockEntryOffset,
-    setStockEntryOffset,
-    message,
-  } = useContext(SearchContext);
+  const { userParams } = useContext(UserContext);
 
-  const [shouldFetch, setShoudFetch] = useState(false);
+  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+    userParams;
 
-  const isPurchasesTab = currentTab === PurchaseTitle;
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderRelease: (event, gestureState) => {
+        if (gestureState.dy > 50) {
+          // Minimum swipe distance
+          console.log("Swiped down!");
+          setStockEntries([]);
+          setOffset(0);
+          setSearchTerm(null);
+          fetchStockEntries();
+        }
+      },
+    })
+  ).current;
 
-  const canSearch = () => {
-    if (shouldSearch === true && isPurchasesTab) {
-      if (searchTerm && searchTerm !== "") {
-        return true;
+  const fetchStockEntries = async () => {
+    try {
+      const searchParameters = {
+        limit: MAXIMUM_RECORDS_PER_FETCH,
+        ...(isShopAttendant && { shopId: attendantShopId }),
+        ...(isShopOwner && { shopOwnerId }),
+      };
+      setIsFetchingMore(true);
+      const response = await new BaseApiService(
+        "/stock-entries"
+      ).getRequestWithJsonResponse({
+        ...searchParameters,
+        offset: offset,
+        ...(searchTerm &&
+          searchTerm.trim() !== "" && { searchTerm: searchTerm }),
+      });
+
+      setStockEntries((prevEntries) => [...prevEntries, ...response.records]);
+
+      setStockEntryRecords(response.totalItems);
+      if (response.totalItems === 0) {
+        setMessage("No stock entries found");
       }
+
+      if (response.totalItems === 0 && searchTerm !== "") {
+        setMessage(`No results found for ${searchTerm}`);
+      }
+      setIsFetchingMore(false);
+    } catch (error) {
+      setLoading(false);
+
+      setMessage("Error fetching stock records");
     }
-    return false;
+  };
+
+  const toggleSearch = () => {
+    setShowSearch(!showSearch);
+  };
+  const handleEndReached = () => {
+    if (!isFetchingMore && stockEntries.length < stockEntryRecords) {
+      setOffset(offset + MAXIMUM_RECORDS_PER_FETCH);
+    }
   };
 
   useEffect(() => {
-    if (canSearch() === true) {
-      setStockEntryOffset(0);
-      setStockEntries([]);
-      setLoading(true);
-      getData(0, searchTerm);
-      setLoading(false);
-    }
-  }, [shouldSearch]);
+    fetchStockEntries();
+  }, [offset]);
 
-  useEffect(() => {
-    if (stockEntries.length > 0 && shouldFetch === true) {
-      getData(stockEntryOffset, searchTerm);
-      setShoudFetch(false);
-    }
-  }, [stockEntryOffset]);
-
-  const handleEndReached = () => {
-    if (!isFetchingMore && stockEntries.length < stockEntryRecords) {
-      setStockEntryOffset(stockEntryOffset + MAXIMUM_RECORDS_PER_FETCH);
-      setShoudFetch(true);
-    }
+  const renderFooter = () => {
+    return (
+      <View style={{ paddingVertical: 20 }}>
+        <ActivityIndicator animating size="large" color={Colors.dark} />
+      </View>
+    );
   };
 
   return (
-    <View style={{ flex: 1, marginTop: 5 }}>
+    <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
+      <AppStatusBar content="light-content" bgColor="black" />
+
+      <TopHeader
+        title="Stock entries"
+        showSearch={true}
+        toggleSearch={toggleSearch}
+        onBackPress={() => navigation.goBack()}
+      />
+
+      {showSearch && (
+        <SearchBar
+          style={{
+            borderWidth: 1,
+            borderColor: Colors.gray,
+            marginBottom: 5,
+          }}
+          value={searchTerm}
+          onChangeText={(text) => {
+            setSearchTerm(text);
+          }}
+          onSearch={() => {
+            setStockEntries([]);
+            setOffset(0);
+            fetchStockEntries();
+          }}
+        />
+      )}
       <FlatList
-        contentContainerStyle={{ padding: 5 }}
-        showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id.toString()}
         data={stockEntries}
         renderItem={({ item }) => <StockPurchaseListComponent data={item} />}
@@ -76,6 +142,7 @@ const StockPurchase = ({ getData, setLoading }) => {
             {stockEntryRecords === 0 && <Text>{message}</Text>}
           </View>
         )}
+        ListFooterComponent={renderFooter}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0}
       />
@@ -83,4 +150,11 @@ const StockPurchase = ({ getData, setLoading }) => {
   );
 };
 
-export default memo(StockPurchase);
+const Item = ({ data }) => {
+  return (
+    <View>
+      <Text>{data}</Text>
+    </View>
+  );
+};
+export default StockPurchase;

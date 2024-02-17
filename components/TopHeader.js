@@ -4,7 +4,6 @@ import Colors from "../constants/Colors";
 
 const TopHeader = ({
   title = "Details",
-  onPress,
   showSave = false,
   onSave,
   onBackPress,
@@ -22,7 +21,7 @@ const TopHeader = ({
         alignItems: "center",
       }}
     >
-      <TouchableOpacity onPress={onPress}>
+      <TouchableOpacity onPress={onBackPress}>
         <Image
           source={require("../assets/icons/icons8-chevron-left-30.png")}
           style={{

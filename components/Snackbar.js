@@ -25,6 +25,7 @@ class Snackbar extends Component {
       Animated.timing(this.animatedValue, {
         toValue: 50,
         duration: 400,
+        useNativeDriver: true,
       }).start(this.hide(duration));
     }
   }
@@ -34,6 +35,7 @@ class Snackbar extends Component {
       Animated.timing(this.animatedValue, {
         toValue: 150,
         duration: 400,
+        useNativeDriver: true,
       }).start(() => {
         this.ShowSnackBar = false;
         clearTimeout(this.timerID);
@@ -62,7 +64,7 @@ export default Snackbar;
 const styles = StyleSheet.create({
   SnackBarContainter: {
     position: "absolute",
-    backgroundColor: "#009688",
+    backgroundColor: Colors.dark,
     flexDirection: "row",
     alignItems: "flex-start",
     elevation: 10,

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
 import { MyDropDown } from "../components/DropdownComponents";
@@ -21,6 +21,7 @@ import { DateCalender } from "../components/Dialogs/DateCalendar";
 import { UserContext } from "../context/UserContext";
 import { useContext } from "react";
 import TopHeader from "../components/TopHeader";
+import Snackbar from "../components/Snackbar";
 
 const StockPurchaseForm = ({ navigation, route }) => {
   const { userParams } = useContext(UserContext);
@@ -57,6 +58,8 @@ const StockPurchaseForm = ({ navigation, route }) => {
   const [disable, setDisable] = useState(true);
 
   //
+
+  const snackBarRef = useRef(null);
   const fetchShops = async () => {
     let searchParameters = {
       offset: 0,
@@ -183,7 +186,6 @@ const StockPurchaseForm = ({ navigation, route }) => {
   const saveStockEntry = () => {
     setSubmitted(true);
     setLoading(true);
-
     let payload;
 
     const isPacked = isPackedProduct && isPackedProduct === true;
@@ -239,10 +241,10 @@ const StockPurchaseForm = ({ navigation, route }) => {
           clearForm();
           setLoading(false);
           setSubmitted(false);
-          Alert.alert("Stock entry saved successfully");
+          snackBarRef.current.show("Stock entry saved successfully", 5000);
         })
         .catch((error) => {
-          Alert.alert(error?.message);
+          snackBarRef.current.show(error?.message, 5000);
           setSubmitted(false);
           setLoading(false);
         });
@@ -250,7 +252,6 @@ const StockPurchaseForm = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    console.log(5576);
     fetchSuppliers();
     fetchShops();
     fetchManufacturers();
@@ -265,12 +266,11 @@ const StockPurchaseForm = ({ navigation, route }) => {
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
         <AppStatusBar />
 
-        {/* <Loader loading={loading} /> */}
-
         <TopHeader
           title="Stock purchase details"
-          onPress={() => navigation.goBack()}
+          onBackPress={() => navigation.goBack()}
         />
+        <Loader loading={loading}/>
         <ScrollView
           style={{
             paddingHorizontal: 8,
@@ -770,6 +770,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
               buttonPress={clearForm}
             />
             <MaterialButton
+              disabled={loading}
               title="Save"
               style={{
                 backgroundColor: Colors.dark,
@@ -786,6 +787,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
             />
           </View>
         </ScrollView>
+        <Snackbar ref={snackBarRef} />
 
         <DateCalender
           singleSelection={true}

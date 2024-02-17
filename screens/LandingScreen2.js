@@ -10,11 +10,13 @@ import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import { Image } from "react-native";
 import AppStatusBar from "../components/AppStatusBar";
 import SelectShop from "../components/SelectShop";
+import { Icon } from "../components/Icon";
+import { categoryIcons } from "../constants/Constants";
 
-const LandingScreen2 = () => {
+const LandingScreen2 = ({ navigation }) => {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <AppStatusBar mode="dark" />
+      <AppStatusBar />
 
       <BlackScreen>
         <UserProfile />
@@ -25,10 +27,21 @@ const LandingScreen2 = () => {
       <View
         style={{
           paddingHorizontal: 10,
-          marginTop:10
+          marginTop: 10,
         }}
       >
-        <Text>Dashboard</Text>
+        <FlatList
+          style={{ marginTop: 10 }}
+          data={categoryIcons}
+          renderItem={({ item }) => (
+            <Icon
+              icon={item}
+              onPress={() => navigation.navigate(item.target)}
+            />
+          )}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+        />
       </View>
     </View>
   );

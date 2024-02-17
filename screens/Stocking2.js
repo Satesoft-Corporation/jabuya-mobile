@@ -7,14 +7,34 @@ import TopHeader from "../components/TopHeader";
 import CurrentShop from "../components/CurrentShop";
 import AppStatusBar from "../components/AppStatusBar";
 
-const Stocking2 = () => {
+const Stocking2 = ({ navigation }) => {
   let list = [
-    "Stock purchases",
-    "Make a purchase",
-    "Stock Listing",
-    "Add new product",
-    "Stock levels",
+    {
+      title: "Stock purchases",
+      target: "stockPurchase",
+    },
+    {
+      title: "Make a purchase",
+      target: "stockPurchaseForm",
+    },
+    {
+      title: "Stock Listing",
+      target: "stockListing",
+    },
+    {
+      title: "Add new product",
+    },
+    {
+      title: "Stock levels",
+      target: "stockLevels",
+    },
   ];
+
+  const onPress = (item) => {
+    if (item.target) {
+      navigation.navigate(item?.target);
+    }
+  };
   return (
     <View
       style={{
@@ -25,12 +45,14 @@ const Stocking2 = () => {
     >
       <AppStatusBar content="light-content" bgColor="black" />
 
-      <TopHeader title="Stocking" />
+      <TopHeader title="Stocking" onBackPress={() => navigation.goBack()} />
       <CurrentShop />
       <FlatList
         style={{ flex: 1, marginTop: 10, paddingHorizontal: 10 }}
         data={list}
-        renderItem={({ item }) => <StockingIcon title={item} />}
+        renderItem={({ item }) => (
+          <StockingIcon title={item.title} onPress={() => onPress(item)} />
+        )}
         numColumns={2}
       />
     </View>

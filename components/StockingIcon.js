@@ -7,6 +7,7 @@ import { Image } from "react-native";
 const StockingIcon = ({ title, onPress }) => {
   return (
     <TouchableOpacity
+      onPress={onPress}
       style={{
         backgroundColor: Colors.light,
         borderRadius: 6,

@@ -5,6 +5,7 @@ import Colors from "../constants/Colors";
 
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { screenWidth } from "../constants/Constants";
 
 export function Icon({ icon, containerStyle, onPress, iconStyle, titleStyle }) {
   return (
@@ -14,12 +15,14 @@ export function Icon({ icon, containerStyle, onPress, iconStyle, titleStyle }) {
       style={{
         flex: 1,
         alignItems: "center",
-        marginVertical: 2,
-        paddingVertical: 5,
-        backgroundColor: Colors.light,
         margin: 10,
-        marginBottom: 10,
         borderRadius: 5,
+        backgroundColor: Colors.light,
+        minWidth: screenWidth / 2 - 30,
+        elevation: 1,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        padding: 10,
       }}
       onPress={onPress}
     >
