@@ -31,6 +31,7 @@ export default function LandingScreen({ navigation }) {
       .getRequestWithJsonResponse({ limit: 0, offset: 0, shopOwnerId: id })
       .then(async (response) => {
         await UserSessionUtils.setShopCount(String(response.totalItems));
+        await UserSessionUtils.setShops(response.records);
       })
       .catch((error) => {
         console.log(error);
@@ -103,6 +104,7 @@ export default function LandingScreen({ navigation }) {
 
         if (isShopOwner) {
           if (shopCount === null) {
+            console.log('landing')
             fetchShops(shopOwnerId);
           }
         }

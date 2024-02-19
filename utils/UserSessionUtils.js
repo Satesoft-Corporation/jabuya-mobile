@@ -159,6 +159,23 @@ export class UserSessionUtils {
   }
 
   /**
+   * This method is used to set the number shops for a shop owner
+   * @param {count} count
+   */
+  static async setShops(shops) {
+    await AsyncStorage.setItem(StorageParams.SHOPS, JSON.stringify(shops));
+  }
+
+  /**
+   * This method is used to get the number of shops an owner has
+   * @returns shopcount
+   */
+  static async getShops() {
+    let shops = await AsyncStorage.getItem(StorageParams.SHOPS);
+    return JSON.parse(shops);
+  }
+
+  /**
    * This method is used to set the login timestamp
    * @param {time} time
    */

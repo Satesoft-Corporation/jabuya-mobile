@@ -1,11 +1,16 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import Colors from "../constants/Colors";
 import { Image } from "react-native";
+import { UserContext } from "../context/UserContext";
+import { useContext } from "react";
 
-const SelectShop = () => {
+const SelectShop = ({ onPress }) => {
+  const { selectedShop } = useContext(UserContext);
+
   return (
-    <View
+    <TouchableOpacity
+      onPress={onPress}
       style={{
         flexDirection: "row",
         justifyContent: "space-between",
@@ -32,7 +37,7 @@ const SelectShop = () => {
             fontSize: 13,
           }}
         >
-          Moses Test Shop
+          {selectedShop?.name}
         </Text>
 
         <View
@@ -78,7 +83,7 @@ const SelectShop = () => {
           }}
         />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

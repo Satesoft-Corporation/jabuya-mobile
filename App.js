@@ -17,6 +17,7 @@ import StockingModel from "./screens/StockingModel";
 import StockLevels from "./screens/StockLevels";
 import StockListing from "./screens/StockListing";
 import StockPurchase from "./screens/StockPurchase";
+import SelectShops from "./screens/SelectShops";
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +50,8 @@ export default function App() {
             <Stack.Screen name="stockListing" component={StockListing} />
 
             <Stack.Screen name="stocking2" component={Stocking2} />
+
+            <Stack.Screen name="selectShops" component={SelectShops} />
 
             <Stack.Screen
               name="stockPurchaseForm"

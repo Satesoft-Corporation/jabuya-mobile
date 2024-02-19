@@ -1,19 +1,16 @@
 import { View, Text, FlatList } from "react-native";
-import React from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import TopHeader from "../components/TopHeader";
 import AppStatusBar from "../components/AppStatusBar";
 import Colors from "../constants/Colors";
 import StockPurchaseListComponent from "../components/stocking/StockPurchaseListComponent";
-import { useContext } from "react";
-import { useState } from "react";
-import { useEffect } from "react";
 import SearchBar from "../components/SearchBar";
 import { UserContext } from "../context/UserContext";
 import { BaseApiService } from "../utils/BaseApiService";
 import { MAXIMUM_RECORDS_PER_FETCH } from "../constants/Constants";
 import { ActivityIndicator } from "react-native";
 import { PanResponder } from "react-native";
-import { useRef } from "react";
+import Snackbar from "../components/Snackbar";
 
 const StockPurchase = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
@@ -25,6 +22,7 @@ const StockPurchase = ({ navigation }) => {
   const [offset, setOffset] = useState(0);
   const [showSearch, setShowSearch] = useState(false);
 
+  const snackbarRef = useRef(null);
   const { userParams } = useContext(UserContext);
 
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
@@ -84,9 +82,13 @@ const StockPurchase = ({ navigation }) => {
   const toggleSearch = () => {
     setShowSearch(!showSearch);
   };
+
   const handleEndReached = () => {
     if (!isFetchingMore && stockEntries.length < stockEntryRecords) {
       setOffset(offset + MAXIMUM_RECORDS_PER_FETCH);
+    }
+    if (stockEntries.length === stockEntryRecords) {
+      snackbarRef.current.show("No more additional data");
     }
   };
 
@@ -95,6 +97,10 @@ const StockPurchase = ({ navigation }) => {
   }, [offset]);
 
   const renderFooter = () => {
+    if (stockEntries.length === stockEntryRecords) {
+      return null;
+    }
+
     return (
       <View style={{ paddingVertical: 20 }}>
         <ActivityIndicator animating size="large" color={Colors.dark} />
@@ -146,6 +152,8 @@ const StockPurchase = ({ navigation }) => {
         onEndReached={handleEndReached}
         onEndReachedThreshold={0}
       />
+
+      <Snackbar ref={snackbarRef} />
     </View>
   );
 };
