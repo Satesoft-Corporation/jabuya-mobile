@@ -27,7 +27,7 @@ import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import { IconsComponent } from "../components/Icon";
 import Loader from "../components/Loader";
 import { ConfirmSalesDialog } from "../components/Dialogs";
-import DispalyMessage from "../components/Dialogs/DisplayMessage";
+import DisplayMessage from "../components/Dialogs/DisplayMessage";
 import Snackbar from "../components/Snackbar";
 import { useRef } from "react";
 
@@ -469,7 +469,7 @@ function SalesEntry({ route, navigation }) {
         setScanned={setScanned}
       />
 
-      <DispalyMessage
+      <DisplayMessage
         showModal={displayMessage}
         message={message}
         onAgree={() => setDisplayMssage(false)}

@@ -4,7 +4,6 @@ import StockingIcon from "../components/StockingIcon";
 import Colors from "../constants/Colors";
 import { FlatList } from "react-native";
 import TopHeader from "../components/TopHeader";
-import CurrentShop from "../components/CurrentShop";
 import AppStatusBar from "../components/AppStatusBar";
 
 const Stocking2 = ({ navigation }) => {
@@ -46,7 +45,6 @@ const Stocking2 = ({ navigation }) => {
       <AppStatusBar content="light-content" bgColor="black" />
 
       <TopHeader title="Stocking" onBackPress={() => navigation.goBack()} />
-      <CurrentShop />
       <FlatList
         style={{ flex: 1, marginTop: 10, paddingHorizontal: 10 }}
         data={list}

@@ -5,7 +5,7 @@ import { Image } from "react-native";
 import { UserContext } from "../context/UserContext";
 import { useContext } from "react";
 
-const SelectShop = ({ onPress }) => {
+const SelectShopBar = ({ onPress }) => {
   const { selectedShop } = useContext(UserContext);
 
   return (
@@ -87,4 +87,4 @@ const SelectShop = ({ onPress }) => {
   );
 };
 
-export default SelectShop;
+export default SelectShopBar;

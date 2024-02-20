@@ -5,13 +5,14 @@ import { FlatList } from "react-native";
 import UserProfile from "../components/UserProfile";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import AppStatusBar from "../components/AppStatusBar";
-import SelectShop from "../components/SelectShop";
+import SelectShopBar from "../components/SelectShopBar";
 import { Icon } from "../components/Icon";
 import { categoryIcons } from "../constants/Constants";
 import { UserContext } from "../context/UserContext";
 import { BaseApiService } from "../utils/BaseApiService";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import { getTimeDifference } from "../utils/Utils";
+import DisplayMessage from "../components/Dialogs/DisplayMessage";
 
 const LandingScreen2 = ({ navigation }) => {
   const { setUserParams, getShopsFromStorage } = useContext(UserContext);
@@ -123,7 +124,7 @@ const LandingScreen2 = ({ navigation }) => {
       <BlackScreen>
         <UserProfile />
 
-        <SelectShop onPress={() => navigation.navigate("selectShops")} />
+        <SelectShopBar onPress={() => navigation.navigate("selectShops")} />
       </BlackScreen>
 
       <View
@@ -142,6 +143,14 @@ const LandingScreen2 = ({ navigation }) => {
           numColumns={2}
         />
       </View>
+      <DisplayMessage
+        showModal={showMoodal}
+        message={message}
+        onAgree={logOut}
+        agreeText={agreeText}
+        setShowModal={setShowModal}
+        canCancel={canCancel}
+      />
     </View>
   );
 };

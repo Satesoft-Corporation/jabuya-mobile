@@ -10,7 +10,7 @@ import Loader from "../components/Loader";
 import { categoryIcons } from "../constants/Constants";
 import { BaseApiService } from "../utils/BaseApiService";
 import { getTimeDifference } from "../utils/Utils";
-import DispalyMessage from "../components/Dialogs/DisplayMessage";
+import DisplayMessage from "../components/Dialogs/DisplayMessage";
 import { UserContext } from "../context/UserContext";
 
 export default function LandingScreen({ navigation }) {
@@ -243,7 +243,7 @@ export default function LandingScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <DispalyMessage
+      <DisplayMessage
         showModal={showMoodal}
         message={message}
         onAgree={logOut}

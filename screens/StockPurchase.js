@@ -4,7 +4,6 @@ import TopHeader from "../components/TopHeader";
 import AppStatusBar from "../components/AppStatusBar";
 import Colors from "../constants/Colors";
 import StockPurchaseListComponent from "../components/stocking/StockPurchaseListComponent";
-import SearchBar from "../components/SearchBar";
 import { UserContext } from "../context/UserContext";
 import { BaseApiService } from "../utils/BaseApiService";
 import { MAXIMUM_RECORDS_PER_FETCH } from "../constants/Constants";
@@ -18,9 +17,8 @@ const StockPurchase = ({ navigation }) => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [message, setMessage] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
   const [offset, setOffset] = useState(0);
-  const [showSearch, setShowSearch] = useState(false);
+  const [showFooter, setShowFooter] = useState(true);
 
   const snackbarRef = useRef(null);
   const { userParams } = useContext(UserContext);
@@ -46,9 +44,10 @@ const StockPurchase = ({ navigation }) => {
 
   const fetchStockEntries = async () => {
     try {
+      setShowFooter(true);
       const searchParameters = {
         limit: MAXIMUM_RECORDS_PER_FETCH,
-        ...(isShopAttendant && { shopId: attendantShopId }),
+        // ...(isShopAttendant && { shopId: attendantShopId }),
         ...(isShopOwner && { shopOwnerId }),
       };
       setIsFetchingMore(true);
@@ -61,10 +60,10 @@ const StockPurchase = ({ navigation }) => {
           searchTerm.trim() !== "" && { searchTerm: searchTerm }),
       });
 
-      setStockEntries((prevEntries) => [...prevEntries, ...response.records]);
+      setStockEntries((prevEntries) => [...prevEntries, ...response?.records]);
 
-      setStockEntryRecords(response.totalItems);
-      if (response.totalItems === 0) {
+      setStockEntryRecords(response?.totalItems);
+      if (response?.totalItems === 0) {
         setMessage("No stock entries found");
       }
 
@@ -74,22 +73,25 @@ const StockPurchase = ({ navigation }) => {
       setIsFetchingMore(false);
     } catch (error) {
       setLoading(false);
-
+      setShowFooter(false);
       setMessage("Error fetching stock records");
     }
-  };
-
-  const toggleSearch = () => {
-    setShowSearch(!showSearch);
   };
 
   const handleEndReached = () => {
     if (!isFetchingMore && stockEntries.length < stockEntryRecords) {
       setOffset(offset + MAXIMUM_RECORDS_PER_FETCH);
     }
-    if (stockEntries.length === stockEntryRecords) {
-      snackbarRef.current.show("No more additional data");
+    if (stockEntries.length === stockEntryRecords && stockEntries.length > 0) {
+      snackbarRef.current.show("No more additional data", 2500);
     }
+  };
+
+  const onSearch = () => {
+    setStockEntries([]);
+    setOffset(0);
+    fetchStockEntries();
+    console.log(stockEntryRecords);
   };
 
   useEffect(() => {
@@ -97,47 +99,37 @@ const StockPurchase = ({ navigation }) => {
   }, [offset]);
 
   const renderFooter = () => {
-    if (stockEntries.length === stockEntryRecords) {
-      return null;
-    }
+    if (showFooter === true) {
+      if (
+        stockEntries.length === stockEntryRecords &&
+        stockEntries.length > 0
+      ) {
+        return null;
+      }
 
-    return (
-      <View style={{ paddingVertical: 20 }}>
-        <ActivityIndicator animating size="large" color={Colors.dark} />
-      </View>
-    );
+      return (
+        <View style={{ paddingVertical: 20 }}>
+          <ActivityIndicator animating size="large" color={Colors.dark} />
+        </View>
+      );
+    }
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <AppStatusBar content="light-content" bgColor="black" />
+      <AppStatusBar />
 
       <TopHeader
         title="Stock entries"
         showSearch={true}
-        toggleSearch={toggleSearch}
         onBackPress={() => navigation.goBack()}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        onSearch={onSearch}
       />
 
-      {showSearch && (
-        <SearchBar
-          style={{
-            borderWidth: 1,
-            borderColor: Colors.gray,
-            marginBottom: 5,
-          }}
-          value={searchTerm}
-          onChangeText={(text) => {
-            setSearchTerm(text);
-          }}
-          onSearch={() => {
-            setStockEntries([]);
-            setOffset(0);
-            fetchStockEntries();
-          }}
-        />
-      )}
       <FlatList
+        style={{ marginTop: 5 }}
         keyExtractor={(item) => item.id.toString()}
         data={stockEntries}
         renderItem={({ item }) => <StockPurchaseListComponent data={item} />}
@@ -158,11 +150,4 @@ const StockPurchase = ({ navigation }) => {
   );
 };
 
-const Item = ({ data }) => {
-  return (
-    <View>
-      <Text>{data}</Text>
-    </View>
-  );
-};
 export default StockPurchase;

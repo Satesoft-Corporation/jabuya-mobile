@@ -6,7 +6,7 @@ import Colors from "../constants/Colors";
 import { Image } from "react-native";
 import { UserContext } from "../context/UserContext";
 
-const SelectShops = ({ navigation }) => {
+const SelectShopBars = ({ navigation }) => {
   const { shops, setSelectedShop, selectedShop } = useContext(UserContext);
 
   useEffect(() => {
@@ -24,7 +24,11 @@ const SelectShops = ({ navigation }) => {
     >
       <AppStatusBar />
 
-      <TopHeader title="Select shop" onBackPress={() => navigation.goBack()} />
+      <TopHeader
+        title="Select shop"
+        onBackPress={() => navigation.goBack()}
+        showShopName={false}
+      />
 
       <View
         style={{
@@ -99,4 +103,4 @@ function ShopItem({ shop, onItemPress, selected }) {
     </TouchableOpacity>
   );
 }
-export default SelectShops;
+export default SelectShopBars;

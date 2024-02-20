@@ -5,7 +5,7 @@ import { View } from "react-native";
 import MaterialButton from "../MaterialButton";
 import Colors from "../../constants/Colors";
 
-export default function DispalyMessage({
+export default function DisplayMessage({
   message,
   onAgree,
   showModal,

@@ -8,12 +8,10 @@ export const UserProvider = ({ children }) => {
   const [selectedShop, setSelectedShop] = useState(null);
 
   const getShopsFromStorage = () => {
-    let allShops = { name: "All shops", id: userParams?.shopOwnerId };
-
     UserSessionUtils.getShops().then((ownerShops) => {
       if (ownerShops) {
-        setSelectedShop(allShops);
-        setShops([allShops, ...ownerShops]);
+        setShops(ownerShops);
+        setSelectedShop(ownerShops[0])
       }
     });
   };

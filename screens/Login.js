@@ -15,7 +15,7 @@ import Constants from "expo-constants";
 import CircularProgress from "../components/CircularProgress";
 import { CommonActions } from "@react-navigation/native";
 import { onDummyLogin } from "../utils/Utils";
-import DispalyMessage from "../components/Dialogs/DisplayMessage";
+import DisplayMessage from "../components/Dialogs/DisplayMessage";
 
 export default function Login({ navigation }) {
   const [username, setUsername] = useState("mosesjespar@gmail.com");
@@ -235,7 +235,7 @@ export default function Login({ navigation }) {
           </Text>
         </View>
       </View>
-      <DispalyMessage
+      <DisplayMessage
         showModal={showMoodal}
         message={message}
         onAgree={() => setShowModal(false)}
