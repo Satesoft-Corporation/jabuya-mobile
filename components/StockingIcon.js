@@ -4,9 +4,10 @@ import Colors from "../constants/Colors";
 import { screenWidth } from "../constants/Constants";
 import { Image } from "react-native";
 
-const StockingIcon = ({ title, onPress }) => {
+const StockingIcon = ({ title, onPress, disabled = false }) => {
   return (
     <TouchableOpacity
+      disabled={disabled}
       onPress={onPress}
       style={{
         backgroundColor: Colors.light,

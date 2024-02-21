@@ -45,31 +45,37 @@ const StockPurchase = ({ navigation }) => {
   const fetchStockEntries = async () => {
     try {
       setShowFooter(true);
+      setMessage(null);
+
       const searchParameters = {
         limit: MAXIMUM_RECORDS_PER_FETCH,
-        // ...(isShopAttendant && { shopId: attendantShopId }),
+        ...(isShopAttendant && { shopId: attendantShopId }),
         ...(isShopOwner && { shopOwnerId }),
-      };
-      setIsFetchingMore(true);
-      const response = await new BaseApiService(
-        "/stock-entries"
-      ).getRequestWithJsonResponse({
-        ...searchParameters,
         offset: offset,
         ...(searchTerm &&
           searchTerm.trim() !== "" && { searchTerm: searchTerm }),
-      });
+      };
+
+      setIsFetchingMore(true);
+
+      const response = await new BaseApiService(
+        "/stock-entries"
+      ).getRequestWithJsonResponse(searchParameters);
 
       setStockEntries((prevEntries) => [...prevEntries, ...response?.records]);
 
       setStockEntryRecords(response?.totalItems);
+
       if (response?.totalItems === 0) {
         setMessage("No stock entries found");
+        setShowFooter(false);
       }
 
       if (response.totalItems === 0 && searchTerm !== "") {
         setMessage(`No results found for ${searchTerm}`);
+        setShowFooter(false);
       }
+
       setIsFetchingMore(false);
     } catch (error) {
       setLoading(false);
@@ -82,7 +88,7 @@ const StockPurchase = ({ navigation }) => {
     if (!isFetchingMore && stockEntries.length < stockEntryRecords) {
       setOffset(offset + MAXIMUM_RECORDS_PER_FETCH);
     }
-    if (stockEntries.length === stockEntryRecords && stockEntries.length > 0) {
+    if (stockEntries.length === stockEntryRecords && stockEntries.length > 10) {
       snackbarRef.current.show("No more additional data", 2500);
     }
   };

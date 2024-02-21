@@ -8,7 +8,6 @@ import {
 import Colors from "../constants/Colors";
 import { formatDate, formatNumberWithCommas } from "../utils/Utils";
 import { useEffect, useState } from "react";
-const screenWidth = Dimensions.get("window").width;
 
 export function SaleTransactionItem({ data, isShopOwner }) {
   // sales report item card
@@ -25,13 +24,7 @@ export function SaleTransactionItem({ data, isShopOwner }) {
   useEffect(() => {
     if (lineItems !== undefined) {
       let cartQty = lineItems.reduce((a, item) => a + item.quantity, 0);
-      let profit = lineItems.reduce((a, item) => a + item.totalProfit, 0);
-      let cap = lineItems.reduce((a, item) => a + item.totalPurchaseCost, 0);
-
       setItemCount(cartQty);
-      // setCount(cartQty);
-      // setSaleProfit(profit); //profit made per cart
-      // setSaleCapital(cap);
     }
   }, [data]);
   return (
@@ -99,12 +92,12 @@ export function SaleTransactionItem({ data, isShopOwner }) {
               <Text>{itemCount}</Text>
             </View>
             <View style={{ alignItems: "center" }}>
-              <Text style={{ fontWeight: 600 }}>Amount</Text>
-              <Text>{formatNumberWithCommas(totalCost)}</Text>
-            </View>
-            <View style={{ alignItems: "center" }}>
               <Text style={{ fontWeight: 600 }}>Recieved</Text>
               <Text>{formatNumberWithCommas(amountPaid)}</Text>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <Text style={{ fontWeight: 600 }}>Amount</Text>
+              <Text>{formatNumberWithCommas(totalCost)}</Text>
             </View>
             <View style={{ alignItems: "center" }}>
               <Text style={{ fontWeight: 600 }}>Balance</Text>

@@ -29,12 +29,14 @@ const SelectShopBar = ({ onPress }) => {
           borderRadius: 5,
           padding: 5,
           flex: 4,
+          paddingHorizontal:10
         }}
       >
         <Text
           style={{
             color: Colors.primary,
             fontSize: 13,
+            
           }}
         >
           {selectedShop?.name}

@@ -1,66 +1,105 @@
-import { View, FlatList } from "react-native";
-import React, { useState, useEffect, memo } from "react";
+import { View, FlatList, ActivityIndicator } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
 
-import {
-  MAXIMUM_RECORDS_PER_FETCH,
-  StockingTabTitles,
-} from "../constants/Constants";
+import { MAXIMUM_RECORDS_PER_FETCH } from "../constants/Constants";
 
 import { Text } from "react-native";
-import { SearchContext } from "../context/SearchContext";
 import { useContext } from "react";
 import StockListingListComponent from "../components/stocking/StockListingListComponent";
+import Colors from "../constants/Colors";
+import { BaseApiService } from "../utils/BaseApiService";
+import Snackbar from "../components/Snackbar";
+import { UserContext } from "../context/UserContext";
+import AppStatusBar from "../components/AppStatusBar";
+import TopHeader from "../components/TopHeader";
 
-const StockListing = ({ getData, setLoading }) => {
-  const {
-    shouldSearch,
-    currentTab,
-    stockListing,
-    setStockListing,
-    stockListRecords,
-    stockListOffset,
-    setStockListOffset,
-    isFetchingMore,
-    searchTerm,
-    message,
-  } = useContext(SearchContext);
+const StockListing = ({ navigation }) => {
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [offset, setOffset] = useState(0);
+  const [showFooter, setShowFooter] = useState(true);
+  const [shopProducts, setShopProducts] = useState([]);
+  const [totalProducts, setTotalProducts] = useState(0);
 
-  const { ListingTitle } = StockingTabTitles;
+  const snackbarRef = useRef(null);
 
-  const [shouldFetch, setShoudFetch] = useState(false);
+  const { userParams } = useContext(UserContext);
 
-  const isStockListingTab = currentTab === ListingTitle;
+  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+    userParams;
 
-  const canSearch = () => {
-    if (shouldSearch === true && isStockListingTab) {
-      if (searchTerm && searchTerm !== "") {
-        return true;
+  const fetchShopProducts = async () => {
+    try {
+      setShowFooter(true);
+
+      const searchParameters = {
+        limit: MAXIMUM_RECORDS_PER_FETCH,
+        ...(isShopAttendant && { shopId: attendantShopId }),
+        ...(isShopOwner && { shopOwnerId }),
+        offset: offset,
+        ...(searchTerm &&
+          searchTerm.trim() !== "" && { searchTerm: searchTerm }),
+      };
+
+      setIsFetchingMore(true);
+
+      const response = await new BaseApiService(
+        "/shop-products"
+      ).getRequestWithJsonResponse(searchParameters);
+
+      setShopProducts((prevEntries) => [...prevEntries, ...response?.records]);
+
+      setTotalProducts(response?.totalItems);
+
+      if (response?.totalItems === 0) {
+        setMessage("No shop products found");
+        setShowFooter(false);
       }
+
+      if (response?.totalItems === 0 && searchTerm !== "") {
+        setMessage(`No results found for ${searchTerm}`);
+        setShowFooter(false);
+      }
+
+      setIsFetchingMore(false);
+    } catch (error) {
+      setLoading(false);
+      setShowFooter(false);
+      setMessage("Error fetching stock records");
     }
-    return false;
+  };
+
+  const onSearch = () => {
+    setShopProducts([]);
+    setOffset(0);
+    fetchShopProducts();
   };
 
   useEffect(() => {
-    if (canSearch() === true) {
-      setStockListOffset(0);
-      setStockListing([]);
-      setLoading(true);
-      getData(0, searchTerm);
-      setLoading(false);
-    }
-  }, [shouldSearch]);
+    fetchShopProducts();
+  }, [offset]);
 
-  useEffect(() => {
-    if (stockListing.length > 0 && shouldFetch === true) {
-      getData(stockListOffset, searchTerm);
-      setShoudFetch(false);
+  const renderFooter = () => {
+    if (showFooter === true) {
+      if (shopProducts.length === totalProducts && shopProducts.length > 0) {
+        return null;
+      }
+
+      return (
+        <View style={{ paddingVertical: 20 }}>
+          <ActivityIndicator animating size="large" color={Colors.dark} />
+        </View>
+      );
     }
-  }, [stockListOffset]);
+  };
 
   const handleEndReached = () => {
-    if (!isFetchingMore && stockListing.length < stockListRecords) {
-      setStockListOffset(stockListOffset + MAXIMUM_RECORDS_PER_FETCH);
-      setShoudFetch(true);
+    if (!isFetchingMore && shopProducts.length < totalProducts) {
+      setOffset(offset + MAXIMUM_RECORDS_PER_FETCH);
+    }
+    if (shopProducts.length === totalProducts && shopProducts.length > 10) {
+      snackbarRef.current.show("No more additional data", 2500);
     }
   };
 
@@ -68,13 +107,25 @@ const StockListing = ({ getData, setLoading }) => {
     <View
       style={{
         flex: 1,
-        marginTop: 5,
+        backgroundColor: Colors.light_2,
       }}
     >
+      <AppStatusBar />
+
+      <TopHeader
+        title="Shop products"
+        showSearch={true}
+        onBackPress={() => navigation.goBack()}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        onSearch={onSearch}
+      />
+
       <FlatList
-        containerStyle={{ padding: 5 }}
+        keyExtractor={(item) => item.id.toString()}
+        style={{ marginTop: 5 }}
         showsHorizontalScrollIndicator={false}
-        data={stockListing}
+        data={shopProducts}
         renderItem={({ item }) => <StockListingListComponent data={item} />}
         ListEmptyComponent={() => (
           <View
@@ -87,11 +138,14 @@ const StockListing = ({ getData, setLoading }) => {
             <Text>{message}</Text>
           </View>
         )}
+        ListFooterComponent={renderFooter}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0}
       />
+
+      <Snackbar ref={snackbarRef} />
     </View>
   );
 };
 
-export default memo(StockListing);
+export default StockListing;

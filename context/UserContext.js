@@ -11,9 +11,22 @@ export const UserProvider = ({ children }) => {
     UserSessionUtils.getShops().then((ownerShops) => {
       if (ownerShops) {
         setShops(ownerShops);
-        setSelectedShop(ownerShops[0])
+        setSelectedShop(ownerShops[0]);
       }
     });
+
+    if (userParams?.isShopAttendant === true) {
+      UserSessionUtils.getFullSessionObject().then((data) => {
+        if (data) {
+          const { attendantShopId, attendantShopName } = data?.user;
+
+          setSelectedShop({
+            name: attendantShopName,
+            id: attendantShopId,
+          });
+        }
+      });
+    }
   };
 
   useEffect(() => {

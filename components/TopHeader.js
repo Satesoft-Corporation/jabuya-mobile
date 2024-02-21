@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
 import React, { useContext, useState } from "react";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import Colors from "../constants/Colors";
 import SearchBar from "./SearchBar";
 import { UserContext } from "../context/UserContext";
@@ -14,7 +14,6 @@ const TopHeader = ({
   showShopName = true,
 }) => {
   const [showBar, setShowBar] = useState(false);
-
   const { selectedShop } = useContext(UserContext);
 
   const toggleSearch = () => {
@@ -22,13 +21,8 @@ const TopHeader = ({
   };
 
   return (
-    <>
-      <View
-        style={{
-          paddingHorizontal: 10,
-          backgroundColor: Colors.dark,
-        }}
-      >
+    <View>
+      <View style={{ paddingHorizontal: 10, backgroundColor: Colors.dark }}>
         <View
           style={{
             height: 40,
@@ -50,11 +44,7 @@ const TopHeader = ({
           </TouchableOpacity>
 
           <Text
-            style={{
-              color: Colors.primary,
-              fontSize: 18,
-              textAlign: "center",
-            }}
+            style={{ color: Colors.primary, fontSize: 18, textAlign: "center" }}
           >
             {title}
           </Text>
@@ -62,7 +52,6 @@ const TopHeader = ({
           <View
             style={{
               flexDirection: "row",
-              justifyContent: "space-between",
               alignItems: "center",
               gap: 10,
               minWidth: 30,
@@ -84,7 +73,7 @@ const TopHeader = ({
           </View>
         </View>
 
-        {showShopName && (
+        {showShopName && selectedShop && (
           <Text
             style={{
               color: Colors.primary,
@@ -98,6 +87,7 @@ const TopHeader = ({
           </Text>
         )}
       </View>
+
       {showBar && (
         <SearchBar
           style={{
@@ -106,13 +96,11 @@ const TopHeader = ({
             marginBottom: 5,
           }}
           value={searchTerm}
-          onChangeText={(text) => {
-            setSearchTerm(text);
-          }}
+          onChangeText={setSearchTerm}
           onSearch={onSearch}
         />
       )}
-    </>
+    </View>
   );
 };
 

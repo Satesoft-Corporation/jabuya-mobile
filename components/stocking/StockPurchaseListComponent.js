@@ -2,7 +2,6 @@ import React, { useState, useMemo, useCallback } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { formatDate, formatNumberWithCommas } from "../../utils/Utils";
 import Colors from "../../constants/Colors";
-import { memo } from "react";
 
 const StockPurchaseListComponent = ({ data }) => {
   const [expanded, setExpanded] = useState(false);
@@ -140,7 +139,13 @@ const StockPurchaseListComponent = ({ data }) => {
           </View>
         </View>
       )}
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <View>
           <Text style={{ fontWeight: 600, fontSize: 12 }}>
             Restock by:{" "}
@@ -148,9 +153,9 @@ const StockPurchaseListComponent = ({ data }) => {
               {data?.createdByFullName}
             </Text>
           </Text>
-          <Text style={{ fontWeight: 300, fontSize: 12 }}>
+          {/* <Text style={{ fontWeight: 300, fontSize: 12 }}>
             {data?.shopName}
-          </Text>
+          </Text> */}
         </View>
         <TouchableOpacity
           onPress={toggleExpand}

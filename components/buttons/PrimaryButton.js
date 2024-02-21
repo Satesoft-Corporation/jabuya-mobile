@@ -10,10 +10,9 @@ const PrimaryButton = ({
   disabled = false,
   titleStyle = {},
   style,
-  mode = "dark",
-  width
+  darkMode = true,
+  width,
 }) => {
-  const darkMode = mode === "dark";
   return (
     <TouchableOpacity
       disabled={disabled}
@@ -27,7 +26,8 @@ const PrimaryButton = ({
           borderColor: Colors.dark,
           height: 40,
           minWidth: 100,
-          width
+          width,
+          flex:1
         },
         style,
       ]}

@@ -1,65 +1,103 @@
 import { View, FlatList } from "react-native";
-import React, { useState, useEffect, memo, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 
-import {
-  MAXIMUM_RECORDS_PER_FETCH,
-  StockingTabTitles,
-} from "../constants/Constants";
+import { MAXIMUM_RECORDS_PER_FETCH } from "../constants/Constants";
 import { Text } from "react-native";
-
-import { SearchContext } from "../context/SearchContext";
+import Colors from "../constants/Colors";
+import { BaseApiService } from "../utils/BaseApiService";
+import Snackbar from "../components/Snackbar";
+import { UserContext } from "../context/UserContext";
+import AppStatusBar from "../components/AppStatusBar";
+import TopHeader from "../components/TopHeader";
 import StockLevelListComponent from "../components/stocking/StockLevelListComponent";
+import { ActivityIndicator } from "react-native";
 
-const StockLevel = ({ getData, setLoading }) => {
-  const [shouldFetch, setShoudFetch] = useState(false);
+const StockLevel = ({ navigation }) => {
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [offset, setOffset] = useState(0);
+  const [showFooter, setShowFooter] = useState(true);
+  const [stockLevels, setStockLevels] = useState([]);
+  const [stockLevelRecords, setStockLevelRecords] = useState(0);
 
-  const { LevelsTitle } = StockingTabTitles;
+  const snackbarRef = useRef(null);
 
-  const {
-    shouldSearch,
-    currentTab,
-    stockLevels,
-    setStockLevels,
-    stockLevelRecords,
-    isFetchingMore,
-    searchTerm,
-    stockLevelOffset,
-    message,
-    setStockLevelOffset,
-  } = useContext(SearchContext);
+  const { userParams } = useContext(UserContext);
 
-  const isStockLevelsTab = currentTab === LevelsTitle;
+  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+    userParams;
 
-  const canSearch = () => {
-    if (shouldSearch === true && isStockLevelsTab) {
-      if (searchTerm && searchTerm !== "") {
-        return true;
+  const fetchShopProducts = async () => {
+    try {
+      setShowFooter(true);
+
+      const searchParameters = {
+        limit: MAXIMUM_RECORDS_PER_FETCH,
+        ...(isShopAttendant && { shopId: attendantShopId }),
+        ...(isShopOwner && { shopOwnerId }),
+        offset: offset,
+        ...(searchTerm &&
+          searchTerm.trim() !== "" && { searchTerm: searchTerm }),
+      };
+
+      setIsFetchingMore(true);
+
+      const response = await new BaseApiService(
+        "/shop-products"
+      ).getRequestWithJsonResponse(searchParameters);
+
+      setStockLevels((prevEntries) => [...prevEntries, ...response?.records]);
+
+      setStockLevelRecords(response?.totalItems);
+
+      if (response?.totalItems === 0) {
+        setMessage("No shop products found");
+        setShowFooter(false);
       }
+
+      if (response?.totalItems === 0 && searchTerm !== "") {
+        setMessage(`No results found for ${searchTerm}`);
+        setShowFooter(false);
+      }
+
+      setIsFetchingMore(false);
+    } catch (error) {
+      setShowFooter(false);
+      setMessage("Error fetching stock records");
     }
-    return false;
+  };
+
+  const onSearch = () => {
+    setStockLevels([]);
+    setOffset(0);
+    fetchShopProducts();
   };
 
   useEffect(() => {
-    if (canSearch() === true) {
-      setStockLevelOffset(0);
-      setStockLevels([]);
-      setLoading(true);
-      getData(0, searchTerm);
-      setLoading(false);
-    }
-  }, [shouldSearch]);
+    fetchShopProducts();
+  }, [offset]);
 
-  useEffect(() => {
-    if (stockLevels.length > 0 && shouldFetch === true) {
-      getData(stockLevelOffset, searchTerm);
-      setShoudFetch(false);
+  const renderFooter = () => {
+    if (showFooter === true) {
+      if (stockLevels.length === stockLevelRecords && stockLevels.length > 0) {
+        return null;
+      }
+
+      return (
+        <View style={{ paddingVertical: 20 }}>
+          <ActivityIndicator animating size="large" color={Colors.dark} />
+        </View>
+      );
     }
-  }, [stockLevelOffset]);
+  };
 
   const handleEndReached = () => {
     if (!isFetchingMore && stockLevels.length < stockLevelRecords) {
-      setStockLevelOffset(stockLevelOffset + MAXIMUM_RECORDS_PER_FETCH);
-      setShoudFetch(true);
+      setOffset(offset + MAXIMUM_RECORDS_PER_FETCH);
+    }
+    if (stockLevels.length === stockLevelRecords && stockLevels.length > 10) {
+      snackbarRef.current.show("No more additional data", 2500);
     }
   };
 
@@ -67,11 +105,22 @@ const StockLevel = ({ getData, setLoading }) => {
     <View
       style={{
         flex: 1,
-        marginTop: 5,
+        backgroundColor: Colors.light_2,
       }}
     >
+      <AppStatusBar />
+
+      <TopHeader
+        title="Stock Levels"
+        showSearch={true}
+        onBackPress={() => navigation.goBack()}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        onSearch={onSearch}
+      />
       <FlatList
-        containerStyle={{ padding: 5 }}
+        keyExtractor={(item) => item.id.toString()}
+        style={{ marginTop: 5 }}
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
         renderItem={({ item }) => <StockLevelListComponent data={item} />}
@@ -88,9 +137,11 @@ const StockLevel = ({ getData, setLoading }) => {
         )}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0}
+        ListFooterComponent={renderFooter}
       />
+      <Snackbar ref={snackbarRef} />
     </View>
   );
 };
 
-export default memo(StockLevel);
+export default StockLevel;

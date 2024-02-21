@@ -198,6 +198,7 @@ function StockListingListComponent({ data }) {
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
+            alignItems:'center'
           }}
         >
           <View>
@@ -217,14 +218,14 @@ function StockListingListComponent({ data }) {
                 {data?.createdByFullName}
               </Text>
             </Text>
-            <Text
+            {/* <Text
               style={{
                 fontWeight: 300,
                 fontSize: 12,
               }}
             >
               {data?.shopName}
-            </Text>
+            </Text> */}
           </View>
           <TouchableOpacity
             onPress={toggleExpand}

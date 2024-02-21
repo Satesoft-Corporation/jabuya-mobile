@@ -5,7 +5,6 @@ import {
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Colors from "../constants/Colors";
@@ -13,7 +12,6 @@ import AppStatusBar from "../components/AppStatusBar";
 import { MyDropDown } from "../components/DropdownComponents";
 import { BaseApiService } from "../utils/BaseApiService";
 import { packageOptions } from "../constants/Constants";
-import MaterialButton from "../components/MaterialButton";
 import Loader from "../components/Loader";
 import { KeyboardAvoidingView } from "react-native";
 import { convertToServerDate, toReadableDate, hasNull } from "../utils/Utils";
@@ -22,20 +20,13 @@ import { UserContext } from "../context/UserContext";
 import { useContext } from "react";
 import TopHeader from "../components/TopHeader";
 import Snackbar from "../components/Snackbar";
+import PrimaryButton from "../components/buttons/PrimaryButton";
 
-const StockPurchaseForm = ({ navigation, route }) => {
-  const { userParams } = useContext(UserContext);
+const StockPurchaseForm = ({ navigation }) => {
+  const { selectedShop, userParams } = useContext(UserContext);
 
-  // const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-  //   userParams;
+  const { shopOwnerId } = userParams;
 
-  let shopOwnerId = 2453;
-  // let isShopOwner = true;
-  const [shops, setShops] = useState([]);
-  const [selectedShop, setSelectedShop] = useState(null);
-
-  const [manufacturers, setManufacturers] = useState([]);
-  const [selectedManufacturer, setSelectedManufacturer] = useState(null);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [suppliers, setSuppliers] = useState([]);
@@ -49,49 +40,15 @@ const StockPurchaseForm = ({ navigation, route }) => {
   const [remarks, setRemarks] = useState(null);
   const [purchasePrice, setPurchasePrice] = useState(null);
   const [unpackedPurchasedQty, setUnpackedPurchasedQty] = useState(null);
-  const [errors, setErrors] = useState(null);
   const [visible, setVisible] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [dateToSelect, setDateToSelect] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const [disable, setDisable] = useState(true);
 
   //
 
   const snackBarRef = useRef(null);
-  const fetchShops = async () => {
-    let searchParameters = {
-      offset: 0,
-      limit: 0,
-      shopOwnerId: shopOwnerId,
-    };
-    new BaseApiService("/shops")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        setShops(response.records);
-        if (response.records.length === 1) {
-          setSelectedShop(response.records[0]);
-        }
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-      });
-  };
-
-  const fetchManufacturers = async () => {
-    let searchParameters = { searchTerm: "", offset: 0, limit: 0 };
-    new BaseApiService("/manufacturers")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        setManufacturers(response.records);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-      });
-  };
 
   const fetchSuppliers = async () => {
     let searchParameters = { offset: 0, limit: 0 };
@@ -106,45 +63,22 @@ const StockPurchaseForm = ({ navigation, route }) => {
       });
   };
 
-  const fetchProducts = async (shopId, manufacturerId, setOwnerId = true) => {
+  const fetchProducts = async () => {
     setIsPackedProduct(null);
     setSelectedProduct(null);
-    setDisable(true);
-    let searchParameters = { offset: 0, limit: 0 };
+    let searchParameters = { offset: 0, limit: 0, shopOwnerId: shopOwnerId };
     setLoading(true);
 
-    if (setOwnerId === true) {
-      // seting the id coz some data may not return if its present during api call
-      searchParameters.shopOwnerId = shopOwnerId;
-    }
-
-    if (shopId) {
-      searchParameters.shopId = shopId;
-    }
-
-    if (manufacturerId) {
-      searchParameters.manufacturerId = manufacturerId;
-    }
     new BaseApiService("/shop-products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setProducts(response.records);
-        setDisable(false);
         setLoading(false);
       })
       .catch((error) => {
-        setDisable(false);
         setLoading(false);
+        snackBarRef.current.show(error?.message);
       });
-  };
-
-  const makeShopSelection = (shop) => {
-    setSelectedShop(shop);
-  };
-
-  const onManufacturerChange = (e) => {
-    setSelectedManufacturer(e);
-    fetchProducts("", e?.id, false);
   };
 
   const onProductChange = (pdt) => {
@@ -156,9 +90,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
   };
 
   const clearForm = () => {
-    setSelectedManufacturer(null);
     setBatchNo(null);
-    setErrors(null);
     setExpiryDate(null);
     setPackedPurchasedQuantity(null);
     setPurchaseDate(null);
@@ -195,15 +127,15 @@ const StockPurchaseForm = ({ navigation, route }) => {
         batchNumber: batchNo,
         expiryDate: convertToServerDate(expiryDate),
         id: 0,
-        manufacturerId: selectedManufacturer.id,
+        manufacturerId: selectedProduct?.manufacturerId,
         packedPurchasedQuantity: Number(packedPurchasedQuantity),
-        productId: selectedProduct.id,
-        productName: selectedProduct.productName,
+        productId: selectedProduct?.id,
+        productName: selectedProduct?.productName,
         purchasePrice: Number(purchasePrice),
         remarks: remarks || "",
-        shopId: 2454,
+        shopId: selectedShop?.id,
         stockedOnDate: convertToServerDate(purchaseDate),
-        supplierId: selectedSupplier.id,
+        supplierId: selectedSupplier?.id,
         unpackedPurchase: false,
       };
     }
@@ -211,8 +143,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
     if (isPacked === false) {
       payload = {
         shopId: selectedShop?.id,
-        productId: selectedProduct?.productId,
-        // packedPurchasedQuantity: stockEntry?.purchasedQuantity,
+        productId: selectedProduct?.id,
         productName: selectedProduct?.productName,
         purchasePrice: Number(purchasePrice),
         batchNumber: batchNo,
@@ -220,8 +151,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
         unpackedPurchase: true,
         unpackedPurchasedQuantity: Number(unpackedPurchasedQty),
         remarks: remarks || "", //remarks is optional
-        manufacturerId: selectedManufacturer?.id,
-        productId: selectedProduct?.id,
+        manufacturerId: selectedProduct?.manufacturerId,
         supplierId: selectedSupplier?.id,
         id: 0,
         stockedOnDate: convertToServerDate(purchaseDate),
@@ -241,7 +171,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
           clearForm();
           setLoading(false);
           setSubmitted(false);
-          snackBarRef.current.show("Stock entry saved successfully", 5000);
+          snackBarRef.current.show("Stock entry saved successfully", 4000);
         })
         .catch((error) => {
           snackBarRef.current.show(error?.message, 5000);
@@ -252,9 +182,8 @@ const StockPurchaseForm = ({ navigation, route }) => {
   };
 
   useEffect(() => {
+    fetchProducts();
     fetchSuppliers();
-    fetchShops();
-    fetchManufacturers();
   }, []);
 
   return (
@@ -267,37 +196,47 @@ const StockPurchaseForm = ({ navigation, route }) => {
         <AppStatusBar />
 
         <TopHeader
-          title="Stock purchase details"
+          title="Stock entry"
           onBackPress={() => navigation.goBack()}
         />
-        <Loader loading={loading}/>
+        <Loader loading={loading} />
         <ScrollView
           style={{
             paddingHorizontal: 8,
           }}
         >
-          <View style={{ marginTop: 8, marginBottom: 5 }}>
+          <Text
+            style={{
+              fontWeight: 500,
+              fontSize: 17,
+              marginVertical: 5,
+            }}
+          >
+            Stock purchase details
+          </Text>
+          <View style={{}}>
             <Text
               style={{
                 marginVertical: 3,
                 marginStart: 6,
+                marginTop: 5,
               }}
             >
-              Shop
+              Product
             </Text>
             <MyDropDown
               style={{
                 backgroundColor: Colors.light,
                 borderColor: Colors.dark,
               }}
-              data={shops}
-              onChange={makeShopSelection}
+              data={products}
+              onChange={onProductChange}
               value={selectedShop}
-              placeholder="Select shop"
-              labelField="name"
+              placeholder="Select product"
+              labelField="productName"
               valueField="id"
             />
-            {submitted && !selectedShop && (
+            {submitted && !selectedProduct && (
               <Text
                 style={{
                   fontSize: 12,
@@ -305,7 +244,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                   color: Colors.error,
                 }}
               >
-                Shop selection is required
+                Product is required
               </Text>
             )}
           </View>
@@ -315,6 +254,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
               style={{
                 marginVertical: 3,
                 marginStart: 6,
+                marginTop: 10,
               }}
             >
               Supplier
@@ -343,76 +283,6 @@ const StockPurchaseForm = ({ navigation, route }) => {
               </Text>
             )}
           </View>
-
-          <View style={{ marginVertical: 8 }}>
-            <Text
-              style={{
-                marginVertical: 3,
-                marginStart: 6,
-              }}
-            >
-              Manufacturer
-            </Text>
-            <MyDropDown
-              style={{
-                backgroundColor: Colors.light,
-                borderColor: Colors.dark,
-              }}
-              data={manufacturers}
-              onChange={onManufacturerChange}
-              value={selectedManufacturer}
-              placeholder="Select manufacuturer"
-              labelField="name"
-              valueField="id"
-            />
-            {submitted && !selectedManufacturer && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginStart: 6,
-                  color: Colors.error,
-                }}
-              >
-                Manufacturer is required
-              </Text>
-            )}
-          </View>
-
-          <View style={{}}>
-            <Text
-              style={{
-                marginVertical: 3,
-                marginStart: 6,
-              }}
-            >
-              Product
-            </Text>
-            <MyDropDown
-              style={{
-                backgroundColor: Colors.light,
-                borderColor: Colors.dark,
-              }}
-              disable={disable}
-              data={products}
-              onChange={onProductChange}
-              value={selectedShop}
-              placeholder="Select product"
-              labelField="productName"
-              valueField="id"
-            />
-            {submitted && !selectedProduct && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginStart: 6,
-                  color: Colors.error,
-                }}
-              >
-                Product is required
-              </Text>
-            )}
-          </View>
-
           <View style={{ marginVertical: 8 }}>
             <Text
               style={{
@@ -749,44 +619,19 @@ const StockPurchaseForm = ({ navigation, route }) => {
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              marginTop: 15,
-              marginBottom: 30,
+              marginTop: 20,
               gap: 10,
             }}
           >
-            <MaterialButton
-              title="Clear"
-              style={{
-                backgroundColor: "transparent",
-                borderRadius: 5,
-                borderWidth: 1,
-                borderColor: Colors.dark,
-                height: 40,
-              }}
-              titleStyle={{
-                fontWeight: "bold",
-                color: Colors.dark,
-              }}
-              buttonPress={clearForm}
+            <PrimaryButton
+              darkMode={false}
+              title={"Clear"}
+              onPress={clearForm}
             />
-            <MaterialButton
-              disabled={loading}
-              title="Save"
-              style={{
-                backgroundColor: Colors.dark,
-                borderRadius: 5,
-                borderWidth: 1,
-                borderColor: Colors.dark,
-                height: 40,
-              }}
-              titleStyle={{
-                fontWeight: "bold",
-                color: Colors.primary,
-              }}
-              buttonPress={saveStockEntry}
-            />
+            <PrimaryButton title={"Save"} onPress={saveStockEntry} />
           </View>
         </ScrollView>
+
         <Snackbar ref={snackBarRef} />
 
         <DateCalender

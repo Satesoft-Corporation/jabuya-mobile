@@ -1,11 +1,5 @@
 import { Dimensions } from "react-native";
 
-export const StockingTabTitles = {
-  PurchaseTitle: "Stock purchase",
-  LevelsTitle: "Stock level",
-  ListingTitle: "Stock listing",
-};
-
 export const packageOptions = [
   { value: "Packed", type: true },
   { value: "Unpacked", type: false },
@@ -29,7 +23,7 @@ export const categoryIcons = [
     id: 3,
     icon: require("../assets/icons/icons8-box-50.png"),
     title: "Stocking",
-    target: "stocking2",
+    target: "stocking",
   },
   {
     id: 4,

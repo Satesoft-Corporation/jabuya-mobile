@@ -1,19 +1,31 @@
-import { View, FlatList, Image, TouchableOpacity } from "react-native";
-import React, { useState, useEffect, useContext } from "react";
+import { View, Text } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
 import Colors from "../constants/Colors";
-import AppStatusBar from "../components/AppStatusBar";
-import { Icon } from "../components/Icon";
-import { UserSessionUtils } from "../utils/UserSessionUtils";
+import { FlatList } from "react-native";
 import UserProfile from "../components/UserProfile";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
-import Loader from "../components/Loader";
+import AppStatusBar from "../components/AppStatusBar";
+import SelectShopBar from "../components/SelectShopBar";
+import { Icon } from "../components/Icon";
 import { categoryIcons } from "../constants/Constants";
+import { UserContext } from "../context/UserContext";
 import { BaseApiService } from "../utils/BaseApiService";
+import { UserSessionUtils } from "../utils/UserSessionUtils";
 import { getTimeDifference } from "../utils/Utils";
 import DisplayMessage from "../components/Dialogs/DisplayMessage";
-import { UserContext } from "../context/UserContext";
+import { TouchableOpacity } from "react-native";
+import { Image } from "react-native";
+import Loader from "../components/Loader";
 
-export default function LandingScreen({ navigation }) {
+const LandingScreen = ({ navigation }) => {
+  const {
+    setUserParams,
+    getShopsFromStorage,
+    userParams,
+    setSelectedShop,
+    setShops,
+  } = useContext(UserContext);
+
   const [tab, setTab] = useState("home");
 
   const [loading, setLoading] = useState(true);
@@ -24,14 +36,13 @@ export default function LandingScreen({ navigation }) {
   const [canCancel, setCanCancel] = useState(false);
   const [timeDiff, setTimeDiff] = useState(null);
 
-  const { setUserParams } = useContext(UserContext);
-
   const fetchShops = (id) => {
     new BaseApiService("/shops")
       .getRequestWithJsonResponse({ limit: 0, offset: 0, shopOwnerId: id })
       .then(async (response) => {
         await UserSessionUtils.setShopCount(String(response.totalItems));
         await UserSessionUtils.setShops(response.records);
+        getShopsFromStorage();
       })
       .catch((error) => {
         console.log(error);
@@ -41,6 +52,9 @@ export default function LandingScreen({ navigation }) {
   const logOut = () => {
     setLoading(false);
     UserSessionUtils.clearLocalStorageAndLogout(navigation);
+    setUserParams(null);
+    setSelectedShop(null);
+    setShops([]);
   };
 
   const confirmLogout = () => {
@@ -59,17 +73,22 @@ export default function LandingScreen({ navigation }) {
 
   const handleTabPress = (item) => {
     const { days, hours } = timeDiff;
-    console.log(timeDiff);
 
-    if (hours >= 5 || days > 0) {
+    if (hours >= 8 || days > 0) {
       //trigger the logout dialog every after 5 hrs
       logInPrompt();
-    } else {
-      item.target
-        ? navigation.navigate(item.target, {
-            ...routeParams,
-          })
-        : null;
+    }
+
+    if (item.target) {
+      if (item.target === "stocking" && userParams?.isShopAttendant === true) {
+        navigation.navigate("stockPurchase");
+        return null;
+      } else {
+        navigation.navigate(item.target, {
+          ...routeParams,
+        });
+        return null;
+      }
     }
   };
 
@@ -104,7 +123,6 @@ export default function LandingScreen({ navigation }) {
 
         if (isShopOwner) {
           if (shopCount === null) {
-            console.log('landing')
             fetchShops(shopOwnerId);
           }
         }
@@ -119,23 +137,32 @@ export default function LandingScreen({ navigation }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
-
+      <AppStatusBar />
       <Loader loading={loading} />
-
       <BlackScreen>
         <UserProfile />
+
+        {userParams?.isShopOwner && (
+          <SelectShopBar onPress={() => navigation.navigate("selectShops")} />
+        )}
       </BlackScreen>
 
-      <FlatList
-        style={{ flex: 1, marginTop: 20 }}
-        data={categoryIcons}
-        renderItem={({ item }) => (
-          <Icon icon={item} onPress={() => handleTabPress(item)} />
-        )}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={2}
-      />
+      <View
+        style={{
+          paddingHorizontal: 10,
+          marginTop: 10,
+        }}
+      >
+        <FlatList
+          style={{ marginTop: 10 }}
+          data={categoryIcons}
+          renderItem={({ item }) => (
+            <Icon icon={item} onPress={() => handleTabPress(item)} />
+          )}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+        />
+      </View>
 
       <View // bottom nav
         style={{
@@ -253,4 +280,6 @@ export default function LandingScreen({ navigation }) {
       />
     </View>
   );
-}
+};
+
+export default LandingScreen;

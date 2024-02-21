@@ -2,6 +2,7 @@ import { View, Text, Image, Linking } from "react-native";
 import React from "react";
 import PrimaryButton from "../components/buttons/PrimaryButton";
 import { Dimensions } from "react-native";
+import Constants from "expo-constants";
 
 const screenWidth = Dimensions.get("window").width;
 let url = "https://play.google.com/store/apps/details?id=com.byaffe.duqact";
@@ -22,7 +23,7 @@ const UpdateScreen = () => {
           fontWeight: 500,
         }}
       >
-        Update Duqact
+        UPDATE
       </Text>
       <Image
         source={require("../assets/icons/icon2.png")}
@@ -32,12 +33,17 @@ const UpdateScreen = () => {
           resizeMode: "contain",
         }}
       />
-      <Text style={{ fontSize: 15 }}>
-        The current app version you are using is out of date and you will need
-        to upgrade to the latest version for better experience.
+      <Text style={{ fontSize: 15, textAlign: "center", lineHeight: 22 }}>
+        The current Duqact version
+        <Text style={{ fontWeight: 500 }}>
+          {" "}
+          {Constants.expoConfig.version}
+        </Text>{" "}
+        you are using is out of date, update to the latest version for better
+        experience.
       </Text>
 
-      <View style={{ marginTop: 15 }}>
+      <View style={{ marginTop: 35, height: 40 }}>
         <PrimaryButton
           title={"Update"}
           width={screenWidth - 30}

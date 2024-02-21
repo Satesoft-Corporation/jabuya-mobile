@@ -19,7 +19,7 @@ export function Icon({ icon, containerStyle, onPress, iconStyle, titleStyle }) {
         borderRadius: 5,
         backgroundColor: Colors.light,
         minWidth: screenWidth / 2 - 30,
-        elevation: 1,
+        elevation: 2,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         padding: 10,

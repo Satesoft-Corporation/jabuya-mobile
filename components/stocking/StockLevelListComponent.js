@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { formatDate } from "../../utils/Utils";
 import Colors from "../../constants/Colors";
-import { memo } from "react";
 
 function StockLevelListComponent({ data }) {
   const [expanded, setExpanded] = useState(false);
@@ -169,6 +168,7 @@ function StockLevelListComponent({ data }) {
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
           <View>
@@ -188,14 +188,14 @@ function StockLevelListComponent({ data }) {
                 {data?.createdByFullName}
               </Text>
             </Text>
-            <Text
+            {/* <Text
               style={{
                 fontWeight: 300,
                 fontSize: 12,
               }}
             >
               {data?.shopName}
-            </Text>
+            </Text> */}
           </View>
           <TouchableOpacity
             onPress={toggleExpand}
