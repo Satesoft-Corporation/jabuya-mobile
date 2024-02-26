@@ -29,7 +29,6 @@ const LandingScreen = ({ navigation }) => {
   const [tab, setTab] = useState("home");
 
   const [loading, setLoading] = useState(true);
-  const [routeParams, setRouteParams] = useState(null);
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
   const [agreeText, setAgreeText] = useState("");
@@ -77,6 +76,7 @@ const LandingScreen = ({ navigation }) => {
     if (hours >= 8 || days > 0) {
       //trigger the logout dialog every after 5 hrs
       logInPrompt();
+      return null;
     }
 
     if (item.target) {
@@ -84,9 +84,7 @@ const LandingScreen = ({ navigation }) => {
         navigation.navigate("stockPurchase");
         return null;
       } else {
-        navigation.navigate(item.target, {
-          ...routeParams,
-        });
+        navigation.navigate(item.target);
         return null;
       }
     }
@@ -101,13 +99,6 @@ const LandingScreen = ({ navigation }) => {
         }
         const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
           data?.user;
-
-        setRouteParams({
-          isShopOwner,
-          isShopAttendant,
-          attendantShopId,
-          shopOwnerId,
-        });
 
         setUserParams({
           isShopOwner,

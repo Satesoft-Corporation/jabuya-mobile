@@ -5,7 +5,7 @@ import { Image } from "react-native";
 import { UserContext } from "../context/UserContext";
 import { useContext } from "react";
 
-const SelectShopBar = ({ onPress }) => {
+const SelectShopBar = ({ onPress, showIcon = true }) => {
   const { selectedShop } = useContext(UserContext);
 
   return (
@@ -29,14 +29,13 @@ const SelectShopBar = ({ onPress }) => {
           borderRadius: 5,
           padding: 5,
           flex: 4,
-          paddingHorizontal:10
+          paddingHorizontal: 10,
         }}
       >
         <Text
           style={{
             color: Colors.primary,
             fontSize: 13,
-            
           }}
         >
           {selectedShop?.name}
@@ -65,26 +64,28 @@ const SelectShopBar = ({ onPress }) => {
         </View>
       </View>
 
-      <View
-        style={{
-          backgroundColor: "#303030",
-          borderRadius: 5,
-          padding: 5,
-          //   height: 30,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Image
-          source={require("../assets/icons/icons8-store-50.png")}
+      {showIcon && (
+        <View
           style={{
-            height: 25,
-            width: 25,
-            resizeMode: "contain",
-            tintColor: Colors.primary,
+            backgroundColor: "#303030",
+            borderRadius: 5,
+            padding: 5,
+            //   height: 30,
+            alignItems: "center",
+            justifyContent: "center",
           }}
-        />
-      </View>
+        >
+          <Image
+            source={require("../assets/icons/icons8-store-50.png")}
+            style={{
+              height: 25,
+              width: 25,
+              resizeMode: "contain",
+              tintColor: Colors.primary,
+            }}
+          />
+        </View>
+      )}
     </TouchableOpacity>
   );
 };

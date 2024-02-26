@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -20,7 +20,6 @@ import AppStatusBar from "../components/AppStatusBar";
 import UserProfile from "../components/UserProfile";
 import { SaleListItem } from "../components/TransactionItems";
 import { SalesDropdownComponent } from "../components/DropdownComponents";
-import { ShopSelectionDropdown } from "../components/DropdownComponents";
 import { SalesQtyInputDialog } from "../components/Dialogs";
 import { formatNumberWithCommas } from "../utils/Utils";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
@@ -30,6 +29,9 @@ import { ConfirmSalesDialog } from "../components/Dialogs";
 import DisplayMessage from "../components/Dialogs/DisplayMessage";
 import Snackbar from "../components/Snackbar";
 import { useRef } from "react";
+import { UserContext } from "../context/UserContext";
+import SelectShopBar from "../components/SelectShopBar";
+import PrimaryButton from "../components/buttons/PrimaryButton";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -44,7 +46,7 @@ function SalesEntry({ route, navigation }) {
   const [showMoodal, setShowModal] = useState(false);
   const [selection, setSelection] = useState(null);
   const [totalCost, setTotalCost] = useState(0);
-  const [recievedAmount, setRecievedAmount] = useState();
+  const [recievedAmount, setRecievedAmount] = useState("");
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -53,17 +55,15 @@ function SalesEntry({ route, navigation }) {
   const [unitCost, setUnitCost] = useState(null);
   const [initialUnitCost, setInitialUnitCost] = useState(null);
   const [errors, setErrors] = useState(null);
-  const [shops, setShops] = useState([]);
-  const [selectedShop, setSelectedShop] = useState(null);
   const [message, setMessage] = useState(null);
   const [displayMessage, setDisplayMssage] = useState(false);
 
   const snackbarRef = useRef(null);
+  const { userParams, selectedShop } = useContext(UserContext);
 
-  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-    route.params;
+  const { isShopOwner, isShopAttendant, attendantShopId } = userParams;
 
-  const fetchProducts = async (shopId) => {
+  const fetchProducts = async () => {
     let searchParameters = {
       offset: 0,
       limit: limit,
@@ -73,8 +73,8 @@ function SalesEntry({ route, navigation }) {
       searchParameters.searchTerm = searchTerm;
     }
 
-    if (shopId !== null) {
-      searchParameters.shopId = shopId;
+    if (isShopOwner) {
+      searchParameters.shopId = selectedShop?.id;
     }
 
     if (isShopAttendant) {
@@ -92,25 +92,6 @@ function SalesEntry({ route, navigation }) {
       });
   };
 
-  const fetchShops = async () => {
-    let searchParameters = { offset: 0, limit: 0, shopOwnerId: shopOwnerId };
-    if (isShopOwner) {
-      new BaseApiService("/shops")
-        .getRequestWithJsonResponse(searchParameters)
-        .then(async (response) => {
-          setShops(response.records);
-          if (response.records.length === 1) {
-            setSelectedShop(response.records[0]);
-            fetchProducts(response.records[0].id);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          setLoading(false);
-        });
-    }
-  };
-
   const postSales = () => {
     let payLoad = {
       id: null,
@@ -118,6 +99,7 @@ function SalesEntry({ route, navigation }) {
       amountPaid: Number(recievedAmount),
       lineItems: selections,
     };
+
     setLoading(true);
     new BaseApiService("/shop-sales")
       .postRequest(payLoad)
@@ -127,7 +109,7 @@ function SalesEntry({ route, navigation }) {
       })
       .then(async (d) => {
         let { info, status } = d;
-        let id = info.id;
+        let id = info?.id;
 
         if (status === 200) {
           new BaseApiService(`/shop-sales/${id}/confirm`)
@@ -136,29 +118,26 @@ function SalesEntry({ route, navigation }) {
             .then((d) => {
               if (d.status === "Success") {
                 setShowConfirmed(false);
-                setMessage("Sale confirmed successfully");
                 setLoading(false);
-                setDisplayMssage(true);
                 clearEverything();
+                snackbarRef.current.show("Sale confirmed successfully", 4000);
               }
             })
             .catch((error) => {
-              setMessage(`Failed to confirm purchases!,${error?.message}`);
               setLoading(false);
-              setDisplayMssage(true);
+              snackbarRef.current.show(
+                `Failed to confirm purchases!,${error?.message}`,
+                6000
+              );
             });
-          setTimeout(() => setLoading(false), 1000);
-        } else if (status === 400) {
-          setMessage(`Failed to confirm purchases!,${error?.message}`);
+        } else {
           setLoading(false);
-          setDisplayMssage(true);
+          snackbarRef.current.show(info?.message, 5000);
         }
       })
       .catch((error) => {
-        snackbarRef.current.show(
-          "An unexpected error occurred! Try again later."
-        );
         setLoading(false);
+        snackbarRef.current.show(error?.message);
       });
   };
 
@@ -171,12 +150,6 @@ function SalesEntry({ route, navigation }) {
 
     setShowModal(true);
     setSelection(item);
-  };
-
-  const makeShopSelection = (shop) => {
-    setSelectedShop(shop);
-    setLoading(true);
-    fetchProducts(shop.id);
   };
 
   const saveSelection = () => {
@@ -305,7 +278,7 @@ function SalesEntry({ route, navigation }) {
     setQuantity(null);
     setSelection(null);
     setTotalCost(0);
-    setRecievedAmount(0);
+    setRecievedAmount("");
     setShowConfirmed(false);
     setSelections([]);
     setTotalQty(0);
@@ -322,14 +295,7 @@ function SalesEntry({ route, navigation }) {
   }, []);
 
   useEffect(() => {
-    if (isShopAttendant) {
-      fetchProducts();
-    }
-    fetchShops();
-  }, []);
-
-  useEffect(() => {
-    fetchProducts(selectedShop?.id);
+    fetchProducts();
   }, [searchTerm]);
 
   useEffect(() => {
@@ -478,6 +444,7 @@ function SalesEntry({ route, navigation }) {
 
       <BlackScreen flex={isShopAttendant ? 12 : 10}>
         <UserProfile />
+
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("viewSales", {
@@ -506,17 +473,15 @@ function SalesEntry({ route, navigation }) {
             Report
           </Text>
         </TouchableOpacity>
-        <View style={{ paddingHorizontal: 10, marginTop: 0 }}>
+
+        <View style={{ paddingHorizontal: 0 }}>
           {isShopOwner && (
-            <>
-              <ShopSelectionDropdown
-                value={selectedShop} // flex is .75 for owner
-                makeShopSelection={makeShopSelection}
-                shops={shops}
-                disable={selections.length > 0}
-              />
-            </>
+            <SelectShopBar
+              showIcon={false}
+              onPress={() => navigation.navigate("selectShops")}
+            />
           )}
+
           <SalesDropdownComponent
             disable={isShopOwner && selectedShop === null}
             value={selection}
@@ -724,53 +689,38 @@ function SalesEntry({ route, navigation }) {
           </View>
 
           <IconsComponent clear={clearEverything} />
-          <TouchableOpacity
-            disabled={selections.length < 1}
-            style={{
-              backgroundColor: Colors.dark,
-              borderRadius: 5,
-              height: 50,
-              justifyContent: "center",
-              marginTop: 8,
-              marginBottom: 20,
-            }}
-            onPress={() => {
-              let shouldConfirm = true;
 
-              if (!recievedAmount) {
-                shouldConfirm = false;
-              }
-
-              if (!(Number(recievedAmount) >= totalCost)) {
-                shouldConfirm = false;
-                setMessage(
-                  `Recieved amount should be greater that UGX ${formatNumberWithCommas(
-                    totalCost
-                  )}`
-                );
-                setDisplayMssage(true);
-              }
-
-              if (shouldConfirm === true) {
-                setLoading(true);
-                setTimeout(() => {
-                  setLoading(false);
-                  setShowConfirmed(true);
-                }, 1000);
-              }
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.primary,
-                alignSelf: "center",
+          <View style={{ marginTop: 8, height: 40, marginBottom: 20 }}>
+            <PrimaryButton
+              title={"Confirm purchase"}
+              titleStyle={{
                 fontSize: 18,
                 fontWeight: 500,
               }}
-            >
-              Confirm purchase
-            </Text>
-          </TouchableOpacity>
+              onPress={() => {
+                const isValidAmount = Number(recievedAmount) >= totalCost;
+
+                if (selections.length > 0) {
+                  if (isValidAmount === true) {
+                    setLoading(true);
+                    setTimeout(() => {
+                      setLoading(false);
+                      setShowConfirmed(true);
+                    }, 1000);
+                  } else {
+                    snackbarRef.current.show(
+                      `Recieved amount should be greater that UGX ${formatNumberWithCommas(
+                        totalCost
+                      )}`,
+                      4000
+                    );
+                  }
+                } else {
+                  snackbarRef.current.show("Product selection is required.");
+                }
+              }}
+            />
+          </View>
         </ScrollView>
         <Snackbar ref={snackbarRef} />
       </View>

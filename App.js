@@ -48,6 +48,8 @@ export default function App() {
 
           <Stack.Screen name="selectShops" component={SelectShops} />
 
+          <Stack.Screen name="productEntry" component={ProductEntry} />
+
           <Stack.Screen
             name="stockPurchaseForm"
             component={StockPurchaseForm}

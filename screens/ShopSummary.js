@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AppStatusBar from "../components/AppStatusBar";
 import Colors from "../constants/Colors";
 import { BaseApiService } from "../utils/BaseApiService";
@@ -8,6 +8,7 @@ import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import UserProfile from "../components/UserProfile";
 import Loader from "../components/Loader";
 import { formatNumberWithCommas } from "../utils/Utils";
+import { UserContext } from "../context/UserContext";
 
 const ShopSummary = ({ navigation, route }) => {
   const [initialCapital, setInitialCapital] = useState("");
@@ -18,7 +19,9 @@ const ShopSummary = ({ navigation, route }) => {
   const [grossProfit, setGrossProfit] = useState(null);
   const [netProfit, setNetProfit] = useState(null);
 
-  const { shopOwnerId } = route.params;
+  const { userParams } = useContext(UserContext);
+
+  const { shopOwnerId } = userParams;
 
   const fetchShopProducts = () => {
     let searchParameters = {

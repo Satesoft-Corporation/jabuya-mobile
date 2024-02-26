@@ -1,23 +1,12 @@
-import {
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  SafeAreaView,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { View, Text, TextInput, ScrollView } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
 import { MyDropDown } from "../components/DropdownComponents";
 import { BaseApiService } from "../utils/BaseApiService";
-import { packageOptions } from "../constants/Constants";
-import MaterialButton from "../components/MaterialButton";
 import Loader from "../components/Loader";
 import { KeyboardAvoidingView } from "react-native";
-import { convertToServerDate, toReadableDate, hasNull } from "../utils/Utils";
-import { DateCalender } from "../components/Dialogs/DateCalendar";
+import { hasNull } from "../utils/Utils";
 import { UserContext } from "../context/UserContext";
 import { useContext } from "react";
 import TopHeader from "../components/TopHeader";
@@ -25,61 +14,23 @@ import Snackbar from "../components/Snackbar";
 import PrimaryButton from "../components/buttons/PrimaryButton";
 
 const ProductEntry = ({ navigation, route }) => {
-  const { userParams } = useContext(UserContext);
-
-  // const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-  //   userParams;
-
-  let shopOwnerId = 2453;
-  // let isShopOwner = true;
-  const [shops, setShops] = useState([]);
-  const [selectedShop, setSelectedShop] = useState(null);
+  const { selectedShop } = useContext(UserContext);
 
   const [manufacturers, setManufacturers] = useState([]);
   const [selectedManufacturer, setSelectedManufacturer] = useState(null);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [suppliers, setSuppliers] = useState([]);
-  const [selectedSupplier, setSelectedSupplier] = useState(null);
-  const [expiryDate, setExpiryDate] = useState(null);
-  const [isPackedProduct, setIsPackedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [batchNo, setBatchNo] = useState(null);
-  const [purchaseDate, setPurchaseDate] = useState(null);
-  const [packedPurchasedQuantity, setPackedPurchasedQuantity] = useState(null);
   const [remarks, setRemarks] = useState(null);
-  const [purchasePrice, setPurchasePrice] = useState(null);
-  const [unpackedPurchasedQty, setUnpackedPurchasedQty] = useState(null);
-  const [errors, setErrors] = useState(null);
-  const [visible, setVisible] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState(null);
-  const [selectedEndDate, setSelectedEndDate] = useState(null);
-  const [dateToSelect, setDateToSelect] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const [disable, setDisable] = useState(true);
+  const [disable, setDisable] = useState(false);
+  const [saleUnits, setSaleUnits] = useState([]);
+  const [selectedSaleUnit, setSelecetedSaleUnit] = useState(false);
+  const [salesPrice, setSalesPrice] = useState("");
 
   //
 
   const snackBarRef = useRef(null);
-  const fetchShops = async () => {
-    let searchParameters = {
-      offset: 0,
-      limit: 0,
-      shopOwnerId: shopOwnerId,
-    };
-    new BaseApiService("/shops")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        setShops(response.records);
-        if (response.records.length === 1) {
-          setSelectedShop(response.records[0]);
-        }
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-      });
-  };
 
   const fetchManufacturers = async () => {
     let searchParameters = { searchTerm: "", offset: 0, limit: 0 };
@@ -94,39 +45,31 @@ const ProductEntry = ({ navigation, route }) => {
       });
   };
 
-  const fetchSuppliers = async () => {
-    let searchParameters = { offset: 0, limit: 0 };
-    new BaseApiService("/suppliers")
+  const fetchSaleUnits = async () => {
+    let searchParameters = {
+      offset: 0,
+      limit: 0,
+      commaSeparatedTypeIds: [4],
+    };
+    new BaseApiService("/lookups/lookup-values")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
-        setSuppliers(response.records);
-        setLoading(false);
+        setSaleUnits(response.records);
       })
-      .catch((error) => {
-        setLoading(false);
-      });
+      .catch((error) => {});
   };
 
-  const fetchProducts = async (shopId, manufacturerId, setOwnerId = true) => {
-    setIsPackedProduct(null);
+  const fetchProducts = async (manufacturerId) => {
     setSelectedProduct(null);
     setDisable(true);
+
     let searchParameters = { offset: 0, limit: 0 };
     setLoading(true);
-
-    if (setOwnerId === true) {
-      // seting the id coz some data may not return if its present during api call
-      searchParameters.shopOwnerId = shopOwnerId;
-    }
-
-    if (shopId) {
-      searchParameters.shopId = shopId;
-    }
 
     if (manufacturerId) {
       searchParameters.manufacturerId = manufacturerId;
     }
-    new BaseApiService("/shop-products")
+    new BaseApiService("/products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setProducts(response.records);
@@ -136,126 +79,76 @@ const ProductEntry = ({ navigation, route }) => {
       .catch((error) => {
         setDisable(false);
         setLoading(false);
+        snackBarRef.current.show("Falied to fetch products, try again");
       });
-  };
-
-  const makeShopSelection = (shop) => {
-    setSelectedShop(shop);
   };
 
   const onManufacturerChange = (e) => {
     setSelectedManufacturer(e);
-    fetchProducts("", e?.id, false);
+    console.log(e);
+    fetchProducts(e?.id);
   };
 
   const onProductChange = (pdt) => {
     setSelectedProduct(pdt);
-  };
-
-  const onSupplierChange = (e) => {
-    setSelectedSupplier(e);
+    console.log(pdt);
   };
 
   const clearForm = () => {
     setSelectedManufacturer(null);
-    setBatchNo(null);
-    setErrors(null);
-    setExpiryDate(null);
-    setPackedPurchasedQuantity(null);
-    setPurchaseDate(null);
-    setPurchasePrice(null);
     setSelectedProduct(null);
-    setIsPackedProduct(null);
-    setSelectedSupplier(null);
     setRemarks(null);
-    setUnpackedPurchasedQty(null);
     setProducts([]);
     setSubmitted(false);
+    setSalesPrice("");
   };
 
-  const handleDayPress = (day) => {
-    setSelectedStartDate(day.dateString);
-    dateToSelect === "expiry"
-      ? setExpiryDate(day.dateString)
-      : setPurchaseDate(day.dateString);
-  };
-
-  const handleCancel = () => {
-    return true;
-  };
-
-  const saveStockEntry = () => {
+  const saveProduct = () => {
     setSubmitted(true);
     setLoading(true);
-    let payload;
+    setDisable(true);
 
-    const isPacked = isPackedProduct && isPackedProduct === true;
-    //setting payload basing on item package type
-    if (isPacked === true) {
-      payload = {
-        batchNumber: batchNo,
-        expiryDate: convertToServerDate(expiryDate),
-        id: 0,
-        manufacturerId: selectedManufacturer.id,
-        packedPurchasedQuantity: Number(packedPurchasedQuantity),
-        productId: selectedProduct.id,
-        productName: selectedProduct.productName,
-        purchasePrice: Number(purchasePrice),
-        remarks: remarks || "",
-        shopId: 2454,
-        stockedOnDate: convertToServerDate(purchaseDate),
-        supplierId: selectedSupplier.id,
-        unpackedPurchase: false,
-      };
-    }
+    let payload = {
+      manufacturerId: selectedManufacturer?.id,
+      shopId: selectedShop?.id,
+      productId: selectedProduct?.id,
+      saleUnitId: selectedSaleUnit?.id,
+      salesPrice: Number(salesPrice),
+      remarks: remarks || "",
+      hasMultipleSaleUnits: false,
+    };
 
-    if (isPacked === false) {
-      payload = {
-        shopId: selectedShop?.id,
-        productId: selectedProduct?.productId,
-        // packedPurchasedQuantity: stockEntry?.purchasedQuantity,
-        productName: selectedProduct?.productName,
-        purchasePrice: Number(purchasePrice),
-        batchNumber: batchNo,
-        expiryDate: convertToServerDate(expiryDate),
-        unpackedPurchase: true,
-        unpackedPurchasedQuantity: Number(unpackedPurchasedQty),
-        remarks: remarks || "", //remarks is optional
-        manufacturerId: selectedManufacturer?.id,
-        productId: selectedProduct?.id,
-        supplierId: selectedSupplier?.id,
-        id: 0,
-        stockedOnDate: convertToServerDate(purchaseDate),
-      };
-    }
+    const apiUrl = "/shop-products";
 
-    let isValidPayload = payload !== undefined && hasNull(payload) === false;
+    let isValidPayload = hasNull(payload) === false;
 
     if (isValidPayload === false) {
       setLoading(false); //removing loader if form is invalid
     }
 
+    console.log(payload);
     if (isValidPayload === true) {
-      new BaseApiService("/stock-entries")
+      new BaseApiService(apiUrl)
         .saveRequestWithJsonResponse(payload, false)
         .then((response) => {
           clearForm();
           setLoading(false);
           setSubmitted(false);
-          snackBarRef.current.show("Stock entry saved successfully", 5000);
+          snackBarRef.current.show("Product saved successfully", 5000);
+          setDisable(false);
         })
         .catch((error) => {
           snackBarRef.current.show(error?.message, 5000);
           setSubmitted(false);
           setLoading(false);
+          setDisable(false);
         });
     }
   };
 
   useEffect(() => {
-    fetchSuppliers();
-    fetchShops();
     fetchManufacturers();
+    fetchSaleUnits();
   }, []);
 
   return (
@@ -330,7 +223,7 @@ const ProductEntry = ({ navigation, route }) => {
               onChange={onProductChange}
               value={selectedShop}
               placeholder="Select product"
-              labelField="productName"
+              labelField="displayName"
               valueField="id"
             />
             {submitted && !selectedProduct && (
@@ -342,6 +235,40 @@ const ProductEntry = ({ navigation, route }) => {
                 }}
               >
                 Product is required
+              </Text>
+            )}
+          </View>
+
+          <View style={{ marginVertical: 8 }}>
+            <Text
+              style={{
+                marginVertical: 3,
+                marginStart: 6,
+              }}
+            >
+              Sale unit
+            </Text>
+            <MyDropDown
+              style={{
+                backgroundColor: Colors.light,
+                borderColor: Colors.dark,
+              }}
+              data={saleUnits}
+              onChange={(e) => setSelecetedSaleUnit(e)}
+              value={selectedManufacturer}
+              placeholder="Select sale unit"
+              labelField="value"
+              valueField="id"
+            />
+            {submitted && !selectedSaleUnit && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginStart: 6,
+                  color: Colors.error,
+                }}
+              >
+                Sale unit is required
               </Text>
             )}
           </View>
@@ -360,13 +287,13 @@ const ProductEntry = ({ navigation, route }) => {
                   marginStart: 6,
                 }}
               >
-                Sale unit
+                Sales prie
               </Text>
               <TextInput
-                value={batchNo}
-                onChangeText={(text) => setBatchNo(text)}
+                value={salesPrice}
+                onChangeText={(text) => setSalesPrice(text)}
                 cursorColor={Colors.dark}
-                inputMode="text"
+                inputMode="numeric"
                 style={{
                   backgroundColor: Colors.light,
                   borderRadius: 5,
@@ -374,10 +301,10 @@ const ProductEntry = ({ navigation, route }) => {
                   borderWidth: 0.6,
                   borderColor: Colors.dark,
                   paddingHorizontal: 10,
-                  textAlign: "center",
+                  textAlign: "right",
                 }}
               />
-              {submitted && !batchNo && (
+              {submitted && salesPrice.trim() === "" && (
                 <Text
                   style={{
                     fontSize: 12,
@@ -385,44 +312,7 @@ const ProductEntry = ({ navigation, route }) => {
                     color: Colors.error,
                   }}
                 >
-                  Batch number is required
-                </Text>
-              )}
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  marginVertical: 3,
-                  marginStart: 6,
-                }}
-              >
-                Sale prie
-              </Text>
-              <TextInput
-                value={batchNo}
-                onChangeText={(text) => setBatchNo(text)}
-                cursorColor={Colors.dark}
-                inputMode="text"
-                style={{
-                  backgroundColor: Colors.light,
-                  borderRadius: 5,
-                  padding: 6,
-                  borderWidth: 0.6,
-                  borderColor: Colors.dark,
-                  paddingHorizontal: 10,
-                  textAlign: "center",
-                }}
-              />
-              {submitted && !expiryDate && (
-                <Text
-                  style={{
-                    fontSize: 12,
-                    marginStart: 6,
-                    color: Colors.error,
-                  }}
-                >
-                  Expiry date is required
+                  Sales price is required
                 </Text>
               )}
             </View>
@@ -467,7 +357,11 @@ const ProductEntry = ({ navigation, route }) => {
           }}
         >
           <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} />
-          <PrimaryButton title={"Save"} />
+          <PrimaryButton
+            title={"Save"}
+            onPress={saveProduct}
+            disabled={disable}
+          />
         </View>
         <Snackbar ref={snackBarRef} />
       </View>

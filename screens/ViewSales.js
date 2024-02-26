@@ -6,7 +6,7 @@ import {
   FlatList,
   Image,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { BaseApiService } from "../utils/BaseApiService";
 
@@ -22,8 +22,9 @@ import UserProfile from "../components/UserProfile";
 import { SaleTransactionItem } from "../components/TransactionItems";
 import Loader from "../components/Loader";
 import { DateCalender } from "../components/Dialogs/DateCalendar";
+import { UserContext } from "../context/UserContext";
 
-export default function ViewSales({ navigation, route }) {
+export default function ViewSales({ navigation }) {
   const [sales, setSales] = useState([]);
   const [totalSalesQty, setTotalSalesQty] = useState(0); //total quantity for all sold items
   const [loading, setLoading] = useState(false);
@@ -40,8 +41,10 @@ export default function ViewSales({ navigation, route }) {
   const [daysProfit, setDaysProfit] = useState(0);
   const [daysCapital, setDaysCapital] = useState(0);
 
+  const { userParams } = useContext(UserContext);
+
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-    route.params;
+    userParams;
 
   const handleDayPress = (day) => {
     if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
@@ -241,9 +244,7 @@ export default function ViewSales({ navigation, route }) {
                     height: 25,
                     justifyContent: "center",
                   }}
-                  onPress={() =>
-                    navigation.navigate("shopSummary", route.params)
-                  }
+                  onPress={() => navigation.navigate("shopSummary")}
                 >
                   <Text
                     style={{

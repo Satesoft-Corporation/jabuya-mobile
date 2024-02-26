@@ -205,7 +205,7 @@ const StockPurchaseForm = ({ navigation }) => {
             paddingHorizontal: 8,
           }}
         >
-          <Text
+          {/* <Text
             style={{
               fontWeight: 500,
               fontSize: 17,
@@ -213,7 +213,7 @@ const StockPurchaseForm = ({ navigation }) => {
             }}
           >
             Stock purchase details
-          </Text>
+          </Text> */}
           <View style={{}}>
             <Text
               style={{

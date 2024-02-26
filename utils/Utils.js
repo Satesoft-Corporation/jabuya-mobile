@@ -3,6 +3,7 @@ import { dummyLoginResponse } from "../constants/Constants";
 import { CommonActions } from "@react-navigation/native";
 
 export function formatNumberWithCommas(number) {
+  number = Number(number);
   return number ? number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0;
 }
 

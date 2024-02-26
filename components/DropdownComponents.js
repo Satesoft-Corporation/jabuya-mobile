@@ -11,6 +11,7 @@ import Colors from "../constants/Colors";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
+
 export const SalesDropdownComponent = ({
   products,
   handleChange,
@@ -30,6 +31,7 @@ export const SalesDropdownComponent = ({
           {
             borderColor: Colors.primary,
             opacity: disable ? 0.8 : 1,
+            height: 35,
           },
         ]}
         placeholderStyle={styles.placeholderStyle}
@@ -67,7 +69,7 @@ export const SalesDropdownComponent = ({
             padding: 10,
             justifyContent: "center",
             borderRadius: 5,
-            paddingVertical: 18.5,
+            paddingVertical: 17,
             opacity: disable ? 0.7 : 1,
           }}
         >
@@ -86,53 +88,6 @@ export const SalesDropdownComponent = ({
   );
 };
 
-export const ShopSelectionDropdown = ({
-  shops,
-  makeShopSelection,
-  value,
-  disable,
-  style = {},
-}) => {
-  const [isFocus, setIsFocus] = useState(false);
-
-  return (
-    <View style={{ marginBottom: 1 }}>
-      <Dropdown
-        disable={disable}
-        style={[
-          {
-            height: 40,
-            borderColor: Colors.primary,
-            borderWidth: 0.5,
-            borderRadius: 5,
-            paddingHorizontal: 13,
-            backgroundColor: Colors.primary,
-            width: "100%",
-          },
-          isFocus && { borderColor: Colors.primary },
-          style,
-        ]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={shops}
-        maxHeight={screenHeight / 2}
-        labelField="name"
-        valueField="name"
-        placeholder={!isFocus ? "Select shop" : "..."}
-        searchPlaceholder="Search..."
-        value={value}
-        onFocus={() => setIsFocus(true)}
-        onBlur={() => setIsFocus(false)}
-        onChange={(item) => {
-          setIsFocus(false);
-          makeShopSelection(item);
-        }}
-      />
-    </View>
-  );
-};
 export const MyDropDown = ({
   onChange,
   style = {},
@@ -142,7 +97,6 @@ export const MyDropDown = ({
   value,
   placeholder = "Select item",
   disable = false,
-  onChangeText,
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -190,6 +144,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     flexDirection: "row",
     justifyContent: "center",
+    paddingHorizontal: 8,
   },
   dropdown: {
     height: 40,

@@ -22,12 +22,12 @@ const PrimaryButton = ({
           justifyContent: "center",
           backgroundColor: darkMode ? Colors.dark : Colors.light,
           borderRadius: 5,
-          borderWidth: 1,
+          borderWidth: darkMode ? 0 : 1,
           borderColor: Colors.dark,
           height: 40,
           minWidth: 100,
           width,
-          flex:1
+          flex: 1,
         },
         style,
       ]}

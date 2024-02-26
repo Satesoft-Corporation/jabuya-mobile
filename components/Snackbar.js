@@ -51,7 +51,7 @@ class Snackbar extends Component {
           styles.SnackBarContainter,
         ]}
       >
-        <Text numberOfLines={1} style={styles.SnackBarMessage}>
+        <Text numberOfLines={3} style={styles.SnackBarMessage}>
           {this.state.SnackBarInsideMsgHolder}
         </Text>
       </Animated.View>
@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     paddingLeft: 20,
     paddingRight: 55,
+    paddingBottom: 10,
   },
   SnackBarMessage: {
     color: "#fff",

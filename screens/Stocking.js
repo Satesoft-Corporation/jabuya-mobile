@@ -22,6 +22,7 @@ const Stocking = ({ navigation }) => {
     },
     {
       title: "Add new product",
+      target: "productEntry",
     },
     {
       title: "Stock levels",
@@ -49,7 +50,11 @@ const Stocking = ({ navigation }) => {
         style={{ flex: 1, marginTop: 10, paddingHorizontal: 10 }}
         data={list}
         renderItem={({ item }) => (
-          <StockingIcon disabled={!item.target} title={item.title} onPress={() => onPress(item)} />
+          <StockingIcon
+            disabled={!item.target}
+            title={item.title}
+            onPress={() => onPress(item)}
+          />
         )}
         numColumns={2}
       />

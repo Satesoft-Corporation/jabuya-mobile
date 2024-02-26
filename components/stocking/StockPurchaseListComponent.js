@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { formatDate, formatNumberWithCommas } from "../../utils/Utils";
 import Colors from "../../constants/Colors";
+import { screenWidth } from "../../constants/Constants";
 
 const StockPurchaseListComponent = ({ data }) => {
   const [expanded, setExpanded] = useState(false);
@@ -10,10 +11,16 @@ const StockPurchaseListComponent = ({ data }) => {
     setExpanded((prevExpanded) => !prevExpanded);
   }, []);
 
-  const totalQuantity = useMemo(
-    () => data?.packedQuantity * data?.purchasedQuantity,
-    [data]
-  );
+  const {
+    purchasedQuantity,
+    productName,
+    purchasePrice,
+    createdByFullName,
+    dateCreated,
+    barcode,
+    expiryDate,
+    supplierName,
+  } = data ?? {};
 
   return (
     <View
@@ -52,6 +59,7 @@ const StockPurchaseListComponent = ({ data }) => {
           {formatDate(data?.dateCreated)}
         </Text>
       </View>
+
       <View
         style={{
           flexDirection: "row",
@@ -59,7 +67,7 @@ const StockPurchaseListComponent = ({ data }) => {
           marginVertical: 10,
         }}
       >
-        <View style={{ alignItems: "left" }}>
+        <View style={{ alignItems: "left", flex: 2 }}>
           <Text
             style={{
               fontWeight: 600,
@@ -68,9 +76,10 @@ const StockPurchaseListComponent = ({ data }) => {
           >
             Product
           </Text>
-          <Text>{data?.productName}</Text>
+          <Text>{productName}</Text>
         </View>
-        <View style={{ alignItems: "center" }}>
+
+        <View style={{ alignItems: "center", flex: 1 }}>
           <Text
             style={{
               fontWeight: 600,
@@ -79,9 +88,10 @@ const StockPurchaseListComponent = ({ data }) => {
           >
             Qty
           </Text>
-          <Text>{totalQuantity}</Text>
+          <Text>{purchasedQuantity}</Text>
         </View>
-        <View style={{ alignItems: "center" }}>
+
+        <View style={{ alignItems: "flex-end", flex: 1 }}>
           <Text
             style={{
               fontWeight: 600,
@@ -91,19 +101,18 @@ const StockPurchaseListComponent = ({ data }) => {
             Amount
           </Text>
           <Text style={{ alignSelf: "flex-end", marginEnd: 2 }}>
-            {formatNumberWithCommas(data?.purchasePrice)}
+            {formatNumberWithCommas(purchasePrice)}
           </Text>
         </View>
       </View>
+
       {expanded && (
         <View>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
             <Text style={{ fontWeight: 400, fontSize: 12 }}>Barcode: </Text>
-            <Text style={{ fontWeight: 300, fontSize: 12 }}>
-              {data?.barcode}
-            </Text>
+            <Text style={{ fontWeight: 300, fontSize: 12 }}>{barcode}</Text>
           </View>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
@@ -112,7 +121,7 @@ const StockPurchaseListComponent = ({ data }) => {
               Restock date:{" "}
             </Text>
             <Text style={{ fontWeight: 300, fontSize: 12 }}>
-              {formatDate(data?.dateChanged, true)}
+              {formatDate(dateCreated, true)}
             </Text>
           </View>
           <View
@@ -124,7 +133,7 @@ const StockPurchaseListComponent = ({ data }) => {
           >
             <Text style={{ fontWeight: 400, fontSize: 12 }}>Expiry date: </Text>
             <Text style={{ fontWeight: 600, fontSize: 12 }}>
-              {formatDate(data?.expiryDate, true)}
+              {formatDate(expiryDate, true)}
             </Text>
           </View>
           <View
@@ -134,11 +143,12 @@ const StockPurchaseListComponent = ({ data }) => {
               Supplier:{" "}
             </Text>
             <Text style={{ fontWeight: 300, fontSize: 12 }}>
-              {data?.supplierName}
+              {supplierName}
             </Text>
           </View>
         </View>
       )}
+
       <View
         style={{
           flexDirection: "row",
@@ -150,13 +160,11 @@ const StockPurchaseListComponent = ({ data }) => {
           <Text style={{ fontWeight: 600, fontSize: 12 }}>
             Restock by:{" "}
             <Text style={{ fontWeight: 300, fontSize: 12 }}>
-              {data?.createdByFullName}
+              {createdByFullName}
             </Text>
           </Text>
-          {/* <Text style={{ fontWeight: 300, fontSize: 12 }}>
-            {data?.shopName}
-          </Text> */}
         </View>
+
         <TouchableOpacity
           onPress={toggleExpand}
           style={{
