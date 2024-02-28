@@ -153,9 +153,7 @@ export const IconsComponent = ({ clear }) => {
           name="broom"
           size={25}
           color="black"
-          onPress={() => {
-            clear();
-          }}
+          onPress={clear}
         />
         <Text style={{ alignSelf: "center" }}>Clear</Text>
       </TouchableOpacity>

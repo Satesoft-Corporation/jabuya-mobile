@@ -1,15 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import {
-  StyleSheet,
   Text,
   View,
   TouchableOpacity,
   TextInput,
-  Alert,
   ScrollView,
   Dimensions,
 } from "react-native";
-import { BarCodeScanner } from "expo-barcode-scanner";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import { BaseApiService } from "../utils/BaseApiService";
@@ -21,52 +18,52 @@ import UserProfile from "../components/UserProfile";
 import { SaleListItem } from "../components/TransactionItems";
 import { SalesDropdownComponent } from "../components/DropdownComponents";
 import { SalesQtyInputDialog } from "../components/Dialogs";
-import { formatNumberWithCommas } from "../utils/Utils";
+import { formatNumberWithCommas, isValidNumber } from "../utils/Utils";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import { IconsComponent } from "../components/Icon";
 import Loader from "../components/Loader";
 import { ConfirmSalesDialog } from "../components/Dialogs";
-import DisplayMessage from "../components/Dialogs/DisplayMessage";
 import Snackbar from "../components/Snackbar";
 import { useRef } from "react";
 import { UserContext } from "../context/UserContext";
 import SelectShopBar from "../components/SelectShopBar";
 import PrimaryButton from "../components/buttons/PrimaryButton";
+import { MAXIMUM_RECORDS_PER_FETCH, dummy } from "../constants/Constants";
+import { SaleEntryContext } from "../context/SaleEntryContext";
 
-const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
-function SalesEntry({ route, navigation }) {
+function SalesEntry({ navigation }) {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState(null);
-  const [limit, setLimit] = useState(20);
-  const [loading, setLoading] = useState(true);
-  const [quantity, setQuantity] = useState(null);
-  const [selections, setSelections] = useState([]); // products in the table(filtered)
-  const [showMoodal, setShowModal] = useState(false);
-  const [selection, setSelection] = useState(null);
-  const [totalCost, setTotalCost] = useState(0);
-  const [recievedAmount, setRecievedAmount] = useState("");
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
-  const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(false);
-  const [scanBarCode, setScanBarCode] = useState(false); // barcode scanner trigger
-  const [totalQty, setTotalQty] = useState(0);
-  const [unitCost, setUnitCost] = useState(null);
-  const [initialUnitCost, setInitialUnitCost] = useState(null);
-  const [errors, setErrors] = useState(null);
-  const [message, setMessage] = useState(null);
-  const [displayMessage, setDisplayMssage] = useState(false);
-
   const snackbarRef = useRef(null);
+
   const { userParams, selectedShop } = useContext(UserContext);
+
+  const {
+    selections,
+    selection,
+    setSelection,
+    setInitialUnitCost,
+    setSelectedSaleUnit,
+    setUnitCost,
+    loading,
+    setLoading,
+    totalQty,
+    recievedAmount,
+    setRecievedAmount,
+    totalCost,
+    clearEverything,
+    setShowModal,
+  } = useContext(SaleEntryContext);
 
   const { isShopOwner, isShopAttendant, attendantShopId } = userParams;
 
   const fetchProducts = async () => {
     let searchParameters = {
       offset: 0,
-      limit: limit,
+      limit: MAXIMUM_RECORDS_PER_FETCH,
     };
 
     if (searchTerm !== null) {
@@ -146,263 +143,15 @@ function SalesEntry({ route, navigation }) {
   };
 
   const makeSelection = (item) => {
-    setUnitCost(String(item?.salesPrice));
-
+    setSelection(dummy);
     setShowModal(true);
-    setSelection(item);
   };
-
-  const saveSelection = () => {
-    // saving the item into the data table
-
-    const parsedQuantity = Number(quantity);
-    const itemUnitCost = Number(unitCost);
-
-    let cost = itemUnitCost * parsedQuantity;
-
-    const isValidQuantity = !isNaN(parsedQuantity) && parsedQuantity > 0;
-    const isValidCost = !isNaN(itemUnitCost) && itemUnitCost >= initialUnitCost;
-
-    if (itemUnitCost < initialUnitCost) {
-      setErrors((prevErrors) => {
-        return {
-          ...prevErrors,
-          lessPriceError: `Unit cost for ${selection.productName} should be greater than ${initialUnitCost}`,
-        };
-      });
-    }
-
-    if (parsedQuantity === 0) {
-      setErrors((prevErrors) => {
-        return {
-          ...prevErrors,
-          qtyZeroError: "Quantity should be greater than 0",
-        };
-      });
-    }
-
-    const isValidSubmition = () => {
-      return isValidQuantity && isValidCost;
-    };
-
-    if (isValidSubmition()) {
-      setLoading(true);
-
-      setTotalCost(totalCost + cost);
-
-      setTotalQty(totalQty + parsedQuantity); //updating total items purchased
-
-      const productIndex = selections.findIndex(
-        //locating the duplicate item in selection array
-        (product) => product.productName === selection.productName
-      );
-
-      if (productIndex !== -1) {
-        //if the already exists, update quantity and total cost
-        let prevQty = selections[productIndex].quantity;
-        let prevTotalCost = selections[productIndex].totalCost;
-
-        selections[productIndex].quantity = Number(quantity) + prevQty;
-        selections[productIndex].totalCost = prevTotalCost + cost;
-        setLoading(false);
-        setScanned(false);
-      } else {
-        setSelections((prev) => [
-          ...prev,
-          {
-            id: selection.id,
-            productName: selection.productName,
-            shopProductId: selection.id,
-            quantity: parsedQuantity, // Use the parsed quantity
-            totalCost: cost,
-            unitCost: unitCost,
-          },
-        ]);
-      }
-      setScanned(false);
-      setSelection(null);
-      setQuantity(null);
-      setShowModal(false);
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
-    }
-
-    setLoading(false);
-  };
-
-  const handleBarCodeScanned = ({ data }) => {
-    setScanned(true);
-    fetchProductByBarCode(data);
-  };
-
-  const fetchProductByBarCode = (barcode) => {
-    setLoading(true);
-
-    let searchParameters = {
-      offset: 0,
-      limit: 0,
-      shopId: isShopAttendant ? attendantShopId : selectedShop?.id,
-      barCode: barcode,
-    };
-
-    new BaseApiService("/shop-products")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        if (response.records.length === 0) {
-          Alert.alert("Cannot find product in your shop", "", [
-            {
-              text: "Ok",
-              onPress: () => setScanned(false),
-              style: "cancel",
-            },
-          ]);
-          setLoading(false);
-          setQuantity(null);
-        } else {
-          setSelection(response.records[0]);
-          setUnitCost(String(response.records[0]?.salesPrice));
-          setScanned(true);
-          setShowModal(true);
-          setLoading(false);
-        }
-      })
-      .catch((error) => {
-        Alert.alert("Error!", error?.message);
-        setLoading(false);
-        setScanned(false);
-      });
-  };
-
-  const clearEverything = () => {
-    setQuantity(null);
-    setSelection(null);
-    setTotalCost(0);
-    setRecievedAmount("");
-    setShowConfirmed(false);
-    setSelections([]);
-    setTotalQty(0);
-    setErrors({});
-  };
-
-  useEffect(() => {
-    const getBarCodeScannerPermissions = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === "granted");
-    };
-
-    getBarCodeScannerPermissions();
-  }, []);
 
   useEffect(() => {
     fetchProducts();
   }, [searchTerm]);
 
-  useEffect(() => {
-    setInitialUnitCost(selection?.salesPrice);
-  }, [selection]);
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: Colors.dark,
-    },
-    overlay: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-    },
-    unfocusedContainer: {
-      //the blured section
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.7)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-
-    focusedContainer: {
-      //scan area
-      borderColor: Colors.primary,
-      borderWidth: 2,
-      height: 150,
-      borderRadius: 5,
-      width: screenWidth / 1.2,
-    },
-  });
-
-  return scanBarCode ? (
-    <View style={styles.container}>
-      <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
-
-      <Loader loading={loading} />
-
-      <SalesQtyInputDialog
-        showMoodal={showMoodal}
-        selection={selection}
-        errors={errors}
-        setErrors={setErrors}
-        setShowModal={setShowModal}
-        quantity={quantity}
-        setQuantity={setQuantity}
-        saveSelection={saveSelection}
-        setUnitCost={setUnitCost}
-        unitCost={unitCost}
-        setScanned={setScanned}
-        setSelection={setSelection}
-      />
-
-      <BarCodeScanner
-        height={screenHeight}
-        width={screenWidth}
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={{ marginTop: -20 }}
-      />
-      <View style={styles.overlay}>
-        <View style={styles.unfocusedContainer}></View>
-        <View style={{ flexDirection: "row" }}>
-          <View style={styles.unfocusedContainer}></View>
-          <View style={styles.focusedContainer}></View>
-          <View style={styles.unfocusedContainer}></View>
-        </View>
-        <View style={styles.unfocusedContainer}></View>
-        <View
-          style={{
-            backgroundColor: "black",
-            justifyContent: "center",
-            width: screenWidth,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => setScanBarCode(false)}
-            style={{
-              alignSelf: "center",
-              justifyContent: "center",
-              backgroundColor: Colors.primary,
-              borderRadius: 5,
-              borderWidth: 1,
-              borderColor: Colors.dark,
-              height: 50,
-              width: 300,
-              marginBottom: 10,
-            }}
-          >
-            <Text
-              style={{
-                fontWeight: 500,
-                color: Colors.dark,
-                alignSelf: "center",
-                fontSize: 20,
-              }}
-            >
-              Done
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  ) : (
+  return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
@@ -420,36 +169,14 @@ function SalesEntry({ route, navigation }) {
         cartLength={totalQty}
       />
 
-      <SalesQtyInputDialog
-        showMoodal={showMoodal}
-        selection={selection}
-        errors={errors}
-        setErrors={setErrors}
-        setShowModal={setShowModal}
-        quantity={quantity}
-        setQuantity={setQuantity}
-        saveSelection={saveSelection}
-        setUnitCost={setUnitCost}
-        unitCost={unitCost}
-        setSelection={setSelection}
-        setScanned={setScanned}
-      />
-
-      <DisplayMessage
-        showModal={displayMessage}
-        message={message}
-        onAgree={() => setDisplayMssage(false)}
-        setShowModal={setDisplayMssage}
-      />
+      <SalesQtyInputDialog />
 
       <BlackScreen flex={isShopAttendant ? 12 : 10}>
         <UserProfile />
 
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("viewSales", {
-              ...route.params,
-            });
+            navigation.navigate("viewSales");
           }}
           style={{
             backgroundColor: Colors.primary,
@@ -489,7 +216,7 @@ function SalesEntry({ route, navigation }) {
             handleChange={(t) => handleChange(t)}
             setLoading={() => setLoading(false)}
             makeSelection={makeSelection}
-            setScanned={() => setScanBarCode(true)}
+            setScanned={() => navigation.navigate("barcodeScreen")}
           />
         </View>
       </BlackScreen>
@@ -706,7 +433,15 @@ function SalesEntry({ route, navigation }) {
                     setTimeout(() => {
                       setLoading(false);
                       setShowConfirmed(true);
-                    }, 1000);
+                    }, 500);
+                    return true;
+                  }
+
+                  if (!isValidNumber(recievedAmount)) {
+                    snackbarRef.current.show(
+                      "Invalid input for recieved amount."
+                    );
+                    return true;
                   } else {
                     snackbarRef.current.show(
                       `Recieved amount should be greater that UGX ${formatNumberWithCommas(
@@ -714,6 +449,7 @@ function SalesEntry({ route, navigation }) {
                       )}`,
                       4000
                     );
+                    return true;
                   }
                 } else {
                   snackbarRef.current.show("Product selection is required.");

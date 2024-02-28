@@ -108,3 +108,50 @@ export const MAXIMUM_RECORDS_PER_FETCH = 20;
 
 export const screenWidth = Dimensions.get("window").width;
 export const screenHeight = Dimensions.get("window").height;
+
+export const dummy = {
+  status: "active",
+  message: "Data entry successful",
+  createdById: 123,
+  createdByUsername: "john_doe",
+  createdByFullName: "John Doe",
+  changedById: 456,
+  changedByUserName: "jane_smith",
+  changedByFullName: "Jane Smith",
+  dateCreated: "2024-02-27T12:35:08.774Z",
+  dateChanged: "2024-02-27T12:35:08.774Z",
+  recordStatus: "available",
+  serialNumber: "SN123456",
+  id: 789,
+  quantityInStock: 100,
+  productId: 101,
+  productName: "Sample Product",
+  saleUnitName: "each",
+  saleUnitId: 1,
+  packageUnitName: "box",
+  packageUnitId: 2,
+  salesPrice: 10.99,
+  remarks: "This is a sample product",
+  barcode: "123456789012",
+  shopId: 987,
+  shopName: "Sample Shop",
+  manufacturerId: 654,
+  manufacturerName: "Sample Manufacturer",
+  categoryId: 321,
+  categoryName: "Sample Category",
+  multipleSaleUnits: [
+    {
+      id: 1,
+      productSaleUnitId: 101,
+      productSaleUnitName: "each",
+      unitPrice: 10.99,
+    },
+    {
+      id: 2,
+      productSaleUnitId: 101,
+      productSaleUnitName: "box",
+      unitPrice: 109.9,
+    },
+  ],
+  hasMultipleSaleUnits: true,
+};

@@ -174,3 +174,9 @@ export const onDummyLogin = async (navigation) => {
     })
   );
 };
+
+export const isValidNumber = (num) => {
+  let reg = /^[-+]?[0-9]*\.?[0-9]+$/;
+
+  return reg.test(num);
+};

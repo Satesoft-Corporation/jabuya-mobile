@@ -6,31 +6,64 @@ import {
   FlatList,
   TextInput,
 } from "react-native";
-import React from "react";
-import { Calendar } from "react-native-calendars";
+import React, { useContext, useState } from "react";
 
 import Card from "./Card";
 import ModalContent from "./ModalContent";
 import MaterialButton from "./MaterialButton";
 import { SaleItem } from "./TransactionItems";
+import ChipButton from "./buttons/ChipButton";
 
 import Colors from "../constants/Colors";
 import { formatDate, formatNumberWithCommas } from "../utils/Utils";
+import PrimaryButton from "./buttons/PrimaryButton";
+import { SaleEntryContext } from "../context/SaleEntryContext";
 
-export function SalesQtyInputDialog({
-  showMoodal,
-  selection,
-  errors,
-  setErrors,
-  setShowModal,
-  quantity,
-  setQuantity,
-  saveSelection,
-  setUnitCost,
-  unitCost,
-  setSelection,
-  setScanned,
-}) {
+export function SalesQtyInputDialog() {
+  const [submitted, setSubmitted] = useState(false);
+
+  const {
+    selection,
+    setSelection,
+    setSelectedSaleUnit,
+    selectedSaleUnit,
+    setUnitCost,
+    setScanned,
+    saveSelection,
+    setQuantity,
+    quantity,
+    setErrors,
+    errors,
+    unitCost,
+    showMoodal,
+    setShowModal,
+    onChipPress,
+  } = useContext(SaleEntryContext);
+
+  const handlePress = () => {
+    if (selectedSaleUnit) {
+      saveSelection();
+      setSubmitted(false);
+    } else {
+      setSubmitted(true);
+    }
+  };
+
+  const renderFooter = () => {
+    if (submitted && !selectedSaleUnit) {
+      return (
+        <Text
+          style={{
+            fontSize: 12,
+            color: Colors.error,
+          }}
+        >
+          Sale unit is required
+        </Text>
+      );
+    }
+  };
+
   return (
     <ModalContent visible={showMoodal} style={{ padding: 35 }}>
       <Card
@@ -61,128 +94,134 @@ export function SalesQtyInputDialog({
               Successfull
             </Text>
             <Text>{selection && selection.productName} has been selected.</Text>
-            <Text
-              style={{
-                fontWeight: "600",
-                fontSize: 13,
-                marginTop: 10,
-              }}
-            >
-              Quantity
-            </Text>
+
+            <View style={{ marginTop: 10 }}>
+              <Text
+                style={{
+                  fontWeight: "600",
+                }}
+              >
+                Select sale unit
+              </Text>
+
+              <FlatList
+                data={selection?.multipleSaleUnits}
+                renderItem={({ item }) => (
+                  <ChipButton
+                    title={item?.productSaleUnitName}
+                    isSelected={
+                      selectedSaleUnit?.productSaleUnitName ===
+                      item?.productSaleUnitName
+                    }
+                    onPress={() => onChipPress(item)}
+                  />
+                )}
+                keyExtractor={(item) => item.productSaleUnitName.toString()}
+                numColumns={3}
+                ListFooterComponent={renderFooter}
+              />
+            </View>
           </View>
 
-          <TextInput
-            onFocus={() => setErrors(null)}
-            onBlur={() => setErrors(null)}
-            textAlign="right"
-            inputMode="numeric"
-            value={quantity}
-            onChangeText={(text) => setQuantity(text)}
-            maxLength={3}
-            autoFocus
-            style={{
-              backgroundColor: Colors.light_3,
-              borderRadius: 5,
-              padding: 6,
-              borderWidth: 1,
-              borderColor: errors?.qtyZeroError ? Colors.error : "transparent",
-            }}
-          />
-          {errors?.qtyZeroError && (
-            <Text
-              style={{
-                fontSize: 12,
-                color: Colors.error,
-              }}
-            >
-              {errors?.qtyZeroError}
-            </Text>
+          {selectedSaleUnit && (
+            <View>
+              <Text
+                style={{
+                  fontWeight: "600",
+                  fontSize: 13,
+                  marginTop: 10,
+                }}
+              >
+                Quantity
+              </Text>
+              <TextInput
+                onFocus={() => setErrors(null)}
+                onBlur={() => setErrors(null)}
+                textAlign="right"
+                inputMode="numeric"
+                value={quantity}
+                onChangeText={(text) => setQuantity(text)}
+                maxLength={3}
+                autoFocus
+                style={{
+                  backgroundColor: Colors.light_3,
+                  borderRadius: 5,
+                  padding: 6,
+                  borderWidth: 1,
+                  borderColor: errors?.qtyZeroError
+                    ? Colors.error
+                    : "transparent",
+                }}
+              />
+              {errors?.qtyZeroError && (
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: Colors.error,
+                  }}
+                >
+                  {errors?.qtyZeroError}
+                </Text>
+              )}
+              <Text
+                style={{
+                  fontWeight: "600",
+                  fontSize: 13,
+                  marginTop: 10,
+                  marginBottom: 5,
+                }}
+              >
+                Unit cost
+              </Text>
+              <TextInput
+                textAlign="right"
+                value={unitCost}
+                inputMode="numeric"
+                onChangeText={(e) => setUnitCost(e)}
+                style={{
+                  backgroundColor: Colors.light_3,
+                  borderRadius: 5,
+                  padding: 6,
+                  borderColor: errors?.lessPriceError
+                    ? Colors.error
+                    : "transparent",
+                }}
+              />
+              {errors?.lessPriceError && (
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: Colors.error,
+                  }}
+                >
+                  {errors?.lessPriceError}
+                </Text>
+              )}
+            </View>
           )}
-          <Text
-            style={{
-              fontWeight: "600",
-              fontSize: 13,
-              marginTop: 10,
-              marginBottom: 5,
-            }}
-          >
-            Unit cost
-          </Text>
-          <TextInput
-            textAlign="right"
-            value={unitCost}
-            inputMode="numeric"
-            onChangeText={(e) => setUnitCost(e)}
-            style={{
-              backgroundColor: Colors.light_3,
-              borderRadius: 5,
-              padding: 6,
-              borderColor: errors?.lessPriceError
-                ? Colors.error
-                : "transparent",
-            }}
-          />
-          {errors?.lessPriceError && (
-            <Text
-              style={{
-                fontSize: 12,
-                color: Colors.error,
-              }}
-            >
-              {errors?.lessPriceError}
-            </Text>
-          )}
+
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
               marginTop: 15,
               marginBottom: 5,
+              gap: 5,
             }}
           >
-            <MaterialButton
-              title="Cancel"
-              style={{
-                backgroundColor: "transparent",
-                borderRadius: 5,
-                borderWidth: 1,
-                borderColor: Colors.dark,
-                marginStart: -2,
-                margin: 10,
-                height: 40,
-              }}
-              titleStyle={{
-                fontWeight: "bold",
-                color: Colors.dark,
-              }}
-              buttonPress={() => {
+            <PrimaryButton
+              darkMode={false}
+              title={"Cancel"}
+              onPress={() => {
                 setShowModal(false);
                 setErrors({});
                 setSelection(null);
                 setScanned(false);
+                setSelectedSaleUnit(null);
+                setSubmitted(false);
               }}
             />
-            <MaterialButton
-              title="Confirm"
-              style={{
-                backgroundColor: Colors.dark,
-                borderRadius: 5,
-                borderWidth: 1,
-                borderColor: Colors.dark,
-                marginStart: 2,
-                marginEnd: -2,
-                margin: 10,
-                height: 40,
-              }}
-              titleStyle={{
-                fontWeight: "bold",
-                color: Colors.primary,
-              }}
-              buttonPress={() => {
-                saveSelection();
-              }}
-            />
+            <PrimaryButton title={"Confirm"} onPress={handlePress} />
           </View>
         </View>
       </Card>

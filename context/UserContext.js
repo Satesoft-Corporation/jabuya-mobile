@@ -3,6 +3,7 @@ import { UserSessionUtils } from "../utils/UserSessionUtils";
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
+  //api call variables
   const [userParams, setUserParams] = useState({});
   const [shops, setShops] = useState([]);
   const [selectedShop, setSelectedShop] = useState(null);
