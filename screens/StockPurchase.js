@@ -19,6 +19,7 @@ const StockPurchase = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [offset, setOffset] = useState(0);
   const [showFooter, setShowFooter] = useState(true);
+  const [disable, setDisable] = useState(false);
 
   const snackbarRef = useRef(null);
   const { userParams } = useContext(UserContext);
@@ -65,6 +66,7 @@ const StockPurchase = ({ navigation }) => {
       setStockEntries((prevEntries) => [...prevEntries, ...response?.records]);
 
       setStockEntryRecords(response?.totalItems);
+      setDisable(false);
 
       if (response?.totalItems === 0) {
         setMessage("No stock entries found");
@@ -78,6 +80,7 @@ const StockPurchase = ({ navigation }) => {
 
       setIsFetchingMore(false);
     } catch (error) {
+      setDisable(false);
       setLoading(false);
       setShowFooter(false);
       setMessage("Error fetching stock records");
@@ -94,10 +97,10 @@ const StockPurchase = ({ navigation }) => {
   };
 
   const onSearch = () => {
+    setDisable(true);
     setStockEntries([]);
     setOffset(0);
     fetchStockEntries();
-    console.log(stockEntryRecords);
   };
 
   useEffect(() => {
@@ -132,6 +135,7 @@ const StockPurchase = ({ navigation }) => {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}
+        disabled={disable}
       />
 
       <FlatList

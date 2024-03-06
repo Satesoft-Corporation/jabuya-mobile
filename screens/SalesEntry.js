@@ -30,6 +30,8 @@ import SelectShopBar from "../components/SelectShopBar";
 import PrimaryButton from "../components/buttons/PrimaryButton";
 import { MAXIMUM_RECORDS_PER_FETCH, dummy } from "../constants/Constants";
 import { SaleEntryContext } from "../context/SaleEntryContext";
+import { UserSessionUtils } from "../utils/UserSessionUtils";
+import NetInfo from "@react-native-community/netinfo";
 
 const screenHeight = Dimensions.get("window").height;
 
@@ -45,9 +47,6 @@ function SalesEntry({ navigation }) {
     selections,
     selection,
     setSelection,
-    setInitialUnitCost,
-    setSelectedSaleUnit,
-    setUnitCost,
     loading,
     setLoading,
     totalQty,
@@ -56,14 +55,51 @@ function SalesEntry({ navigation }) {
     totalCost,
     clearEverything,
     setShowModal,
+    setSaleUnits,
   } = useContext(SaleEntryContext);
 
   const { isShopOwner, isShopAttendant, attendantShopId } = userParams;
 
+  const resolvePendingSales = async () => {
+    setLoading(true);
+
+    let pendingSales = await UserSessionUtils.getPendingSales();
+
+    if (pendingSales.length > 0) {
+      pendingSales.forEach((cart, index) => {
+        new BaseApiService("/shop-sales")
+          .postRequest(cart)
+          .then(async (response) => {
+            let d = { info: await response.json(), status: response.status };
+            return d;
+          })
+          .then(async (d) => {
+            let { info, status } = d;
+            let id = info?.id;
+
+            if (status === 200) {
+              new BaseApiService(`/shop-sales/${id}/confirm`)
+                .postRequest()
+                .then((d) => d.json())
+                .then(async (d) => {
+                  await UserSessionUtils.removePendingSale(index);
+                })
+                .catch((error) => {
+                  console.log(error, cart);
+                });
+            } else {
+              console.log(error, cart);
+            }
+          });
+      });
+    }
+    fetchProducts();
+  };
+
   const fetchProducts = async () => {
     let searchParameters = {
       offset: 0,
-      limit: MAXIMUM_RECORDS_PER_FETCH,
+      limit: 10000,
     };
 
     if (searchTerm !== null) {
@@ -78,15 +114,28 @@ function SalesEntry({ navigation }) {
       searchParameters.shopId = attendantShopId;
     }
 
-    new BaseApiService("/shop-products")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        setProducts(response.records);
+    NetInfo.fetch().then(async (state) => {
+      if (state.isConnected) {
+        new BaseApiService("/shop-products")
+          .getRequestWithJsonResponse(searchParameters)
+          .then(async (response) => {
+            setProducts(response.records);
+            setLoading(false);
+
+            if (!searchTerm) {
+              await UserSessionUtils.setShopProducts(response.records); //to keep updating the list locally
+            }
+          })
+          .catch((error) => {
+            setLoading(false);
+          });
+      } else {
+        let pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
+        setProducts(pdtList);
+        snackbarRef.current.show("enjoy offline mode", 6000);
         setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-      });
+      }
+    });
   };
 
   const postSales = () => {
@@ -98,44 +147,60 @@ function SalesEntry({ navigation }) {
     };
 
     setLoading(true);
-    new BaseApiService("/shop-sales")
-      .postRequest(payLoad)
-      .then(async (response) => {
-        let d = { info: await response.json(), status: response.status };
-        return d;
-      })
-      .then(async (d) => {
-        let { info, status } = d;
-        let id = info?.id;
+    NetInfo.fetch().then(async (state) => {
+      if (state.isConnected) {
+        new BaseApiService("/shop-sales")
+          .postRequest(payLoad)
+          .then(async (response) => {
+            let d = { info: await response.json(), status: response.status };
+            return d;
+          })
+          .then(async (d) => {
+            let { info, status } = d;
+            let id = info?.id;
 
-        if (status === 200) {
-          new BaseApiService(`/shop-sales/${id}/confirm`)
-            .postRequest()
-            .then((d) => d.json())
-            .then((d) => {
-              if (d.status === "Success") {
-                setShowConfirmed(false);
-                setLoading(false);
-                clearEverything();
-                snackbarRef.current.show("Sale confirmed successfully", 4000);
-              }
-            })
-            .catch((error) => {
+            if (status === 200) {
+              new BaseApiService(`/shop-sales/${id}/confirm`)
+                .postRequest()
+                .then((d) => d.json())
+                .then((d) => {
+                  if (d.status === "Success") {
+                    setShowConfirmed(false);
+                    setLoading(false);
+                    clearEverything();
+                    snackbarRef.current.show(
+                      "Sale confirmed successfully",
+                      4000
+                    );
+                  }
+                })
+                .catch((error) => {
+                  setLoading(false);
+                  snackbarRef.current.show(
+                    `Failed to confirm purchases!,${error?.message}`,
+                    6000
+                  );
+                });
+            } else {
               setLoading(false);
-              snackbarRef.current.show(
-                `Failed to confirm purchases!,${error?.message}`,
-                6000
-              );
-            });
-        } else {
-          setLoading(false);
-          snackbarRef.current.show(info?.message, 5000);
-        }
-      })
-      .catch((error) => {
-        setLoading(false);
-        snackbarRef.current.show(error?.message);
-      });
+              snackbarRef.current.show(info?.message, 5000);
+            }
+          })
+          .catch((error) => {
+            setLoading(false);
+            snackbarRef.current.show(error?.message);
+          });
+      } else {
+        console.log("going offline");
+        await UserSessionUtils.addPendingSale(payLoad);
+        setTimeout(() => setLoading(false), 1000);
+        clearEverything();
+        snackbarRef.current.show(
+          "Sale record will be saved when online.",
+          4000
+        );
+      }
+    });
   };
 
   const handleChange = (value) => {
@@ -143,9 +208,24 @@ function SalesEntry({ navigation }) {
   };
 
   const makeSelection = (item) => {
-    setSelection(dummy);
+    const { multipleSaleUnits, saleUnitName, salesPrice } = item;
+
+    let defUnit = { productSaleUnitName: saleUnitName, unitPrice: salesPrice };
+
+    setSelection(item);
+    console.log(item);
     setShowModal(true);
+
+    if (multipleSaleUnits) {
+      setSaleUnits([defUnit, ...multipleSaleUnits]);
+    } else {
+      setSaleUnits([{ ...defUnit }]);
+    }
   };
+
+  useEffect(() => {
+    resolvePendingSales();
+  }, []);
 
   useEffect(() => {
     fetchProducts();

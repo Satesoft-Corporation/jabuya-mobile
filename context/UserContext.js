@@ -1,5 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
+import NetInfo from "@react-native-community/netinfo";
+
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
@@ -7,6 +9,7 @@ export const UserProvider = ({ children }) => {
   const [userParams, setUserParams] = useState({});
   const [shops, setShops] = useState([]);
   const [selectedShop, setSelectedShop] = useState(null);
+  
 
   const getShopsFromStorage = () => {
     UserSessionUtils.getShops().then((ownerShops) => {

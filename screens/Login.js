@@ -51,6 +51,7 @@ export default function Login({ navigation }) {
           await UserSessionUtils.setFullSessionObject(info);
           await UserSessionUtils.setShopid(String(info.user.attendantShopId));
           await UserSessionUtils.setLoginTime(String(date));
+          await UserSessionUtils.resetPendingSales()
           navigation.navigate("welcome");
           setPassword("");
           setUsername("");

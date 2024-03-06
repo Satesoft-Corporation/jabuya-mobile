@@ -9,4 +9,6 @@ export default {
   SHOP_COUNT: "@shop_count",
   LOGIN_TIME: "@login_time",
   SHOPS: "@shops",
+  SHOP_PRODUCTS: "@shop_products",
+  PENDING_SALES: "@pending_sales",
 };

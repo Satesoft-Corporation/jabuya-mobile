@@ -191,4 +191,51 @@ export class UserSessionUtils {
     let time = await AsyncStorage.getItem(StorageParams.LOGIN_TIME);
     return new Date(time);
   }
+
+  static async setShopProducts(productList) {
+    await AsyncStorage.setItem(
+      StorageParams.SHOP_PRODUCTS,
+      JSON.stringify(productList)
+    );
+  }
+
+  static async getShopProducts(shopId) {
+    let productList = await AsyncStorage.getItem(StorageParams.SHOP_PRODUCTS);
+
+    if (productList) {
+      let newList = [...JSON.parse(productList)];
+      let filtered = newList.filter((item) => item.shopId === shopId);
+      return filtered;
+    } else {
+      return [];
+    }
+  }
+
+  static async addPendingSale(salePayLoad) {
+    let pendingSales = await this.getPendingSales(); //an array
+
+    await AsyncStorage.setItem(
+      StorageParams.PENDING_SALES,
+      JSON.stringify([...pendingSales, salePayLoad])
+    );
+  }
+
+  static async removePendingSale(index) {
+    let pendingSales = await this.getPendingSales(); //an array
+    pendingSales.splice(index, 1); // Removes one element at the specified index
+
+    await AsyncStorage.setItem(
+      StorageParams.PENDING_SALES,
+      JSON.stringify([...pendingSales])
+    );
+  }
+
+  static async getPendingSales() {
+    let list = await AsyncStorage.getItem(StorageParams.PENDING_SALES);
+    return JSON.parse(list);
+  }
+
+  static async resetPendingSales() {
+    await AsyncStorage.setItem(StorageParams.PENDING_SALES, JSON.stringify([]));
+  }
 }

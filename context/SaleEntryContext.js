@@ -1,11 +1,12 @@
 import { createContext, useState } from "react";
 import { isValidNumber } from "../utils/Utils";
+import Loader from "../components/Loader";
+import { BaseApiService } from "../utils/BaseApiService";
 
 export const SaleEntryContext = createContext();
 
+// the sale logic on both sales desk and bar code
 export const SaleEntryProvider = ({ children }) => {
-  //
-  //items to do with the sales desk and barcode screen
   const [quantity, setQuantity] = useState("");
   const [selections, setSelections] = useState([]); // products in the table(filtered)
   const [selection, setSelection] = useState(null);
@@ -19,6 +20,20 @@ export const SaleEntryProvider = ({ children }) => {
   const [recievedAmount, setRecievedAmount] = useState("");
   const [totalQty, setTotalQty] = useState(0);
   const [showMoodal, setShowModal] = useState(false);
+  const [saleUnitId, setSaleUnitId] = useState(null);
+  const [saleUnits, setSaleUnits] = useState([]);
+
+  const clearEverything = () => {
+    setQuantity("");
+    setSelection(null);
+    setTotalCost(0);
+    setRecievedAmount("");
+    setSelections([]);
+    setTotalQty(0);
+    setErrors({});
+    setSelectedSaleUnit(null);
+    setSaleUnitId(null);
+  };
 
   const saveSelection = () => {
     // saving the item into the data table
@@ -100,6 +115,7 @@ export const SaleEntryProvider = ({ children }) => {
             quantity: parsedQuantity, // Use the parsed quantity
             totalCost: cost,
             unitCost: Number(unitCost),
+            saleUnitId: selectedSaleUnit?.id || null,
           },
         ]);
       }
@@ -120,20 +136,14 @@ export const SaleEntryProvider = ({ children }) => {
     setSelectedSaleUnit(item);
     setInitialUnitCost(item?.unitPrice);
     setUnitCost(String(item?.unitPrice));
-  };
-
-  const clearEverything = () => {
-    setQuantity("");
-    setSelection(null);
-    setTotalCost(0);
-    setRecievedAmount("");
-    setSelections([]);
-    setTotalQty(0);
-    setErrors({});
-    setSelectedSaleUnit(null);
+    setSaleUnitId(item?.id);
   };
 
   const data = {
+    saleUnits,
+    setSaleUnits,
+    saleUnitId,
+    setSaleUnitId,
     onChipPress,
     clearEverything,
     totalQty,
@@ -167,6 +177,7 @@ export const SaleEntryProvider = ({ children }) => {
 
   return (
     <SaleEntryContext.Provider value={data}>
+      {/* <Loader loading={loading} /> */}
       {children}
     </SaleEntryContext.Provider>
   );

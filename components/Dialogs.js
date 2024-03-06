@@ -38,6 +38,8 @@ export function SalesQtyInputDialog() {
     showMoodal,
     setShowModal,
     onChipPress,
+    setSaleUnitId,
+    saleUnits,
   } = useContext(SaleEntryContext);
 
   const handlePress = () => {
@@ -105,7 +107,7 @@ export function SalesQtyInputDialog() {
               </Text>
 
               <FlatList
-                data={selection?.multipleSaleUnits}
+                data={saleUnits}
                 renderItem={({ item }) => (
                   <ChipButton
                     title={item?.productSaleUnitName}
@@ -219,6 +221,7 @@ export function SalesQtyInputDialog() {
                 setScanned(false);
                 setSelectedSaleUnit(null);
                 setSubmitted(false);
+                setSaleUnitId(null);
               }}
             />
             <PrimaryButton title={"Confirm"} onPress={handlePress} />

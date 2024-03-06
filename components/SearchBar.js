@@ -7,6 +7,7 @@ export default function SearchBar({
   onChangeText,
   placeholder = "Search...",
   style,
+  disabled,
   onSearch,
   onClear,
 }) {
@@ -33,6 +34,7 @@ export default function SearchBar({
         />
       </View>
       <TouchableOpacity
+        disabled={disabled}
         onPress={onSearch}
         style={{ width: 50, alignItems: "center", justifyContent: "center" }}
       >
