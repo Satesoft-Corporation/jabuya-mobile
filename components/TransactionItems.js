@@ -91,14 +91,17 @@ export function SaleTransactionItem({ data, isShopOwner }) {
               <Text style={{ fontWeight: 600 }}>Items</Text>
               <Text>{itemCount}</Text>
             </View>
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ fontWeight: 600 }}>Recieved</Text>
-              <Text>{formatNumberWithCommas(amountPaid)}</Text>
-            </View>
+
             <View style={{ alignItems: "center" }}>
               <Text style={{ fontWeight: 600 }}>Amount</Text>
               <Text>{formatNumberWithCommas(totalCost)}</Text>
             </View>
+
+            <View style={{ alignItems: "center" }}>
+              <Text style={{ fontWeight: 600 }}>Recieved</Text>
+              <Text>{formatNumberWithCommas(amountPaid)}</Text>
+            </View>
+
             <View style={{ alignItems: "center" }}>
               <Text style={{ fontWeight: 600 }}>Balance</Text>
               <Text>{formatNumberWithCommas(balanceGivenOut)}</Text>

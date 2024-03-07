@@ -14,13 +14,13 @@ import { BaseApiService } from "../utils/BaseApiService";
 import { packageOptions } from "../constants/Constants";
 import Loader from "../components/Loader";
 import { KeyboardAvoidingView } from "react-native";
-import { convertToServerDate, toReadableDate, hasNull } from "../utils/Utils";
-import { DateCalender } from "../components/Dialogs/DateCalendar";
+import { convertToServerDate, hasNull } from "../utils/Utils";
 import { UserContext } from "../context/UserContext";
 import { useContext } from "react";
 import TopHeader from "../components/TopHeader";
 import Snackbar from "../components/Snackbar";
 import PrimaryButton from "../components/buttons/PrimaryButton";
+import { DatePickerInput } from "react-native-paper-dates";
 
 const StockPurchaseForm = ({ navigation }) => {
   const { selectedShop, userParams } = useContext(UserContext);
@@ -34,16 +34,12 @@ const StockPurchaseForm = ({ navigation }) => {
   const [expiryDate, setExpiryDate] = useState(null);
   const [isPackedProduct, setIsPackedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [batchNo, setBatchNo] = useState(null);
+  const [batchNo, setBatchNo] = useState("");
   const [purchaseDate, setPurchaseDate] = useState(null);
   const [packedPurchasedQuantity, setPackedPurchasedQuantity] = useState(null);
-  const [remarks, setRemarks] = useState(null);
+  const [remarks, setRemarks] = useState("");
   const [purchasePrice, setPurchasePrice] = useState(null);
   const [unpackedPurchasedQty, setUnpackedPurchasedQty] = useState(null);
-  const [visible, setVisible] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState(null);
-  const [selectedEndDate, setSelectedEndDate] = useState(null);
-  const [dateToSelect, setDateToSelect] = useState(null);
   const [submitted, setSubmitted] = useState(false);
 
   //
@@ -66,7 +62,11 @@ const StockPurchaseForm = ({ navigation }) => {
   const fetchProducts = async () => {
     setIsPackedProduct(null);
     setSelectedProduct(null);
-    let searchParameters = { offset: 0, limit: 0, shopOwnerId: shopOwnerId };
+    let searchParameters = {
+      offset: 0,
+      limit: 10000,
+      shopOwnerId: shopOwnerId,
+    };
     setLoading(true);
 
     new BaseApiService("/shop-products")
@@ -90,7 +90,7 @@ const StockPurchaseForm = ({ navigation }) => {
   };
 
   const clearForm = () => {
-    setBatchNo(null);
+    setBatchNo("");
     setExpiryDate(null);
     setPackedPurchasedQuantity(null);
     setPurchaseDate(null);
@@ -98,21 +98,10 @@ const StockPurchaseForm = ({ navigation }) => {
     setSelectedProduct(null);
     setIsPackedProduct(null);
     setSelectedSupplier(null);
-    setRemarks(null);
+    setRemarks("");
     setUnpackedPurchasedQty(null);
     setProducts([]);
     setSubmitted(false);
-  };
-
-  const handleDayPress = (day) => {
-    setSelectedStartDate(day.dateString);
-    dateToSelect === "expiry"
-      ? setExpiryDate(day.dateString)
-      : setPurchaseDate(day.dateString);
-  };
-
-  const handleCancel = () => {
-    return true;
   };
 
   const saveStockEntry = () => {
@@ -122,39 +111,34 @@ const StockPurchaseForm = ({ navigation }) => {
 
     const isPacked = isPackedProduct && isPackedProduct === true;
     //setting payload basing on item package type
+
+    const constants = {
+      batchNumber: batchNo,
+      expiryDate: convertToServerDate(expiryDate),
+      id: 0,
+      manufacturerId: selectedProduct?.manufacturerId,
+      productId: selectedProduct?.id,
+      productName: selectedProduct?.productName,
+      shopId: selectedShop?.id,
+      stockedOnDate: convertToServerDate(purchaseDate),
+      supplierId: selectedSupplier?.id,
+      remarks: remarks || "",
+      purchasePrice: Number(purchasePrice),
+    };
+
     if (isPacked === true) {
       payload = {
-        batchNumber: batchNo,
-        expiryDate: convertToServerDate(expiryDate),
-        id: 0,
-        manufacturerId: selectedProduct?.manufacturerId,
+        ...constants,
         packedPurchasedQuantity: Number(packedPurchasedQuantity),
-        productId: selectedProduct?.id,
-        productName: selectedProduct?.productName,
-        purchasePrice: Number(purchasePrice),
-        remarks: remarks || "",
-        shopId: selectedShop?.id,
-        stockedOnDate: convertToServerDate(purchaseDate),
-        supplierId: selectedSupplier?.id,
         unpackedPurchase: false,
       };
     }
 
     if (isPacked === false) {
       payload = {
-        shopId: selectedShop?.id,
-        productId: selectedProduct?.id,
-        productName: selectedProduct?.productName,
-        purchasePrice: Number(purchasePrice),
-        batchNumber: batchNo,
-        expiryDate: convertToServerDate(expiryDate),
+        ...constants,
         unpackedPurchase: true,
         unpackedPurchasedQuantity: Number(unpackedPurchasedQty),
-        remarks: remarks || "", //remarks is optional
-        manufacturerId: selectedProduct?.manufacturerId,
-        supplierId: selectedSupplier?.id,
-        id: 0,
-        stockedOnDate: convertToServerDate(purchaseDate),
       };
     }
 
@@ -163,6 +147,8 @@ const StockPurchaseForm = ({ navigation }) => {
     if (isValidPayload === false) {
       setLoading(false); //removing loader if form is invalid
     }
+
+    console.log(payload);
 
     if (isValidPayload === true) {
       new BaseApiService("/stock-entries")
@@ -189,7 +175,7 @@ const StockPurchaseForm = ({ navigation }) => {
   return (
     <KeyboardAvoidingView
       enabled={true}
-      behavior={"height"}
+      // behavior={"height"}
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
@@ -205,16 +191,7 @@ const StockPurchaseForm = ({ navigation }) => {
             paddingHorizontal: 8,
           }}
         >
-          {/* <Text
-            style={{
-              fontWeight: 500,
-              fontSize: 17,
-              marginVertical: 5,
-            }}
-          >
-            Stock purchase details
-          </Text> */}
-          <View style={{}}>
+          <View>
             <Text
               style={{
                 marginVertical: 3,
@@ -231,7 +208,7 @@ const StockPurchaseForm = ({ navigation }) => {
               }}
               data={products}
               onChange={onProductChange}
-              value={selectedShop}
+              value={selectedProduct}
               placeholder="Select product"
               labelField="productName"
               valueField="id"
@@ -438,7 +415,7 @@ const StockPurchaseForm = ({ navigation }) => {
                 Batch no.
               </Text>
               <TextInput
-                value={batchNo}
+                value={batchNo || ""}
                 onChangeText={(text) => setBatchNo(text)}
                 cursorColor={Colors.dark}
                 inputMode="text"
@@ -452,7 +429,7 @@ const StockPurchaseForm = ({ navigation }) => {
                   textAlign: "center",
                 }}
               />
-              {submitted && !batchNo && (
+              {submitted && batchNo === "" && (
                 <Text
                   style={{
                     fontSize: 12,
@@ -472,32 +449,24 @@ const StockPurchaseForm = ({ navigation }) => {
                   marginStart: 6,
                 }}
               >
-                Expiry date{" "}
+                Expiry date
               </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setVisible(true);
-                  setDateToSelect("expiry");
-                }}
+
+              <DatePickerInput
+                locale="en"
+                value={expiryDate}
+                withModal={false}
+                // withDateFormatInLabel={false}
+                onChange={(d) => setExpiryDate(d)}
+                inputMode="start"
                 style={{
-                  backgroundColor: Colors.light,
-                  borderRadius: 5,
-                  padding: 6,
-                  borderWidth: 0.6,
-                  borderColor: Colors.dark,
-                  paddingHorizontal: 10,
                   height: 40,
                   justifyContent: "center",
+                  marginTop: -7,
                 }}
-              >
-                <Text
-                  style={{
-                    textAlign: "center",
-                  }}
-                >
-                  {toReadableDate(expiryDate)}
-                </Text>
-              </TouchableOpacity>
+                mode="outlined"
+              />
+
               {submitted && !expiryDate && (
                 <Text
                   style={{
@@ -550,32 +519,23 @@ const StockPurchaseForm = ({ navigation }) => {
                   marginStart: 6,
                 }}
               >
-                Purchase date{" "}
+                Purchase date
               </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setVisible(true);
-                  setDateToSelect("purchase");
-                }}
+
+              <DatePickerInput
+                locale="en"
+                value={purchaseDate}
+                withModal={false}
+                // withDateFormatInLabel={false}
+                onChange={(d) => setPurchaseDate(d)}
+                inputMode="start"
                 style={{
-                  backgroundColor: Colors.light,
-                  borderRadius: 5,
-                  padding: 6,
-                  borderWidth: 0.6,
-                  borderColor: Colors.dark,
-                  paddingHorizontal: 10,
                   height: 40,
                   justifyContent: "center",
+                  marginTop: -7,
                 }}
-              >
-                <Text
-                  style={{
-                    textAlign: "center",
-                  }}
-                >
-                  {toReadableDate(purchaseDate)}
-                </Text>
-              </TouchableOpacity>
+                mode="outlined"
+              />
               {submitted && !purchaseDate && (
                 <Text
                   style={{
@@ -611,6 +571,7 @@ const StockPurchaseForm = ({ navigation }) => {
                 borderWidth: 0.6,
                 borderColor: Colors.dark,
                 paddingHorizontal: 10,
+                minHeight: 80,
               }}
             />
           </View>
@@ -633,20 +594,6 @@ const StockPurchaseForm = ({ navigation }) => {
         </ScrollView>
 
         <Snackbar ref={snackBarRef} />
-
-        <DateCalender
-          singleSelection={true}
-          selectedEndDate={selectedEndDate}
-          visible={visible}
-          selectedStartDate={selectedStartDate}
-          handleDayPress={handleDayPress}
-          setVisible={setVisible}
-          onFinish={() => setVisible(false)}
-          setSelectedEndDate={setSelectedEndDate}
-          setSelectedStartDate={setSelectedStartDate}
-          moreCancelActions={handleCancel}
-          setFiltering={() => {}}
-        />
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

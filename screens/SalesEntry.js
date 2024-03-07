@@ -28,7 +28,6 @@ import { useRef } from "react";
 import { UserContext } from "../context/UserContext";
 import SelectShopBar from "../components/SelectShopBar";
 import PrimaryButton from "../components/buttons/PrimaryButton";
-import { MAXIMUM_RECORDS_PER_FETCH, dummy } from "../constants/Constants";
 import { SaleEntryContext } from "../context/SaleEntryContext";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import NetInfo from "@react-native-community/netinfo";
@@ -88,9 +87,10 @@ function SalesEntry({ navigation }) {
                   console.log(error, cart);
                 });
             } else {
-              console.log(error, cart);
+              // console.log(error, cart);
             }
-          });
+          })
+          .catch((error) => {});
       });
     }
     fetchProducts();

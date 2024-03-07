@@ -18,50 +18,63 @@ import SelectShops from "./screens/SelectShops";
 import AppCalendar from "./components/AppCalendar";
 import ProductEntry from "./forms/ProductEntry";
 import BarCodeScreen from "./screens/BarCodeScreen";
+import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
+import Colors from "./constants/Colors";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const theme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: Colors.dark, // Change this to your primary color
+      text: Colors.dark, // Change this to your text color
+    },
+  };
+
   return (
-    <UserProvider>
-      <SaleEntryProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            <Stack.Screen name="welcome" component={LandingScreen} />
+    <PaperProvider theme={theme}>
+      <UserProvider>
+        <SaleEntryProvider>
+          <NavigationContainer>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false,
+              }}
+            >
+              <Stack.Screen name="welcome" component={LandingScreen} />
 
-            <Stack.Screen name="login" component={Login} />
+              <Stack.Screen name="login" component={Login} />
 
-            <Stack.Screen name="salesEntry" component={SalesEntry} />
+              <Stack.Screen name="salesEntry" component={SalesEntry} />
 
-            <Stack.Screen name="viewSales" component={ViewSales} />
+              <Stack.Screen name="viewSales" component={ViewSales} />
 
-            <Stack.Screen name="barcodeScreen" component={BarCodeScreen} />
+              <Stack.Screen name="barcodeScreen" component={BarCodeScreen} />
 
-            <Stack.Screen name="shopSummary" component={ShopSummary} />
+              <Stack.Screen name="shopSummary" component={ShopSummary} />
 
-            <Stack.Screen name="stocking" component={Stocking} />
+              <Stack.Screen name="stocking" component={Stocking} />
 
-            <Stack.Screen name="stockPurchase" component={StockPurchase} />
+              <Stack.Screen name="stockPurchase" component={StockPurchase} />
 
-            <Stack.Screen name="stockLevels" component={StockLevels} />
+              <Stack.Screen name="stockLevels" component={StockLevels} />
 
-            <Stack.Screen name="stockListing" component={StockListing} />
+              <Stack.Screen name="stockListing" component={StockListing} />
 
-            <Stack.Screen name="selectShops" component={SelectShops} />
+              <Stack.Screen name="selectShops" component={SelectShops} />
 
-            <Stack.Screen name="productEntry" component={ProductEntry} />
+              <Stack.Screen name="productEntry" component={ProductEntry} />
 
-            <Stack.Screen
-              name="stockPurchaseForm"
-              component={StockPurchaseForm}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SaleEntryProvider>
-    </UserProvider>
+              <Stack.Screen
+                name="stockPurchaseForm"
+                component={StockPurchaseForm}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SaleEntryProvider>
+      </UserProvider>
+    </PaperProvider>
   );
 }
