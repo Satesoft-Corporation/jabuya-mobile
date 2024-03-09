@@ -31,30 +31,41 @@ const TopHeader = ({
             alignItems: "center",
           }}
         >
-          <TouchableOpacity onPress={onBackPress}>
-            <Image
-              source={require("../assets/icons/icons8-chevron-left-30.png")}
-              style={{
-                height: 30,
-                width: 20,
-                resizeMode: "contain",
-                tintColor: Colors.primary,
-              }}
-            />
-          </TouchableOpacity>
-
-          <Text
-            style={{ color: Colors.primary, fontSize: 18, textAlign: "center" }}
-          >
-            {title}
-          </Text>
-
           <View
             style={{
               flexDirection: "row",
+              justifyContent: "space-between",
               alignItems: "center",
-              gap: 10,
+            }}
+          >
+            <TouchableOpacity onPress={onBackPress}>
+              <Image
+                source={require("../assets/icons/icons8-chevron-left-30.png")}
+                style={{
+                  height: 30,
+                  width: 20,
+                  resizeMode: "contain",
+                  tintColor: Colors.primary,
+                }}
+              />
+            </TouchableOpacity>
+
+            <Text
+              style={{
+                color: Colors.primary,
+                fontSize: 18,
+                marginStart: 10,
+              }}
+            >
+              {title}
+            </Text>
+          </View>
+
+          <View
+            style={{
+              alignItems: "center",
               minWidth: 30,
+              justifyContent: "flex-end",
             }}
           >
             {showSearch && (
@@ -77,10 +88,10 @@ const TopHeader = ({
           <Text
             style={{
               color: Colors.primary,
-              textAlign: "center",
-              alignSelf: "center",
               fontSize: 13,
-              paddingVertical: 2,
+              paddingBottom: 8,
+              marginStart: 30,
+              marginTop: -10,
             }}
           >
             {selectedShop?.name}

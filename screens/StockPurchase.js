@@ -33,7 +33,6 @@ const StockPurchase = ({ navigation }) => {
       onPanResponderRelease: (event, gestureState) => {
         if (gestureState.dy > 50) {
           // Minimum swipe distance
-          console.log("Swiped down!");
           setStockEntries([]);
           setOffset(0);
           setSearchTerm(null);
@@ -129,7 +128,7 @@ const StockPurchase = ({ navigation }) => {
       <AppStatusBar />
 
       <TopHeader
-        title="Stock entries"
+        title="Stock purchases"
         showSearch={true}
         onBackPress={() => navigation.goBack()}
         searchTerm={searchTerm}

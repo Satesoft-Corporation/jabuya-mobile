@@ -33,6 +33,8 @@ export const SaleEntryProvider = ({ children }) => {
     setErrors({});
     setSelectedSaleUnit(null);
     setSaleUnitId(null);
+    setUnitCost("");
+    setInitialUnitCost(null);
   };
 
   const saveSelection = () => {
@@ -136,7 +138,6 @@ export const SaleEntryProvider = ({ children }) => {
     setSelectedSaleUnit(item);
     setInitialUnitCost(item?.unitPrice);
     setUnitCost(String(item?.unitPrice));
-    setSaleUnitId(item?.id);
   };
 
   const data = {

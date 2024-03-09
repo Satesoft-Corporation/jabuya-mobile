@@ -16,6 +16,7 @@ export function SaleTransactionItem({ data, isShopOwner }) {
 
   const [expanded, setExpanded] = useState(false);
   const [itemCount, setItemCount] = useState(0);
+  const [profit, setProfit] = useState(0);
 
   const toggleExpand = () => {
     setExpanded(!expanded);
@@ -24,7 +25,10 @@ export function SaleTransactionItem({ data, isShopOwner }) {
   useEffect(() => {
     if (lineItems !== undefined) {
       let cartQty = lineItems.reduce((a, item) => a + item.quantity, 0);
+      let cartProfit = lineItems.reduce((a, i) => a + i.totalProfit, 0);
+
       setItemCount(cartQty);
+      setProfit(Math.round(cartProfit));
     }
   }, [data]);
   return (
@@ -64,7 +68,7 @@ export function SaleTransactionItem({ data, isShopOwner }) {
               alignSelf: "flex-end",
             }}
           >
-            {formatDate(data?.dateCreated)}
+            {formatDate(data?.soldOnDate)}
           </Text>
           {expanded && (
             <Text
@@ -105,6 +109,11 @@ export function SaleTransactionItem({ data, isShopOwner }) {
             <View style={{ alignItems: "center" }}>
               <Text style={{ fontWeight: 600 }}>Balance</Text>
               <Text>{formatNumberWithCommas(balanceGivenOut)}</Text>
+            </View>
+
+            <View style={{ alignItems: "center" }}>
+              <Text style={{ fontWeight: 600 }}>Income</Text>
+              <Text>{formatNumberWithCommas(profit)}</Text>
             </View>
           </View>
           <View
@@ -278,6 +287,25 @@ export function SaleTransactionItem({ data, isShopOwner }) {
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
+              marginVertical: 5,
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>Income</Text>
+            <Text
+              style={{
+                alignSelf: "flex-end",
+                fontWeight: "bold",
+                marginEnd: 4,
+              }}
+            >
+              {formatNumberWithCommas(profit)}
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
               marginTop: 10,
             }}
           >
@@ -367,6 +395,9 @@ export const SaleListItem = ({ data }) => {
 
 export const SaleItem = ({ data }) => {
   //part of SaleTransaction item component
+  const { productName, shopProductName, saleUnitName } = data;
+
+  let unitName = saleUnitName ? " - " + saleUnitName : "";
 
   return (
     <>
@@ -382,7 +413,7 @@ export const SaleItem = ({ data }) => {
         }}
       >
         <Text style={{ flex: 2.5, justifyContent: "center" }}>
-          {data?.productName || data?.shopProductName}
+          {productName || shopProductName + unitName}
         </Text>
 
         <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>

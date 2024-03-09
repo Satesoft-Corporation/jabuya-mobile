@@ -40,6 +40,7 @@ export function SalesQtyInputDialog() {
     onChipPress,
     setSaleUnitId,
     saleUnits,
+    setInitialUnitCost,
   } = useContext(SaleEntryContext);
 
   const handlePress = () => {
@@ -132,6 +133,7 @@ export function SalesQtyInputDialog() {
                   fontWeight: "600",
                   fontSize: 13,
                   marginTop: 10,
+                  marginLeft: 4,
                 }}
               >
                 Quantity
@@ -144,8 +146,10 @@ export function SalesQtyInputDialog() {
                 value={quantity}
                 onChangeText={(text) => setQuantity(text)}
                 maxLength={3}
+                cursorColor={Colors.dark}
                 autoFocus
                 style={{
+                  marginTop: 5,
                   backgroundColor: Colors.light_3,
                   borderRadius: 5,
                   padding: 6,
@@ -153,6 +157,8 @@ export function SalesQtyInputDialog() {
                   borderColor: errors?.qtyZeroError
                     ? Colors.error
                     : "transparent",
+                  fontSize: 18,
+                  paddingEnd: 10,
                 }}
               />
               {errors?.qtyZeroError && (
@@ -171,6 +177,7 @@ export function SalesQtyInputDialog() {
                   fontSize: 13,
                   marginTop: 10,
                   marginBottom: 5,
+                  marginLeft: 4,
                 }}
               >
                 Unit cost
@@ -179,6 +186,7 @@ export function SalesQtyInputDialog() {
                 textAlign="right"
                 value={unitCost}
                 inputMode="numeric"
+                cursorColor={Colors.dark}
                 onChangeText={(e) => setUnitCost(e)}
                 style={{
                   backgroundColor: Colors.light_3,
@@ -187,6 +195,8 @@ export function SalesQtyInputDialog() {
                   borderColor: errors?.lessPriceError
                     ? Colors.error
                     : "transparent",
+                  fontSize: 18,
+                  paddingEnd: 10,
                 }}
               />
               {errors?.lessPriceError && (
@@ -207,7 +217,7 @@ export function SalesQtyInputDialog() {
               flexDirection: "row",
               justifyContent: "space-between",
               marginTop: 15,
-              marginBottom: 5,
+              marginBottom: 20,
               gap: 5,
             }}
           >
@@ -221,10 +231,13 @@ export function SalesQtyInputDialog() {
                 setScanned(false);
                 setSelectedSaleUnit(null);
                 setSubmitted(false);
-                setSaleUnitId(null);
+                setUnitCost("");
+                setInitialUnitCost(null);
               }}
             />
-            <PrimaryButton title={"Confirm"} onPress={handlePress} />
+            {selectedSaleUnit && (
+              <PrimaryButton title={"Confirm"} onPress={handlePress} />
+            )}
           </View>
         </View>
       </Card>

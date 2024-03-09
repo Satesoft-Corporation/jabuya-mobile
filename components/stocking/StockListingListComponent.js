@@ -68,7 +68,7 @@ function StockListingListComponent({ data }) {
             </Text>
             <Text>{data?.productName}</Text>
           </View>
-          <View style={{ alignItems: "center", flex: 2 }}>
+          <View style={{ alignItems: "center", flex: 1 }}>
             <Text
               style={{
                 fontWeight: 600,
@@ -82,19 +82,17 @@ function StockListingListComponent({ data }) {
             </Text>
           </View>
 
-          <View style={{ alignItems: "center", flex: 1 }}>
+          <View style={{ alignItems: "flex-end", flex: 1, marginEnd: 5 }}>
             <Text
               style={{
                 fontWeight: 600,
                 marginBottom: 3,
-                alignSelf: "center",
               }}
             >
               Status
             </Text>
             <Text
               style={{
-                alignSelf: "center",
                 marginEnd: 2,
               }}
             >
@@ -109,6 +107,8 @@ function StockListingListComponent({ data }) {
           <View
             style={{
               justifyContent: "space-between",
+              gap: 3,
+              marginEnd:5
             }}
           >
             <View
@@ -141,7 +141,7 @@ function StockListingListComponent({ data }) {
                   fontSize: 12,
                 }}
               >
-                Restock date:{" "}
+                Last restocked:{" "}
               </Text>
               <Text
                 style={{
@@ -154,7 +154,11 @@ function StockListingListComponent({ data }) {
             </View>
 
             <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginBottom: 10,
+              }}
             >
               <Text
                 style={{
@@ -174,31 +178,33 @@ function StockListingListComponent({ data }) {
               </Text>
             </View>
 
-            <View style={{ marginBottom: 10 }}>
-              <Text
-                style={{
-                  fontWeight: 400,
-                  fontSize: 12,
-                }}
-              >
-                Remarks:{" "}
-              </Text>
-              <Text
-                style={{
-                  fontWeight: 300,
-                  fontSize: 12,
-                }}
-              >
-                {data?.remarks}
-              </Text>
-            </View>
+            {data?.remarks && (
+              <View style={{ marginBottom: 10 }}>
+                <Text
+                  style={{
+                    fontWeight: 400,
+                    fontSize: 12,
+                  }}
+                >
+                  Remarks:{" "}
+                </Text>
+                <Text
+                  style={{
+                    fontWeight: 300,
+                    fontSize: 12,
+                  }}
+                >
+                  {data?.remarks}
+                </Text>
+              </View>
+            )}
           </View>
         )}
         <View
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            alignItems:'center'
+            alignItems: "center",
           }}
         >
           <View>

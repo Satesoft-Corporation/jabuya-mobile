@@ -232,7 +232,7 @@ export default function Login({ navigation }) {
           <Text
             style={{ color: Colors.primary, alignSelf: "center", fontSize: 12 }}
           >
-            V {Constants.expoConfig.version}
+            v {Constants.expoConfig.version}
           </Text>
         </View>
       </View>

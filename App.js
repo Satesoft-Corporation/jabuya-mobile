@@ -30,6 +30,7 @@ export default function App() {
       ...DefaultTheme.colors,
       primary: Colors.dark, // Change this to your primary color
       text: Colors.dark, // Change this to your text color
+      background:Colors.light
     },
   };
 
@@ -57,7 +58,7 @@ export default function App() {
 
               <Stack.Screen name="stocking" component={Stocking} />
 
-              <Stack.Screen name="stockPurchase" component={StockPurchase} />
+              <Stack.Screen name="stockEntries" component={StockPurchase} />
 
               <Stack.Screen name="stockLevels" component={StockLevels} />
 
@@ -68,7 +69,7 @@ export default function App() {
               <Stack.Screen name="productEntry" component={ProductEntry} />
 
               <Stack.Screen
-                name="stockPurchaseForm"
+                name="newStockEntry"
                 component={StockPurchaseForm}
               />
             </Stack.Navigator>

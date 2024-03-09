@@ -10,20 +10,20 @@ const Stocking = ({ navigation }) => {
   let list = [
     {
       title: "Stock purchases",
-      target: "stockPurchase",
+      target: "stockEntries",
     },
     {
       title: "Make a purchase",
-      target: "stockPurchaseForm",
+      target: "newStockEntry",
     },
     {
-      title: "Stock Listing",
+      title: "Shop products",
       target: "stockListing",
     },
-    {
-      title: "Add new product",
-      target: "productEntry",
-    },
+    // {
+    //   title: "Add product",
+    //   // target: "productEntry",
+    // },
     {
       title: "Stock levels",
       target: "stockLevels",

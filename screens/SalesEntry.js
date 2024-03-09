@@ -55,6 +55,9 @@ function SalesEntry({ navigation }) {
     clearEverything,
     setShowModal,
     setSaleUnits,
+    setSelectedSaleUnit,
+    setInitialUnitCost,
+    setUnitCost,
   } = useContext(SaleEntryContext);
 
   const { isShopOwner, isShopAttendant, attendantShopId } = userParams;
@@ -191,7 +194,6 @@ function SalesEntry({ navigation }) {
             snackbarRef.current.show(error?.message);
           });
       } else {
-        console.log("going offline");
         await UserSessionUtils.addPendingSale(payLoad);
         setTimeout(() => setLoading(false), 1000);
         clearEverything();
@@ -203,6 +205,10 @@ function SalesEntry({ navigation }) {
     });
   };
 
+  useEffect(() => {
+    clearEverything();
+  }, [selectedShop]);
+
   const handleChange = (value) => {
     setSearchTerm(value);
   };
@@ -213,13 +219,15 @@ function SalesEntry({ navigation }) {
     let defUnit = { productSaleUnitName: saleUnitName, unitPrice: salesPrice };
 
     setSelection(item);
-    console.log(item);
     setShowModal(true);
 
     if (multipleSaleUnits) {
       setSaleUnits([defUnit, ...multipleSaleUnits]);
     } else {
       setSaleUnits([{ ...defUnit }]);
+      setSelectedSaleUnit(defUnit);
+      setInitialUnitCost(salesPrice);
+      setUnitCost(String(salesPrice));
     }
   };
 

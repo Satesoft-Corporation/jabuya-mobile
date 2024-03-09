@@ -210,9 +210,13 @@ export class UserSessionUtils {
       return [];
     }
   }
-
+/**
+ * 
+ * @param {*} salePayLoad 
+ * stores a sale record when the user is offline
+ */
   static async addPendingSale(salePayLoad) {
-    let pendingSales = await this.getPendingSales(); //an array
+    let pendingSales = await this.getPendingSales();
 
     await AsyncStorage.setItem(
       StorageParams.PENDING_SALES,
@@ -221,8 +225,8 @@ export class UserSessionUtils {
   }
 
   static async removePendingSale(index) {
-    let pendingSales = await this.getPendingSales(); //an array
-    pendingSales.splice(index, 1); // Removes one element at the specified index
+    let pendingSales = await this.getPendingSales();
+    pendingSales.splice(index, 1); // Removes the sale record at the specified index
 
     await AsyncStorage.setItem(
       StorageParams.PENDING_SALES,
@@ -236,6 +240,7 @@ export class UserSessionUtils {
   }
 
   static async resetPendingSales() {
+    //to clear the list
     await AsyncStorage.setItem(StorageParams.PENDING_SALES, JSON.stringify([]));
   }
 }

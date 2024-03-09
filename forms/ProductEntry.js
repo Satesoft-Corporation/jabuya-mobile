@@ -85,13 +85,11 @@ const ProductEntry = ({ navigation, route }) => {
 
   const onManufacturerChange = (e) => {
     setSelectedManufacturer(e);
-    console.log(e);
     fetchProducts(e?.id);
   };
 
   const onProductChange = (pdt) => {
     setSelectedProduct(pdt);
-    console.log(pdt);
   };
 
   const clearForm = () => {
@@ -126,7 +124,6 @@ const ProductEntry = ({ navigation, route }) => {
       setLoading(false); //removing loader if form is invalid
     }
 
-    console.log(payload);
     if (isValidPayload === true) {
       new BaseApiService(apiUrl)
         .saveRequestWithJsonResponse(payload, false)
@@ -161,7 +158,7 @@ const ProductEntry = ({ navigation, route }) => {
         <AppStatusBar />
 
         <TopHeader
-          title="Add new product"
+          title="Add product"
           onBackPress={() => navigation.goBack()}
         />
         <Loader loading={loading} />
@@ -170,6 +167,17 @@ const ProductEntry = ({ navigation, route }) => {
             paddingHorizontal: 8,
           }}
         >
+          <Text
+            style={{
+              marginVertical: 10,
+              fontWeight: 500,
+              fontSize: 16,
+              marginStart: 5,
+            }}
+          >
+            Enter product detail
+          </Text>
+
           <View style={{ marginVertical: 8 }}>
             <Text
               style={{

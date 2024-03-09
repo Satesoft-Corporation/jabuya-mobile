@@ -23,6 +23,10 @@ const BarCodeScreen = ({ navigation }) => {
     loading,
     setLoading,
     setShowModal,
+    setSaleUnits,
+    setSelectedSaleUnit,
+    setInitialUnitCost,
+    setUnitCost,
   } = useContext(SaleEntryContext);
 
   const { isShopAttendant, attendantShopId } = userParams;
@@ -56,10 +60,27 @@ const BarCodeScreen = ({ navigation }) => {
           setLoading(false);
           setQuantity(null);
         } else {
-          setSelection(dummy);
           setShowModal(true);
-          //   setSelection(response.records[0]);
-          //   setUnitCost(String(response.records[0]?.salesPrice));
+          // setUnitCost(String(response.records[0]?.salesPrice));
+          const { multipleSaleUnits, saleUnitName, salesPrice } =
+            response.records[0];
+
+          let defUnit = {
+            productSaleUnitName: saleUnitName,
+            unitPrice: salesPrice,
+          };
+          setSelection(response.records[0]);
+
+          setShowModal(true);
+
+          if (multipleSaleUnits) {
+            setSaleUnits([defUnit, ...multipleSaleUnits]);
+          } else {
+            setSaleUnits([{ ...defUnit }]);
+            setSelectedSaleUnit(defUnit);
+            setInitialUnitCost(salesPrice);
+            setUnitCost(String(salesPrice));
+          }
           setScanned(true);
           setShowModal(true);
           setLoading(false);

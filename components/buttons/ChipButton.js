@@ -12,9 +12,9 @@ const ChipButton = ({ title, onPress, isSelected = false }) => {
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 4,
-        width: 75,
-        borderColor: Colors.dark,
-        borderWidth: isSelected ? 0 : 1,
+        width: 80,
+        borderColor: isSelected ? Colors.primary : Colors.dark,
+        borderWidth: 1,
         margin: 5,
         marginStart: 1,
       }}
@@ -24,6 +24,7 @@ const ChipButton = ({ title, onPress, isSelected = false }) => {
           textAlign: "center",
           color: Colors.dark,
           alignSelf: "center",
+          fontSize: 15,
         }}
       >
         {title}

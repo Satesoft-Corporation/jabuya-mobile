@@ -44,7 +44,6 @@ const LandingScreen = ({ navigation }) => {
         getShopsFromStorage();
       })
       .catch((error) => {
-        console.log(error);
       });
   };
 
@@ -81,7 +80,7 @@ const LandingScreen = ({ navigation }) => {
 
     if (item.target) {
       if (item.target === "stocking" && userParams?.isShopAttendant === true) {
-        navigation.navigate("stockPurchase");
+        navigation.navigate("stockEntries");
         return null;
       } else {
         navigation.navigate(item.target);
@@ -120,7 +119,6 @@ const LandingScreen = ({ navigation }) => {
         setLoading(false);
       })
       .catch(async (error) => {
-        console.log(error);
         //loging the user out if the object is missing
         logOut();
       });

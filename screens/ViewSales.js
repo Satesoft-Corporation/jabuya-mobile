@@ -147,7 +147,6 @@ export default function ViewSales({ navigation }) {
         }, 100);
       })
       .catch((error) => {
-        console.log(error);
         Alert.alert("Cannot get sales!", error?.message);
         setLoading(false);
       });

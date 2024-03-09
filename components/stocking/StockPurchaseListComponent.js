@@ -20,6 +20,7 @@ const StockPurchaseListComponent = ({ data }) => {
     barcode,
     expiryDate,
     supplierName,
+    batchNumber,
   } = data ?? {};
 
   return (
@@ -109,13 +110,22 @@ const StockPurchaseListComponent = ({ data }) => {
       {expanded && (
         <View>
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginVertical: 2,
+            }}
           >
             <Text style={{ fontWeight: 400, fontSize: 12 }}>Barcode: </Text>
             <Text style={{ fontWeight: 300, fontSize: 12 }}>{barcode}</Text>
           </View>
+
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginVertical: 2,
+            }}
           >
             <Text style={{ fontWeight: 400, fontSize: 12 }}>
               Restock date:{" "}
@@ -124,6 +134,18 @@ const StockPurchaseListComponent = ({ data }) => {
               {formatDate(dateCreated, true)}
             </Text>
           </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginVertical: 2,
+            }}
+          >
+            <Text style={{ fontWeight: 400, fontSize: 12 }}>Batch no: </Text>
+            <Text style={{ fontWeight: 600, fontSize: 12 }}>{batchNumber}</Text>
+          </View>
+
           <View
             style={{
               flexDirection: "row",
@@ -137,7 +159,11 @@ const StockPurchaseListComponent = ({ data }) => {
             </Text>
           </View>
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: 5,
+            }}
           >
             <Text style={{ fontWeight: 400, fontSize: 12, marginBottom: 10 }}>
               Supplier:{" "}

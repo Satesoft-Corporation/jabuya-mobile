@@ -97,14 +97,14 @@ function StockLevelListComponent({ data }) {
               {summary?.totalQuantitySoldThisMonth || 0}
             </Text>
           </View>
-          <View style={{ alignItems: "center", flex: 1 }}>
+          <View style={{ alignItems: "flex-end", flex: 1, marginEnd: 5 }}>
             <Text
               style={{
                 fontWeight: 600,
                 marginBottom: 3,
               }}
             >
-              In stock
+              Stock
             </Text>
             <Text style={{ fontWeight: 600 }}>{remainingStock}</Text>
           </View>

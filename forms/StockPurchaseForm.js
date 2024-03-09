@@ -14,7 +14,11 @@ import { BaseApiService } from "../utils/BaseApiService";
 import { packageOptions } from "../constants/Constants";
 import Loader from "../components/Loader";
 import { KeyboardAvoidingView } from "react-native";
-import { convertToServerDate, hasNull } from "../utils/Utils";
+import {
+  convertToServerDate,
+  formatNumberWithCommas,
+  hasNull,
+} from "../utils/Utils";
 import { UserContext } from "../context/UserContext";
 import { useContext } from "react";
 import TopHeader from "../components/TopHeader";
@@ -41,6 +45,7 @@ const StockPurchaseForm = ({ navigation }) => {
   const [purchasePrice, setPurchasePrice] = useState(null);
   const [unpackedPurchasedQty, setUnpackedPurchasedQty] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const [unitPurchaseCost, setUnitPurchaseCost] = useState(0);
 
   //
 
@@ -148,8 +153,6 @@ const StockPurchaseForm = ({ navigation }) => {
       setLoading(false); //removing loader if form is invalid
     }
 
-    console.log(payload);
-
     if (isValidPayload === true) {
       new BaseApiService("/stock-entries")
         .saveRequestWithJsonResponse(payload, false)
@@ -167,6 +170,18 @@ const StockPurchaseForm = ({ navigation }) => {
     }
   };
 
+  // useEffect(() => {
+  //   const { packageQuantity } = selectedProduct;
+
+  //   const isPacked = isPackedProduct && isPackedProduct === true;
+
+  //   let qty = isPacked ? packedPurchasedQuantity : unpackedPurchasedQty;
+
+  //   let totalPrice = qty * (packageQuantity || 0);
+
+  //   setUnitPurchaseCost(totalPrice);
+  // }, [purchasePrice, packedPurchasedQuantity, unpackedPurchasedQty]);
+
   useEffect(() => {
     fetchProducts();
     fetchSuppliers();
@@ -182,49 +197,25 @@ const StockPurchaseForm = ({ navigation }) => {
         <AppStatusBar />
 
         <TopHeader
-          title="Stock entry"
+          title="Stock purchase"
           onBackPress={() => navigation.goBack()}
         />
         <Loader loading={loading} />
         <ScrollView
           style={{
-            paddingHorizontal: 8,
+            paddingHorizontal: 10,
           }}
         >
-          <View>
-            <Text
-              style={{
-                marginVertical: 3,
-                marginStart: 6,
-                marginTop: 5,
-              }}
-            >
-              Product
-            </Text>
-            <MyDropDown
-              style={{
-                backgroundColor: Colors.light,
-                borderColor: Colors.dark,
-              }}
-              data={products}
-              onChange={onProductChange}
-              value={selectedProduct}
-              placeholder="Select product"
-              labelField="productName"
-              valueField="id"
-            />
-            {submitted && !selectedProduct && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginStart: 6,
-                  color: Colors.error,
-                }}
-              >
-                Product is required
-              </Text>
-            )}
-          </View>
+          <Text
+            style={{
+              marginVertical: 10,
+              fontWeight: 500,
+              fontSize: 16,
+              marginStart: 5,
+            }}
+          >
+            Enter stock detail
+          </Text>
 
           <View>
             <Text
@@ -260,6 +251,42 @@ const StockPurchaseForm = ({ navigation }) => {
               </Text>
             )}
           </View>
+
+          <View>
+            <Text
+              style={{
+                marginVertical: 3,
+                marginStart: 6,
+                marginTop: 5,
+              }}
+            >
+              Product
+            </Text>
+            <MyDropDown
+              style={{
+                backgroundColor: Colors.light,
+                borderColor: Colors.dark,
+              }}
+              data={products}
+              onChange={onProductChange}
+              value={selectedProduct}
+              placeholder="Select product"
+              labelField="productName"
+              valueField="id"
+            />
+            {submitted && !selectedProduct && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginStart: 6,
+                  color: Colors.error,
+                }}
+              >
+                Product is required
+              </Text>
+            )}
+          </View>
+
           <View style={{ marginVertical: 8 }}>
             <Text
               style={{
@@ -340,6 +367,7 @@ const StockPurchaseForm = ({ navigation }) => {
                     borderColor: Colors.dark,
                     paddingHorizontal: 10,
                     textAlign: "center",
+                    fontSize: 17,
                   }}
                 />
                 {submitted &&
@@ -365,7 +393,7 @@ const StockPurchaseForm = ({ navigation }) => {
                 >
                   {isPackedProduct === true
                     ? "Purchase price"
-                    : "Purchase amount"}{" "}
+                    : "Purchase amount"}
                   (UGX)
                 </Text>
                 <TextInput
@@ -381,6 +409,7 @@ const StockPurchaseForm = ({ navigation }) => {
                     borderColor: Colors.dark,
                     paddingHorizontal: 10,
                     textAlign: "right",
+                    fontSize: 17,
                   }}
                 />
                 {submitted && !purchasePrice && (
@@ -427,6 +456,7 @@ const StockPurchaseForm = ({ navigation }) => {
                   borderColor: Colors.dark,
                   paddingHorizontal: 10,
                   textAlign: "center",
+                  fontSize: 17,
                 }}
               />
               {submitted && batchNo === "" && (
@@ -456,13 +486,15 @@ const StockPurchaseForm = ({ navigation }) => {
                 locale="en"
                 value={expiryDate}
                 withModal={false}
-                // withDateFormatInLabel={false}
+                withDateFormatInLabel={false}
+                placeholder="MM-DD-YY"
                 onChange={(d) => setExpiryDate(d)}
                 inputMode="start"
                 style={{
                   height: 40,
                   justifyContent: "center",
                   marginTop: -7,
+                  // fontSize: 17,
                 }}
                 mode="outlined"
               />
@@ -496,7 +528,7 @@ const StockPurchaseForm = ({ navigation }) => {
                   marginStart: 6,
                 }}
               >
-                Unit sales price
+                Unit purchase price
               </Text>
               <TouchableOpacity
                 disabled
@@ -509,7 +541,9 @@ const StockPurchaseForm = ({ navigation }) => {
                   paddingHorizontal: 10,
                   height: 40,
                 }}
-              ></TouchableOpacity>
+              >
+                {/* <Text> {formatNumberWithCommas(unitPurchaseCost)}</Text> */}
+              </TouchableOpacity>
             </View>
 
             <View style={{ flex: 1 }}>
@@ -526,7 +560,8 @@ const StockPurchaseForm = ({ navigation }) => {
                 locale="en"
                 value={purchaseDate}
                 withModal={false}
-                // withDateFormatInLabel={false}
+                withDateFormatInLabel={false}
+                placeholder="MM-DD-YY"
                 onChange={(d) => setPurchaseDate(d)}
                 inputMode="start"
                 style={{
