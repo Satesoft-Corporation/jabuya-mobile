@@ -94,7 +94,7 @@ function StockLevelListComponent({ data }) {
                 marginEnd: 2,
               }}
             >
-              {summary?.totalQuantitySoldThisMonth || 0}
+              {summary?.totalQuantitySold || 0}
             </Text>
           </View>
           <View style={{ alignItems: "flex-end", flex: 1, marginEnd: 5 }}>

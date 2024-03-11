@@ -108,7 +108,7 @@ function StockListingListComponent({ data }) {
             style={{
               justifyContent: "space-between",
               gap: 3,
-              marginEnd:5
+              marginEnd: 5,
             }}
           >
             <View

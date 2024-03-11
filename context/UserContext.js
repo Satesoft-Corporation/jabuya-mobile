@@ -9,7 +9,6 @@ export const UserProvider = ({ children }) => {
   const [userParams, setUserParams] = useState({});
   const [shops, setShops] = useState([]);
   const [selectedShop, setSelectedShop] = useState(null);
-  
 
   const getShopsFromStorage = () => {
     UserSessionUtils.getShops().then((ownerShops) => {
