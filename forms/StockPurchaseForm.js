@@ -14,11 +14,7 @@ import { BaseApiService } from "../utils/BaseApiService";
 import { packageOptions } from "../constants/Constants";
 import Loader from "../components/Loader";
 import { KeyboardAvoidingView } from "react-native";
-import {
-  convertToServerDate,
-  formatNumberWithCommas,
-  hasNull,
-} from "../utils/Utils";
+import { convertToServerDate, hasNull } from "../utils/Utils";
 import { UserContext } from "../context/UserContext";
 import { useContext } from "react";
 import TopHeader from "../components/TopHeader";
@@ -39,7 +35,7 @@ const StockPurchaseForm = ({ navigation }) => {
   const [isPackedProduct, setIsPackedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [batchNo, setBatchNo] = useState("");
-  const [purchaseDate, setPurchaseDate] = useState(null);
+  const [purchaseDate, setPurchaseDate] = useState(new Date());
   const [packedPurchasedQuantity, setPackedPurchasedQuantity] = useState(null);
   const [remarks, setRemarks] = useState("");
   const [purchasePrice, setPurchasePrice] = useState(null);
@@ -98,14 +94,12 @@ const StockPurchaseForm = ({ navigation }) => {
     setBatchNo("");
     setExpiryDate(null);
     setPackedPurchasedQuantity(null);
-    setPurchaseDate(null);
     setPurchasePrice(null);
     setSelectedProduct(null);
     setIsPackedProduct(null);
     setSelectedSupplier(null);
     setRemarks("");
     setUnpackedPurchasedQty(null);
-    setProducts([]);
     setSubmitted(false);
   };
 
@@ -485,31 +479,28 @@ const StockPurchaseForm = ({ navigation }) => {
               <DatePickerInput
                 locale="en"
                 value={expiryDate}
-                withModal={false}
+                withModal={true}
                 withDateFormatInLabel={false}
-                placeholder="MM-DD-YY"
+                placeholder="MM-DD-YYYY"
                 onChange={(d) => setExpiryDate(d)}
                 inputMode="start"
                 style={{
                   height: 40,
                   justifyContent: "center",
-                  marginTop: -7,
-                  // fontSize: 17,
                 }}
                 mode="outlined"
               />
 
-              {submitted && !expiryDate && (
-                <Text
-                  style={{
-                    fontSize: 12,
-                    marginStart: 6,
-                    color: Colors.error,
-                  }}
-                >
-                  Expiry date is required
-                </Text>
-              )}
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginStart: 6,
+                  color: Colors.error,
+                  opacity: submitted && !expiryDate ? 1 : 0,
+                }}
+              >
+                Expiry date is required
+              </Text>
             </View>
           </View>
 
@@ -559,29 +550,27 @@ const StockPurchaseForm = ({ navigation }) => {
               <DatePickerInput
                 locale="en"
                 value={purchaseDate}
-                withModal={false}
                 withDateFormatInLabel={false}
-                placeholder="MM-DD-YY"
+                withModal={true}
+                placeholder="MM-DD-YYYY"
                 onChange={(d) => setPurchaseDate(d)}
                 inputMode="start"
                 style={{
                   height: 40,
                   justifyContent: "center",
-                  marginTop: -7,
                 }}
                 mode="outlined"
               />
-              {submitted && !purchaseDate && (
-                <Text
-                  style={{
-                    fontSize: 12,
-                    marginStart: 6,
-                    color: Colors.error,
-                  }}
-                >
-                  Purchase date is required
-                </Text>
-              )}
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginStart: 6,
+                  color: Colors.error,
+                  opacity: submitted && !purchaseDate ? 1 : 0,
+                }}
+              >
+                Purchase date is required
+              </Text>
             </View>
           </View>
 
