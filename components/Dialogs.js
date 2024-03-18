@@ -38,7 +38,6 @@ export function SalesQtyInputDialog() {
     showMoodal,
     setShowModal,
     onChipPress,
-    setSaleUnitId,
     saleUnits,
     setInitialUnitCost,
   } = useContext(SaleEntryContext);
@@ -98,32 +97,34 @@ export function SalesQtyInputDialog() {
             </Text>
             <Text>{selection && selection.productName} has been selected.</Text>
 
-            <View style={{ marginTop: 10 }}>
-              <Text
-                style={{
-                  fontWeight: "600",
-                }}
-              >
-                Select sale unit
-              </Text>
+            {!selectedSaleUnit && (
+              <View style={{ marginTop: 10 }}>
+                <Text
+                  style={{
+                    fontWeight: "600",
+                  }}
+                >
+                  Select sale unit
+                </Text>
 
-              <FlatList
-                data={saleUnits}
-                renderItem={({ item }) => (
-                  <ChipButton
-                    title={item?.productSaleUnitName}
-                    isSelected={
-                      selectedSaleUnit?.productSaleUnitName ===
-                      item?.productSaleUnitName
-                    }
-                    onPress={() => onChipPress(item)}
-                  />
-                )}
-                keyExtractor={(item) => item.productSaleUnitName.toString()}
-                numColumns={3}
-                ListFooterComponent={renderFooter}
-              />
-            </View>
+                <FlatList
+                  data={saleUnits}
+                  renderItem={({ item }) => (
+                    <ChipButton
+                      title={item?.productSaleUnitName}
+                      isSelected={
+                        selectedSaleUnit?.productSaleUnitName ===
+                        item?.productSaleUnitName
+                      }
+                      onPress={() => onChipPress(item)}
+                    />
+                  )}
+                  keyExtractor={(item) => item.productSaleUnitName.toString()}
+                  numColumns={3}
+                  ListFooterComponent={renderFooter}
+                />
+              </View>
+            )}
           </View>
 
           {selectedSaleUnit && (

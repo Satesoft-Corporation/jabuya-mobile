@@ -43,8 +43,7 @@ const LandingScreen = ({ navigation }) => {
         await UserSessionUtils.setShops(response.records);
         getShopsFromStorage();
       })
-      .catch((error) => {
-      });
+      .catch((error) => {});
   };
 
   const logOut = () => {
@@ -72,7 +71,7 @@ const LandingScreen = ({ navigation }) => {
   const handleTabPress = (item) => {
     const { days, hours } = timeDiff;
 
-    if (hours >= 8 || days > 0) {
+    if (hours >= 12 || days > 0) {
       //trigger the logout dialog every after 5 hrs
       logInPrompt();
       return null;
@@ -87,6 +86,40 @@ const LandingScreen = ({ navigation }) => {
         return null;
       }
     }
+  };
+
+  const resolveUnsavedSales = async () => {
+    let pendingSales = await UserSessionUtils.getPendingSales();
+    if (pendingSales.length > 0) {
+      pendingSales.forEach(async (cart, index) => {
+        await new BaseApiService("/shop-sales")
+          .postRequest(cart)
+          .then(async (response) => {
+            let d = { info: await response.json(), status: response.status };
+            return d;
+          })
+          .then(async (d) => {
+            let { info, status } = d;
+            let id = info?.id;
+
+            if (status === 200) {
+              new BaseApiService(`/shop-sales/${id}/confirm`)
+                .postRequest()
+                .then((d) => d.json())
+                .then(async (d) => {
+                  await UserSessionUtils.removePendingSale(index);
+                })
+                .catch((error) => {
+                  console.log(error, cart);
+                });
+            } else {
+              // console.log(error, cart);
+            }
+          })
+          .catch((error) => {});
+      });
+    }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -107,6 +140,12 @@ const LandingScreen = ({ navigation }) => {
         });
         let prevTime = await UserSessionUtils.getLoginTime();
         let timeDifferance = getTimeDifference(prevTime, new Date());
+
+        if (timeDifferance.hours < 24) {
+          //to save if access token is still valid
+          resolveUnsavedSales();
+        }
+
         setTimeDiff(timeDifferance);
 
         let shopCount = await UserSessionUtils.getShopCount();
@@ -116,7 +155,6 @@ const LandingScreen = ({ navigation }) => {
             fetchShops(shopOwnerId);
           }
         }
-        setLoading(false);
       })
       .catch(async (error) => {
         //loging the user out if the object is missing

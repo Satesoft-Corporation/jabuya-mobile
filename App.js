@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./screens/Login";
@@ -20,17 +20,20 @@ import ProductEntry from "./forms/ProductEntry";
 import BarCodeScreen from "./screens/BarCodeScreen";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 import Colors from "./constants/Colors";
+import { UserSessionUtils } from "./utils/UserSessionUtils";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+
+  //changing the borderan text color of the date input fields
   const theme = {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
-      primary: Colors.dark, // Change this to your primary color
-      text: Colors.dark, // Change this to your text color
-      background:Colors.light
+      primary: Colors.dark, 
+      text: Colors.dark, 
+      background: Colors.light,
     },
   };
 

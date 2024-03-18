@@ -1,7 +1,5 @@
 import { createContext, useState } from "react";
 import { isValidNumber } from "../utils/Utils";
-import Loader from "../components/Loader";
-import { BaseApiService } from "../utils/BaseApiService";
 
 export const SaleEntryContext = createContext();
 
@@ -93,10 +91,11 @@ export const SaleEntryProvider = ({ children }) => {
 
       setTotalQty(totalQty + parsedQuantity); //updating total items purchased
 
-      const productIndex = selections.findIndex(
-        //locating the duplicate item in selection array
-        (product) => product.productName === selection.productName
-      );
+      const productIndex = selections.findIndex((item) => {
+        const { productName } = item;
+        const { productSaleUnitName } = selectedSaleUnit;
+        return productName.includes(productSaleUnitName);
+      });
 
       if (productIndex !== -1) {
         //if the already exists, update quantity and total cost
@@ -108,11 +107,17 @@ export const SaleEntryProvider = ({ children }) => {
         setLoading(false);
         setScanned(false);
       } else {
+        const { productSaleUnitName } = selectedSaleUnit;
+
+        //appending the sale unit name on the selection
+        let name =
+          productSaleUnitName !== "Whole" ? " - " + productSaleUnitName : "";
+
         setSelections((prev) => [
           ...prev,
           {
             id: selection.id,
-            productName: selection.productName,
+            productName: selection?.productName + name,
             shopProductId: selection.id,
             quantity: parsedQuantity, // Use the parsed quantity
             totalCost: cost,
@@ -123,7 +128,7 @@ export const SaleEntryProvider = ({ children }) => {
       }
       setScanned(false);
       setSelection(null);
-      setQuantity(null);
+      setQuantity("");
       setShowModal(false);
       setSelectedSaleUnit(null);
       setTimeout(() => {

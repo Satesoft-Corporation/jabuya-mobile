@@ -62,43 +62,6 @@ function SalesEntry({ navigation }) {
 
   const { isShopOwner, isShopAttendant, attendantShopId } = userParams;
 
-  const resolvePendingSales = async () => {
-    setLoading(true);
-
-    let pendingSales = await UserSessionUtils.getPendingSales();
-
-    if (pendingSales.length > 0) {
-      pendingSales.forEach((cart, index) => {
-        new BaseApiService("/shop-sales")
-          .postRequest(cart)
-          .then(async (response) => {
-            let d = { info: await response.json(), status: response.status };
-            return d;
-          })
-          .then(async (d) => {
-            let { info, status } = d;
-            let id = info?.id;
-
-            if (status === 200) {
-              new BaseApiService(`/shop-sales/${id}/confirm`)
-                .postRequest()
-                .then((d) => d.json())
-                .then(async (d) => {
-                  await UserSessionUtils.removePendingSale(index);
-                })
-                .catch((error) => {
-                  console.log(error, cart);
-                });
-            } else {
-              // console.log(error, cart);
-            }
-          })
-          .catch((error) => {});
-      });
-    }
-    fetchProducts();
-  };
-
   const fetchProducts = async () => {
     let searchParameters = {
       offset: 0,
@@ -231,9 +194,7 @@ function SalesEntry({ navigation }) {
     }
   };
 
-  useEffect(() => {
-    resolvePendingSales();
-  }, []);
+
 
   useEffect(() => {
     fetchProducts();
@@ -415,7 +376,7 @@ function SalesEntry({ navigation }) {
               }}
             >
               {selections.map((item) => (
-                <SaleListItem data={item} key={item.id} />
+                <SaleListItem data={item} key={item.productName} />
               ))}
             </ScrollView>
             <View
