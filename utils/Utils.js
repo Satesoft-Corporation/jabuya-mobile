@@ -7,7 +7,7 @@ export function formatNumberWithCommas(number) {
   return number ? number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0;
 }
 
-export function formatDate(inputDate, removeTime = false) {
+export function formatDate(inputDate, removeTime = false, onlyTime = false) {
   let options;
   if (removeTime === true) {
     options = {
@@ -32,6 +32,22 @@ export function formatDate(inputDate, removeTime = false) {
   const formattedDate = date.toLocaleDateString("en-US", options);
 
   return formattedDate;
+}
+
+export function extractTime(inputDate) {
+  const date = new Date(inputDate);
+
+  // Define options for formatting the time
+  const options = {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true, // Use 12-hour format
+  };
+
+  const formattedTime = date.toLocaleTimeString("en-US", options);
+
+  return formattedTime;
 }
 
 export function formatDateToDDMMYY(dateString) {

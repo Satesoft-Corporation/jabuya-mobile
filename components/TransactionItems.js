@@ -6,7 +6,11 @@ import {
   FlatList,
 } from "react-native";
 import Colors from "../constants/Colors";
-import { formatDate, formatNumberWithCommas } from "../utils/Utils";
+import {
+  extractTime,
+  formatDate,
+  formatNumberWithCommas,
+} from "../utils/Utils";
 import { useEffect, useState } from "react";
 
 export function SaleTransactionItem({ data, isShopOwner }) {
@@ -68,7 +72,9 @@ export function SaleTransactionItem({ data, isShopOwner }) {
               alignSelf: "flex-end",
             }}
           >
-            {formatDate(data?.soldOnDate)}
+            {formatDate(data?.soldOnDate, true) +
+              ", " +
+              extractTime(data.dateCreated)}
           </Text>
           {expanded && (
             <Text

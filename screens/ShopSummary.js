@@ -15,19 +15,17 @@ const ShopSummary = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [stock, setStock] = useState(null);
   const [totalSalesValue, setTotalSalesValue] = useState(null); //cash at hand
-  const [expenses, setExpenses] = useState(null);
-  const [grossProfit, setGrossProfit] = useState(null);
-  const [netProfit, setNetProfit] = useState(null);
+  const [financialRecords, setFinancialRecords] = useState(null);
 
   const { userParams } = useContext(UserContext);
 
-  const { shopOwnerId } = userParams;
+  const { shopOwnerId } = userParams; // changes the id when done
 
   const fetchShopProducts = () => {
     let searchParameters = {
       offset: 0,
       limit: 0,
-      shopOwnerId: shopOwnerId,
+      shopOwnerId: 2453,
     };
     let itemsStockValues = [];
     let itemsSaleValues = [];
@@ -63,8 +61,55 @@ const ShopSummary = ({ navigation, route }) => {
       });
   };
 
+  const fetchShopDetails = () => {
+    let searchParameters = {
+      offset: 0,
+      limit: 0,
+      shopOwnerId: shopOwnerId //1427, // 2453,
+    };
+
+    new BaseApiService("/shops")
+      .getRequestWithJsonResponse(searchParameters)
+      .then(async (response) => {
+        // console.log(response.records);
+        let totalCapital = 0;
+        let stockValue = 0;
+        let cashAtHand = 0;
+        let expenses = 0;
+        let grossProfit = 0;
+        let initialCap = 0;
+
+        response.records.forEach(async (item) => {
+          totalCapital += item?.initialCapital;
+
+          stockValue += item?.performanceSummary?.totalStockValue || 0;
+
+          cashAtHand += item?.performanceSummary?.totalSalesValue || 0;
+
+          expenses += item?.performanceSummary?.totalExpenses || 0;
+
+          grossProfit += item?.performanceSummary?.totalStockValue || 0;
+          initialCap += item?.initialCapital;
+        });
+
+        setFinancialRecords({
+          totalCapital,
+          stockValue,
+          cashAtHand,
+          expenses,
+          grossProfit,
+        });
+        setInitialCapital(initialCap);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+      });
+  };
+
   useEffect(() => {
     fetchShopProducts();
+    fetchShopDetails();
   }, []);
 
   return (
@@ -100,7 +145,7 @@ const ShopSummary = ({ navigation, route }) => {
               >
                 UGX
               </Text>{" "}
-              {initialCapital}
+              {formatNumberWithCommas(initialCapital)}
             </Text>
           </View>
           <View
@@ -193,6 +238,7 @@ const ShopSummary = ({ navigation, route }) => {
             marginTop: 10,
             borderRadius: 3,
             justifyContent: "space-between",
+            gap: 10,
           }}
         >
           <View
@@ -207,7 +253,50 @@ const ShopSummary = ({ navigation, route }) => {
             }}
           >
             <Image
-              source={require("../assets/icons/icons8-cash-50.png")}
+              source={require("../assets/icons/bank1.png")}
+              style={{
+                width: 40,
+                height: 40,
+                tintColor: Colors.dark,
+                marginEnd: 10,
+              }}
+            />
+
+            <View>
+              <Text
+                style={{
+                  fontWeight: 500,
+                  fontSize: 16,
+                  alignSelf: "flex-end",
+                }}
+              >
+                {formatNumberWithCommas(0)}
+              </Text>
+              <Text
+                style={{
+                  fontWeight: 300,
+                  fontSize: 10,
+                  alignSelf: "flex-end",
+                }}
+              >
+                Banked
+              </Text>
+            </View>
+          </View>
+
+          <View
+            style={{
+              backgroundColor: Colors.light,
+              flexDirection: "row",
+              alignItems: "center",
+              padding: 6,
+              borderRadius: 3,
+              justifyContent: "space-between",
+              flex: 1,
+            }}
+          >
+            <Image
+              source={require("../assets/icons/open-hand.png")}
               style={{
                 width: 40,
                 height: 40,
@@ -246,8 +335,52 @@ const ShopSummary = ({ navigation, route }) => {
             marginTop: 10,
             borderRadius: 3,
             justifyContent: "space-between",
+            gap: 10,
           }}
         >
+          <View
+            style={{
+              backgroundColor: Colors.light,
+              flexDirection: "row",
+              alignItems: "center",
+              padding: 6,
+              borderRadius: 3,
+              justifyContent: "space-between",
+              flex: 1,
+            }}
+          >
+            <Image
+              source={require("../assets/icons/icons8-cash-50.png")}
+              style={{
+                width: 40,
+                height: 40,
+                tintColor: Colors.dark,
+                marginEnd: 10,
+              }}
+            />
+
+            <View>
+              <Text
+                style={{
+                  fontWeight: 500,
+                  alignSelf: "flex-end",
+                  fontSize: 16,
+                }}
+              >
+                0
+              </Text>
+              <Text
+                style={{
+                  fontWeight: 300,
+                  fontSize: 10,
+                  alignSelf: "flex-end",
+                }}
+              >
+                Debt
+              </Text>
+            </View>
+          </View>
+
           <View
             style={{
               backgroundColor: Colors.light,
@@ -273,50 +406,6 @@ const ShopSummary = ({ navigation, route }) => {
               <Text
                 style={{
                   fontWeight: 500,
-                  alignSelf: "flex-end",
-                  fontSize: 16,
-                }}
-              >
-                0
-              </Text>
-              <Text
-                style={{
-                  fontWeight: 300,
-                  fontSize: 10,
-                  alignSelf: "flex-end",
-                }}
-              >
-                Sold capital value
-              </Text>
-            </View>
-          </View>
-
-          <View style={{ width: 10 }}></View>
-          <View
-            style={{
-              backgroundColor: Colors.light,
-              flexDirection: "row",
-              alignItems: "center",
-              padding: 6,
-              borderRadius: 3,
-              justifyContent: "space-between",
-              flex: 1,
-            }}
-          >
-            <Image
-              source={require("../assets/icons/icons8-box-502.png")}
-              style={{
-                width: 40,
-                height: 40,
-                tintColor: Colors.dark,
-                marginEnd: 10,
-              }}
-            />
-
-            <View>
-              <Text
-                style={{
-                  fontWeight: 500,
                   fontSize: 16,
                   alignSelf: "flex-end",
                 }}
@@ -330,11 +419,12 @@ const ShopSummary = ({ navigation, route }) => {
                   alignSelf: "flex-end",
                 }}
               >
-                Restocking
+                Credit
               </Text>
             </View>
           </View>
         </View>
+
         <View
           style={{
             backgroundColor: Colors.light,
@@ -358,7 +448,7 @@ const ShopSummary = ({ navigation, route }) => {
             />
             <View>
               <Text style={{ fontWeight: 400, fontSize: 16 }}>
-                Gross profit
+                Gross income
               </Text>
               <Text style={{ fontWeight: 300, fontSize: 10 }}>
                 Before expenses
@@ -368,7 +458,7 @@ const ShopSummary = ({ navigation, route }) => {
 
           <View>
             <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>
-              {formatNumberWithCommas(grossProfit)}
+              {formatNumberWithCommas(financialRecords?.grossProfit)}
             </Text>
           </View>
         </View>
@@ -386,7 +476,7 @@ const ShopSummary = ({ navigation, route }) => {
         >
           <View style={{ flexDirection: "row", justifyContent: "center" }}>
             <Image
-              source={require("../assets/icons/icons8-current-expenses-64.png")}
+              source={require("../assets/icons/spending.png")}
               style={{
                 width: 40,
                 height: 40,
@@ -404,7 +494,7 @@ const ShopSummary = ({ navigation, route }) => {
 
           <View>
             <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>
-              {formatNumberWithCommas(expenses)}
+              {formatNumberWithCommas(financialRecords?.expenses)}
             </Text>
           </View>
         </View>
@@ -453,7 +543,7 @@ const ShopSummary = ({ navigation, route }) => {
                 color: Colors.primary,
               }}
             >
-              {formatNumberWithCommas(netProfit)}
+              {formatNumberWithCommas(0)}
             </Text>
           </View>
         </View>
