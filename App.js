@@ -20,19 +20,20 @@ import ProductEntry from "./forms/ProductEntry";
 import BarCodeScreen from "./screens/BarCodeScreen";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 import Colors from "./constants/Colors";
-import { UserSessionUtils } from "./utils/UserSessionUtils";
+import LockScreen from "./screens/applock/LockScreen";
+import Settings from "./screens/settings/Settings";
+import LockSetUp from "./screens/applock/LockSetUp";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-
   //changing the borderan text color of the date input fields
   const theme = {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
-      primary: Colors.dark, 
-      text: Colors.dark, 
+      primary: Colors.dark,
+      text: Colors.dark,
       background: Colors.light,
     },
   };
@@ -75,6 +76,12 @@ export default function App() {
                 name="newStockEntry"
                 component={StockPurchaseForm}
               />
+
+              <Stack.Screen name="settings" component={Settings} />
+
+              <Stack.Screen name="lockscreen" component={LockScreen} />
+
+              <Stack.Screen name="locksetup" component={LockSetUp} />
             </Stack.Navigator>
           </NavigationContainer>
         </SaleEntryProvider>

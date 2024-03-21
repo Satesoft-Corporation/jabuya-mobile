@@ -1,31 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, TouchableOpacity, Image, Text } from "react-native";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Colors from "../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { BaseApiService } from "../utils/BaseApiService";
 import { useNavigation } from "@react-navigation/native";
+import { UserContext } from "../context/UserContext";
 
 const UserProfile = () => {
-  const [role, setRole] = useState("");
-  const [name, setName] = useState("");
-  const [shopName, setShopName] = useState("");
-  const [shops, setShops] = useState(1);
-
+  const [shops, setShops] = useState(null);
   const navigation = useNavigation();
+
+  const { sessionObj } = useContext(UserContext);
+
+  const { role, fullName, attendantShopName } = { ...sessionObj };
 
   useEffect(() => {
     UserSessionUtils.getShopCount().then((count) => {
       if (count) {
         setShops(count);
-      }
-    });
-    UserSessionUtils.getFullSessionObject().then((data) => {
-      if (data) {
-        const { roles, firstName, lastName, attendantShopName } = data?.user;
-        setRole(roles[0].name);
-        setName(firstName + " " + lastName);
-        setShopName(attendantShopName);
       }
     });
   }, []);
@@ -48,7 +40,7 @@ const UserProfile = () => {
           marginTop: 10,
         }}
       >
-        <TouchableOpacity onPress={() => true}>
+        <TouchableOpacity onPress={() => navigation.navigate("settings")}>
           <Image
             source={require("../assets/images/man_placeholder.jpg")}
             style={{
@@ -72,7 +64,7 @@ const UserProfile = () => {
               fontSize: 12,
             }}
           >
-            {name}
+            {fullName}
           </Text>
           <Text
             style={{
@@ -90,7 +82,7 @@ const UserProfile = () => {
               fontSize: 11,
             }}
           >
-            {shopName || `Shops: ${shops}`}
+            {attendantShopName || (shops && `Shops: ${shops}`)}
           </Text>
         </View>
       </View>

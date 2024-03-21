@@ -16,6 +16,7 @@ import DisplayMessage from "../components/Dialogs/DisplayMessage";
 import { TouchableOpacity } from "react-native";
 import { Image } from "react-native";
 import Loader from "../components/Loader";
+import { CommonActions } from "@react-navigation/native";
 
 const LandingScreen = ({ navigation }) => {
   const {
@@ -24,6 +25,8 @@ const LandingScreen = ({ navigation }) => {
     userParams,
     setSelectedShop,
     setShops,
+    hasUserSetPinCode,
+    logInWithPin,
   } = useContext(UserContext);
 
   const [tab, setTab] = useState("home");
@@ -129,8 +132,30 @@ const LandingScreen = ({ navigation }) => {
           logOut();
           return true;
         }
+
+        let prevPinTime = await UserSessionUtils.getPinLoginTime();
+
+        if (prevPinTime !== null) {
+          let pintimeDiff = getTimeDifference(prevPinTime, new Date());
+
+          if (pintimeDiff.minutes >= 1) {
+            const { dispatch } = navigation;
+
+            dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: "lockscreen" }],
+              })
+            );
+          }
+        }
+
         const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
           data?.user;
+
+        let prevLoginTime = await UserSessionUtils.getLoginTime();
+
+        let logintimeDifferance = getTimeDifference(prevLoginTime, new Date());
 
         setUserParams({
           isShopOwner,
@@ -138,15 +163,13 @@ const LandingScreen = ({ navigation }) => {
           attendantShopId,
           shopOwnerId,
         });
-        let prevTime = await UserSessionUtils.getLoginTime();
-        let timeDifferance = getTimeDifference(prevTime, new Date());
 
-        if (timeDifferance.hours < 24) {
+        if (logintimeDifferance.hours < 24) {
           //to save if access token is still valid
           resolveUnsavedSales();
         }
 
-        setTimeDiff(timeDifferance);
+        setTimeDiff(logintimeDifferance);
 
         let shopCount = await UserSessionUtils.getShopCount();
 

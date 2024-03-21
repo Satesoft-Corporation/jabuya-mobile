@@ -210,11 +210,11 @@ export class UserSessionUtils {
       return [];
     }
   }
-/**
- * 
- * @param {*} salePayLoad 
- * stores a sale record when the user is offline
- */
+  /**
+   *
+   * @param {*} salePayLoad
+   * stores a sale record when the user is offline
+   */
   static async addPendingSale(salePayLoad) {
     let pendingSales = await this.getPendingSales();
 
@@ -242,5 +242,22 @@ export class UserSessionUtils {
   static async resetPendingSales() {
     //to clear the list
     await AsyncStorage.setItem(StorageParams.PENDING_SALES, JSON.stringify([]));
+  }
+
+  static async setUserPinCode(code) {
+    await AsyncStorage.setItem(StorageParams.PIN_CODE, code);
+  }
+
+  static async getUserPinCode() {
+    return await AsyncStorage.getItem(StorageParams.PIN_CODE);
+  }
+
+  static async setPinLoginTime(time) {
+    await AsyncStorage.setItem(StorageParams.PIN_LOGIN, time);
+  }
+
+  static async getPinLoginTime() {
+    let time = await AsyncStorage.getItem(StorageParams.PIN_LOGIN);
+    return time ? new Date(time) : null;
   }
 }
