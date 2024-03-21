@@ -138,7 +138,7 @@ const LandingScreen = ({ navigation }) => {
         if (prevPinTime !== null) {
           let pintimeDiff = getTimeDifference(prevPinTime, new Date());
 
-          if (pintimeDiff.minutes >= 1) {
+          if (pintimeDiff.hours >= 1) {
             const { dispatch } = navigation;
 
             dispatch(
