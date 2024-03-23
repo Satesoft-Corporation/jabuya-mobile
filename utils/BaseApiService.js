@@ -121,14 +121,14 @@ export class BaseApiService {
    * This method is used to obtain a refresh token from the server
    */
   async refreshTokenRequest() {
-    let requestBody = { token: UserSessionUtils.getRefreshToken() };
+    let token = await UserSessionUtils.getRefreshToken();
+
+    const headers = {
+      Authorization: "Bearer " + token,
+    };
     return await fetch(this.apiEndpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify(requestBody),
+      headers: headers,
     });
   }
 
@@ -139,7 +139,7 @@ export class BaseApiService {
    * @returns
    */
   async putRequest(requestBody) {
-    let token = UserSessionUtils.getBearerToken();
+    let token = await UserSessionUtils.getBearerToken();
     const headers = {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,

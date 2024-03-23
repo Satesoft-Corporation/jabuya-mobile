@@ -14,7 +14,11 @@ import { BaseApiService } from "../utils/BaseApiService";
 import { packageOptions } from "../constants/Constants";
 import Loader from "../components/Loader";
 import { KeyboardAvoidingView } from "react-native";
-import { convertToServerDate, hasNull } from "../utils/Utils";
+import {
+  convertToServerDate,
+  formatNumberWithCommas,
+  hasNull,
+} from "../utils/Utils";
 import { UserContext } from "../context/UserContext";
 import { useContext } from "react";
 import TopHeader from "../components/TopHeader";
@@ -22,7 +26,7 @@ import Snackbar from "../components/Snackbar";
 import PrimaryButton from "../components/buttons/PrimaryButton";
 import { DatePickerInput } from "react-native-paper-dates";
 
-const StockPurchaseForm = ({ navigation }) => {
+const StockPurchaseForm = ({ navigation, route }) => {
   const { selectedShop, userParams } = useContext(UserContext);
 
   const { shopOwnerId } = userParams;
@@ -41,9 +45,7 @@ const StockPurchaseForm = ({ navigation }) => {
   const [purchasePrice, setPurchasePrice] = useState(null);
   const [unpackedPurchasedQty, setUnpackedPurchasedQty] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const [unitPurchaseCost, setUnitPurchaseCost] = useState(0);
-
-  //
+  const [edit, setEdit] = useState(false);
 
   const snackBarRef = useRef(null);
 
@@ -116,7 +118,7 @@ const StockPurchaseForm = ({ navigation }) => {
       expiryDate: convertToServerDate(expiryDate),
       id: 0,
       manufacturerId: selectedProduct?.manufacturerId,
-      productId: selectedProduct?.id,
+      productId: selectedProduct?.productId,
       productName: selectedProduct?.productName,
       shopId: selectedShop?.id,
       stockedOnDate: convertToServerDate(purchaseDate),
@@ -146,11 +148,17 @@ const StockPurchaseForm = ({ navigation }) => {
     if (isValidPayload === false) {
       setLoading(false); //removing loader if form is invalid
     }
+    console.log(payload);
 
     if (isValidPayload === true) {
-      new BaseApiService("/stock-entries")
-        .saveRequestWithJsonResponse(payload, false)
+      const apiUrl = edit
+        ? "/stock-entries/" + selectedProduct.id
+        : "/stock-entries";
+
+      new BaseApiService(apiUrl)
+        .saveRequestWithJsonResponse(payload, edit)
         .then((response) => {
+          console.log(response);
           clearForm();
           setLoading(false);
           setSubmitted(false);
@@ -164,22 +172,74 @@ const StockPurchaseForm = ({ navigation }) => {
     }
   };
 
-  // useEffect(() => {
-  //   const { packageQuantity } = selectedProduct;
+  const populateForm = () => {
+    if (route.params) {
+      const selectedRecord = {
+        ...route.params,
+      };
+      console.log(route.params);
 
-  //   const isPacked = isPackedProduct && isPackedProduct === true;
+      setLoading(false);
+      setEdit(true);
 
-  //   let qty = isPacked ? packedPurchasedQuantity : unpackedPurchasedQty;
+      setSelectedProduct({
+        productName: selectedRecord?.productName,
+        id: selectedRecord?.id,
+        productId: selectedRecord?.productId,
+        packageUnitName: selectedRecord?.formattedQuantity.split(" ")[1],
+        manufacturerId: selectedRecord?.manufacturerId,
+        packageQuantity: selectedRecord?.purchasedQuantity,
+      });
 
-  //   let totalPrice = qty * (packageQuantity || 0);
+      setIsPackedProduct(!selectedRecord?.unpackedPurchase);
 
-  //   setUnitPurchaseCost(totalPrice);
-  // }, [purchasePrice, packedPurchasedQuantity, unpackedPurchasedQty]);
+      setExpiryDate(new Date(selectedRecord?.expiryDate));
+
+      setSelectedSupplier({
+        companyOrBusinessName: selectedRecord?.supplierName,
+        id: selectedRecord?.supplierId,
+      });
+
+      setPurchaseDate(new Date(selectedRecord?.stockedOnDate));
+      setPurchasePrice(String(selectedRecord.purchasePrice));
+      setUnpackedPurchasedQty(String(selectedRecord?.unpackedQuantity));
+      setPackedPurchasedQuantity(String(selectedRecord?.packedQuantity));
+      setBatchNo(selectedRecord?.batchNumber);
+      setRemarks(selectedRecord?.remarks);
+    } else {
+      //to fetch these only on entry
+      fetchProducts();
+      fetchSuppliers();
+    }
+  };
+
+  const getUnitPurchasePrice = () => {
+    let qty = isPackedProduct ? packedPurchasedQuantity : unpackedPurchasedQty;
+
+    let price = Number(purchasePrice);
+
+    if (isPackedProduct) {
+      return Math.round(
+        price / (selectedProduct?.packageQuantity * Number(qty))
+      );
+    } else {
+      return Math.round(price / qty);
+    }
+  };
 
   useEffect(() => {
-    fetchProducts();
-    fetchSuppliers();
+    populateForm();
   }, []);
+
+  useEffect(() => {
+    console.log(selectedProduct);
+    getUnitPurchasePrice();
+  }, [
+    selectedProduct,
+    purchasePrice,
+    packedPurchasedQuantity,
+    unpackedPurchasedQty,
+  ]);
 
   return (
     <KeyboardAvoidingView
@@ -208,7 +268,7 @@ const StockPurchaseForm = ({ navigation }) => {
               marginStart: 5,
             }}
           >
-            Enter stock detail
+            {edit ? "Edit" : "Enter"} stock detail
           </Text>
 
           <View>
@@ -226,7 +286,7 @@ const StockPurchaseForm = ({ navigation }) => {
                 backgroundColor: Colors.light,
                 borderColor: Colors.dark,
               }}
-              data={suppliers}
+              data={edit ? [{ ...selectedSupplier }] : suppliers}
               onChange={onSupplierChange}
               value={selectedSupplier}
               placeholder="Select supplier"
@@ -261,7 +321,7 @@ const StockPurchaseForm = ({ navigation }) => {
                 backgroundColor: Colors.light,
                 borderColor: Colors.dark,
               }}
-              data={products}
+              data={edit ? [{ ...selectedProduct }] : products}
               onChange={onProductChange}
               value={selectedProduct}
               placeholder="Select product"
@@ -365,7 +425,8 @@ const StockPurchaseForm = ({ navigation }) => {
                   }}
                 />
                 {submitted &&
-                  (!unpackedPurchasedQty || !packedPurchasedQuantity) && (
+                  ((!unpackedPurchasedQty && !isPackedProduct) ||
+                    (!packedPurchasedQuantity && isPackedProduct)) && (
                     <Text
                       style={{
                         fontSize: 12,
@@ -531,9 +592,14 @@ const StockPurchaseForm = ({ navigation }) => {
                   borderColor: Colors.dark,
                   paddingHorizontal: 10,
                   height: 40,
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
-                {/* <Text> {formatNumberWithCommas(unitPurchaseCost)}</Text> */}
+                <Text style={{ textAlign: "center" }}>
+                  {" "}
+                  {formatNumberWithCommas(getUnitPurchasePrice())}
+                </Text>
               </TouchableOpacity>
             </View>
 

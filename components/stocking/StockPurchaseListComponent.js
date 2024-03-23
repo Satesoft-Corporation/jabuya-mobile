@@ -1,15 +1,16 @@
-import React, { useState, useCallback } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text } from "react-native";
 import { formatDate, formatNumberWithCommas } from "../../utils/Utils";
 import Colors from "../../constants/Colors";
 import { screenWidth } from "../../constants/Constants";
+import ChipButton2 from "../buttons/ChipButton2";
 
-const StockPurchaseListComponent = ({ data }) => {
+const StockPurchaseListComponent = ({ data, navigation }) => {
   const [expanded, setExpanded] = useState(false);
 
-  const toggleExpand = useCallback(() => {
-    setExpanded((prevExpanded) => !prevExpanded);
-  }, []);
+  const toggleExpand = () => {
+    setExpanded(!expanded);
+  };
 
   const {
     purchasedQuantity,
@@ -191,23 +192,19 @@ const StockPurchaseListComponent = ({ data }) => {
           </Text>
         </View>
 
-        <TouchableOpacity
-          onPress={toggleExpand}
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: Colors.dark,
-            borderRadius: 3,
-            paddingHorizontal: 12,
-            paddingVertical: 4,
-          }}
-        >
-          <Text
-            style={{ color: Colors.primary, fontSize: 13, fontWeight: 300 }}
-          >
-            {expanded ? "Hide" : "More"}
-          </Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          {expanded && (
+            <ChipButton2
+              onPress={() => navigation?.navigate("newStockEntry", data)}
+              title={"Edit"}
+              darkMode={false}
+            />
+          )}
+          <ChipButton2
+            onPress={toggleExpand}
+            title={expanded ? "Hide" : "More"}
+          />
+        </View>
       </View>
     </View>
   );

@@ -138,7 +138,7 @@ const LandingScreen = ({ navigation }) => {
         if (prevPinTime !== null) {
           let pintimeDiff = getTimeDifference(prevPinTime, new Date());
 
-          if (pintimeDiff.hours >= 1) {
+          if (pintimeDiff.seconds >= 10) {
             const { dispatch } = navigation;
 
             dispatch(
@@ -214,7 +214,7 @@ const LandingScreen = ({ navigation }) => {
         />
       </View>
 
-      <View // bottom nav
+      {/* <View // bottom nav
         style={{
           height: 70,
           backgroundColor: Colors.dark,
@@ -318,7 +318,7 @@ const LandingScreen = ({ navigation }) => {
             source={require("../assets/icons/icons8-logout-24.png")}
           />
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <DisplayMessage
         showModal={showMoodal}

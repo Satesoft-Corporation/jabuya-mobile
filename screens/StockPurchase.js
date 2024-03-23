@@ -141,7 +141,9 @@ const StockPurchase = ({ navigation }) => {
         style={{ marginTop: 5 }}
         keyExtractor={(item) => item.id.toString()}
         data={stockEntries}
-        renderItem={({ item }) => <StockPurchaseListComponent data={item} />}
+        renderItem={({ item }) => (
+          <StockPurchaseListComponent data={item} navigation={navigation} />
+        )}
         ListEmptyComponent={() => (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}

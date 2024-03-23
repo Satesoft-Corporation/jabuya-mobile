@@ -2,11 +2,11 @@ import { createContext, useState, useEffect } from "react";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import NetInfo from "@react-native-community/netinfo";
 import { getTimeDifference } from "../utils/Utils";
+import { BaseApiService } from "../utils/BaseApiService";
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  //api call variables
   const [userParams, setUserParams] = useState({});
   const [shops, setShops] = useState([]);
   const [selectedShop, setSelectedShop] = useState(null);

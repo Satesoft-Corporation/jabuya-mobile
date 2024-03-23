@@ -50,7 +50,6 @@ const LockScreen = ({ navigation, route }) => {
 
     if (isCorrectPin) {
       const { dispatch } = navigation;
-      setPinCode(["", "", "", "", ""]);
       await UserSessionUtils.setPinLoginTime(String(new Date()));
       dispatch(
         CommonActions.reset({
@@ -58,6 +57,7 @@ const LockScreen = ({ navigation, route }) => {
           routes: [{ name: "welcome" }],
         })
       );
+      setPinCode(["", "", "", "", ""]);
     }
 
     if (!pinCode.includes("") && !isCorrectPin) {
