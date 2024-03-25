@@ -94,7 +94,9 @@ export const SaleEntryProvider = ({ children }) => {
       const productIndex = selections.findIndex((item) => {
         const { productName } = item;
         const { productSaleUnitName } = selectedSaleUnit;
-        return productName.includes(productSaleUnitName);
+        let unit = selectedSaleUnit?.id ? " - " + productSaleUnitName : ""; //the sale unit name(the default saleunit doesnt have an id in my design)
+        let unitName = selection?.productName + unit;
+        return productName === unitName; //we've found the duplicate item
       });
 
       if (productIndex !== -1) {
