@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import Colors from "../constants/Colors";
-import { dummy, screenHeight, screenWidth } from "../constants/Constants";
+import { screenHeight, screenWidth } from "../constants/Constants";
 import Loader from "../components/Loader";
 import { SalesQtyInputDialog } from "../components/Dialogs";
 import { BarCodeScanner } from "expo-barcode-scanner";

@@ -236,7 +236,7 @@ export class UserSessionUtils {
 
   static async getPendingSales() {
     let list = await AsyncStorage.getItem(StorageParams.PENDING_SALES);
-    return JSON.parse(list);
+    return list ? JSON.parse(list) : [];
   }
 
   static async resetPendingSales() {

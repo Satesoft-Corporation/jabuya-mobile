@@ -15,14 +15,11 @@ import Colors from "../constants/Colors";
 
 import AppStatusBar from "../components/AppStatusBar";
 import UserProfile from "../components/UserProfile";
-import { SaleListItem } from "../components/TransactionItems";
 import { SalesDropdownComponent } from "../components/DropdownComponents";
-import { SalesQtyInputDialog } from "../components/Dialogs";
 import { formatNumberWithCommas, isValidNumber } from "../utils/Utils";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import { IconsComponent } from "../components/Icon";
 import Loader from "../components/Loader";
-import { ConfirmSalesDialog } from "../components/Dialogs";
 import Snackbar from "../components/Snackbar";
 import { useRef } from "react";
 import { UserContext } from "../context/UserContext";
@@ -31,8 +28,10 @@ import PrimaryButton from "../components/buttons/PrimaryButton";
 import { SaleEntryContext } from "../context/SaleEntryContext";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import NetInfo from "@react-native-community/netinfo";
-
-const screenHeight = Dimensions.get("window").height;
+import EnterSaleQtyModal from "../components/sales/EnterSaleQtyModal";
+import ConfirmSaleModal from "../components/sales/ConfirmSaleModal";
+import SalesTable from "../components/sales/SalesTable";
+import { SafeAreaView } from "react-native";
 
 function SalesEntry({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -194,31 +193,24 @@ function SalesEntry({ navigation }) {
     }
   };
 
-
-
   useEffect(() => {
     fetchProducts();
   }, [searchTerm]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
       <Loader loading={loading} />
 
-      <ConfirmSalesDialog
+      <ConfirmSaleModal
         visible={showConfirmed}
-        addSale={postSales}
-        sales={selections}
-        totalCost={totalCost}
         setVisible={() => setShowConfirmed(false)}
-        clear={clearEverything}
-        amountPaid={recievedAmount}
-        balanceGivenOut={recievedAmount - totalCost}
-        cartLength={totalQty}
+        setLoading={setLoading}
+        snackbarRef={snackbarRef}
       />
 
-      <SalesQtyInputDialog />
+      <EnterSaleQtyModal />
 
       <BlackScreen flex={isShopAttendant ? 12 : 10}>
         <UserProfile />
@@ -348,37 +340,8 @@ function SalesEntry({ navigation }) {
               marginTop: 8,
             }}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                height: 25,
-                paddingEnd: 10,
-                borderBottomColor: Colors.gray,
-                borderBottomWidth: 0.3,
-              }}
-            >
-              <Text style={{ flex: 2.5, fontWeight: 600 }}>Item</Text>
-              <Text style={{ flex: 0.5, textAlign: "center", fontWeight: 600 }}>
-                Qty
-              </Text>
-              <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
-                Cost
-              </Text>
+            <SalesTable sales={selections} />
 
-              <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
-                Amount
-              </Text>
-            </View>
-            <ScrollView
-              style={{
-                height: screenHeight / 4,
-              }}
-            >
-              {selections.map((item) => (
-                <SaleListItem data={item} key={item.productName} />
-              ))}
-            </ScrollView>
             <View
               style={{
                 backgroundColor: Colors.light,
@@ -464,7 +427,7 @@ function SalesEntry({ navigation }) {
             </View>
           </View>
 
-          <IconsComponent clear={clearEverything} />
+          <IconsComponent clear={() => clearEverything()} />
 
           <View style={{ marginTop: 8, height: 40, marginBottom: 20 }}>
             <PrimaryButton
@@ -509,7 +472,7 @@ function SalesEntry({ navigation }) {
         </ScrollView>
         <Snackbar ref={snackbarRef} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

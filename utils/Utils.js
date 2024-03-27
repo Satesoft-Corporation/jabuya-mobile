@@ -1,7 +1,4 @@
-import { UserSessionUtils } from "./UserSessionUtils";
-import { dummyLoginResponse } from "../constants/Constants";
-import { CommonActions } from "@react-navigation/native";
- // eas build -p android --profile preview
+// eas build -p android --profile preview
 export function formatNumberWithCommas(number) {
   number = Number(number);
   return number ? number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0;
@@ -167,29 +164,6 @@ export function getTimeDifference(date1, date2) {
     seconds: seconds,
   };
 }
-
-export const onDummyLogin = async (navigation) => {
-  let info = { ...dummyLoginResponse };
-  const date = new Date();
-
-  const { dispatch } = navigation;
-  await UserSessionUtils.setLoggedIn(true);
-  await UserSessionUtils.setUserDetails(info.user);
-  await UserSessionUtils.setUserAuthToken(info.accessToken);
-  await UserSessionUtils.setUserRefreshToken(info.refreshToken);
-  await UserSessionUtils.setFullSessionObject(info);
-  await UserSessionUtils.setShopid(String(info.user.attendantShopId));
-  await UserSessionUtils.setLoginTime(String(date));
-
-  navigation.navigate("welcome");
-
-  dispatch(
-    CommonActions.reset({
-      index: 0,
-      routes: [{ name: "welcome" }],
-    })
-  );
-};
 
 export const isValidNumber = (num) => {
   let reg = /^[-+]?[0-9]*\.?[0-9]+$/;

@@ -93,6 +93,7 @@ const LandingScreen = ({ navigation }) => {
 
   const resolveUnsavedSales = async () => {
     let pendingSales = await UserSessionUtils.getPendingSales();
+
     if (pendingSales.length > 0) {
       pendingSales.forEach(async (cart, index) => {
         await new BaseApiService("/shop-sales")
@@ -121,8 +122,9 @@ const LandingScreen = ({ navigation }) => {
           })
           .catch((error) => {});
       });
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -138,7 +140,7 @@ const LandingScreen = ({ navigation }) => {
         if (prevPinTime !== null) {
           let pintimeDiff = getTimeDifference(prevPinTime, new Date());
 
-          if (pintimeDiff.seconds >= 10) {
+          if (pintimeDiff.hours >= 1) {
             const { dispatch } = navigation;
 
             dispatch(
@@ -164,11 +166,6 @@ const LandingScreen = ({ navigation }) => {
           shopOwnerId,
         });
 
-        if (logintimeDifferance.hours < 24) {
-          //to save if access token is still valid
-          resolveUnsavedSales();
-        }
-
         setTimeDiff(logintimeDifferance);
 
         let shopCount = await UserSessionUtils.getShopCount();
@@ -177,6 +174,10 @@ const LandingScreen = ({ navigation }) => {
           if (shopCount === null) {
             fetchShops(shopOwnerId);
           }
+        }
+        if (logintimeDifferance.hours < 24) {
+          //to save if access token is still valid
+          resolveUnsavedSales();
         }
       })
       .catch(async (error) => {

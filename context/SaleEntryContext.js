@@ -1,5 +1,7 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import { isValidNumber } from "../utils/Utils";
+
+import { paymentMethods } from "../constants/Constants";
 
 export const SaleEntryContext = createContext();
 
@@ -21,6 +23,8 @@ export const SaleEntryProvider = ({ children }) => {
   const [saleUnitId, setSaleUnitId] = useState(null);
   const [saleUnits, setSaleUnits] = useState([]);
 
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+
   const clearEverything = () => {
     setQuantity("");
     setSelection(null);
@@ -33,6 +37,7 @@ export const SaleEntryProvider = ({ children }) => {
     setSaleUnitId(null);
     setUnitCost("");
     setInitialUnitCost(null);
+    setSelectedPaymentMethod(paymentMethods[0]);
   };
 
   const saveSelection = () => {
@@ -147,7 +152,13 @@ export const SaleEntryProvider = ({ children }) => {
     setUnitCost(String(item?.unitPrice));
   };
 
+  useEffect(() => {
+    setSelectedPaymentMethod(paymentMethods[0]);
+  }, []);
+
   const data = {
+    selectedPaymentMethod,
+    setSelectedPaymentMethod,
     saleUnits,
     setSaleUnits,
     saleUnitId,
