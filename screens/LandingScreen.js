@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import Colors from "../constants/Colors";
 import { FlatList } from "react-native";
@@ -13,8 +13,6 @@ import { BaseApiService } from "../utils/BaseApiService";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import { getTimeDifference } from "../utils/Utils";
 import DisplayMessage from "../components/Dialogs/DisplayMessage";
-import { TouchableOpacity } from "react-native";
-import { Image } from "react-native";
 import Loader from "../components/Loader";
 import { CommonActions } from "@react-navigation/native";
 
@@ -25,11 +23,7 @@ const LandingScreen = ({ navigation }) => {
     userParams,
     setSelectedShop,
     setShops,
-    hasUserSetPinCode,
-    logInWithPin,
   } = useContext(UserContext);
-
-  const [tab, setTab] = useState("home");
 
   const [loading, setLoading] = useState(true);
   const [showMoodal, setShowModal] = useState(false);
@@ -214,112 +208,6 @@ const LandingScreen = ({ navigation }) => {
           numColumns={2}
         />
       </View>
-
-      {/* <View // bottom nav
-        style={{
-          height: 70,
-          backgroundColor: Colors.dark,
-          flexDirection: "row",
-          alignSelf: "stretch",
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => setTab("cash")}
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Image
-            style={{
-              width: 25,
-              height: 25,
-              tintColor: tab === "cash" ? Colors.primary : Colors.light,
-            }}
-            resizeMode={"contain"}
-            source={require("../assets/icons/icons8-money-bag-50.png")}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setTab("box")}
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Image
-            style={{
-              width: 25,
-              height: 25,
-              tintColor: tab === "box" ? Colors.primary : Colors.light,
-            }}
-            resizeMode={"contain"}
-            source={require("../assets/icons/icons8-box-50.png")}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setTab("home")}
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Image
-            style={{
-              width: 25,
-              height: 25,
-              tintColor: tab === "home" ? Colors.primary : Colors.light,
-            }}
-            resizeMode={"contain"}
-            source={require("../assets/icons/icons8-home-48.png")}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setTab("wallet")}
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Image
-            style={{
-              width: 25,
-              height: 25,
-              tintColor: tab === "wallet" ? Colors.primary : Colors.light,
-            }}
-            resizeMode={"contain"}
-            source={require("../assets/icons/icons8-wallet-50.png")}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={confirmLogout}
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Image
-            style={{
-              width: 25,
-              height: 25,
-              tintColor: tab === "check" ? Colors.primary : Colors.light,
-            }}
-            resizeMode={"contain"}
-            source={require("../assets/icons/icons8-logout-24.png")}
-          />
-        </TouchableOpacity>
-      </View> */}
 
       <DisplayMessage
         showModal={showMoodal}

@@ -113,7 +113,7 @@ const StockLevel = ({ navigation }) => {
       <TopHeader
         title="Stock Levels"
         showSearch={true}
-        onBackPress={() => navigation.goBack()}
+        
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}

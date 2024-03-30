@@ -1,8 +1,5 @@
 import { createContext, useState, useEffect } from "react";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
-import NetInfo from "@react-native-community/netinfo";
-import { getTimeDifference } from "../utils/Utils";
-import { BaseApiService } from "../utils/BaseApiService";
 
 export const UserContext = createContext();
 
@@ -14,6 +11,8 @@ export const UserProvider = ({ children }) => {
   const [userPincode, setUserPinCode] = useState("");
   const [sessionObj, setSessionObj] = useState(null);
   const [logInWithPin, setLoginWithPin] = useState(false);
+
+  const [reload, setReload] = useState(false); // flag for reloading screen when a record edit is made
 
   const getShopsFromStorage = () => {
     UserSessionUtils.getShops().then((ownerShops) => {
@@ -99,6 +98,8 @@ export const UserProvider = ({ children }) => {
     setSelectedShop,
     getShopsFromStorage,
     logInWithPin,
+    reload,
+    setReload,
   };
   return <UserContext.Provider value={data}>{children}</UserContext.Provider>;
 };

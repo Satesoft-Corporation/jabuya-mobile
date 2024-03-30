@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import Colors from "../constants/Colors";
 import SearchBar from "./SearchBar";
 import { UserContext } from "../context/UserContext";
+import { useNavigation } from "@react-navigation/native";
 
 const TopHeader = ({
   title = "Details",
@@ -16,6 +17,7 @@ const TopHeader = ({
   const [showBar, setShowBar] = useState(false);
   const { selectedShop } = useContext(UserContext);
 
+  const navigation = useNavigation();
   const toggleSearch = () => {
     setShowBar(!showBar);
   };
@@ -38,7 +40,7 @@ const TopHeader = ({
               alignItems: "center",
             }}
           >
-            <TouchableOpacity onPress={onBackPress}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <Image
                 source={require("../assets/icons/icons8-chevron-left-30.png")}
                 style={{

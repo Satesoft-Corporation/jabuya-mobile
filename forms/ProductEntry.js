@@ -159,7 +159,7 @@ const ProductEntry = ({ navigation, route }) => {
 
         <TopHeader
           title="Add product"
-          onBackPress={() => navigation.goBack()}
+          
         />
         <Loader loading={loading} />
         <ScrollView

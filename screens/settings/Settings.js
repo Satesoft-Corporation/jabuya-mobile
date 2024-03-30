@@ -43,7 +43,7 @@ const Settings = ({ navigation }) => {
       <TopHeader
         title="Settings"
         showShopName={false}
-        onBackPress={() => navigation.goBack()}
+        
       />
 
       <View style={{ paddingHorizontal: 10 }}>

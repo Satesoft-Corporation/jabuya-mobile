@@ -8,7 +8,6 @@ import { UserContext } from "../context/UserContext";
 import { BaseApiService } from "../utils/BaseApiService";
 import { MAXIMUM_RECORDS_PER_FETCH } from "../constants/Constants";
 import { ActivityIndicator } from "react-native";
-import { PanResponder } from "react-native";
 import Snackbar from "../components/Snackbar";
 
 const StockPurchase = ({ navigation }) => {
@@ -22,25 +21,10 @@ const StockPurchase = ({ navigation }) => {
   const [disable, setDisable] = useState(false);
 
   const snackbarRef = useRef(null);
-  const { userParams } = useContext(UserContext);
+  const { userParams, reload, setReload } = useContext(UserContext);
 
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
     userParams;
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderRelease: (event, gestureState) => {
-        if (gestureState.dy > 50) {
-          // Minimum swipe distance
-          setStockEntries([]);
-          setOffset(0);
-          setSearchTerm(null);
-          fetchStockEntries();
-        }
-      },
-    })
-  ).current;
 
   const fetchStockEntries = async () => {
     try {
@@ -66,6 +50,7 @@ const StockPurchase = ({ navigation }) => {
 
       setStockEntryRecords(response?.totalItems);
       setDisable(false);
+      setReload(false);
 
       if (response?.totalItems === 0) {
         setMessage("No stock entries found");
@@ -80,7 +65,6 @@ const StockPurchase = ({ navigation }) => {
       setIsFetchingMore(false);
     } catch (error) {
       setDisable(false);
-      setLoading(false);
       setShowFooter(false);
       setMessage("Error fetching stock records");
     }
@@ -103,8 +87,13 @@ const StockPurchase = ({ navigation }) => {
   };
 
   useEffect(() => {
+    if (reload === true) {
+      setDisable(true);
+      setStockEntries([]);
+      setOffset(0); //has the reload functionality
+    }
     fetchStockEntries();
-  }, [offset]);
+  }, [offset, reload]);
 
   const renderFooter = () => {
     if (showFooter === true) {
@@ -130,7 +119,6 @@ const StockPurchase = ({ navigation }) => {
       <TopHeader
         title="Stock purchases"
         showSearch={true}
-        onBackPress={() => navigation.goBack()}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}

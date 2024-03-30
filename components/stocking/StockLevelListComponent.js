@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { formatDate } from "../../utils/Utils";
 import Colors from "../../constants/Colors";
+import DataRow from "./DataRow";
 
 function StockLevelListComponent({ data }) {
   const [expanded, setExpanded] = useState(false);
@@ -97,6 +98,7 @@ function StockLevelListComponent({ data }) {
               {summary?.totalQuantitySold || 0}
             </Text>
           </View>
+
           <View style={{ alignItems: "flex-end", flex: 1, marginEnd: 5 }}>
             <Text
               style={{
@@ -116,54 +118,14 @@ function StockLevelListComponent({ data }) {
               justifyContent: "space-between",
             }}
           >
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <Text
-                style={{
-                  fontWeight: 400,
-                  fontSize: 12,
-                }}
-              >
-                Restock date:{" "}
-              </Text>
-              <Text
-                style={{
-                  fontWeight: 300,
-                  fontSize: 12,
-                }}
-              >
-                {formatDate(data?.dateChanged, true)}
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginVertical: 2,
-              }}
-            >
-              <Text
-                style={{
-                  fontWeight: 400,
-                  fontSize: 12,
-                  marginBottom: 10,
-                }}
-              >
-                Manufacturer:{" "}
-              </Text>
-              <Text
-                style={{
-                  fontWeight: 300,
-                  fontSize: 12,
-                }}
-              >
-                {data?.manufacturerName}
-              </Text>
-            </View>
+            <DataRow
+              label={"Restock date"}
+              value={formatDate(data?.dateChanged, true)}
+            />
+            <DataRow label={"Manufacturer"} value={data?.manufacturerName} />
           </View>
         )}
+
         <View
           style={{
             flexDirection: "row",

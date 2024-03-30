@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text } from "react-native";
 import { formatDate, formatNumberWithCommas } from "../../utils/Utils";
 import Colors from "../../constants/Colors";
-import { screenWidth } from "../../constants/Constants";
 import ChipButton2 from "../buttons/ChipButton2";
+import DataRow from "./DataRow";
 
 const StockPurchaseListComponent = ({ data, navigation }) => {
   const [expanded, setExpanded] = useState(false);
@@ -24,44 +24,8 @@ const StockPurchaseListComponent = ({ data, navigation }) => {
     batchNumber,
   } = data ?? {};
 
-  return (
-    <View
-      style={{
-        marginTop: 10,
-        marginHorizontal: 10,
-        borderRadius: 3,
-        backgroundColor: "white",
-        paddingVertical: 15,
-        paddingHorizontal: 10,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 12,
-            fontWeight: "bold",
-            color: Colors.dark,
-            marginBottom: 2,
-          }}
-        >
-          SN: {data?.serialNumber}
-        </Text>
-        <Text
-          style={{
-            fontSize: 12,
-            color: Colors.gray,
-            alignSelf: "flex-end",
-          }}
-        >
-          {formatDate(data?.dateCreated)}
-        </Text>
-      </View>
-
+  const ItemRow = () => {
+    return (
       <View
         style={{
           flexDirection: "row",
@@ -107,72 +71,62 @@ const StockPurchaseListComponent = ({ data, navigation }) => {
           </Text>
         </View>
       </View>
+    );
+  };
+
+  return (
+    <View
+      style={{
+        marginTop: 10,
+        marginHorizontal: 10,
+        borderRadius: 3,
+        backgroundColor: "white",
+        paddingVertical: 15,
+        paddingHorizontal: 10,
+      }}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 12,
+            fontWeight: "bold",
+            color: Colors.dark,
+            marginBottom: 2,
+          }}
+        >
+          SN: {data?.serialNumber}
+        </Text>
+        <Text
+          style={{
+            fontSize: 12,
+            color: Colors.gray,
+            alignSelf: "flex-end",
+          }}
+        >
+          {formatDate(data?.dateCreated)}
+        </Text>
+      </View>
+
+      <ItemRow />
 
       {expanded && (
         <View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginVertical: 2,
-            }}
-          >
-            <Text style={{ fontWeight: 400, fontSize: 12 }}>Barcode: </Text>
-            <Text style={{ fontWeight: 300, fontSize: 12 }}>{barcode}</Text>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginVertical: 2,
-            }}
-          >
-            <Text style={{ fontWeight: 400, fontSize: 12 }}>
-              Restock date:{" "}
-            </Text>
-            <Text style={{ fontWeight: 300, fontSize: 12 }}>
-              {formatDate(dateCreated, true)}
-            </Text>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginVertical: 2,
-            }}
-          >
-            <Text style={{ fontWeight: 400, fontSize: 12 }}>Batch no: </Text>
-            <Text style={{ fontWeight: 600, fontSize: 12 }}>{batchNumber}</Text>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginVertical: 2,
-            }}
-          >
-            <Text style={{ fontWeight: 400, fontSize: 12 }}>Expiry date: </Text>
-            <Text style={{ fontWeight: 600, fontSize: 12 }}>
-              {formatDate(expiryDate, true)}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 5,
-            }}
-          >
-            <Text style={{ fontWeight: 400, fontSize: 12, marginBottom: 10 }}>
-              Supplier:{" "}
-            </Text>
-            <Text style={{ fontWeight: 300, fontSize: 12 }}>
-              {supplierName}
-            </Text>
-          </View>
+          <DataRow
+            label="Unit purchase cost"
+            value={formatNumberWithCommas(
+              Math.round(purchasePrice / purchasedQuantity)
+            )}
+          />
+          <DataRow label="Barcode" value={barcode} />
+          <DataRow label="Restock date" value={formatDate(dateCreated, true)} />
+          <DataRow label="Batch no" value={batchNumber} />
+          <DataRow label="Expiry date" value={formatDate(expiryDate, true)} />
+          <DataRow label="Supplier" value={supplierName} />
         </View>
       )}
 

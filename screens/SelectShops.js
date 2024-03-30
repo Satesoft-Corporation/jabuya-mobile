@@ -26,7 +26,7 @@ const SelectShopBars = ({ navigation }) => {
 
       <TopHeader
         title="Select shop"
-        onBackPress={() => navigation.goBack()}
+        
         showShopName={false}
       />
 

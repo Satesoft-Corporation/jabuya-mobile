@@ -21,6 +21,7 @@ const SalesTable = ({ sales = [], fixHeight = true }) => {
         <Text style={{ flex: 0.5, textAlign: "center", fontWeight: 600 }}>
           Qty
         </Text>
+
         <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
           Cost
         </Text>

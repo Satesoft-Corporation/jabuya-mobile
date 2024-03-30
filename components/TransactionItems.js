@@ -1,10 +1,4 @@
-import {
-  Dimensions,
-  Text,
-  TouchableOpacity,
-  View,
-  FlatList,
-} from "react-native";
+import { Text, TouchableOpacity, View, FlatList } from "react-native";
 import Colors from "../constants/Colors";
 import {
   extractTime,
@@ -103,13 +97,15 @@ export function SaleTransactionItem({ data, isShopOwner }) {
             </View>
 
             <View style={{ alignItems: "center" }}>
-              <Text style={{ fontWeight: 600 }}>Amount</Text>
-              <Text>{formatNumberWithCommas(totalCost)}</Text>
+              <Text style={{ fontWeight: 600 }}>Recieved</Text>
+              <Text>{formatNumberWithCommas(amountPaid)}</Text>
             </View>
 
             <View style={{ alignItems: "center" }}>
-              <Text style={{ fontWeight: 600 }}>Recieved</Text>
-              <Text>{formatNumberWithCommas(amountPaid)}</Text>
+              <Text style={{ fontWeight: 600 }}>Amount</Text>
+              <Text style={{ fontWeight: 600 }}>
+                {formatNumberWithCommas(totalCost)}
+              </Text>
             </View>
 
             <View style={{ alignItems: "center" }}>

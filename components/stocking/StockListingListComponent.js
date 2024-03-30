@@ -1,7 +1,8 @@
-import React, { useState, memo } from "react";
+import React, { useState } from "react";
 import Colors from "../../constants/Colors";
 import { formatDate } from "../../utils/Utils";
 import { View, Text, TouchableOpacity } from "react-native";
+import DataRow from "./DataRow";
 
 function StockListingListComponent({ data }) {
   const [expanded, setExpanded] = useState(false);
@@ -111,72 +112,12 @@ function StockListingListComponent({ data }) {
               marginEnd: 5,
             }}
           >
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <Text
-                style={{
-                  fontWeight: 400,
-                  fontSize: 12,
-                }}
-              >
-                Barcode:{" "}
-              </Text>
-              <Text
-                style={{
-                  fontWeight: 300,
-                  fontSize: 12,
-                }}
-              >
-                {data?.barcode}
-              </Text>
-            </View>
-
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <Text
-                style={{
-                  fontWeight: 400,
-                  fontSize: 12,
-                }}
-              >
-                Last restocked:{" "}
-              </Text>
-              <Text
-                style={{
-                  fontWeight: 300,
-                  fontSize: 12,
-                }}
-              >
-                {formatDate(data?.dateChanged, true)}
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 10,
-              }}
-            >
-              <Text
-                style={{
-                  fontWeight: 400,
-                  fontSize: 12,
-                }}
-              >
-                Manufacturer:{" "}
-              </Text>
-              <Text
-                style={{
-                  fontWeight: 300,
-                  fontSize: 12,
-                }}
-              >
-                {data?.manufacturerName}
-              </Text>
-            </View>
+            <DataRow label={"Barcode"} value={data?.barcode} />
+            <DataRow
+              label={"Last restocked"}
+              value={formatDate(data?.dateChanged, true)}
+            />
+            <DataRow label={"Manufacturer"} value={data?.manufacturerName} />
 
             {data?.remarks && (
               <View style={{ marginBottom: 10 }}>

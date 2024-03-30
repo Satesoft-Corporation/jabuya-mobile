@@ -27,7 +27,7 @@ import PrimaryButton from "../components/buttons/PrimaryButton";
 import { DatePickerInput } from "react-native-paper-dates";
 
 const StockPurchaseForm = ({ navigation, route }) => {
-  const { selectedShop, userParams } = useContext(UserContext);
+  const { selectedShop, userParams, setReload } = useContext(UserContext);
 
   const { shopOwnerId } = userParams;
 
@@ -148,7 +148,6 @@ const StockPurchaseForm = ({ navigation, route }) => {
     if (isValidPayload === false) {
       setLoading(false); //removing loader if form is invalid
     }
-    console.log(payload);
 
     if (isValidPayload === true) {
       const apiUrl = edit
@@ -158,11 +157,13 @@ const StockPurchaseForm = ({ navigation, route }) => {
       new BaseApiService(apiUrl)
         .saveRequestWithJsonResponse(payload, edit)
         .then((response) => {
-          console.log(response);
           clearForm();
-          setLoading(false);
           setSubmitted(false);
+          setLoading(false);
           snackBarRef.current.show("Stock entry saved successfully", 4000);
+          if (edit) {
+            setReload(true);
+          }
         })
         .catch((error) => {
           snackBarRef.current.show(error?.message, 5000);
@@ -250,10 +251,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
         <AppStatusBar />
 
-        <TopHeader
-          title="Stock purchase"
-          onBackPress={() => navigation.goBack()}
-        />
+        <TopHeader title="Stock purchase" />
         <Loader loading={loading} />
         <ScrollView
           style={{

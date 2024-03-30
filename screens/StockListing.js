@@ -115,7 +115,7 @@ const StockListing = ({ navigation }) => {
       <TopHeader
         title="Shop products"
         showSearch={true}
-        onBackPress={() => navigation.goBack()}
+        
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}

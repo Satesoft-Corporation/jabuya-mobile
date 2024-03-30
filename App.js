@@ -15,7 +15,6 @@ import StockLevels from "./screens/StockLevels";
 import StockListing from "./screens/StockListing";
 import StockPurchase from "./screens/StockPurchase";
 import SelectShops from "./screens/SelectShops";
-import AppCalendar from "./components/AppCalendar";
 import ProductEntry from "./forms/ProductEntry";
 import BarCodeScreen from "./screens/BarCodeScreen";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";

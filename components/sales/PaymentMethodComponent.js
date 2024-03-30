@@ -1,5 +1,5 @@
 import { View, Text, FlatList, TextInput } from "react-native";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import Colors from "../../constants/Colors";
 import { paymentMethods } from "../../constants/Constants";
 import { SaleEntryContext } from "../../context/SaleEntryContext";
@@ -7,7 +7,6 @@ import ChipButton from "../buttons/ChipButton";
 import { DatePickerInput } from "react-native-paper-dates";
 
 const PaymentMethodComponent = ({
-  submitted = false,
   soldOnDate,
   setSoldOnDate,
   clientName,
@@ -101,21 +100,9 @@ const PaymentMethodComponent = ({
                   borderWidth: 0.6,
                   borderColor: Colors.dark,
                   paddingHorizontal: 10,
-                  textAlign: "center",
                   height: 35,
                 }}
               />
-              {/* {submitted && clientName === "" && (
-                <Text
-                  style={{
-                    fontSize: 12,
-                    marginStart: 6,
-                    color: Colors.error,
-                  }}
-                >
-                  Client name is required
-                </Text>
-              )} */}
             </View>
 
             <View style={{ flex: 1 }}>
@@ -140,22 +127,9 @@ const PaymentMethodComponent = ({
                   borderWidth: 0.6,
                   borderColor: Colors.dark,
                   paddingHorizontal: 10,
-                  textAlign: "center",
                   height: 35,
                 }}
               />
-
-              {/* {submitted && clientPhoneNumber === "" && (
-                <Text
-                  style={{
-                    fontSize: 12,
-                    marginStart: 6,
-                    color: Colors.error,
-                  }}
-                >
-                  Client phone number is required
-                </Text>
-              )} */}
             </View>
           </View>
 
@@ -188,7 +162,7 @@ const PaymentMethodComponent = ({
                   borderWidth: 0.6,
                   borderColor: Colors.dark,
                   paddingHorizontal: 10,
-                  textAlign: "center",
+                  textAlign: "right",
                   height: 35,
                 }}
               />

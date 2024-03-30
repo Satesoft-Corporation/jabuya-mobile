@@ -6,7 +6,6 @@ import {
   convertToServerDate,
   formatDate,
   formatNumberWithCommas,
-  hasNull,
 } from "../../utils/Utils";
 import Colors from "../../constants/Colors";
 import SalesTable from "./SalesTable";
@@ -17,7 +16,6 @@ import { BaseApiService } from "../../utils/BaseApiService";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import NetInfo from "@react-native-community/netinfo";
 import { UserContext } from "../../context/UserContext";
-import { paymentMethods } from "../../constants/Constants";
 
 const ConfirmSaleModal = ({ setVisible, setLoading, snackbarRef, visible }) => {
   const [submitted, setSubmitted] = useState(false);
@@ -299,6 +297,7 @@ const ConfirmSaleModal = ({ setVisible, setLoading, snackbarRef, visible }) => {
               title={"Cancel"}
               onPress={() => {
                 setVisible();
+                setError(null);
               }}
             />
             <PrimaryButton title={"Save"} onPress={postSales} />

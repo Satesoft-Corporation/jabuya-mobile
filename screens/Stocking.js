@@ -45,7 +45,7 @@ const Stocking = ({ navigation }) => {
     >
       <AppStatusBar content="light-content" bgColor="black" />
 
-      <TopHeader title="Stocking" onBackPress={() => navigation.goBack()} />
+      <TopHeader title="Stocking"  />
       <FlatList
         style={{ flex: 1, marginTop: 10, paddingHorizontal: 10 }}
         data={list}
