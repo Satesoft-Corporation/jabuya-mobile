@@ -30,6 +30,17 @@ export const categoryIcons = [
     icon: require("../assets/icons/icons8-chat-50.png"),
     title: "Chat",
   },
+  {
+    id: 5,
+    icon: require("../assets/icons/icons8-box-50.png"),
+    title: "Contact Book",
+  },
+  {
+    id: 6,
+    icon: require("../assets/icons/icons8-chat-50.png"),
+    title: "Credit/Debit",
+    target: "credit_menu",
+  },
 ];
 
 export const MAXIMUM_RECORDS_PER_FETCH = 20;

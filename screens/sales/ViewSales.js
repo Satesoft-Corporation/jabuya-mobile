@@ -8,21 +8,21 @@ import {
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 
-import { BaseApiService } from "../utils/BaseApiService";
+import { BaseApiService } from "../../utils/BaseApiService";
 
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
 
-import AppStatusBar from "../components/AppStatusBar";
+import AppStatusBar from "../../components/AppStatusBar";
 import {
   convertDateFormat,
   formatNumberWithCommas,
   getCurrentDay,
-} from "../utils/Utils";
-import UserProfile from "../components/UserProfile";
-import { SaleTransactionItem } from "../components/TransactionItems";
-import Loader from "../components/Loader";
-import { DateCalender } from "../components/Dialogs/DateCalendar";
-import { UserContext } from "../context/UserContext";
+} from "../../utils/Utils";
+import UserProfile from "../../components/UserProfile";
+import { SaleTransactionItem } from "../../components/TransactionItems";
+import Loader from "../../components/Loader";
+import { DateCalender } from "../../components/Dialogs/DateCalendar";
+import { UserContext } from "../../context/UserContext";
 
 export default function ViewSales({ navigation }) {
   const [sales, setSales] = useState([]);
@@ -215,7 +215,7 @@ export default function ViewSales({ navigation }) {
             >
               <TouchableOpacity onPress={handleRefresh}>
                 <Image
-                  source={require("../assets/icons/icons8-refresh-50.png")}
+                  source={require("../../assets/icons/icons8-refresh-50.png")}
                   style={{
                     width: 25,
                     height: 25,
@@ -226,7 +226,7 @@ export default function ViewSales({ navigation }) {
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setVisible(true)}>
                 <Image
-                  source={require("../assets/icons/icons8-calendar-26.png")}
+                  source={require("../../assets/icons/icons8-calendar-26.png")}
                   style={{
                     width: 25,
                     height: 25,

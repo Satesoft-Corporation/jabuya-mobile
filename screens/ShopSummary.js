@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import AppStatusBar from "../components/AppStatusBar";
 import Colors from "../constants/Colors";
 import { BaseApiService } from "../utils/BaseApiService";
-import { ItemHeader } from "./ViewSales";
+import { ItemHeader } from "./sales/ViewSales";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import UserProfile from "../components/UserProfile";
 import Loader from "../components/Loader";
@@ -65,7 +65,7 @@ const ShopSummary = ({ navigation, route }) => {
     let searchParameters = {
       offset: 0,
       limit: 0,
-      shopOwnerId: shopOwnerId //1427, // 2453,
+      shopOwnerId: shopOwnerId, //1427, // 2453,
     };
 
     new BaseApiService("/shops")

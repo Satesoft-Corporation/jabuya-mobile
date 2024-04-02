@@ -9,28 +9,28 @@ import {
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 
-import { BaseApiService } from "../utils/BaseApiService";
+import { BaseApiService } from "../../utils/BaseApiService";
 
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
 
-import AppStatusBar from "../components/AppStatusBar";
-import UserProfile from "../components/UserProfile";
-import { SalesDropdownComponent } from "../components/DropdownComponents";
-import { formatNumberWithCommas, isValidNumber } from "../utils/Utils";
-import { BlackScreen } from "../components/BlackAndWhiteScreen";
-import { IconsComponent } from "../components/Icon";
-import Loader from "../components/Loader";
-import Snackbar from "../components/Snackbar";
+import AppStatusBar from "../../components/AppStatusBar";
+import UserProfile from "../../components/UserProfile";
+import { SalesDropdownComponent } from "../../components/DropdownComponents";
+import { formatNumberWithCommas, isValidNumber } from "../../utils/Utils";
+import { BlackScreen } from "../../components/BlackAndWhiteScreen";
+import { IconsComponent } from "../../components/Icon";
+import Loader from "../../components/Loader";
+import Snackbar from "../../components/Snackbar";
 import { useRef } from "react";
-import { UserContext } from "../context/UserContext";
-import SelectShopBar from "../components/SelectShopBar";
-import PrimaryButton from "../components/buttons/PrimaryButton";
-import { SaleEntryContext } from "../context/SaleEntryContext";
-import { UserSessionUtils } from "../utils/UserSessionUtils";
+import { UserContext } from "../../context/UserContext";
+import SelectShopBar from "../../components/SelectShopBar";
+import PrimaryButton from "../../components/buttons/PrimaryButton";
+import { SaleEntryContext } from "../../context/SaleEntryContext";
+import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import NetInfo from "@react-native-community/netinfo";
-import EnterSaleQtyModal from "../components/sales/EnterSaleQtyModal";
-import ConfirmSaleModal from "../components/sales/ConfirmSaleModal";
-import SalesTable from "../components/sales/SalesTable";
+import EnterSaleQtyModal from "../../components/sales/EnterSaleQtyModal";
+import ConfirmSaleModal from "../../components/sales/ConfirmSaleModal";
+import SalesTable from "../../components/sales/SalesTable";
 import { SafeAreaView } from "react-native";
 
 function SalesEntry({ navigation }) {

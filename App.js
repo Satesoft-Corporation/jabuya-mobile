@@ -3,8 +3,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./screens/Login";
 import LandingScreen from "./screens/LandingScreen";
-import SalesEntry from "./screens/SalesEntry";
-import ViewSales from "./screens/ViewSales";
+import ViewSales from "./screens/sales/ViewSales";
+import SalesEntry from "./screens/sales/SalesEntry";
 import ShopSummary from "./screens/ShopSummary";
 import Stocking from "./screens/Stocking";
 import StockPurchaseForm from "./forms/StockPurchaseForm";
@@ -22,6 +22,10 @@ import Colors from "./constants/Colors";
 import LockScreen from "./screens/applock/LockScreen";
 import Settings from "./screens/settings/Settings";
 import LockSetUp from "./screens/applock/LockSetUp";
+import CreditMenu from "./screens/sales/credit/CreditMenu";
+import CreditSales from "./screens/sales/credit/CreditSales";
+import NewClient from "./forms/NewClient";
+import ClientRegister from "./screens/sales/credit/ClientRegister";
 
 const Stack = createNativeStackNavigator();
 
@@ -81,6 +85,14 @@ export default function App() {
               <Stack.Screen name="lockscreen" component={LockScreen} />
 
               <Stack.Screen name="locksetup" component={LockSetUp} />
+
+              <Stack.Screen name="credit_menu" component={CreditMenu} />
+
+              <Stack.Screen name="credit_records" component={CreditSales} />
+
+              <Stack.Screen name="new_client" component={NewClient} />
+
+              <Stack.Screen name="client_register" component={ClientRegister} />
             </Stack.Navigator>
           </NavigationContainer>
         </SaleEntryProvider>

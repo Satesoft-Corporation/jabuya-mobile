@@ -97,6 +97,7 @@ export const MyDropDown = ({
   value,
   placeholder = "Select item",
   disable = false,
+  search = true,
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -128,7 +129,7 @@ export const MyDropDown = ({
         placeholder={!isFocus ? placeholder : "..."}
         searchPlaceholder="Search..."
         value={value}
-        search
+        search={search}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {

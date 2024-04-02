@@ -88,11 +88,11 @@ const StockPurchase = ({ navigation }) => {
 
   useEffect(() => {
     if (reload === true) {
-      setDisable(true);
-      setStockEntries([]);
-      setOffset(0); //has the reload functionality
+      const reload = () => fetchStockEntries();
+      reload();
+    } else {
+      fetchStockEntries();
     }
-    fetchStockEntries();
   }, [offset, reload]);
 
   const renderFooter = () => {

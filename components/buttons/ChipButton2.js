@@ -9,7 +9,7 @@ const ChipButton2 = ({ onPress, title = "", darkMode = true }) => {
       style={{
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: darkMode ? Colors.dark : Colors.primary,
+        backgroundColor: darkMode ? Colors.dark : Colors.light,
         borderRadius: 3,
         paddingHorizontal: 12,
         paddingVertical: 4,
