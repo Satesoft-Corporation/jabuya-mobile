@@ -14,10 +14,6 @@ import Snackbar from "../components/Snackbar";
 const CreditPayment = ({ navigation, route }) => {
   const sale = { ...route.params };
 
-  useEffect(() => {
-    console.log(sale);
-  }, []);
-
   const [paymentDate, setPaymentDate] = useState(new Date());
   const [amount, setAmount] = useState("");
   const [remarks, setRemarks] = useState("");
@@ -34,7 +30,7 @@ const CreditPayment = ({ navigation, route }) => {
   };
 
   const savePayment = async () => {
-    setSubmitted(true);
+    // setSubmitted(true);
     setLoading(true);
     let payLoad = {
       id: 0,
@@ -94,7 +90,8 @@ const CreditPayment = ({ navigation, route }) => {
               fontSize: 16,
             }}
           >
-           Outstanding balance : {formatNumberWithCommas(sale?.amountLoaned-sale?.amountRepaid)}
+            Outstanding balance :{" "}
+            {formatNumberWithCommas(sale?.amountLoaned - sale?.amountRepaid)}
           </Text>
         </View>
 
