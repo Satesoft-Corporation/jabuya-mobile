@@ -11,6 +11,9 @@ const MyInput = ({
   inputMode = "text",
   isDateInput = false,
   style,
+  editable = true,
+  mt = -5,
+  numberOfLines = 1,
 }) => {
   if (isDateInput === false) {
     return (
@@ -23,6 +26,8 @@ const MyInput = ({
           secureTextEntry={isPassword}
           inputMode={inputMode}
           cursorColor={Colors.dark}
+          editable={editable}
+          numberOfLines={numberOfLines}
           style={{
             backgroundColor: Colors.light,
             borderRadius: 5,
@@ -30,6 +35,8 @@ const MyInput = ({
             borderWidth: 0.6,
             borderColor: Colors.dark,
             paddingHorizontal: 10,
+            color: Colors.dark,
+            textAlign: inputMode === "numeric" ? "right" : "left",
           }}
         />
       </View>
@@ -49,7 +56,7 @@ const MyInput = ({
           style={{
             height: 40,
             justifyContent: "center",
-            // marginTop: -5,
+            marginTop: mt,
           }}
           mode="outlined"
         />

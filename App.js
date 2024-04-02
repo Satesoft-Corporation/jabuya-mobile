@@ -26,6 +26,7 @@ import CreditMenu from "./screens/sales/credit/CreditMenu";
 import CreditSales from "./screens/sales/credit/CreditSales";
 import NewClient from "./forms/NewClient";
 import ClientRegister from "./screens/sales/credit/ClientRegister";
+import CreditPayment from "./forms/CreditPayment";
 
 const Stack = createNativeStackNavigator();
 
@@ -93,6 +94,8 @@ export default function App() {
               <Stack.Screen name="new_client" component={NewClient} />
 
               <Stack.Screen name="client_register" component={ClientRegister} />
+
+              <Stack.Screen name="credit_payments" component={CreditPayment} />
             </Stack.Navigator>
           </NavigationContainer>
         </SaleEntryProvider>

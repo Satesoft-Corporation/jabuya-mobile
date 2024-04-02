@@ -3,8 +3,11 @@ import React from "react";
 import CardHeader from "../cardComponents/CardHeader";
 import { formatDate, formatNumberWithCommas } from "../../utils/Utils";
 import CardFooter1 from "../cardComponents/CardFooter1";
+import CardFooter2 from "../cardComponents/CardFooter2";
+import { useNavigation } from "@react-navigation/native";
 
 const CreditSaleListItem = ({ sale }) => {
+  const navigation = useNavigation();
   return (
     <View
       style={{
@@ -91,7 +94,13 @@ const CreditSaleListItem = ({ sale }) => {
         </View>
       </View>
 
-      <CardFooter1 label={`Served by: ${sale?.createdByFullName}`} />
+      <CardFooter2
+        label={`Served by: ${sale?.createdByFullName}`}
+        btnTitle="Pay"
+        onBtnPress={() => {
+          navigation.navigate('credit_payments', sale);
+        }}
+      />
     </View>
   );
 };
