@@ -4,30 +4,40 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Alert,
-  SafeAreaView,
+  KeyboardAvoidingView,
 } from "react-native";
-import MaterialButton from "../components/MaterialButton";
 import MaterialInput from "../components/MaterialInput";
 import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
 import { BaseApiService } from "../utils/BaseApiService";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
+import Constants from "expo-constants";
+import CircularProgress from "../components/CircularProgress";
+import { CommonActions } from "@react-navigation/native";
+import { onDummyLogin } from "../utils/Utils";
+import DispalyMessage from "../components/Dialogs/DisplayMessage";
 
 export default function Login({ navigation }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("mosesjespar@gmail.com");
+  const [password, setPassword] = useState("0701807062");
+  const [disabled, setDisabled] = useState(false);
+  const [showMoodal, setShowModal] = useState(false);
+  const [message, setMessage] = useState(null);
 
   let loginInfo = {
     username,
     password,
   };
 
+  const date = new Date();
+
   const onLogin = () => {
+    setDisabled(true);
+    const { dispatch } = navigation;
+
     new BaseApiService("/auth/login")
       .postRequest(loginInfo)
       .then(async (response) => {
-        
         let d = { info: await response.json(), status: response.status };
         return d;
       })
@@ -39,198 +49,198 @@ export default function Login({ navigation }) {
           await UserSessionUtils.setUserAuthToken(info.accessToken);
           await UserSessionUtils.setUserRefreshToken(info.refreshToken);
           await UserSessionUtils.setFullSessionObject(info);
-          await UserSessionUtils.setShopid(String(info.user.attendantShopId))
-          navigation.navigate("welcome");
+          await UserSessionUtils.setShopid(String(info.user.attendantShopId));
+          await UserSessionUtils.setLoginTime(String(date));
           setPassword("");
           setUsername("");
+          navigation.navigate("welcome");
+          setTimeout(() => setDisabled(false), 1000);
+
+          dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: "welcome" }],
+            })
+          );
         } else if (status === 400) {
-          Alert.alert("Invalid username or password");
+          setMessage("Invalid username or password.");
+          setShowModal(true);
+          setDisabled(false);
+        } else {
+          setMessage(`Login failed!, ${info.message}`);
+          setShowModal(true);
+          setDisabled(false);
         }
       })
       .catch((error) => {
-        Alert.alert("Login Failed!", error?.message);
+        setDisabled(false);
+        setMessage("An unexpected error happened, please try again.");
+        setShowModal(true);
       });
   };
+
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: Colors.dark,
-        paddingHorizontal: 15,
-      }}
+    <KeyboardAvoidingView
+      enabled={true}
+      behavior={"height"}
+      style={{ flex: 1 }}
     >
-      <AppStatusBar />
-
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Image
-            source={require("../assets/icons/yellow_transparent.png")}
-            style={{
-              height: 150,
-              width: 150,
-              resizeMode: "contain",
-            }}
-          />
-        </View>
-      </View>
-      <Text
-        style={{
-          fontWeight: "bold",
-          color: Colors.primary,
-          fontSize: 15,
-          paddingVertical: 5,
-        }}
-      >
-        Username
-      </Text>
-
-      <MaterialInput
-        value={username}
-        onChangeText={(text) => {
-          setUsername(text);
-        }}
-        placeholder="Username,Email or Phone number"
-        style={{
-          borderRadius: 5,
-          borderColor: Colors.primary,
-          marginBottom: 5,
-          color: Colors.light,
-        }}
-      />
-
-      <Text
-        style={{
-          fontWeight: "bold",
-          color: Colors.primary,
-          fontSize: 15,
-          paddingVertical: 5,
-        }}
-      >
-        Password
-      </Text>
-
-      <MaterialInput
-        value={password}
-        onChangeText={(text) => setPassword(text)}
-        placeholder="Password"
-        isPassword={true}
-        style={{
-          borderRadius: 5,
-          borderColor: Colors.primary,
-          color: Colors.light,
-        }}
-      />
-
-      <MaterialButton
-        title="LOGIN"
-        style={{
-          backgroundColor: Colors.dark,
-          marginTop: 30,
-          borderRadius: 5,
-          borderWidth: 1,
-          borderColor: Colors.primary,
-        }}
-        titleStyle={{
-          fontWeight: "bold",
-          color: Colors.primary,
-        }}
-        buttonPress={() => onLogin()}
-      />
-
-      <View
-        style={{
-          marginTop: 20,
-        }}
-      >
-        <TouchableOpacity>
-          <Text
-            style={{
-              alignSelf: "center",
-              paddingVertical: 15,
-              fontSize: 14,
-              fontWeight: 200,
-              color: Colors.primary,
-            }}
-          >
-            Forgot password
-          </Text>
-        </TouchableOpacity>
-
-        <View
-          style={{
-            borderBottomColor: Colors.primary,
-            borderBottomWidth: 1,
-            marginTop: 5,
-          }}
-        ></View>
-      </View>
-      <SocailMediaLinks />
-    </View>
-  );
-
-  function SocailMediaLinks() {
-    return (
       <View
         style={{
           flex: 1,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingHorizontal: 5,
-          alignItems: "center",
-          marginTop: -35,
+          backgroundColor: Colors.dark,
+          paddingHorizontal: 15,
         }}
       >
-        <MaterialButton
-          title="Google"
+        <AppStatusBar />
+
+        <View
+          style={{ flex: 0.5, justifyContent: "center", alignItems: "center" }}
+        >
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Image
+              source={require("../assets/icons/yellow_transparent.png")}
+              style={{
+                height: 100,
+                width: 100,
+                resizeMode: "contain",
+              }}
+            />
+          </View>
+        </View>
+        <Text
           style={{
-            backgroundColor: Colors.dark,
-            borderRadius: 5,
-            borderWidth: 1,
-            borderColor: Colors.primary_light,
+            fontWeight: "bold",
+            color: Colors.primary,
+            fontSize: 15,
+            paddingVertical: 5,
           }}
-          titleStyle={{
-            color: Colors.primary_light,
-            paddingHorizontal: 10,
-            letterSpacing: 2,
+        >
+          Username
+        </Text>
+
+        <MaterialInput
+          value={username}
+          onChangeText={(text) => {
+            setUsername(text);
           }}
-          buttonPress={() => console.log("hello world")}
-        />
-        <MaterialButton
-          title="Facebook"
+          placeholder="Username,Email or Phone number"
           style={{
-            backgroundColor: Colors.dark,
             borderRadius: 5,
-            borderWidth: 1,
-            borderColor: Colors.primary_light,
+            borderColor: Colors.primary,
+            marginBottom: 5,
+            color: Colors.primary,
           }}
-          titleStyle={{
-            color: Colors.primary_light,
-            paddingHorizontal: 10,
-            letterSpacing: 2,
-          }}
-          buttonPress={() => console.log("hello world")}
         />
-        <MaterialButton
-          title="Twitter"
+
+        <Text
           style={{
-            backgroundColor: Colors.dark,
+            fontWeight: "bold",
+            color: Colors.primary,
+            fontSize: 15,
+            paddingVertical: 5,
+          }}
+        >
+          Password
+        </Text>
+
+        <MaterialInput
+          value={password}
+          onChangeText={(text) => setPassword(text)}
+          placeholder="Password"
+          isPassword={true}
+          style={{
             borderRadius: 5,
-            borderWidth: 1,
-            borderColor: Colors.primary_light,
+            borderColor: Colors.primary,
+            color: Colors.primary,
           }}
-          titleStyle={{
-            color: Colors.primary_light,
-            paddingHorizontal: 10,
-            letterSpacing: 2,
-          }}
-          buttonPress={() => console.log("hello world")}
         />
+
+        {!disabled ? (
+          <TouchableOpacity
+            disabled={disabled}
+            onPress={() => onLogin()}
+            style={{
+              backgroundColor: Colors.primary,
+              marginTop: 30,
+              borderRadius: 5,
+              borderWidth: 1,
+              borderColor: Colors.primary,
+              paddingVertical: 10,
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontWeight: "bold",
+                color: Colors.dark,
+                alignSelf: "center",
+                fontSize: 16,
+              }}
+            >
+              Login
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <CircularProgress />
+        )}
+
+        <View
+          style={{
+            marginTop: 20,
+          }}
+        >
+          <TouchableOpacity>
+            <Text
+              style={{
+                alignSelf: "center",
+                paddingVertical: 15,
+                fontSize: 14,
+                fontWeight: 200,
+                color: Colors.primary,
+              }}
+            >
+              Forgot password
+            </Text>
+          </TouchableOpacity>
+
+          <View style={{ margin: 10, alignItems: "center" }}>
+            <Text
+              style={{
+                fontWeight: 200,
+                color: Colors.primary,
+              }}
+            >
+              Powered by
+            </Text>
+            <Text style={{ color: Colors.primary }}>Satesoft</Text>
+          </View>
+        </View>
+        <View
+          style={{
+            alignSelf: "center",
+            position: "absolute",
+            bottom: 10,
+          }}
+        >
+          <Text
+            style={{ color: Colors.primary, alignSelf: "center", fontSize: 12 }}
+          >
+            V {Constants.expoConfig.version}
+          </Text>
+        </View>
       </View>
-    );
-  }
+      <DispalyMessage
+        showModal={showMoodal}
+        message={message}
+        onAgree={() => setShowModal(false)}
+        agreeText="OK"
+      />
+    </KeyboardAvoidingView>
+  );
 }

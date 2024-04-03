@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StorageParams from "../constants/StorageParams";
+import { CommonActions } from "@react-navigation/native";
 export class UserSessionUtils {
   /**
    * This is used to get the user's bearer token.
@@ -21,10 +22,16 @@ export class UserSessionUtils {
   /**
    * This method is used to clear the localstorage and redirect the user to the login screen
    */
-  static async clearLocalStorageAndLogout(pageContext) {
+  static async clearLocalStorageAndLogout(navigation) {
     // remove all
     await AsyncStorage.clear();
-    pageContext?.pageDispatch({ page: "appTour" });
+    const { dispatch } = navigation;
+    dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "login" }],
+      })
+    );
   }
 
   /**
@@ -132,5 +139,39 @@ export class UserSessionUtils {
    */
   static async setShopid(id) {
     await AsyncStorage.setItem(StorageParams.SHOP_ID, id);
+  }
+
+  /**
+   * This method is used to set the number shops for a shop owner
+   * @param {count} count
+   */
+  static async setShopCount(count) {
+    await AsyncStorage.setItem(StorageParams.SHOP_COUNT, count);
+  }
+
+  /**
+   * This method is used to get the number of shops an owner has
+   * @returns shopcount
+   */
+  static async getShopCount() {
+    let count = await AsyncStorage.getItem(StorageParams.SHOP_COUNT);
+    return count;
+  }
+
+  /**
+   * This method is used to set the login timestamp
+   * @param {time} time
+   */
+  static async setLoginTime(time) {
+    await AsyncStorage.setItem(StorageParams.LOGIN_TIME, time);
+  }
+
+  /**
+   * This method is used to get the login timestamp
+   * @returns
+   */
+  static async getLoginTime() {
+    let time = await AsyncStorage.getItem(StorageParams.LOGIN_TIME);
+    return time;
   }
 }

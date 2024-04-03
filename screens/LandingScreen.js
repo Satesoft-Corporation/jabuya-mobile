@@ -1,256 +1,125 @@
-import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
-import React, { useState, useEffect } from "react";
+import { View, FlatList, Image, TouchableOpacity } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
 import Colors from "../constants/Colors";
 import AppStatusBar from "../components/AppStatusBar";
-import { Ionicons } from "@expo/vector-icons";
-import Icon from "../components/Icon";
+import { Icon } from "../components/Icon";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
-import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
+import UserProfile from "../components/UserProfile";
+import { BlackScreen } from "../components/BlackAndWhiteScreen";
+import Loader from "../components/Loader";
+import { categoryIcons } from "../constants/Constants";
+import { BaseApiService } from "../utils/BaseApiService";
+import { getTimeDifference } from "../utils/Utils";
+import DispalyMessage from "../components/Dialogs/DisplayMessage";
 
 export default function LandingScreen({ navigation }) {
   const [tab, setTab] = useState("home");
-  const [role, setRole] = useState("");
-  const [joinDate, setJoinDate] = useState("");
-  const [shopName, setShopName] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [name, setName] = useState("");
-  const [shopId, setShopId] = useState("");
 
-  const categoryIcons = [
-    {
-      id: 1,
-      icon: require("../assets/icons/icons8-cash-register-50.png"),
-      title: "Sales Desk",
-      target: "salesEntry",
-    },
-    {
-      id: 2,
-      icon: require("../assets/icons/icons8-report-50.png"),
-      title: "Reports",
-      target: "salesEntry",
-    },
-    {
-      id: 3,
-      icon: require("../assets/icons/icons8-box-50.png"),
-      title: "Stocking",
-      target: "viewSales",
-    },
-    {
-      id: 4,
-      icon: require("../assets/icons/icons8-chat-50.png"),
-      title: "Chat",
-      target: "salesEntry",
-    },
-  ];
+  const [loading, setLoading] = useState(false);
+  const [routeParams, setRouteParams] = useState(null);
+  const [showMoodal, setShowModal] = useState(false);
+  const [message, setMessage] = useState("");
+  const [agreeText, setAgreeText] = useState("");
+  const [canCancel, setCanCancel] = useState(false);
+
+  const fetchShops = (id) => {
+    new BaseApiService("/shops")
+      .getRequestWithJsonResponse({ limit: 0, offset: 0, shopOwnerId: id })
+      .then(async (response) => {
+        await UserSessionUtils.setShopCount(String(response.totalItems));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const logOut = () => {
+    UserSessionUtils.clearLocalStorageAndLogout(navigation);
+  };
+
+  const confirmLogout = () => {
+    setMessage("Are you sure you want to log out?");
+    setAgreeText("Yes");
+    setCanCancel(true);
+    setShowModal(true);
+  };
+
+  const logInPrompt = () => {
+    setMessage("Your session has expired, please login to continue.");
+    setAgreeText("Login");
+    setCanCancel(false);
+    setShowModal(true);
+  };
+
   useEffect(() => {
-    UserSessionUtils.getFullSessionObject().then((data) => {
-      const {
-        dateCreated,
-        roles,
-        attendantShopName,
-        firstName,
-        lastName,
-        attendantShopId,
-      } = data.user;
-      setRole(roles[0].name);
-      setJoinDate(formatDate(dateCreated));
-      setShopId(attendantShopId);
-      setShopName(attendantShopName);
-      setName(firstName + " " + lastName);
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    });
+    UserSessionUtils.getFullSessionObject()
+      .then(async (data) => {
+        if (data === null) {
+          logOut();
+        }
+        const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+          data.user;
+
+        setRouteParams({
+          isShopOwner,
+          isShopAttendant,
+          attendantShopId,
+          shopOwnerId,
+        });
+
+        let prevLoginTime = await UserSessionUtils.getLoginTime();
+        let timeDiff = getTimeDifference(prevLoginTime, new Date());
+
+        if (timeDiff.hours >= 4) {
+          //trigger the logout dialog
+          logInPrompt();
+        }
+
+        let shopCount = await UserSessionUtils.getShopCount();
+
+        if (isShopOwner) {
+          if (shopCount === null) {
+            fetchShops(shopOwnerId);
+          }
+        }
+        setTimeout(() => {
+          setLoading(false);
+        }, 100);
+      })
+      .catch(async (error) => {
+        //loging the user out if the object is missing
+        logOut();
+      });
   }, []);
-  function formatDate(inputDate) {
-    const date = new Date(inputDate);
-
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
-    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-    const formattedDay = dayNames[date.getUTCDay()];
-    const formattedMonth = monthNames[date.getUTCMonth()];
-    const formattedYear = date.getUTCFullYear();
-
-    const formattedDate = `${formattedDay}, ${formattedMonth} ${date.getUTCDate()}, ${formattedYear}`;
-
-    return formattedDate;
-  }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: Colors.dark,
-      }}
-    >
+    <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
-      <OrientationLoadingOverlay
-        visible={loading}
-        color={Colors.primary}
-        indicatorSize="large"
-        messageFontSize={24}
-        message=""
+
+      <Loader loading={loading} />
+
+      <BlackScreen>
+        <UserProfile />
+      </BlackScreen>
+
+      <FlatList
+        style={{ flex: 1, marginTop: 20 }}
+        data={categoryIcons}
+        renderItem={({ item }) => (
+          <Icon
+            icon={item}
+            onPress={() =>
+              item.target
+                ? navigation.navigate(item.target, {
+                    ...routeParams,
+                  })
+                : null
+            }
+          />
+        )}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={2}
       />
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 10,
-          alignItems: "center",
-          paddingHorizontal: 15,
-        }}
-      >
-        <TouchableOpacity>
-          <Image
-            source={require("../assets/icons/menu2.png")}
-            style={{
-              width: 30,
-              height: 25,
-            }}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={{ marginStart: 75 }}>
-          <Ionicons
-            name="notifications-outline"
-            size={24}
-            color={Colors.primary_light}
-          />
-        </TouchableOpacity>
-        {/* </View> */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingStart: 15,
-            alignItems: "center",
-            marginTop: 10,
-          }}
-        >
-          <View>
-            <Text
-              style={{
-                color: Colors.primary,
-                fontWeight: "bold",
-                fontSize: 15,
-              }}
-            >
-              {name}
-            </Text>
-            <Text
-              style={{
-                color: Colors.primary,
-                fontWeight: "bold",
-                alignSelf: "flex-end",
-              }}
-            >
-              {role}
-            </Text>
-          </View>
-
-          <Image
-            source={require("../assets/images/man_placeholder.jpg")}
-            style={{
-              width: 50,
-              height: 50,
-              resizeMode: "cover",
-              borderRadius: 50,
-              marginStart: 5,
-            }}
-          />
-        </View>
-      </View>
-
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 20,
-          paddingHorizontal: 15,
-        }}
-      >
-        <View>
-          <Text style={{ color: Colors.primary_light }}>Shop Name</Text>
-          <Text style={{ color: Colors.primary, fontSize: 16 }}>
-            {shopName}
-          </Text>
-        </View>
-        <View>
-          <Text style={{ color: Colors.primary_light }}>Shop Id</Text>
-          <Text
-            style={{
-              color: Colors.primary,
-              fontSize: 16,
-              alignSelf: "flex-end",
-            }}
-          >
-            {shopId}
-          </Text>
-        </View>
-      </View>
-
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 20,
-          paddingHorizontal: 15,
-        }}
-      >
-        <View>
-          <Text style={{ color: Colors.primary_light }}>Join Date</Text>
-          <Text style={{ color: Colors.primary, fontSize: 16 }}>
-            {joinDate}
-          </Text>
-        </View>
-        <View>
-          <Text style={{ color: Colors.primary_light }}>Active period</Text>
-          <Text
-            style={{
-              color: Colors.primary,
-              fontSize: 16,
-              alignSelf: "flex-end",
-            }}
-          >
-            21 Days
-          </Text>
-        </View>
-      </View>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: Colors.light_2,
-          marginTop: 10,
-        }}
-      >
-        <FlatList
-          style={{ flex: 1, marginTop: 10 }}
-          data={categoryIcons}
-          renderItem={({ item }) => (
-            <Icon
-              icon={item}
-              onPress={() => navigation.navigate(item.target)}
-            />
-          )}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-        />
-      </View>
 
       <View // bottom nav
         style={{
@@ -268,7 +137,11 @@ export default function LandingScreen({ navigation }) {
       >
         <TouchableOpacity
           onPress={() => setTab("cash")}
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <Image
             style={{
@@ -282,7 +155,11 @@ export default function LandingScreen({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setTab("box")}
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <Image
             style={{
@@ -296,7 +173,11 @@ export default function LandingScreen({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setTab("home")}
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <Image
             style={{
@@ -310,7 +191,11 @@ export default function LandingScreen({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setTab("wallet")}
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <Image
             style={{
@@ -323,8 +208,12 @@ export default function LandingScreen({ navigation }) {
           />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => setTab("check")}
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          onPress={confirmLogout}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           <Image
             style={{
@@ -333,10 +222,19 @@ export default function LandingScreen({ navigation }) {
               tintColor: tab === "check" ? Colors.primary : Colors.light,
             }}
             resizeMode={"contain"}
-            source={require("../assets/icons/icons8-reset-50.png")}
+            source={require("../assets/icons/icons8-logout-24.png")}
           />
         </TouchableOpacity>
       </View>
+
+      <DispalyMessage
+        showModal={showMoodal}
+        message={message}
+        onAgree={logOut}
+        agreeText={agreeText}
+        setShowModal={setShowModal}
+        canCancel={canCancel}
+      />
     </View>
   );
 }

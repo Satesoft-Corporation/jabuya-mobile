@@ -2,334 +2,384 @@ import {
   View,
   Text,
   Alert,
-  SafeAreaView,
-  ScrollView,
-  Dimensions,
   TouchableOpacity,
+  FlatList,
+  Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
+
 import { BaseApiService } from "../utils/BaseApiService";
+
 import Colors from "../constants/Colors";
+
 import AppStatusBar from "../components/AppStatusBar";
-import MultiColumnView from "../components/MultiColumnView";
-import HeaderOneButton from "../components/HeaderOneButton";
-import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
-import SaleSummaryDialog from "../components/SaleSummaryDialog";
-import { UserSessionUtils } from "../utils/UserSessionUtils";
+import {
+  convertDateFormat,
+  formatNumberWithCommas,
+  getCurrentDay,
+} from "../utils/Utils";
+import UserProfile from "../components/UserProfile";
+import { SaleTransactionItem } from "../components/TransactionItems";
+import Loader from "../components/Loader";
+import { DateCalender } from "../components/Dialogs/DateCalendar";
 
-const screenWidth = Dimensions.get("window").width;
-
-export default function ViewSales({ navigation }) {
-  const [sales, setSales] = useState([]); // sales got from the server
-  const [totalSales, setTotalSales] = useState(0);
-  const [loading, setLoading] = useState(true);
+export default function ViewSales({ navigation, route }) {
+  const [sales, setSales] = useState([]);
+  const [totalSalesQty, setTotalSalesQty] = useState(0); //total quantity for all sold items
+  const [loading, setLoading] = useState(false);
+  const [offset, setOffset] = useState(0);
   const [visible, setVisible] = useState(false);
-  const [sale, setSale] = useState(null); //individual sale
-  const [lineItems, setLineItems] = useState([]);
+  const [filtering, setFiltering] = useState(false);
+  const [selectedStartDate, setSelectedStartDate] = useState(null);
+  const [selectedEndDate, setSelectedEndDate] = useState(null);
+  const [salesValue, setSalesValue] = useState(0); //total money value sold
+  const [searchPeriod, setSearchPeriod] = useState("Today");
+  const [saleCapital, setSaleCapital] = useState([]); //capital list
+  const [profits, setProfits] = useState([]); //profits list
+  const [emptyMsg, setEmptyMsg] = useState(null);
+  const [daysProfit, setDaysProfit] = useState(0);
+  const [daysCapital, setDaysCapital] = useState(0);
 
-  let dummy = {
-    status: "Success",
-    message: "Data retrieved successfully",
-    createdById: 1,
-    createdByUsername: "john_doe",
-    createdByFullName: "John Doe",
-    changedById: 2,
-    changedByUserName: "jane_smith",
-    changedByFullName: "Jane Smith",
-    dateCreated: "2023-10-04T17:15:52.858Z",
-    dateChanged: "2023-10-04T17:15:52.858Z",
-    recordStatus: "Active",
-    serialNumber: "ABC123",
-    id: 12345,
-    totalCost: 100.5,
-    amountPaid: 75.0,
-    balanceGivenOut: 25.5,
-    shopAttendantId: 3,
-    shopAttendantName: "Alice Johnson",
-    shopId: 987,
-    shopName: "BestMart",
-    statusId: 4,
-    statusName: "Completed",
-    lineItems: [
-      {
-        id: 5,
-        shopProductId: 105,
-        shopProductName: "Potatoes - 5 lbs",
-        quantity: 2,
-        unitCost: 200,
-        totalCost: 400,
-      },
-      {
-        id: 6,
-        shopProductId: 106,
-        shopProductName: "Orange Juice - 64 oz",
-        quantity: 1,
-        unitCost: 350,
-        totalCost: 350,
-      },
-      {
-        id: 7,
-        shopProductId: 107,
-        shopProductName: "Granola Cereal - 16 oz",
-        quantity: 2,
-        unitCost: 180,
-        totalCost: 360,
-      },
-      {
-        id: 8,
-        shopProductId: 108,
-        shopProductName: "Chicken Thighs - 4-Pack",
-        quantity: 2,
-        unitCost: 450,
-        totalCost: 900,
-      },
-      {
-        id: 9,
-        shopProductId: 109,
-        shopProductName: "Toilet Paper - 12 Rolls",
-        quantity: 1,
-        unitCost: 550,
-        totalCost: 550,
-      },
-    ],
+  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+    route.params;
+
+  const handleDayPress = (day) => {
+    if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+      setSelectedStartDate(day.dateString);
+      setSelectedEndDate(null);
+    } else if (
+      selectedStartDate &&
+      !selectedEndDate &&
+      day.dateString !== selectedStartDate
+    ) {
+      setSelectedEndDate(day.dateString);
+    } else {
+      setSelectedStartDate(day.dateString);
+      setSelectedEndDate(day.dateString); // Set both start and end dates to the single selected date
+    }
   };
-  let shopId = null;
-  const getSales = async () => {
+
+  const handleRefresh = () => {
+    setSelectedEndDate(null);
+    setSelectedStartDate(null);
+    getSales();
+  };
+
+  const clearFields = () => {
+    //reseting calculatable fields
+    setSales([]);
+    setLoading(true);
+    setSalesValue(0);
+    setTotalSalesQty(0);
+    setProfits([]);
+    setSaleCapital([]);
+    setDaysCapital(0);
+    setDaysProfit(0);
+    setEmptyMsg(null);
+  };
+
+  const getSales = async (startDate, endDate) => {
     let searchParameters = {
-      searchTerm: "",
-      offset: 0,
-      limit: 20,
-      shopId: shopId,
+      offset: offset,
+      limit: 0,
     };
-console.log(JSON.stringify(searchParameters))
+    clearFields();
+
+    if (!startDate && !endDate) {
+      searchParameters.startDate = getCurrentDay();
+    }
+
+    if (startDate) {
+      searchParameters.startDate = convertDateFormat(startDate);
+    }
+
+    if (endDate) {
+      searchParameters.endDate = convertDateFormat(endDate, true);
+    }
+    if (endDate === null && startDate) {
+      //specific day setting
+      searchParameters.endDate = convertDateFormat(startDate, true);
+    }
+    if (isShopOwner) {
+      searchParameters.shopOwnerId = shopOwnerId;
+    }
+    if (isShopAttendant) {
+      searchParameters.shopId = attendantShopId;
+    }
     new BaseApiService("/shop-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
-        setSales(response.records);
-        setTotalSales(response.totalItems);
+        let sV = response.records.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
+
+        if (response.totalItems === 0) {
+          setEmptyMsg("No sales made on this today");
+        }
+
+        [...response.records].forEach((item) => {
+          const { lineItems } = item;
+          if (lineItems !== undefined) {
+            let cartQty = lineItems.reduce((a, item) => a + item.quantity, 0);
+
+            let cartProfit = lineItems.reduce((a, i) => a + i.totalProfit, 0);
+
+            let cap = lineItems.reduce((a, i) => a + i.totalPurchaseCost, 0); // cart capital
+
+            profits.push(cartProfit);
+            saleCapital.push(cap);
+
+            setCount(cartQty);
+          }
+        });
+
+        let income = profits.reduce((a, b) => a + b, 0); //getting the sum profit in all carts
+        let capital = saleCapital.reduce((a, b) => a + b, 0);
+
+        setDaysProfit(formatNumberWithCommas(Math.round(income)));
+        setDaysCapital(formatNumberWithCommas(Math.round(capital)));
+        setSalesValue(sV);
+        setSales(response?.records);
+
         setTimeout(() => {
           setLoading(false);
         }, 100);
       })
       .catch((error) => {
+        console.log(error);
         Alert.alert("Cannot get sales!", error?.message);
         setLoading(false);
       });
   };
 
-  useEffect(async () => {
-    shopId = await UserSessionUtils.getShopId();
+  const filterSales = () => {
+    let startDate = selectedStartDate ? new Date(selectedStartDate) : null;
+    let endDate = selectedEndDate ? new Date(selectedEndDate) : null;
+    if (startDate > endDate && endDate) {
+      // if the start date is greater than the end date
+      [startDate, endDate] = [endDate, startDate]; // Swap the dates using destructuring assignment
+    }
+    getSales(startDate, endDate);
+  };
+
+  const setCount = (count) => {
+    setTotalSalesQty((prevCount) => prevCount + count);
+  };
+
+  useEffect(() => {
     getSales();
   }, []);
 
-  const showSummary = (item) => {
-    if (item.lineItems !== undefined) {
-      setSale(item);
-      for (let item of item.lineItems) {
-        lineItems.push([
-          item.shopProductName,
-          item.unitCost,
-          item.quantity,
-          item.totalCost,
-        ]);
-      }
-        setVisible(true);
-        
-    } else {
-      setSale(dummy);
-      for (let item of dummy.lineItems) {
-        lineItems.push([
-          item.shopProductName,
-          item.unitCost,
-          item.quantity,
-          item.totalCost,
-        ]);
-      }
-        setVisible(true);
-     
-    }
-  };
-
-  const closeSummary = () => {
-    setVisible(false);
-    setLineItems([]);
-    setSale(null);
-  };
-
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <HeaderOneButton
-          bgColor={Colors.dark}
-          title="Shop Sales"
-          titleStyle={{ color: Colors.primary }}
-          navPress={() => navigation.goBack()}
-        />
+    <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
+      <Loader loading={loading} />
 
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: Colors.light_2,
-            paddingHorizontal: 15,
-            paddingBottom: 30,
-          }}
-        >
-          <OrientationLoadingOverlay
-            visible={loading}
-            color={Colors.primary}
-            indicatorSize="large"
-            messageFontSize={24}
-            message=""
-          />
-          <AppStatusBar bgColor="black" content="light-content" />
+      <AppStatusBar bgColor="black" content="light-content" />
 
-          <View>
-            <MultiColumnView
-              containerStyle={{ padding: 5 }}
-              data={sales}
-              renderItem={(item, i) => (
-                <TransactionItem
-                  key={i}
-                  data={item}
-                  index={sales.indexOf(item) + 1}
-                  showSummary={() => showSummary(item)}
+      <View style={{ flex: 1.2, backgroundColor: "black" }}>
+        <UserProfile />
+        <View style={{ flex: 0.8, marginTop: 5 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingHorizontal: 10,
+              marginVertical: 10,
+            }}
+          >
+            <View style={{ justifyContent: "center" }}>
+              <Text
+                style={{
+                  color: Colors.primary,
+                  fontSize: 16,
+                  fontWeight: 600,
+                  marginTop: 8,
+                }}
+              >
+                Sales summary
+              </Text>
+              {/* <Text
+                style={{
+                  color: Colors.primary,
+                  fontSize: 16,
+                  fontWeight: 400,
+                  marginTop: 3,
+                }}
+              >
+                Period : {searchPeriod}
+              </Text> */}
+            </View>
+
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <TouchableOpacity onPress={handleRefresh}>
+                <Image
+                  source={require("../assets/icons/icons8-refresh-50.png")}
+                  style={{
+                    width: 25,
+                    height: 25,
+                    tintColor: Colors.primary,
+                    marginEnd: 10,
+                  }}
                 />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setVisible(true)}>
+                <Image
+                  source={require("../assets/icons/icons8-calendar-26.png")}
+                  style={{
+                    width: 25,
+                    height: 25,
+                    tintColor: Colors.primary,
+                    marginEnd: 10,
+                  }}
+                />
+              </TouchableOpacity>
+              {isShopAttendant !== true && (
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 3,
+                    height: 25,
+                    justifyContent: "center",
+                  }}
+                  onPress={() =>
+                    navigation.navigate("shopSummary", route.params)
+                  }
+                >
+                  <Text
+                    style={{
+                      color: Colors.dark,
+                      paddingHorizontal: 6,
+                      alignSelf: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    Investment
+                  </Text>
+                </TouchableOpacity>
               )}
+            </View>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              marginTop: 15,
+              justifyContent: "space-between",
+              paddingHorizontal: 12,
+            }}
+          >
+            <ItemHeader value={totalSalesQty || 0} title="Qty" ugx={false} />
+            <View
+              style={{
+                width: 1,
+                height: "inherit",
+                backgroundColor: Colors.primary,
+              }}
             />
+            <ItemHeader
+              title="Sales"
+              value={formatNumberWithCommas(salesValue)}
+            />
+            <View
+              style={{
+                width: 1,
+                height: "inherit",
+                backgroundColor: Colors.primary,
+              }}
+            />
+            <ItemHeader title="Capital " value={daysCapital} />
+            <View
+              style={{
+                width: 1,
+                height: "inherit",
+                backgroundColor: Colors.primary,
+              }}
+            />
+            <ItemHeader title="Income" value={daysProfit} />
           </View>
         </View>
-        <SaleSummaryDialog
-          visible={visible}
-          closeSummary={closeSummary}
-          sale={sale}
-          lineItems={lineItems}
-        />
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+
+      <View style={{ backgroundColor: Colors.light_2, flex: 3 }}>
+        <View
+          style={{
+            flex: 3,
+            paddingBottom: 20,
+          }}
+        >
+          <View style={{ marginTop: 1, flex: 1 }}>
+            {sales.length > 0 ? (
+              <FlatList
+                containerStyle={{ padding: 5 }}
+                showsHorizontalScrollIndicator={false}
+                data={sales}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item, i }) => (
+                  <SaleTransactionItem
+                    key={i}
+                    data={item}
+                    isShopOwner={isShopOwner}
+                  />
+                )}
+              />
+            ) : (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ color: "black", textAlign: "center" }}>
+                  {emptyMsg}
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </View>
+
+      <DateCalender
+        selectedEndDate={selectedEndDate}
+        visible={visible}
+        selectedStartDate={selectedStartDate}
+        handleDayPress={handleDayPress}
+        setFiltering={setFiltering}
+        setVisible={setVisible}
+        onFinish={filterSales}
+        setSelectedEndDate={setSelectedEndDate}
+        setSelectedStartDate={setSelectedStartDate}
+        moreCancelActions={() => {}}
+      />
+    </View>
   );
 }
 
-function TransactionItem({ data, index, showSummary }) {
-  function formatDate(inputDate) {
-    const options = {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    const date = new Date(inputDate);
-
-    // Format the date
-    const formattedDate = date.toLocaleDateString("en-US", options);
-
-    return formattedDate;
-  }
+export function ItemHeader({ title, value, ugx = true }) {
   return (
-    <TouchableOpacity onPress={showSummary}>
-      <View
+    <View style={{ alignItems: "center" }}>
+      <Text
         style={{
-          width: screenWidth - 30,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-around",
-          marginTop: 10,
-          marginHorizontal: 10,
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.3,
-          shadowRadius: 5,
-          borderRadius: 5,
-          elevation: 3,
-          backgroundColor: "white",
-          paddingHorizontal: 20,
-          paddingVertical: 15,
+          fontSize: 12,
+          color: Colors.primary,
+          alignSelf: "flex-start",
+          opacity: 0.6,
+          marginBottom: 3,
         }}
       >
-        <View
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: Colors.primary,
-          }}
-        >
-          <Text style={{ color: "black" }}>#{index}</Text>
-        </View>
-        <View style={{ flex: 1, paddingHorizontal: 10 }}>
+        {title}
+      </Text>
+      <Text style={{ fontSize: 15, color: Colors.primary, fontWeight: "600" }}>
+        {ugx && (
           <Text
             style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              color: Colors.dark,
-              marginBottom: 2,
+              fontSize: 10,
             }}
           >
-            Amount Recieved:
+            UGX
           </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              color: Colors.dark,
-              marginBottom: 2,
-            }}
-          >
-            Created by:
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              color: Colors.dark,
-              marginBottom: 2,
-            }}
-          >
-            Transaction Id:
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              color: Colors.gray,
-              marginTop: 4,
-              marginBottom: 2,
-            }}
-          >
-            {formatDate(data.dateCreated)}
-          </Text>
-        </View>
-        <View style={{ alignItems: "flex-end" }}>
-          <Text
-            style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              color: Colors.lime,
-              marginBottom: 2,
-            }}
-          >
-            UGX {data.amountPaid}
-          </Text>
-          <Text style={{ fontSize: 12, fontWeight: 500, marginBottom: 2 }}>
-            {data.createdByFullName}
-          </Text>
-          <Text style={{ fontSize: 12, fontWeight: 500, marginBottom: 2 }}>
-            {data.id}
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              color: Colors.light,
-              marginTop: 4,
-              marginBottom: 2,
-              opacity: 0,
-            }}
-          >
-            some space
-          </Text>
-        </View>
-      </View>
-    </TouchableOpacity>
+        )}{" "}
+        {value}
+      </Text>
+    </View>
   );
 }

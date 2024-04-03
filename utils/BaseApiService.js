@@ -1,11 +1,16 @@
 import { INTERNAL_SERVER_ERROR } from "../constants/ErrorMessages";
 import { UserSessionUtils } from "./UserSessionUtils";
 import { BASE_URL } from "./BaseUrl";
+import { Platform } from "react-native";
+import Constants from "expo-constants";
 
 export class BaseApiService {
   apiEndpoint;
   authToken = UserSessionUtils.getBearerToken();
-  requestHeaders = {};
+  requestHeaders = {
+    PLATFORM_TYPE: Platform.OS,
+    VERSION_CODE: Constants.expoConfig.version,
+  };
 
   /**
    * This is constructor is used to initialize the API service endpoint to be used for this call.
@@ -125,5 +130,53 @@ export class BaseApiService {
 
       body: JSON.stringify(requestBody),
     });
+  }
+
+  /**
+   * This method is used to make a POST API request to the provided constructor endpoint.
+   *
+   * @param requestBody
+   * @returns
+   */
+  async putRequest(requestBody) {
+    let token = UserSessionUtils.getBearerToken();
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    };
+    return fetch(this.apiEndpoint, {
+      method: "PUT",
+      headers: headers,
+      body: requestBody !== null ? JSON.stringify(requestBody) : "",
+    });
+  }
+
+  /**
+   * This method is used to make a POST/PUT  API request to the provided constructor endpoint.
+   * This returns a JSON response or redirects to the login screen if a 401 is detected.
+   *
+   * @param requestBody
+   * @returns
+   */
+  async saveRequestWithJsonResponse(requestBody, update) {
+    const response =
+      update && update === true
+        ? await this.putRequest(requestBody)
+        : await this.postRequest(requestBody);
+    if (response.ok) {
+      return response.json();
+    } else if (
+      response.status === 400 ||
+      response.status === 403 ||
+      response.status === 500
+    ) {
+      let data = await response.json();
+      let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
+      throw new TypeError(errorMessage);
+    } else if (response.status === 401) {
+      UserSessionUtils.clearLocalStorageAndLogout();
+    } else {
+      throw new TypeError(INTERNAL_SERVER_ERROR);
+    }
   }
 }

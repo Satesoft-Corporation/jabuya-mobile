@@ -4,86 +4,117 @@ import {
   Text,
   View,
   TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
   TextInput,
   Alert,
+  ScrollView,
+  Dimensions,
 } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
-import Colors from "../constants/Colors";
-import AppStatusBar from "../components/AppStatusBar";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { BarCodeScanner } from "expo-barcode-scanner";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
-import { Table, Row, Rows, TableWrapper } from "react-native-table-component";
-import MaterialButton from "../components/MaterialButton";
+
 import { BaseApiService } from "../utils/BaseApiService";
-import OrientationLoadingOverlay from "react-native-orientation-loading-overlay";
-import ModalContent from "../components/ModalContent";
-import Card from "../components/Card";
-import { UserSessionUtils } from "../utils/UserSessionUtils";
-import ConfirmSalesDialog from "../components/ConfirmSalesDialog";
 
-const tableHead = ["Product", "Unit Price", "Qnty", "Amount"];
+import Colors from "../constants/Colors";
 
-function SalesEntry({ navigation }) {
+import AppStatusBar from "../components/AppStatusBar";
+import UserProfile from "../components/UserProfile";
+import { SaleListItem } from "../components/TransactionItems";
+import { SalesDropdownComponent } from "../components/DropdownComponents";
+import { ShopSelectionDropdown } from "../components/DropdownComponents";
+import { SalesQtyInputDialog } from "../components/Dialogs";
+import { formatNumberWithCommas } from "../utils/Utils";
+import { BlackScreen } from "../components/BlackAndWhiteScreen";
+import { IconsComponent } from "../components/Icon";
+import Loader from "../components/Loader";
+import { ConfirmSalesDialog } from "../components/Dialogs";
+import DispalyMessage from "../components/Dialogs/DisplayMessage";
+
+const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
+
+function SalesEntry({ route, navigation }) {
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(null);
   const [limit, setLimit] = useState(20);
   const [loading, setLoading] = useState(true);
-  const [selectedProducts, setSelectedProducts] = useState([]); //unfiltered selections array
   const [quantity, setQuantity] = useState(null);
   const [selections, setSelections] = useState([]); // products in the table(filtered)
   const [showMoodal, setShowModal] = useState(false);
   const [selection, setSelection] = useState(null);
   const [totalCost, setTotalCost] = useState(0);
-  const [recievedAmount, setRecievedAmount] = useState(0);
-  const [showMoodal_1, setShowModal_1] = useState(false);
-  const [shopId, setShopId] = useState(null);
-  const [attendantShopId, setAttendantShopId] = useState(null);
+  const [recievedAmount, setRecievedAmount] = useState();
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
-  const [postedPdts, setPostedPdts] = useState([]);
-  const [lineItems, setLineItems] = useState([]);
-  const [returnCost, setReturnedCost] = useState(0);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+  const [scanBarCode, setScanBarCode] = useState(false); // barcode scanner trigger
+  const [totalQty, setTotalQty] = useState(0);
+  const [unitCost, setUnitCost] = useState(null);
+  const [initialUnitCost, setInitialUnitCost] = useState(null);
+  const [errors, setErrors] = useState(null);
+  const [shops, setShops] = useState([]);
+  const [selectedShop, setSelectedShop] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [displayMessage, setDisplayMssage] = useState(false);
 
-  useEffect(() => {
-    UserSessionUtils.getFullSessionObject().then((d) => {
-      setShopId(d.user.shopOwnerId);
-      setAttendantShopId(d.user.attendantShopId);
-      fetchProducts(null);
-    });
-  }, []);
+  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
+    route.params;
 
-  const fetchProducts = async (query) => {
-    let searchParameters = { offset: 0, limit: limit, shopId: attendantShopId };
-    if (query != undefined && query != null) {
-      searchParameters.searchTerm = query;
+  const fetchProducts = async (shopId) => {
+    let searchParameters = {
+      offset: 0,
+      limit: limit,
+    };
+
+    if (searchTerm !== null) {
+      searchParameters.searchTerm = searchTerm;
+    }
+
+    if (shopId !== null) {
+      searchParameters.shopId = shopId;
+    }
+
+    if (isShopAttendant) {
+      searchParameters.shopId = attendantShopId;
     }
 
     new BaseApiService("/shop-products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setProducts(response.records);
-
         setLoading(false);
       })
       .catch((error) => {
-        console.log(error);
-
         setLoading(false);
       });
   };
 
+  const fetchShops = async () => {
+    let searchParameters = { offset: 0, limit: 0, shopOwnerId: shopOwnerId };
+    if (isShopOwner) {
+      new BaseApiService("/shops")
+        .getRequestWithJsonResponse(searchParameters)
+        .then(async (response) => {
+          setShops(response.records);
+          if (response.records.length === 1) {
+            setSelectedShop(response.records[0]);
+            fetchProducts(response.records[0].id);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          setLoading(false);
+        });
+    }
+  };
+
   const postSales = () => {
     let payLoad = {
-      id: shopId,
-      shopId: attendantShopId,
-      amountPaid: totalCost,
-      lineItems: selectedProducts,
+      id: null,
+      shopId: isShopAttendant ? attendantShopId : selectedShop?.id,
+      amountPaid: Number(recievedAmount),
+      lineItems: selections,
     };
-
     setLoading(true);
-
     new BaseApiService("/shop-sales")
       .postRequest(payLoad)
       .then(async (response) => {
@@ -92,97 +123,414 @@ function SalesEntry({ navigation }) {
       })
       .then(async (d) => {
         let { info, status } = d;
-
-        let items = info.lineItems;
         let id = info.id;
-        let totalCost_1 = info.totalCost;
-        setReturnedCost(totalCost_1);
-        for (let item of items) {
-          lineItems.push([item.shopProductName, item.quantity, item.totalCost]);
-        }
-        if (status === 200) {
-          saveSales(items, id);
-        }
-      })
-      .catch((error) => {
-        Alert.alert("Failed to confirm purchases!", error?.message);
-      });
-  };
 
-  const saveSales = (items, id) => {
-    postedPdts.push(items);
-    new BaseApiService(`/shop-sales/${id}/confirm`)
-      .postRequest()
-      .then((d) => d.json())
-      .then((d) => {
-        if (d.status === "Success") {
+        if (status === 200) {
+          new BaseApiService(`/shop-sales/${id}/confirm`)
+            .postRequest()
+            .then((d) => d.json())
+            .then((d) => {
+              if (d.status === "Success") {
+                setShowConfirmed(false);
+                setMessage("Sale confirmed successfully");
+                setLoading(false);
+                setDisplayMssage(true);
+                clearEverything();
+              }
+            })
+            .catch((error) => {
+              setMessage(`Failed to confirm purchases!,${error?.message}`);
+              setLoading(false);
+              setDisplayMssage(true);
+            });
+          setTimeout(() => setLoading(false), 1000);
+        } else if (status === 400) {
+          setMessage(`Failed to confirm purchases!,${error?.message}`);
           setLoading(false);
-          setShowConfirmed(true);
+          setDisplayMssage(true);
         }
       })
       .catch((error) => {
-        Alert.alert("Failed to confirm purchases!", error?.message);
+        setMessage("An unexpected error occurred! Try again later.");
+        setDisplayMssage(true);
+        setLoading(false);
       });
   };
 
   const handleChange = (value) => {
-    // setLoading(true);
-    fetchProducts(value);
+    setSearchTerm(value);
   };
 
   const makeSelection = (item) => {
+    setUnitCost(String(item?.salesPrice));
+
     setShowModal(true);
     setSelection(item);
   };
 
+  const makeShopSelection = (shop) => {
+    setSelectedShop(shop);
+    setLoading(true);
+    fetchProducts(shop.id);
+  };
+
+  const saveSelection = () => {
+    // saving the item into the data table
+
+    const parsedQuantity = Number(quantity);
+    const itemUnitCost = Number(unitCost);
+
+    let cost = itemUnitCost * parsedQuantity;
+
+    const isValidQuantity = !isNaN(parsedQuantity) && parsedQuantity > 0;
+    const isValidCost = !isNaN(itemUnitCost) && itemUnitCost >= initialUnitCost;
+
+    if (itemUnitCost < initialUnitCost) {
+      setErrors((prevErrors) => {
+        return {
+          ...prevErrors,
+          lessPriceError: `Unit cost for ${selection.productName} should be greater than ${initialUnitCost}`,
+        };
+      });
+    }
+
+    if (parsedQuantity === 0) {
+      setErrors((prevErrors) => {
+        return {
+          ...prevErrors,
+          qtyZeroError: "Quantity should be greater than 0",
+        };
+      });
+    }
+
+    const isValidSubmition = () => {
+      return isValidQuantity && isValidCost;
+    };
+
+    if (isValidSubmition()) {
+      setLoading(true);
+
+      setTotalCost(totalCost + cost);
+
+      setTotalQty(totalQty + parsedQuantity); //updating total items purchased
+
+      const productIndex = selections.findIndex(
+        //locating the duplicate item in selection array
+        (product) => product.productName === selection.productName
+      );
+
+      if (productIndex !== -1) {
+        //if the already exists, update quantity and total cost
+        let prevQty = selections[productIndex].quantity;
+        let prevTotalCost = selections[productIndex].totalCost;
+
+        selections[productIndex].quantity = Number(quantity) + prevQty;
+        selections[productIndex].totalCost = prevTotalCost + cost;
+        setLoading(false);
+        setScanned(false);
+      } else {
+        setSelections((prev) => [
+          ...prev,
+          {
+            id: selection.id,
+            productName: selection.productName,
+            shopProductId: selection.id,
+            quantity: parsedQuantity, // Use the parsed quantity
+            totalCost: cost,
+            unitCost: unitCost,
+          },
+        ]);
+      }
+      setScanned(false);
+      setSelection(null);
+      setQuantity(null);
+      setShowModal(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+
+    setLoading(false);
+  };
+
+  const handleBarCodeScanned = ({ data }) => {
+    setScanned(true);
+    fetchProductByBarCode(data);
+  };
+
+  const fetchProductByBarCode = (barcode) => {
+    setLoading(true);
+
+    let searchParameters = {
+      offset: 0,
+      limit: 0,
+      shopId: isShopAttendant ? attendantShopId : selectedShop?.id,
+      barCode: barcode,
+    };
+
+    new BaseApiService("/shop-products")
+      .getRequestWithJsonResponse(searchParameters)
+      .then(async (response) => {
+        if (response.records.length === 0) {
+          Alert.alert("Cannot find product in your shop", "", [
+            {
+              text: "Ok",
+              onPress: () => setScanned(false),
+              style: "cancel",
+            },
+          ]);
+          setLoading(false);
+          setQuantity(null);
+        } else {
+          setSelection(response.records[0]);
+          setUnitCost(String(response.records[0]?.salesPrice));
+          setScanned(true);
+          setShowModal(true);
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        Alert.alert("Error!", error?.message);
+        setLoading(false);
+        setScanned(false);
+      });
+  };
+
   const clearEverything = () => {
-    setSelectedProducts([]);
     setQuantity(null);
     setSelection(null);
     setTotalCost(0);
     setRecievedAmount(0);
     setShowConfirmed(false);
     setSelections([]);
-    setLineItems([]);
+    setTotalQty(0);
+    setErrors({});
   };
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: Colors.light_2,
-          paddingHorizontal: 15,
-          paddingBottom: 30,
-        }}
-      >
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <AppStatusBar />
-          <OrientationLoadingOverlay
-            visible={loading}
-            color="white"
-            indicatorSize="large"
-            messageFontSize={24}
-            message=""
-          />
-          <ConfirmSalesDialog
-            visible={showConfirmed}
-            navigation={navigation}
-            addSale={clearEverything}
-            sales={lineItems}
-            total={returnCost}
-          />
-          <DropdownComponent
+  useEffect(() => {
+    const getBarCodeScannerPermissions = async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === "granted");
+    };
+
+    getBarCodeScannerPermissions();
+  }, []);
+
+  useEffect(() => {
+    if (isShopAttendant) {
+      fetchProducts();
+    }
+    fetchShops();
+  }, []);
+
+  useEffect(() => {
+    fetchProducts(selectedShop?.id);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setInitialUnitCost(selection?.salesPrice);
+  }, [selection]);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: Colors.dark,
+    },
+    overlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    },
+    unfocusedContainer: {
+      //the blured section
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.7)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+
+    focusedContainer: {
+      //scan area
+      borderColor: Colors.primary,
+      borderWidth: 2,
+      height: 150,
+      borderRadius: 5,
+      width: screenWidth / 1.2,
+    },
+  });
+
+  return scanBarCode ? (
+    <View style={styles.container}>
+      <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
+
+      <Loader loading={loading} />
+
+      <SalesQtyInputDialog
+        showMoodal={showMoodal}
+        selection={selection}
+        errors={errors}
+        setErrors={setErrors}
+        setShowModal={setShowModal}
+        quantity={quantity}
+        setQuantity={setQuantity}
+        saveSelection={saveSelection}
+        setUnitCost={setUnitCost}
+        unitCost={unitCost}
+        setScanned={setScanned}
+        setSelection={setSelection}
+      />
+
+      <BarCodeScanner
+        height={screenHeight}
+        width={screenWidth}
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={{ marginTop: -20 }}
+      />
+      <View style={styles.overlay}>
+        <View style={styles.unfocusedContainer}></View>
+        <View style={{ flexDirection: "row" }}>
+          <View style={styles.unfocusedContainer}></View>
+          <View style={styles.focusedContainer}></View>
+          <View style={styles.unfocusedContainer}></View>
+        </View>
+        <View style={styles.unfocusedContainer}></View>
+        <View
+          style={{
+            backgroundColor: "black",
+            justifyContent: "center",
+            width: screenWidth,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => setScanBarCode(false)}
+            style={{
+              alignSelf: "center",
+              justifyContent: "center",
+              backgroundColor: Colors.primary,
+              borderRadius: 5,
+              borderWidth: 1,
+              borderColor: Colors.dark,
+              height: 50,
+              width: 300,
+              marginBottom: 10,
+            }}
+          >
+            <Text
+              style={{
+                fontWeight: 500,
+                color: Colors.dark,
+                alignSelf: "center",
+                fontSize: 20,
+              }}
+            >
+              Done
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  ) : (
+    <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
+      <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
+
+      <Loader loading={loading} />
+
+      <ConfirmSalesDialog
+        visible={showConfirmed}
+        addSale={postSales}
+        sales={selections}
+        totalCost={totalCost}
+        setVisible={() => setShowConfirmed(false)}
+        clear={clearEverything}
+        amountPaid={recievedAmount}
+        balanceGivenOut={recievedAmount - totalCost}
+        cartLength={totalQty}
+      />
+
+      <SalesQtyInputDialog
+        showMoodal={showMoodal}
+        selection={selection}
+        errors={errors}
+        setErrors={setErrors}
+        setShowModal={setShowModal}
+        quantity={quantity}
+        setQuantity={setQuantity}
+        saveSelection={saveSelection}
+        setUnitCost={setUnitCost}
+        unitCost={unitCost}
+        setSelection={setSelection}
+        setScanned={setScanned}
+      />
+
+      <DispalyMessage
+        showModal={displayMessage}
+        message={message}
+        onAgree={() => setDisplayMssage(false)}
+        setShowModal={setDisplayMssage}
+      />
+      <BlackScreen flex={isShopAttendant ? 12 : 10}>
+        <UserProfile />
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("viewSales", {
+              ...route.params,
+            });
+          }}
+          style={{
+            backgroundColor: Colors.primary,
+            borderRadius: 3,
+            height: 25,
+            justifyContent: "center",
+            alignSelf: "flex-end",
+            marginEnd: 10,
+            marginBottom: 7,
+            paddingHorizontal: 5,
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.dark,
+              paddingHorizontal: 6,
+              alignSelf: "center",
+              justifyContent: "center",
+            }}
+          >
+            Report
+          </Text>
+        </TouchableOpacity>
+        <View style={{ paddingHorizontal: 10, marginTop: 0 }}>
+          {isShopOwner && (
+            <>
+              <ShopSelectionDropdown
+                value={selectedShop} // flex is .75 for owner
+                makeShopSelection={makeShopSelection}
+                shops={shops}
+                disable={selections.length > 0}
+              />
+            </>
+          )}
+          <SalesDropdownComponent
+            disable={isShopOwner && selectedShop === null}
+            value={selection}
             products={products}
             handleChange={(t) => handleChange(t)}
             setLoading={() => setLoading(false)}
             makeSelection={makeSelection}
+            setScanned={() => setScanBarCode(true)}
           />
+        </View>
+      </BlackScreen>
+
+      <View style={{ backgroundColor: Colors.light_2, flex: 1 }}>
+        <ScrollView style={{ paddingHorizontal: 10, marginTop: 7 }}>
           <View
             style={{
               backgroundColor: Colors.light,
               borderRadius: 5,
               padding: 10,
+              paddingVertical: 4,
               flexDirection: "row",
               justifyContent: "space-between",
             }}
@@ -191,6 +539,9 @@ function SalesEntry({ navigation }) {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
+                elevation: 10,
+                shadowOffset: { width: 0, height: 25 },
+                shadowOpacity: 0.8,
               }}
             >
               <FontAwesome5 name="money-bill" size={24} color="black" />
@@ -199,8 +550,7 @@ function SalesEntry({ navigation }) {
                   marginLeft: 10,
                 }}
               >
-                <Text style={{ fontWeight: "bold" }}>Recieved</Text>
-                <Text>Amount paid</Text>
+                <Text style={{ fontWeight: "bold" }}>Recieved amt</Text>
               </View>
             </View>
             <View
@@ -209,13 +559,37 @@ function SalesEntry({ navigation }) {
                 alignItems: "flex-end",
               }}
             >
-              <Text
+              <View
                 style={{
-                  fontWeight: 500,
+                  flexDirection: "row",
+                  justifyContent: "center",
                 }}
               >
-                UGX {recievedAmount}
-              </Text>
+                <Text
+                  style={{
+                    alignSelf: "center",
+                    color: Colors.gray,
+                    fontSize: 10,
+                    marginEnd: 5,
+                  }}
+                >
+                  UGX
+                </Text>
+                <TextInput
+                  textAlign="right"
+                  value={recievedAmount}
+                  inputMode="numeric"
+                  onChangeText={(text) => setRecievedAmount(text)}
+                  style={{
+                    backgroundColor: Colors.light,
+                    borderRadius: 5,
+                    padding: 5,
+                    width: 120,
+                    fontSize: 17,
+                  }}
+                  placeholder="Enter amount"
+                />
+              </View>
             </View>
           </View>
 
@@ -224,32 +598,40 @@ function SalesEntry({ navigation }) {
               backgroundColor: Colors.light,
               borderRadius: 5,
               padding: 10,
-              marginTop: 15,
+              marginTop: 8,
             }}
           >
-            <Table>
-              <Row
-                data={tableHead}
-                style={{ height: 40 }}
-                textStyle={{
-                  // margin: 5,
-                  fontWeight: 600,
-                }}
-                flexArr={[1.8, 1.5, 0.8, 1]}
-              />
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                height: 25,
+                paddingEnd: 10,
+                borderBottomColor: Colors.gray,
+                borderBottomWidth: 0.3,
+              }}
+            >
+              <Text style={{ flex: 2.5, fontWeight: 600 }}>Item</Text>
+              <Text style={{ flex: 0.5, textAlign: "center", fontWeight: 600 }}>
+                Qty
+              </Text>
+              <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
+                Cost
+              </Text>
 
-              <TableWrapper style={{ flexDirection: "row" }}>
-                <Rows
-                  style={{ borderTopColor: Colors.dark, borderTopWidth: 0.5 }}
-                  data={selections}
-                  textStyle={{
-                    margin: 5,
-                    textAlign: "left",
-                  }}
-                  flexArr={[1.8, 1.5, 0.8, 1]}
-                />
-              </TableWrapper>
-            </Table>
+              <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
+                Amount
+              </Text>
+            </View>
+            <ScrollView
+              style={{
+                height: screenHeight / 4,
+              }}
+            >
+              {selections.map((item) => (
+                <SaleListItem data={item} key={item.id} />
+              ))}
+            </ScrollView>
             <View
               style={{
                 backgroundColor: Colors.light,
@@ -260,13 +642,13 @@ function SalesEntry({ navigation }) {
               }}
             >
               <View>
-                <Text style={{ fontWeight: "bold" }}>Purchased Amount</Text>
-                <Text>
-                  Payment for {selections.length}
-                  {selections.length > 1 ? (
-                    <Text>items</Text>
-                  ) : (
-                    <Text>item</Text>
+                <Text style={{ fontWeight: "bold", marginTop: 5 }}>
+                  Sold{" "}
+                  {totalQty >= 1 && (
+                    <Text>
+                      {totalQty}
+                      {totalQty > 1 ? <Text> items</Text> : <Text> item</Text>}
+                    </Text>
                   )}
                 </Text>
               </View>
@@ -278,23 +660,24 @@ function SalesEntry({ navigation }) {
               >
                 <Text
                   style={{
-                    fontWeight: 500,
+                    fontWeight: 700,
                   }}
                 >
-                  UGX {totalCost}
+                  <Text style={{ fontSize: 10, fontWeight: 400 }}>UGX</Text>{" "}
+                  {formatNumberWithCommas(totalCost)}
                 </Text>
               </View>
             </View>
           </View>
 
-          <View
+          <View // selections table
             style={{
               backgroundColor: Colors.light,
               borderRadius: 5,
               padding: 10,
               flexDirection: "row",
               justifyContent: "space-between",
-              marginTop: 10,
+              marginTop: 8,
             }}
           >
             <View
@@ -309,8 +692,9 @@ function SalesEntry({ navigation }) {
                   marginLeft: 10,
                 }}
               >
-                <Text style={{ fontWeight: "bold" }}>Balance</Text>
-                <Text>Cash less purchase</Text>
+                <Text style={{ fontWeight: "bold", fontSize: 17 }}>
+                  Balance
+                </Text>
               </View>
             </View>
             <View
@@ -321,338 +705,70 @@ function SalesEntry({ navigation }) {
             >
               <Text
                 style={{
-                  fontWeight: 500,
+                  fontWeight: 700,
                 }}
               >
-                UGX {recievedAmount === 0 ? 0 : recievedAmount - totalCost}
+                <Text style={{ fontSize: 10, fontWeight: 400 }}>UGX </Text>
+                <Text style={{ fontSize: 17 }}>
+                  {recievedAmount &&
+                    formatNumberWithCommas(recievedAmount - totalCost)}
+                </Text>
               </Text>
             </View>
           </View>
 
           <IconsComponent clear={clearEverything} />
-
-          <MaterialButton
-            title="Confirm Purchase"
+          <TouchableOpacity
+            disabled={selections.length < 1}
             style={{
               backgroundColor: Colors.dark,
-              marginTop: 10,
               borderRadius: 5,
+              height: 50,
+              justifyContent: "center",
+              marginTop: 8,
+              marginBottom: 20,
             }}
-            titleStyle={{
-              fontWeight: "bold",
-              color: Colors.primary,
-            }}
-            buttonPress={() => {
-              if (selections.length > 0) {
-                setShowModal_1(true);
+            onPress={() => {
+              let shouldConfirm = true;
+
+              if (!recievedAmount) {
+                shouldConfirm = false;
+              }
+
+              if (!(Number(recievedAmount) >= totalCost)) {
+                shouldConfirm = false;
+                setMessage(
+                  `Recieved amount should be greater that UGX ${formatNumberWithCommas(
+                    totalCost
+                  )}`
+                );
+                setDisplayMssage(true);
+              }
+
+              if (shouldConfirm === true) {
+                setLoading(true);
+                setTimeout(() => {
+                  setLoading(false);
+                  setShowConfirmed(true);
+                }, 1000);
               }
             }}
-          />
-
-          <ModalContent visible={showMoodal} style={{ padding: 35 }}>
-            <Card
+          >
+            <Text
               style={{
-                paddingHorizontal: 15,
+                color: Colors.primary,
+                alignSelf: "center",
+                fontSize: 18,
+                fontWeight: 500,
               }}
             >
-              <View
-                style={{
-                  backgroundColor: "white",
-                  padding: 2,
-                }}
-              >
-                <Text
-                  style={{
-                    marginTop: 10,
-                    fontWeight: "500",
-                    fontSize: 18,
-                    marginBottom: 5,
-                    marginStart: 10,
-                    marginTop: 20,
-                  }}
-                >
-                  Input quantity
-                </Text>
-
-                <TextInput
-                  inputMode="numeric"
-                  onChangeText={(text) => setQuantity(text)}
-                  maxLength={3}
-                  style={{
-                    backgroundColor: Colors.light_3,
-                    borderRadius: 8,
-                    padding: 6,
-                  }}
-                />
-                <MaterialButton
-                  title="Confirm"
-                  style={{
-                    backgroundColor: Colors.dark,
-                    marginTop: 10,
-                    borderRadius: 5,
-                    width: 150,
-                    alignSelf: "center",
-                    marginBottom: 20,
-                  }}
-                  titleStyle={{
-                    fontWeight: "bold",
-                    color: Colors.primary,
-                  }}
-                  buttonPress={() => {
-                    let cost = selection.salesPrice * quantity;
-                    setTotalCost(totalCost + cost);
-                    selectedProducts.push({
-                      id: selection.id,
-                      shopProductId: selection.id,
-                      quantity: quantity,
-                    });
-                    setSelections((prev) => [
-                      ...prev,
-                      [
-                        selection.productName,
-                        selection.salesPrice,
-                        quantity,
-                        cost,
-                      ],
-                    ]);
-                    setShowModal(false);
-                    setLoading(true);
-                    setTimeout(() => {
-                      setLoading(false);
-                    }, 1000);
-                  }}
-                />
-              </View>
-            </Card>
-          </ModalContent>
-
-          <ModalContent visible={showMoodal_1} style={{ padding: 35 }}>
-            <Card
-              style={{
-                paddingHorizontal: 15,
-              }}
-            >
-              <View
-                style={{
-                  backgroundColor: "white",
-                  padding: 2,
-                }}
-              >
-                <Text
-                  style={{
-                    marginTop: 10,
-                    fontWeight: "500",
-                    fontSize: 18,
-                    marginBottom: 5,
-                    marginStart: 10,
-                    marginTop: 20,
-                  }}
-                >
-                  Input recieved amount
-                </Text>
-
-                <TextInput
-                  inputMode="numeric"
-                  onChangeText={(text) => setRecievedAmount(text)}
-                  maxLength={10}
-                  style={{
-                    backgroundColor: Colors.light_3,
-                    borderRadius: 8,
-                    padding: 6,
-                  }}
-                />
-                <MaterialButton
-                  title="Confirm"
-                  style={{
-                    backgroundColor: Colors.dark,
-                    marginTop: 10,
-                    borderRadius: 5,
-                    width: 150,
-                    alignSelf: "center",
-                    marginBottom: 20,
-                  }}
-                  titleStyle={{
-                    fontWeight: "bold",
-                    color: Colors.primary,
-                  }}
-                  buttonPress={() => {
-                    setShowModal_1(false);
-                    postSales();
-                  }}
-                />
-              </View>
-            </Card>
-          </ModalContent>
+              Confirm purchase
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
-const DropdownComponent = ({
-  products,
-  handleChange,
-  setLoading,
-  makeSelection,
-}) => {
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
 
-  return (
-    <View style={styles.container}>
-      <Dropdown
-        style={[styles.dropdown, isFocus && { borderColor: Colors.primary }]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={products}
-        search
-        maxHeight={300}
-        labelField="productName"
-        valueField="productName"
-        placeholder={!isFocus ? "Select Product" : "..."}
-        searchPlaceholder="Search..."
-        value={value}
-        onFocus={() => setIsFocus(true)}
-        onBlur={() => setIsFocus(false)}
-        onChange={(item) => {
-          setIsFocus(false);
-          setLoading(false);
-          makeSelection(item);
-        }}
-        onChangeText={(text) => handleChange(text)}
-      />
-      {/* <TouchableOpacity
-        style={{
-          backgroundColor: Colors.primary,
-        }}
-      >
-        <MaterialCommunityIcons
-          name="qrcode-scan"
-          size={30}
-          color="black"
-          style={{}}
-        />
-      </TouchableOpacity> */}
-    </View>
-  );
-};
-
-const IconsComponent = ({ clear }) => {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginTop: 10,
-      }}
-    >
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          backgroundColor: Colors.light,
-          borderRadius: 5,
-          alignItems: "center",
-        }}
-      >
-        <FontAwesome name="credit-card" size={30} color="black" />
-        <Text style={{ alignSelf: "center" }}>Card</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          backgroundColor: Colors.light,
-          borderRadius: 5,
-          alignItems: "center",
-        }}
-      >
-        <FontAwesome name="mobile" size={30} color="black" />
-        <Text style={{ alignSelf: "center" }}>Mobile</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          backgroundColor: Colors.light,
-          borderRadius: 5,
-          alignItems: "center",
-        }}
-      >
-        <FontAwesome name="wechat" size={30} color="black" />
-        <Text style={{ alignSelf: "center" }}>Fap</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          backgroundColor: Colors.light,
-          borderRadius: 5,
-          alignItems: "center",
-        }}
-      >
-        <FontAwesome name="credit-card" size={30} color="black" />
-        <Text style={{ alignSelf: "center" }}>Credit</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          padding: 10,
-          backgroundColor: Colors.primary,
-          borderRadius: 5,
-          alignItems: "center",
-        }}
-      >
-        <MaterialCommunityIcons
-          name="broom"
-          size={30}
-          color="black"
-          onPress={() => {
-            clear();
-          }}
-        />
-        <Text style={{ alignSelf: "center" }}>Clear</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
 export default SalesEntry;
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 20,
-  },
-  dropdown: {
-    height: 50,
-    borderColor: Colors.primary,
-    borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    backgroundColor: Colors.primary,
-    marginBottom: 10,
-  },
-  icon: {
-    marginRight: 5,
-  },
-
-  label: {
-    position: "absolute",
-    // backgroundColor: "white",
-    left: 22,
-    top: 8,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
-});
