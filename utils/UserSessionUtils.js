@@ -260,4 +260,14 @@ export class UserSessionUtils {
     let time = await AsyncStorage.getItem(StorageParams.PIN_LOGIN);
     return time ? new Date(time) : null;
   }
+
+  static async setShopClients(clients) {
+    let data = JSON.stringify(clients);
+    await AsyncStorage.setItem(StorageParams.SHOP_CLIENTS, data);
+  }
+
+  static async getShopClients() {
+    let list = await AsyncStorage.getItem(StorageParams.SHOP_CLIENTS);
+    return list ? JSON.parse(list) : [];
+  }
 }

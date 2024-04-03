@@ -111,10 +111,12 @@ const LandingScreen = ({ navigation }) => {
                   console.log(error, cart);
                 });
             } else {
-              // console.log(error, cart);
+              setLoading(false);
             }
           })
-          .catch((error) => {});
+          .catch((error) => {
+            setLoading(false);
+          });
       });
     } else {
       setLoading(false);

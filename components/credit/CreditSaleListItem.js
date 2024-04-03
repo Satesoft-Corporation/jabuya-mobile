@@ -90,7 +90,9 @@ const CreditSaleListItem = ({ sale }) => {
           >
             Balance
           </Text>
-          <Text>{formatNumberWithCommas(sale?.balance)}</Text>
+          <Text>
+            {formatNumberWithCommas(sale?.amountLoaned - sale?.amountRepaid)}
+          </Text>
         </View>
       </View>
 
@@ -98,7 +100,7 @@ const CreditSaleListItem = ({ sale }) => {
         label={`Served by: ${sale?.createdByFullName}`}
         btnTitle="Pay"
         onBtnPress={() => {
-          navigation.navigate('credit_payments', sale);
+          navigation.navigate("credit_payments", sale);
         }}
       />
     </View>

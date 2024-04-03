@@ -5,16 +5,16 @@ import { paymentMethods } from "../../constants/Constants";
 import { SaleEntryContext } from "../../context/SaleEntryContext";
 import ChipButton from "../buttons/ChipButton";
 import { DatePickerInput } from "react-native-paper-dates";
+import { MyDropDown } from "../DropdownComponents";
 
 const PaymentMethodComponent = ({
   soldOnDate,
   setSoldOnDate,
-  clientName,
-  setClientName,
-  clientPhoneNumber,
-  setClientPhoneNumber,
   amountPaid,
   setAmountPaid,
+  clients = [],
+  selectedClient,
+  setSelectedClient,
 }) => {
   const { selectedPaymentMethod, setSelectedPaymentMethod } =
     useContext(SaleEntryContext);
@@ -80,55 +80,17 @@ const PaymentMethodComponent = ({
             }}
           >
             <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  marginVertical: 3,
-                  marginStart: 6,
-                }}
-              >
-                Client name
-              </Text>
-              <TextInput
-                value={clientName}
-                onChangeText={(text) => setClientName(text)}
-                cursorColor={Colors.dark}
-                inputMode="text"
+              <MyDropDown
                 style={{
                   backgroundColor: Colors.light,
-                  borderRadius: 5,
-                  padding: 6,
-                  borderWidth: 0.6,
                   borderColor: Colors.dark,
-                  paddingHorizontal: 10,
-                  height: 35,
                 }}
-              />
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  marginVertical: 3,
-                  marginStart: 6,
-                }}
-              >
-                Client phone number
-              </Text>
-
-              <TextInput
-                value={clientPhoneNumber}
-                onChangeText={(text) => setClientPhoneNumber(text)}
-                cursorColor={Colors.dark}
-                inputMode="numeric"
-                style={{
-                  backgroundColor: Colors.light,
-                  borderRadius: 5,
-                  padding: 6,
-                  borderWidth: 0.6,
-                  borderColor: Colors.dark,
-                  paddingHorizontal: 10,
-                  height: 35,
-                }}
+                data={clients}
+                onChange={(e) => setSelectedClient(e)}
+                value={selectedClient}
+                placeholder="Select client"
+                labelField="fullName"
+                valueField="id"
               />
             </View>
           </View>

@@ -10,7 +10,7 @@ const CreditMenu = ({ navigation }) => {
     {
       id: 1,
       icon: require("../../../assets/icons/icons8-cash-register-50.png"),
-      title: "Credit Record",
+      title: "Credit Records",
       target: "credit_records",
     },
     {

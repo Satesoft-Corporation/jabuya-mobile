@@ -1,5 +1,5 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ModalContent from "../ModalContent";
 import Card from "../Card";
 import {
@@ -17,13 +17,18 @@ import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import NetInfo from "@react-native-community/netinfo";
 import { UserContext } from "../../context/UserContext";
 
-const ConfirmSaleModal = ({ setVisible, setLoading, snackbarRef, visible }) => {
+const ConfirmSaleModal = ({
+  setVisible,
+  setLoading,
+  snackbarRef,
+  visible,
+  clients,
+}) => {
   const [submitted, setSubmitted] = useState(false);
   const [soldOnDate, setSoldOnDate] = useState(new Date());
-  const [clientName, setClientName] = useState("");
-  const [clientPhoneNumber, setClientPhoneNumber] = useState("");
   const [amountPaid, setAmountPaid] = useState("");
   const [serverError, setError] = useState(null);
+  const [selectedClient, setSelectedClient] = useState(null);
 
   const { userParams, selectedShop } = useContext(UserContext);
 
@@ -39,9 +44,8 @@ const ConfirmSaleModal = ({ setVisible, setLoading, snackbarRef, visible }) => {
   const { isShopAttendant, attendantShopId } = userParams;
 
   const clearForm = () => {
-    setClientName("");
     setAmountPaid("");
-    setClientPhoneNumber("");
+    setSelectedClient(null);
     setError(null);
   };
 
@@ -58,8 +62,8 @@ const ConfirmSaleModal = ({ setVisible, setLoading, snackbarRef, visible }) => {
       paymentMode: selectedPaymentMethod?.id,
       onCredit: onCredit,
       soldOnDate: convertToServerDate(soldOnDate),
-      ...(onCredit && { clientPhoneNumber: clientPhoneNumber }),
-      ...(onCredit && { clientName: clientName }),
+      ...(onCredit && { clientPhoneNumber: selectedClient?.phoneNumber }),
+      ...(onCredit && { clientId: selectedClient?.id }),
     };
 
     setLoading(true);
@@ -275,12 +279,11 @@ const ConfirmSaleModal = ({ setVisible, setLoading, snackbarRef, visible }) => {
             submitted={submitted}
             soldOnDate={soldOnDate}
             setSoldOnDate={setSoldOnDate}
-            clientName={clientName}
-            setClientName={setClientName}
-            clientPhoneNumber={clientPhoneNumber}
-            setClientPhoneNumber={setClientPhoneNumber}
             amountPaid={amountPaid}
             setAmountPaid={setAmountPaid}
+            clients={clients}
+            selectedClient={selectedClient}
+            setSelectedClient={setSelectedClient}
           />
 
           <View
@@ -298,6 +301,8 @@ const ConfirmSaleModal = ({ setVisible, setLoading, snackbarRef, visible }) => {
               onPress={() => {
                 setVisible();
                 setError(null);
+                setSelectedClient(null);
+                setAmountPaid(null);
               }}
             />
             <PrimaryButton title={"Save"} onPress={postSales} />

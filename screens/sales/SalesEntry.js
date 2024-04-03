@@ -37,6 +37,8 @@ function SalesEntry({ navigation }) {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState(null);
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
+  const [clients, setClients] = useState([]);
+
   const snackbarRef = useRef(null);
 
   const { userParams, selectedShop } = useContext(UserContext);
@@ -93,9 +95,10 @@ function SalesEntry({ navigation }) {
           })
           .catch((error) => {
             setLoading(false);
+            console.log(error);
           });
       } else {
-        let pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
+        let pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id); //store the payload in local storage
         setProducts(pdtList);
         snackbarRef.current.show("enjoy offline mode", 6000);
         setLoading(false);
@@ -103,66 +106,27 @@ function SalesEntry({ navigation }) {
     });
   };
 
-  const postSales = () => {
-    let payLoad = {
-      id: null,
-      shopId: isShopAttendant ? attendantShopId : selectedShop?.id,
-      amountPaid: Number(recievedAmount),
-      lineItems: selections,
+  const fetchClients = () => {
+    const serachParams = {
+      shopId: selectedShop?.id,
+      limit: 0,
+      offset: 0,
     };
-
-    setLoading(true);
     NetInfo.fetch().then(async (state) => {
       if (state.isConnected) {
-        new BaseApiService("/shop-sales")
-          .postRequest(payLoad)
+        new BaseApiService("/clients-controller")
+          .getRequestWithJsonResponse(serachParams)
           .then(async (response) => {
-            let d = { info: await response.json(), status: response.status };
-            return d;
-          })
-          .then(async (d) => {
-            let { info, status } = d;
-            let id = info?.id;
+            setClients(response.records);
 
-            if (status === 200) {
-              new BaseApiService(`/shop-sales/${id}/confirm`)
-                .postRequest()
-                .then((d) => d.json())
-                .then((d) => {
-                  if (d.status === "Success") {
-                    setShowConfirmed(false);
-                    setLoading(false);
-                    clearEverything();
-                    snackbarRef.current.show(
-                      "Sale confirmed successfully",
-                      4000
-                    );
-                  }
-                })
-                .catch((error) => {
-                  setLoading(false);
-                  snackbarRef.current.show(
-                    `Failed to confirm purchases!,${error?.message}`,
-                    6000
-                  );
-                });
-            } else {
-              setLoading(false);
-              snackbarRef.current.show(info?.message, 5000);
-            }
+            await UserSessionUtils.setShopClients(response.records); //to keep updating the list locally
           })
           .catch((error) => {
-            setLoading(false);
-            snackbarRef.current.show(error?.message);
+            setMessage("Error fetching shop clients");
           });
       } else {
-        await UserSessionUtils.addPendingSale(payLoad);
-        setTimeout(() => setLoading(false), 1000);
-        clearEverything();
-        snackbarRef.current.show(
-          "Sale record will be saved when online.",
-          4000
-        );
+        let clients = await UserSessionUtils.getShopClients();
+        setClients(clients);
       }
     });
   };
@@ -197,6 +161,10 @@ function SalesEntry({ navigation }) {
     fetchProducts();
   }, [searchTerm]);
 
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
@@ -208,6 +176,7 @@ function SalesEntry({ navigation }) {
         setVisible={() => setShowConfirmed(false)}
         setLoading={setLoading}
         snackbarRef={snackbarRef}
+        clients={clients}
       />
 
       <EnterSaleQtyModal />
@@ -442,10 +411,7 @@ function SalesEntry({ navigation }) {
                 if (selections.length > 0) {
                   if (isValidAmount === true) {
                     setLoading(true);
-                    setTimeout(() => {
-                      setLoading(false);
-                      setShowConfirmed(true);
-                    }, 500);
+                    setShowConfirmed(true);
                     return true;
                   }
 

@@ -12,5 +12,7 @@ export default {
   SHOP_PRODUCTS: "@shop_products",
   PENDING_SALES: "@pending_sales",
   PIN_CODE: "@pincode",
-  PIN_LOGIN:'@pin_login'
+  PIN_LOGIN:'@pin_login',
+  SHOP_CLIENTS:'@shop_clients'
+
 };
