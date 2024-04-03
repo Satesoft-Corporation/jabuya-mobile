@@ -27,6 +27,7 @@ import CreditSales from "./screens/sales/credit/CreditSales";
 import NewClient from "./forms/NewClient";
 import ClientRegister from "./screens/sales/credit/ClientRegister";
 import CreditPayment from "./forms/CreditPayment";
+import ContactBook from "./screens/ContactBook";
 
 const Stack = createNativeStackNavigator();
 
@@ -96,6 +97,9 @@ export default function App() {
               <Stack.Screen name="client_register" component={ClientRegister} />
 
               <Stack.Screen name="credit_payments" component={CreditPayment} />
+
+              <Stack.Screen name="contact_book" component={ContactBook} />
+
             </Stack.Navigator>
           </NavigationContainer>
         </SaleEntryProvider>

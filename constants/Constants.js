@@ -34,6 +34,7 @@ export const categoryIcons = [
     id: 5,
     icon: require("../assets/icons/icons8-box-50.png"),
     title: "Contact Book",
+    target: "contact_book",
   },
   {
     id: 6,
