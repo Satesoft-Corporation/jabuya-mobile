@@ -45,7 +45,7 @@ const CreditSaleListItem = ({ sale }) => {
           </Text>
         </View>
 
-        <View style={{ alignItems: "center" }}>
+        {/* <View style={{ alignItems: "center" }}>
           <Text
             style={{
               fontWeight: 600,
@@ -55,7 +55,7 @@ const CreditSaleListItem = ({ sale }) => {
             Txns
           </Text>
           <Text>{"0"}</Text>
-        </View>
+        </View> */}
 
         <View style={{ alignItems: "center" }}>
           <Text

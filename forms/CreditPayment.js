@@ -10,7 +10,7 @@ import { convertToServerDate, formatNumberWithCommas } from "../utils/Utils";
 import Loader from "../components/Loader";
 import { BaseApiService } from "../utils/BaseApiService";
 import Snackbar from "../components/Snackbar";
-
+import DataRow from "../components/stocking/DataRow";
 const CreditPayment = ({ navigation, route }) => {
   const sale = { ...route.params };
 
@@ -66,35 +66,42 @@ const CreditPayment = ({ navigation, route }) => {
       <View
         style={{
           marginHorizontal: 5,
-          paddingHorizontal: 10,
+          paddingHorizontal: 12,
           marginVertical: 10,
           backgroundColor: Colors.light,
-          elevation: 5,
+          elevation: 1,
           shadowOffset: { width: 0, height: 1 },
           shadowOpacity: 0.2,
           borderRadius: 8,
         }}
       >
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View style={{ gap: 5, marginBottom: 5, paddingHorizontal: 2 }}>
           <Text
             style={{
               marginTop: 10,
               fontSize: 16,
+              fontWeight: 600,
             }}
           >
             Credit Payment
           </Text>
-          <Text
-            style={{
-              marginTop: 10,
-              fontSize: 16,
-            }}
-          >
-            Outstanding balance :{" "}
-            {formatNumberWithCommas(sale?.amountLoaned - sale?.amountRepaid)}
-          </Text>
         </View>
 
+        <DataRow
+          label={"Balance "}
+          labelTextStyle={{ fontSize: 15, paddingHorizontal: 4 }}
+          valueTextStyle={{ fontSize: 15 }}
+          value={
+            <>
+              <Text style={{ fontSize: 10 }}>UGX</Text>
+              <Text style={{ fontWeight: 600 }}>
+                {formatNumberWithCommas(
+                  sale?.amountLoaned - sale?.amountRepaid
+                )}
+              </Text>
+            </>
+          }
+        />
         <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
           <MyInput
             label="Client name"
@@ -143,7 +150,6 @@ const CreditPayment = ({ navigation, route }) => {
             marginBottom: 10,
           }}
         >
-          <ChipButton title={"Cancel"} />
           <ChipButton darkMode title={"Save"} onPress={savePayment} />
         </View>
       </View>

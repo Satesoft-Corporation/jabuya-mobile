@@ -18,7 +18,7 @@ const MyInput = ({
   if (isDateInput === false) {
     return (
       <View style={[{ gap: 5, marginBottom: 10 }, style]}>
-        <Text>{label}</Text>
+        <Text style={{ paddingHorizontal: 4 }}>{label}</Text>
 
         <TextInput
           value={value}
@@ -44,7 +44,7 @@ const MyInput = ({
   } else {
     return (
       <View style={{ flex: 1, gap: 5 }}>
-        <Text>{label}</Text>
+        <Text style={{ paddingHorizontal: 4 }}>{label}</Text>
         <DatePickerInput
           locale="en"
           value={value}

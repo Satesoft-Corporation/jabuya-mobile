@@ -91,6 +91,7 @@ const PaymentMethodComponent = ({
                 placeholder="Select client"
                 labelField="fullName"
                 valueField="id"
+                search={false}
               />
             </View>
           </View>

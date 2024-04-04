@@ -9,19 +9,19 @@ const CreditMenu = ({ navigation }) => {
   const menuItems = [
     {
       id: 1,
-      icon: require("../../../assets/icons/icons8-cash-register-50.png"),
+      icon: require("../../../assets/icons/open-hand.png"),
       title: "Credit Records",
       target: "credit_records",
     },
     {
       id: 2,
-      icon: require("../../../assets/icons/icons8-report-50.png"),
+      icon: require("../../../assets/icons/icons8-user-plus-48.png"),
       title: "Add Client",
       target: "new_client",
     },
     {
       id: 3,
-      icon: require("../../../assets/icons/icons8-box-50.png"),
+      icon: require("../../../assets/icons/icons8-book-48.png"),
       title: "Register",
       target: "client_register",
     },

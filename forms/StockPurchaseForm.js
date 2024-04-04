@@ -178,7 +178,6 @@ const StockPurchaseForm = ({ navigation, route }) => {
       const selectedRecord = {
         ...route.params,
       };
-      console.log(route.params);
 
       setLoading(false);
       setEdit(true);
@@ -233,7 +232,6 @@ const StockPurchaseForm = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    console.log(selectedProduct);
     getUnitPurchasePrice();
   }, [
     selectedProduct,

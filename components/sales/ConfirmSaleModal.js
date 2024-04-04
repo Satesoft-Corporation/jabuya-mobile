@@ -29,6 +29,7 @@ const ConfirmSaleModal = ({
   const [amountPaid, setAmountPaid] = useState("");
   const [serverError, setError] = useState(null);
   const [selectedClient, setSelectedClient] = useState(null);
+  const [disabled, setDisabled] = useState(false);
 
   const { userParams, selectedShop } = useContext(UserContext);
 
@@ -67,6 +68,7 @@ const ConfirmSaleModal = ({
     };
 
     setLoading(true);
+    setDisabled(true);
 
     NetInfo.fetch().then(async (state) => {
       if (state.isConnected) {
@@ -90,6 +92,7 @@ const ConfirmSaleModal = ({
                     setLoading(false);
                     clearEverything();
                     clearForm();
+                    setDisabled(false);
                     snackbarRef.current.show(
                       "Sale confirmed successfully",
                       4000
@@ -98,15 +101,21 @@ const ConfirmSaleModal = ({
                 })
                 .catch((error) => {
                   setLoading(false);
+                  setDisabled(false);
+
                   setError(`Failed to confirm sale!, ${error?.message}`);
                 });
             } else {
               setLoading(false);
+              setDisabled(false);
+
               setError(`Failed to confirm sale!, ${info?.message}`);
             }
           })
           .catch((error) => {
             setLoading(false);
+            setDisabled(false);
+
             setError(`Failed to confirm sale!,${error?.message}`);
           });
       } else {
@@ -305,7 +314,11 @@ const ConfirmSaleModal = ({
                 setAmountPaid(null);
               }}
             />
-            <PrimaryButton title={"Save"} onPress={postSales} />
+            <PrimaryButton
+              title={"Save"}
+              onPress={postSales}
+              disabled={disabled}
+            />
           </View>
         </View>
       </Card>

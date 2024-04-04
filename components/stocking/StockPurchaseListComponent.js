@@ -117,6 +117,8 @@ const StockPurchaseListComponent = ({ data, navigation }) => {
       {expanded && (
         <View>
           <DataRow
+            valueTextStyle={{ fontWeight: 600 }}
+            labelTextStyle={{ fontWeight: 600 }}
             label="Unit purchase cost"
             value={formatNumberWithCommas(
               Math.round(purchasePrice / purchasedQuantity)
@@ -146,7 +148,7 @@ const StockPurchaseListComponent = ({ data, navigation }) => {
           </Text>
         </View>
 
-        <View style={{ flexDirection: "row", gap: 10 }}>
+        <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
           {expanded && (
             <ChipButton2
               onPress={() => navigation?.navigate("newStockEntry", data)}

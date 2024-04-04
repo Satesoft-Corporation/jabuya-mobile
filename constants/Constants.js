@@ -27,20 +27,20 @@ export const categoryIcons = [
   },
   {
     id: 4,
-    icon: require("../assets/icons/icons8-chat-50.png"),
-    title: "Chat",
+    icon: require("../assets/icons/open-hand.png"),
+    title: "Credit/Debit",
+    target: "credit_menu",
   },
   {
     id: 5,
-    icon: require("../assets/icons/icons8-box-50.png"),
+    icon: require("../assets/icons/icons8-contact-book-64.png"),
     title: "Contact Book",
     target: "contact_book",
   },
   {
     id: 6,
     icon: require("../assets/icons/icons8-chat-50.png"),
-    title: "Credit/Debit",
-    target: "credit_menu",
+    title: "Chat",
   },
 ];
 
