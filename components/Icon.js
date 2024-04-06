@@ -6,6 +6,7 @@ import Colors from "../constants/Colors";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { screenWidth } from "../constants/Constants";
+import { useNavigation } from "@react-navigation/native";
 
 export function Icon({ icon, containerStyle, onPress, iconStyle, titleStyle }) {
   return (
@@ -70,6 +71,8 @@ export function Icon({ icon, containerStyle, onPress, iconStyle, titleStyle }) {
 
 export const IconsComponent = ({ clear }) => {
   let color = Colors.gray;
+  const navigation = useNavigation();
+
   return (
     <View
       style={{
@@ -122,6 +125,7 @@ export const IconsComponent = ({ clear }) => {
         <Text style={{ alignSelf: "center", color }}>Fap</Text>
       </TouchableOpacity>
       <TouchableOpacity
+        onPress={()=>navigation.navigate("credit_records")}
         style={{
           padding: 10,
           backgroundColor: Colors.light,
@@ -129,15 +133,14 @@ export const IconsComponent = ({ clear }) => {
           alignItems: "center",
           width: 63,
           height: 63,
-          opacity: 0.7,
         }}
       >
         <MaterialCommunityIcons
           name="hand-extended-outline"
           size={24}
-          color={color}
+          color={Colors.dark}
         />
-        <Text style={{ alignSelf: "center", color }}>Credit</Text>
+        <Text style={{ alignSelf: "center", color:Colors.dark }}>Credit</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={{

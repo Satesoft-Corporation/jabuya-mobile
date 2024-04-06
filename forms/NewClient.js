@@ -58,7 +58,6 @@ const NewClient = () => {
         snackRef.current.show("Client details saved", 4000);
       })
       .catch((e) => {
-        console.log(e);
         setLoading(false);
 
         snackRef.current.show(e?.message, 4000);
