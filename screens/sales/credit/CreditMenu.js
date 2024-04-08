@@ -4,7 +4,11 @@ import TopHeader from "../../../components/TopHeader";
 import AppStatusBar from "../../../components/AppStatusBar";
 import Colors from "../../../constants/Colors";
 import { Icon } from "../../../components/Icon";
-import { CLIENT_FORM, CLIENT_REGISTER, CREDIT_SALES } from "../../../navigation/ScreenNames";
+import {
+  CLIENT_FORM,
+  CLIENT_REGISTER,
+  CREDIT_SALES,
+} from "../../../navigation/ScreenNames";
 
 const CreditMenu = ({ navigation }) => {
   const menuItems = [

@@ -11,6 +11,7 @@ import { convertToServerDate } from "../utils/Utils";
 import Loader from "../components/Loader";
 import { BaseApiService } from "../utils/BaseApiService";
 import Snackbar from "../components/Snackbar";
+import { BaseStyle } from "../utils/BaseStyle";
 
 const NewClient = () => {
   const [firstName, setFirstName] = useState("");
@@ -69,18 +70,7 @@ const NewClient = () => {
       <AppStatusBar />
       <TopHeader title="Add Client" />
       <Loader loading={loading} />
-      <View
-        style={{
-          marginHorizontal: 5,
-          paddingHorizontal: 5,
-          marginVertical: 10,
-          backgroundColor: Colors.light,
-          elevation: 5,
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.2,
-          borderRadius: 8,
-        }}
-      >
+      <View style={BaseStyle.shadowedContainer}>
         <Text
           style={{
             marginTop: 10,

@@ -14,6 +14,7 @@ const MyInput = ({
   editable = true,
   mt = -5,
   numberOfLines = 1,
+  multiline = false,
 }) => {
   if (isDateInput === false) {
     return (
@@ -28,6 +29,7 @@ const MyInput = ({
           cursorColor={Colors.dark}
           editable={editable}
           numberOfLines={numberOfLines}
+          multiline={multiline}
           style={{
             backgroundColor: Colors.light,
             borderRadius: 5,

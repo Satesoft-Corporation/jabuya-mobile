@@ -7,12 +7,12 @@ import { useNavigation } from "@react-navigation/native";
 
 const TopHeader = ({
   title = "Details",
-  onBackPress,
   showSearch = false,
   searchTerm,
   setSearchTerm,
   onSearch,
   showShopName = true,
+  renderExtraIcon = () => {},
 }) => {
   const [showBar, setShowBar] = useState(false);
   const { selectedShop } = useContext(UserContext);
@@ -68,6 +68,8 @@ const TopHeader = ({
               alignItems: "center",
               minWidth: 30,
               justifyContent: "flex-end",
+              flexDirection: "row",
+              gap: 10,
             }}
           >
             {showSearch && (
@@ -83,6 +85,8 @@ const TopHeader = ({
                 />
               </TouchableOpacity>
             )}
+
+            {renderExtraIcon()}
           </View>
         </View>
 

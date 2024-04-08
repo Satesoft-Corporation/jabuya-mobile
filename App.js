@@ -29,6 +29,8 @@ import CreditPayment from "./forms/CreditPayment";
 import ContactBook from "./screens/ContactBook";
 import * as s from "./navigation/ScreenNames";
 import LandingScreen from "./screens/LandingScreen/LandingScreen";
+import Expenses from "./screens/expenses/Expenses";
+import ExpenseForm from "./screens/expenses/ExpenseForm";
 
 const Stack = createNativeStackNavigator();
 
@@ -106,6 +108,10 @@ export default function App() {
               />
 
               <Stack.Screen name={s.CONTACT_BOOK} component={ContactBook} />
+
+              <Stack.Screen name={s.EXPENSES} component={Expenses} />
+
+              <Stack.Screen name={s.EXPENSE_FORM} component={ExpenseForm} />
             </Stack.Navigator>
           </NavigationContainer>
         </SaleEntryProvider>

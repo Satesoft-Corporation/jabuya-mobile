@@ -20,7 +20,6 @@ export const CLIENT_FORM = "client_form";
 export const SUPPLIERS = "suppliers";
 export const CREDIT_PAYMENTS = "credit_payments";
 
-
 export const CONTACT_BOOK = "contact_book";
 export const CHAT = "chat";
 export const SETTINGS = "settings";
@@ -28,6 +27,7 @@ export const SETTINGS = "settings";
 export const SHOP_SUMMARY = "shop_summary";
 export const SHOP_SELECTION = "shop_selection";
 export const EXPENSES = "expenses";
+export const EXPENSE_FORM = "expense_form";
 
 export const LOCK_SCREEN = "lock_screen";
 export const LOCK_SETuP = "lock_setup";

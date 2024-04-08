@@ -16,14 +16,15 @@ export function Icon({ icon, containerStyle, onPress, iconStyle, titleStyle }) {
       style={{
         flex: 1,
         alignItems: "center",
-        margin: 10,
+        margin: 5,
         borderRadius: 5,
         backgroundColor: Colors.light,
-        minWidth: screenWidth / 2 - 30,
+        // maxWidth: screenWidth / 2 - 30,
         elevation: 2,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         padding: 10,
+        width: 200,
       }}
       onPress={onPress}
     >
@@ -59,6 +60,7 @@ export function Icon({ icon, containerStyle, onPress, iconStyle, titleStyle }) {
             fontSize: 15,
             margin: 10,
             fontWeight: "500",
+            textAlign: "center",
           },
           titleStyle,
         ]}
@@ -125,7 +127,7 @@ export const IconsComponent = ({ clear }) => {
         <Text style={{ alignSelf: "center", color }}>Fap</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={()=>navigation.navigate("credit_records")}
+        onPress={() => navigation.navigate("credit_records")}
         style={{
           padding: 10,
           backgroundColor: Colors.light,
@@ -140,7 +142,7 @@ export const IconsComponent = ({ clear }) => {
           size={24}
           color={Colors.dark}
         />
-        <Text style={{ alignSelf: "center", color:Colors.dark }}>Credit</Text>
+        <Text style={{ alignSelf: "center", color: Colors.dark }}>Credit</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={{

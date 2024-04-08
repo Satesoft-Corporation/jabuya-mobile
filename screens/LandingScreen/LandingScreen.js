@@ -207,7 +207,7 @@ const LandingScreen = ({ navigation }) => {
             <Icon icon={item} onPress={() => handleTabPress(item)} />
           )}
           keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
+          numColumns={3}
         />
       </View>
 
