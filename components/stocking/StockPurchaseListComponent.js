@@ -4,6 +4,7 @@ import { formatDate, formatNumberWithCommas } from "../../utils/Utils";
 import Colors from "../../constants/Colors";
 import ChipButton2 from "../buttons/ChipButton2";
 import DataRow from "./DataRow";
+import { STOCK_ENTRY_FORM } from "../../navigation/ScreenNames";
 
 const StockPurchaseListComponent = ({ data, navigation }) => {
   const [expanded, setExpanded] = useState(false);
@@ -151,7 +152,7 @@ const StockPurchaseListComponent = ({ data, navigation }) => {
         <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
           {expanded && (
             <ChipButton2
-              onPress={() => navigation?.navigate("newStockEntry", data)}
+              onPress={() => navigation?.navigate(STOCK_ENTRY_FORM, data)}
               title={"Edit"}
               darkMode={false}
             />

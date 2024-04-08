@@ -118,7 +118,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
       expiryDate: convertToServerDate(expiryDate),
       id: 0,
       manufacturerId: selectedProduct?.manufacturerId,
-      productId: selectedProduct?.productId,
+      productId: edit ? selectedProduct?.productId : selectedProduct?.id,
       productName: selectedProduct?.productName,
       shopId: selectedShop?.id,
       stockedOnDate: convertToServerDate(purchaseDate),
