@@ -44,8 +44,8 @@ export const navList = [
     title: "Chat",
   },
   {
-    id: 6,
-    icon: require("../../assets/icons/icons8-chat-50.png"),
+    id: 7,
+    icon: require("../../assets/icons/spending.png"),
     title: "Expenses",
     target: EXPENSES,
   },

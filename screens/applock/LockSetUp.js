@@ -19,7 +19,8 @@ const LockSetUp = ({ navigation, route }) => {
   const [pinReady, setIsPinReady] = useState(false);
   const [errorText, setErrorText] = useState(null);
 
-  const { hasUserSetPinCode, setHasUserSetPinCode } = useContext(UserContext);
+  const { hasUserSetPinCode, setHasUserSetPinCode, setLoginWithPin } =
+    useContext(UserContext);
 
   const onNumberPress = (num) => {
     let tempCode = [...pinCode];
@@ -66,6 +67,8 @@ const LockSetUp = ({ navigation, route }) => {
       if (confirmPinCode?.join("") === confirmPinCode2?.join("")) {
         UserSessionUtils.setUserPinCode(pinCode.join(""));
         setHasUserSetPinCode(true);
+        setLoginWithPin(true);
+
         UserSessionUtils.setPinLoginTime(String(new Date()));
         navigation.goBack();
         return true;

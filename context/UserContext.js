@@ -72,6 +72,10 @@ export const UserProvider = ({ children }) => {
       if (data) {
         setHasUserSetPinCode(true);
         setUserPinCode(data);
+        setLoginWithPin(true);
+      } else {
+        setHasUserSetPinCode(false);
+        setLoginWithPin(false);
       }
     });
   };
@@ -84,6 +88,12 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     getAppLockStatus();
   }, [hasUserSetPinCode, userParams]);
+
+  useEffect(() => {
+    if (hasUserSetPinCode === false) {
+      setLoginWithPin(false);
+    }
+  }, [logInWithPin]);
 
   const data = {
     sessionObj,
@@ -98,6 +108,7 @@ export const UserProvider = ({ children }) => {
     setSelectedShop,
     getShopsFromStorage,
     logInWithPin,
+    setLoginWithPin,
     reload,
     setReload,
   };

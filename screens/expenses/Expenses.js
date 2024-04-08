@@ -32,7 +32,7 @@ const Expenses = ({}) => {
 
       const searchParameters = {
         limit: MAXIMUM_RECORDS_PER_FETCH,
-        shopId:selectedShop?.id,
+        shopId: selectedShop?.id,
         offset: offset,
       };
 
@@ -86,7 +86,7 @@ const Expenses = ({}) => {
       <TopHeader title="Expenses" renderExtraIcon={addBtn} />
 
       <FlatList
-        data={[3, 7, 1, 2, 2, 3, 3, 4, 7]}
+        data={expenses}
         renderItem={({ item }) => <ExpenseCard />}
         ListEmptyComponent={() => (
           <View

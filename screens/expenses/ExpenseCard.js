@@ -26,7 +26,7 @@ const ExpenseCard = () => {
           >
             Description
           </Text>
-          <Text>This thhwgui hwuh9w wwg9y</Text>
+          <Text>Description</Text>
         </View>
         <View style={{ alignItems: "center", flex: 1 }}>
           <Text

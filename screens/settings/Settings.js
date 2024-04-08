@@ -4,37 +4,42 @@ import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import { SafeAreaView } from "react-native";
 import Colors from "../../constants/Colors";
-import SettingsBar from "../../components/SettingsBar";
+import SettingsBar from "./SettingsBar";
 import Constants from "expo-constants";
 import { UserContext } from "../../context/UserContext";
 import DisplayMessage from "../../components/Dialogs/DisplayMessage";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import { LOCK_SETuP } from "../../navigation/ScreenNames";
+import UserProfile from "../../components/UserProfile";
+import { BaseStyle } from "../../utils/BaseStyle";
+import { Switch } from "react-native-paper";
 
 const Settings = ({ navigation }) => {
-  const { hasUserSetPinCode, sessionObj } = useContext(UserContext);
+  const { hasUserSetPinCode, sessionObj, logInWithPin, setLoginWithPin } =
+    useContext(UserContext);
 
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
   const [agreeText, setAgreeText] = useState("");
   const [canCancel, setCanCancel] = useState(false);
-  const [agreeFn, setAgreeFn] = useState(() => {});
 
-  const { role, fullName } = sessionObj;
+  const onToggleSwitch = () => {
+    setLoginWithPin(!logInWithPin);
 
-  const handleAppLockPress = () => {
-    if (hasUserSetPinCode === true) {
-      setMessage("Pin code is already set, would you like to change it?");
-      setAgreeText("Yes");
-      setCanCancel(true);
-      setShowModal(true);
-    } else {
+    if (hasUserSetPinCode === false) {
       navigation.navigate(LOCK_SETuP);
     }
   };
+  const { role, fullName } = sessionObj;
 
   const logOut = () => {
     UserSessionUtils.clearLocalStorageAndLogout(navigation);
+  };
+  const handleLogout = () => {
+    setMessage("Are you sure you want to log out?");
+    setAgreeText("Yes");
+    setCanCancel(true);
+    setShowModal(true);
   };
 
   return (
@@ -43,108 +48,114 @@ const Settings = ({ navigation }) => {
 
       <TopHeader title="Settings" showShopName={false} />
 
-      <View style={{ paddingHorizontal: 10 }}>
-        <View style={{ marginTop: 20 }}>
-          <Text style={{ fontSize: 16 }}>Account</Text>
-
-          <View
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: Colors.dark,
+          paddingVertical: 10,
+        }}
+      >
+        <Image
+          source={require("../../assets/images/man_placeholder.jpg")}
+          style={{
+            width: 45,
+            height: 45,
+            resizeMode: "cover",
+            borderRadius: 10,
+            marginStart: 5,
+            borderWidth: 1,
+            borderColor: Colors.dark,
+          }}
+        />
+        <View
+          style={{
+            marginHorizontal: 5,
+          }}
+        >
+          <Text
             style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: 10,
-              borderBottomWidth: 1,
-              borderBottomColor: Colors.gray,
-              paddingBottom: 10,
-              alignItems: "center",
+              fontWeight: 400,
+              color: Colors.primary,
             }}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Image
-                source={require("../../assets/images/man_placeholder.jpg")}
-                style={{
-                  width: 50,
-                  height: 50,
-                  resizeMode: "cover",
-                  borderRadius: 50,
-                  marginStart: 5,
-                  borderWidth: 1,
-                  borderColor: Colors.dark,
-                }}
-              />
-              <View
-                style={{
-                  marginHorizontal: 5,
-                }}
-              >
-                <Text
-                  style={{
-                    fontWeight: 400,
-                    // fontSize: 12,
-                  }}
-                >
-                  {fullName}
-                </Text>
-                <Text
-                  style={{
-                    fontWeight: 300,
-                    // fontSize: 11,
-                  }}
-                >
-                  {role}
-                </Text>
-              </View>
-            </View>
+            {fullName}
+          </Text>
+          <Text
+            style={{
+              fontWeight: 300,
+              color: Colors.primary,
+            }}
+          >
+            {role}
+          </Text>
+        </View>
+      </View>
 
-            <Image
-              source={require("../../assets/icons/icons8-right-arrow-50.png")}
-              style={{
-                width: 15,
-                height: 15,
-                resizeMode: "cover",
-                alignSelf: "center",
-                justifyContent: "center",
-              }}
+      <View style={{ paddingHorizontal: 10 }}>
+        <View style={{ marginTop: 20 }}>
+          <Text style={{ fontSize: 16 }}>Personal</Text>
+          <View style={BaseStyle.shadowedContainer}>
+            <SettingsBar
+              icon={require("../../assets/icons/icons8-font-size-60.png")}
+              text="Text font size"
+            />
+
+            <SettingsBar
+              icon={require("../../assets/icons/ic_notification.png")}
+              text="Notfications"
+            />
+
+            <SettingsBar
+              icon={require("../../assets/icons/icons8-magnetic-card-50.png")}
+              text="Subscriptions"
             />
           </View>
         </View>
 
         <View style={{ marginTop: 20 }}>
-          <Text style={{ fontSize: 16 }}>Settings</Text>
+          <Text style={{ fontSize: 16 }}>Security and Mangement</Text>
+          <View style={BaseStyle.shadowedContainer}>
+            <SettingsBar
+              icon={require("../../assets/icons/icons8-shield-50.png")}
+              text="Password"
+            />
 
-          <SettingsBar
-            icon={require("../../assets/icons/icons8-lock-24.png")}
-            text="App lock"
-            onPress={() => handleAppLockPress()}
-          />
+            <SettingsBar
+              icon={require("../../assets/icons/icons8-shield-50.png")}
+              text="Pin Lock"
+              renderRight={() => (
+                <Switch
+                  style={{ height: 20 }}
+                  value={logInWithPin}
+                  onValueChange={onToggleSwitch}
+                />
+              )}
+            />
 
-          <SettingsBar
-            icon={require("../../assets/icons/ic_notification.png")}
-            text="Notfications"
-          />
-
-          <SettingsBar
-            icon={require("../../assets/icons/ic_notification.png")}
-            text="Privacy"
-          />
-
-          <SettingsBar
-            icon={require("../../assets/icons/ic_notification.png")}
-            text="Contact us"
-          />
-
-          <SettingsBar
-            icon={require("../../assets/icons/icons8-logout-30.png")}
-            text="Log out"
-            onPress={logOut}
-          />
+            <SettingsBar
+              icon={require("../../assets/icons/icons8-shield-50.png")}
+              text="Help center"
+            />
+            <SettingsBar
+              icon={require("../../assets/icons/icons8-shield-50.png")}
+              text="Terms and privacy"
+            />
+          </View>
         </View>
+
+        <SettingsBar
+          onPress={handleLogout}
+          icon={require("../../assets/icons/icons8-logout-48.png")}
+          text="Logout"
+          tintColor={Colors.primary}
+          textColor={Colors.primary}
+          textStyle={{ fontSize: 17 }}
+          style={[
+            BaseStyle.shadowedContainer,
+            { backgroundColor: Colors.dark, paddingVertical: 7 },
+          ]}
+        />
       </View>
 
       <View
@@ -162,7 +173,7 @@ const Settings = ({ navigation }) => {
       <DisplayMessage
         showModal={showMoodal}
         message={message}
-        onAgree={() => navigation.navigate("locksetup")}
+        onAgree={logOut}
         agreeText={agreeText}
         setShowModal={setShowModal}
         canCancel={canCancel}

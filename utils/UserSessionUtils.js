@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StorageParams from "../constants/StorageParams";
-import { CommonActions } from "@react-navigation/native";
+import { StackActions } from "@react-navigation/native";
 import { LOGIN } from "../navigation/ScreenNames";
 export class UserSessionUtils {
   /**
@@ -26,13 +26,7 @@ export class UserSessionUtils {
   static async clearLocalStorageAndLogout(navigation) {
     // remove all
     await AsyncStorage.clear();
-    const { dispatch } = navigation;
-    dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: LOGIN }],
-      })
-    );
+    navigation.dispatch(StackActions.replace(LOGIN));
   }
 
   /**

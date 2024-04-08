@@ -30,6 +30,7 @@ const UserProfile = () => {
         marginTop: 10,
         alignItems: "center",
         paddingHorizontal: 10,
+        backgroundColor:Colors.dark
       }}
     >
       <View

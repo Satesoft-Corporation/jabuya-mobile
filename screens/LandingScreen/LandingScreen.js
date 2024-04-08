@@ -7,7 +7,6 @@ import { BlackScreen } from "../../components/BlackAndWhiteScreen";
 import AppStatusBar from "../../components/AppStatusBar";
 import SelectShopBar from "../../components/SelectShopBar";
 import { Icon } from "../../components/Icon";
-import { categoryIcons } from "../../constants/Constants";
 import { UserContext } from "../../context/UserContext";
 import { BaseApiService } from "../../utils/BaseApiService";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
@@ -53,13 +52,6 @@ const LandingScreen = ({ navigation }) => {
     setShops([]);
   };
 
-  const confirmLogout = () => {
-    setMessage("Are you sure you want to log out?");
-    setAgreeText("Yes");
-    setCanCancel(true);
-    setShowModal(true);
-  };
-
   const logInPrompt = () => {
     setMessage("Your session has expired, please login to continue.");
     setAgreeText("Login");
@@ -71,7 +63,7 @@ const LandingScreen = ({ navigation }) => {
     const { days, hours } = timeDiff;
 
     if (hours >= 12 || days > 0) {
-      //trigger the logout dialog every after 5 hrs
+      //trigger the logout dialog every after 12hr
       logInPrompt();
       return null;
     }
