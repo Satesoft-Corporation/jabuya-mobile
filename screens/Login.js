@@ -16,6 +16,7 @@ import CircularProgress from "../components/CircularProgress";
 import { CommonActions } from "@react-navigation/native";
 import { onDummyLogin } from "../utils/Utils";
 import DisplayMessage from "../components/Dialogs/DisplayMessage";
+import { LANDING_SCREEN } from "../navigation/ScreenNames";
 
 export default function Login({ navigation }) {
   const [username, setUsername] = useState("mosesjespar@gmail.com");
@@ -51,8 +52,8 @@ export default function Login({ navigation }) {
           await UserSessionUtils.setFullSessionObject(info);
           await UserSessionUtils.setShopid(String(info.user.attendantShopId));
           await UserSessionUtils.setLoginTime(String(date));
-          await UserSessionUtils.resetPendingSales()
-          navigation.navigate("welcome");
+          await UserSessionUtils.resetPendingSales();
+          navigation.navigate(LANDING_SCREEN);
           setPassword("");
           setUsername("");
           setTimeout(() => setDisabled(false), 1000);
@@ -60,7 +61,7 @@ export default function Login({ navigation }) {
           dispatch(
             CommonActions.reset({
               index: 0,
-              routes: [{ name: "welcome" }],
+              routes: [{ name: LANDING_SCREEN }],
             })
           );
         } else if (status === 400) {

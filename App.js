@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./screens/Login";
-import LandingScreen from "./screens/LandingScreen";
 import ViewSales from "./screens/sales/ViewSales";
-import SalesEntry from "./screens/sales/SalesEntry";
+import SalesEntry from "./screens/SalesDesk/SalesEntry";
 import ShopSummary from "./screens/ShopSummary";
 import Stocking from "./screens/Stocking";
 import StockPurchaseForm from "./forms/StockPurchaseForm";
@@ -28,6 +27,8 @@ import NewClient from "./forms/NewClient";
 import ClientRegister from "./screens/sales/credit/ClientRegister";
 import CreditPayment from "./forms/CreditPayment";
 import ContactBook from "./screens/ContactBook";
+import * as s from "./navigation/ScreenNames";
+import LandingScreen from "./screens/LandingScreen/LandingScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -53,53 +54,58 @@ export default function App() {
                 headerShown: false,
               }}
             >
-              <Stack.Screen name="welcome" component={LandingScreen} />
+              <Stack.Screen name={s.LANDING_SCREEN} component={LandingScreen} />
 
-              <Stack.Screen name="login" component={Login} />
+              <Stack.Screen name={s.LOGIN} component={Login} />
 
-              <Stack.Screen name="salesEntry" component={SalesEntry} />
+              <Stack.Screen name={s.SALES_DESK} component={SalesEntry} />
 
-              <Stack.Screen name="viewSales" component={ViewSales} />
+              <Stack.Screen name={s.SALES_REPORTS} component={ViewSales} />
 
-              <Stack.Screen name="barcodeScreen" component={BarCodeScreen} />
+              <Stack.Screen name={s.BARCODE_SCREEN} component={BarCodeScreen} />
 
-              <Stack.Screen name="shopSummary" component={ShopSummary} />
+              <Stack.Screen name={s.SHOP_SUMMARY} component={ShopSummary} />
 
-              <Stack.Screen name="stocking" component={Stocking} />
+              <Stack.Screen name={s.STOCKNG} component={Stocking} />
 
-              <Stack.Screen name="stockEntries" component={StockPurchase} />
+              <Stack.Screen name={s.STOCK_ENTRY} component={StockPurchase} />
 
-              <Stack.Screen name="stockLevels" component={StockLevels} />
+              <Stack.Screen name={s.STOCK_LEVELS} component={StockLevels} />
 
-              <Stack.Screen name="stockListing" component={StockListing} />
+              <Stack.Screen name={s.STOCK_LISTING} component={StockListing} />
 
-              <Stack.Screen name="selectShops" component={SelectShops} />
+              <Stack.Screen name={s.SHOP_SELECTION} component={SelectShops} />
 
-              <Stack.Screen name="productEntry" component={ProductEntry} />
+              <Stack.Screen name={s.PDT_ENTRY} component={ProductEntry} />
 
               <Stack.Screen
-                name="newStockEntry"
+                name={s.STOCK_ENTRY_FORM}
                 component={StockPurchaseForm}
               />
 
-              <Stack.Screen name="settings" component={Settings} />
+              <Stack.Screen name={s.SETTINGS} component={Settings} />
 
-              <Stack.Screen name="lockscreen" component={LockScreen} />
+              <Stack.Screen name={s.LOCK_SCREEN} component={LockScreen} />
 
-              <Stack.Screen name="locksetup" component={LockSetUp} />
+              <Stack.Screen name={s.LOCK_SETuP} component={LockSetUp} />
 
-              <Stack.Screen name="credit_menu" component={CreditMenu} />
+              <Stack.Screen name={s.CREDIT_MENU} component={CreditMenu} />
 
-              <Stack.Screen name="credit_records" component={CreditSales} />
+              <Stack.Screen name={s.CREDIT_SALES} component={CreditSales} />
 
-              <Stack.Screen name="new_client" component={NewClient} />
+              <Stack.Screen name={s.CLIENT_FORM} component={NewClient} />
 
-              <Stack.Screen name="client_register" component={ClientRegister} />
+              <Stack.Screen
+                name={s.CLIENT_REGISTER}
+                component={ClientRegister}
+              />
 
-              <Stack.Screen name="credit_payments" component={CreditPayment} />
+              <Stack.Screen
+                name={s.CREDIT_PAYMENTS}
+                component={CreditPayment}
+              />
 
-              <Stack.Screen name="contact_book" component={ContactBook} />
-
+              <Stack.Screen name={s.CONTACT_BOOK} component={ContactBook} />
             </Stack.Navigator>
           </NavigationContainer>
         </SaleEntryProvider>

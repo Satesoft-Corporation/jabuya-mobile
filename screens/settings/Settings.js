@@ -9,6 +9,7 @@ import Constants from "expo-constants";
 import { UserContext } from "../../context/UserContext";
 import DisplayMessage from "../../components/Dialogs/DisplayMessage";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
+import { LOCK_SETuP } from "../../navigation/ScreenNames";
 
 const Settings = ({ navigation }) => {
   const { hasUserSetPinCode, sessionObj } = useContext(UserContext);
@@ -28,7 +29,7 @@ const Settings = ({ navigation }) => {
       setCanCancel(true);
       setShowModal(true);
     } else {
-      navigation.navigate("locksetup");
+      navigation.navigate(LOCK_SETuP);
     }
   };
 
@@ -40,11 +41,7 @@ const Settings = ({ navigation }) => {
     <SafeAreaView style={{ flex: 1 }}>
       <AppStatusBar />
 
-      <TopHeader
-        title="Settings"
-        showShopName={false}
-        
-      />
+      <TopHeader title="Settings" showShopName={false} />
 
       <View style={{ paddingHorizontal: 10 }}>
         <View style={{ marginTop: 20 }}>

@@ -5,20 +5,26 @@ import Colors from "../constants/Colors";
 import { FlatList } from "react-native";
 import TopHeader from "../components/TopHeader";
 import AppStatusBar from "../components/AppStatusBar";
+import {
+  STOCK_ENTRY,
+  STOCK_ENTRY_FORM,
+  STOCK_LEVELS,
+  STOCK_LISTING,
+} from "../navigation/ScreenNames";
 
 const Stocking = ({ navigation }) => {
   let list = [
     {
       title: "Stock purchases",
-      target: "stockEntries",
+      target: STOCK_ENTRY,
     },
     {
       title: "Make a purchase",
-      target: "newStockEntry",
+      target: STOCK_ENTRY_FORM,
     },
     {
       title: "Shop products",
-      target: "stockListing",
+      target: STOCK_LISTING,
     },
     // {
     //   title: "Add product",
@@ -26,7 +32,7 @@ const Stocking = ({ navigation }) => {
     // },
     {
       title: "Stock levels",
-      target: "stockLevels",
+      target: STOCK_LEVELS,
     },
   ];
 
@@ -45,7 +51,7 @@ const Stocking = ({ navigation }) => {
     >
       <AppStatusBar content="light-content" bgColor="black" />
 
-      <TopHeader title="Stocking"  />
+      <TopHeader title="Stocking" />
       <FlatList
         style={{ flex: 1, marginTop: 10, paddingHorizontal: 10 }}
         data={list}

@@ -5,45 +5,6 @@ export const packageOptions = [
   { value: "Unpacked", type: false },
 ];
 
-export const categoryIcons = [
-  // landing screen icons
-  {
-    id: 1,
-    icon: require("../assets/icons/icons8-cash-register-50.png"),
-    title: "Sales Desk",
-    target: "salesEntry",
-  },
-  {
-    id: 2,
-    icon: require("../assets/icons/icons8-report-50.png"),
-    title: "Reports",
-    target: "viewSales",
-  },
-  {
-    id: 3,
-    icon: require("../assets/icons/icons8-box-50.png"),
-    title: "Stocking",
-    target: "stocking",
-  },
-  {
-    id: 4,
-    icon: require("../assets/icons/open-hand.png"),
-    title: "Credit/Debit",
-    target: "credit_menu",
-  },
-  {
-    id: 5,
-    icon: require("../assets/icons/icons8-contact-book-64.png"),
-    title: "Contact Book",
-    target: "contact_book",
-  },
-  {
-    id: 6,
-    icon: require("../assets/icons/icons8-chat-50.png"),
-    title: "Chat",
-  },
-];
-
 export const MAXIMUM_RECORDS_PER_FETCH = 20;
 
 export const screenWidth = Dimensions.get("window").width;

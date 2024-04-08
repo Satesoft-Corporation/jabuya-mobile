@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StorageParams from "../constants/StorageParams";
 import { CommonActions } from "@react-navigation/native";
+import { LOGIN } from "../navigation/ScreenNames";
 export class UserSessionUtils {
   /**
    * This is used to get the user's bearer token.
@@ -29,7 +30,7 @@ export class UserSessionUtils {
     dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: "login" }],
+        routes: [{ name: LOGIN }],
       })
     );
   }

@@ -4,6 +4,7 @@ import TopHeader from "../../../components/TopHeader";
 import AppStatusBar from "../../../components/AppStatusBar";
 import Colors from "../../../constants/Colors";
 import { Icon } from "../../../components/Icon";
+import { CLIENT_FORM, CLIENT_REGISTER, CREDIT_SALES } from "../../../navigation/ScreenNames";
 
 const CreditMenu = ({ navigation }) => {
   const menuItems = [
@@ -11,19 +12,19 @@ const CreditMenu = ({ navigation }) => {
       id: 1,
       icon: require("../../../assets/icons/open-hand.png"),
       title: "Credit Records",
-      target: "credit_records",
+      target: CREDIT_SALES,
     },
     {
       id: 2,
       icon: require("../../../assets/icons/icons8-user-plus-48.png"),
       title: "Add Client",
-      target: "new_client",
+      target: CLIENT_FORM,
     },
     {
       id: 3,
       icon: require("../../../assets/icons/icons8-book-48.png"),
       title: "Register",
-      target: "client_register",
+      target: CLIENT_REGISTER,
     },
     {
       id: 4,

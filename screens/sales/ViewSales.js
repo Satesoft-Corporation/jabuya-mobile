@@ -23,6 +23,7 @@ import { SaleTransactionItem } from "../../components/TransactionItems";
 import Loader from "../../components/Loader";
 import { DateCalender } from "../../components/Dialogs/DateCalendar";
 import { UserContext } from "../../context/UserContext";
+import { SHOP_SUMMARY } from "../../navigation/ScreenNames";
 
 export default function ViewSales({ navigation }) {
   const [sales, setSales] = useState([]);
@@ -243,7 +244,7 @@ export default function ViewSales({ navigation }) {
                     height: 25,
                     justifyContent: "center",
                   }}
-                  onPress={() => navigation.navigate("shopSummary")}
+                  onPress={() => navigation.navigate(SHOP_SUMMARY)}
                 >
                   <Text
                     style={{

@@ -32,6 +32,7 @@ import EnterSaleQtyModal from "../../components/sales/EnterSaleQtyModal";
 import ConfirmSaleModal from "../../components/sales/ConfirmSaleModal";
 import SalesTable from "../../components/sales/SalesTable";
 import { SafeAreaView } from "react-native";
+import { SALES_REPORTS } from "../../navigation/ScreenNames";
 
 function SalesEntry({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -186,7 +187,7 @@ function SalesEntry({ navigation }) {
 
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("viewSales");
+            navigation.navigate(SALES_REPORTS);
           }}
           style={{
             backgroundColor: Colors.primary,

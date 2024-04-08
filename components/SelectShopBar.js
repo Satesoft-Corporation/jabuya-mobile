@@ -4,13 +4,15 @@ import Colors from "../constants/Colors";
 import { Image } from "react-native";
 import { UserContext } from "../context/UserContext";
 import { useContext } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { SHOP_SELECTION } from "../navigation/ScreenNames";
 
 const SelectShopBar = ({ onPress, showIcon = true }) => {
   const { selectedShop } = useContext(UserContext);
-
+  const navigation = useNavigation();
   return (
     <TouchableOpacity
-      onPress={onPress}
+      onPress={() => navigation.navigate(SHOP_SELECTION)}
       style={{
         flexDirection: "row",
         justifyContent: "space-between",
