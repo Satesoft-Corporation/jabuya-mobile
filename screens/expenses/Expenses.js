@@ -39,7 +39,6 @@ const Expenses = ({}) => {
       const response = await new BaseApiService(
         "/shop/expenses"
       ).getRequestWithJsonResponse(searchParameters);
-      console.log(response.records);
       setExpenses((prevEntries) => [...prevEntries, ...response?.records]);
 
       setTotalItems(response?.totalItems);

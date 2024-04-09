@@ -1,7 +1,6 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import Colors from "../constants/Colors";
-import { screenWidth } from "../constants/Constants";
 import { Image } from "react-native";
 
 const StockingIcon = ({ title, onPress, disabled = false }) => {
@@ -12,11 +11,12 @@ const StockingIcon = ({ title, onPress, disabled = false }) => {
       style={{
         backgroundColor: Colors.light,
         borderRadius: 6,
-        minWidth: screenWidth / 2 - 30,
+        width: 200,
         margin: 10,
         elevation: 2,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
+        flex:1
       }}
     >
       <View

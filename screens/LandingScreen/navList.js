@@ -29,7 +29,7 @@ export const navList = [
   {
     id: 4,
     icon: require("../../assets/icons/open-hand.png"),
-    title: "Credit/Debit",
+    title: "Credit/Debt",
     target: CREDIT_MENU,
   },
   {

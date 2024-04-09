@@ -33,7 +33,6 @@ const ExpenseForm = () => {
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setCategories(response.records);
-        console.log(response.records)
         setLoading(false);
       })
       .catch((error) => {
