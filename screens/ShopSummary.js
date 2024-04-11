@@ -3,7 +3,6 @@ import React, { useContext, useEffect, useState } from "react";
 import AppStatusBar from "../components/AppStatusBar";
 import Colors from "../constants/Colors";
 import { BaseApiService } from "../utils/BaseApiService";
-import { ItemHeader } from "./sales/ViewSales";
 import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import UserProfile from "../components/UserProfile";
 import Loader from "../components/Loader";

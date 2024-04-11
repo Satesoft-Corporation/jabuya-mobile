@@ -17,8 +17,17 @@ export const UserProvider = ({ children }) => {
   const getShopsFromStorage = () => {
     UserSessionUtils.getShops().then((ownerShops) => {
       if (ownerShops) {
-        setShops(ownerShops);
         setSelectedShop(ownerShops[0]);
+        if (ownerShops?.length > 1) {
+          const allShops = {
+            name: "All shops",
+            id: userParams?.shopOwnerId,
+          };
+
+          setShops([allShops, ...ownerShops]);
+        } else {
+          setShops(ownerShops);
+        }
       }
     });
 

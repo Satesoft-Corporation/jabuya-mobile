@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  Alert,
-  TouchableOpacity,
-  FlatList,
-  Image,
-} from "react-native";
+import { View, Text, TouchableOpacity, FlatList, Image } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 
 import { BaseApiService } from "../../utils/BaseApiService";
@@ -19,33 +12,33 @@ import {
   getCurrentDay,
 } from "../../utils/Utils";
 import UserProfile from "../../components/UserProfile";
-import { SaleTransactionItem } from "../../components/TransactionItems";
-import Loader from "../../components/Loader";
 import { DateCalender } from "../../components/Dialogs/DateCalendar";
 import { UserContext } from "../../context/UserContext";
-import { SHOP_SUMMARY } from "../../navigation/ScreenNames";
+import { SHOP_SELECTION, SHOP_SUMMARY } from "../../navigation/ScreenNames";
+import { ActivityIndicator } from "react-native";
+import { SaleTransactionItem } from "./SaleTransactionItem";
+import ItemHeader from "./ItemHeader";
 
 export default function ViewSales({ navigation }) {
   const [sales, setSales] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [totalSalesQty, setTotalSalesQty] = useState(0); //total quantity for all sold items
-  const [loading, setLoading] = useState(false);
   const [offset, setOffset] = useState(0);
   const [visible, setVisible] = useState(false);
   const [filtering, setFiltering] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [salesValue, setSalesValue] = useState(0); //total money value sold
-  const [searchPeriod, setSearchPeriod] = useState("Today");
   const [saleCapital, setSaleCapital] = useState([]); //capital list
   const [profits, setProfits] = useState([]); //profits list
-  const [emptyMsg, setEmptyMsg] = useState(null);
   const [daysProfit, setDaysProfit] = useState(0);
   const [daysCapital, setDaysCapital] = useState(0);
+  const [message, setMessage] = useState(null);
+  const [showFooter, setShowFooter] = useState(true);
 
-  const { userParams } = useContext(UserContext);
+  const { userParams, selectedShop } = useContext(UserContext);
 
-  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-    userParams;
+  const { isShopOwner, isShopAttendant, shopOwnerId } = userParams;
 
   const handleDayPress = (day) => {
     if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
@@ -72,20 +65,45 @@ export default function ViewSales({ navigation }) {
   const clearFields = () => {
     //reseting calculatable fields
     setSales([]);
-    setLoading(true);
     setSalesValue(0);
     setTotalSalesQty(0);
     setProfits([]);
     setSaleCapital([]);
     setDaysCapital(0);
     setDaysProfit(0);
-    setEmptyMsg(null);
+    setMessage(null);
+    setTotalItems(0);
+  };
+
+  const renderFooter = () => {
+    if (showFooter === true) {
+      if (sales.length === totalItems && sales.length > 0) {
+        return null;
+      }
+
+      return (
+        <View style={{ paddingVertical: 20 }}>
+          <ActivityIndicator animating size="large" color={Colors.dark} />
+        </View>
+      );
+    }
   };
 
   const getSales = async (startDate, endDate) => {
+    const getAllData = selectedShop?.id === shopOwnerId;
+
     let searchParameters = {
       offset: offset,
       limit: 0,
+      /**
+       * conditionally set search parameters based on the shop selections
+       */
+      ...(getAllData && {
+        shopOwnerId: selectedShop?.id,
+      }),
+      ...(!getAllData && {
+        shopId: selectedShop?.id,
+      }),
     };
     clearFields();
 
@@ -104,22 +122,25 @@ export default function ViewSales({ navigation }) {
       //specific day setting
       searchParameters.endDate = convertDateFormat(startDate, true);
     }
-    if (isShopOwner) {
-      searchParameters.shopOwnerId = shopOwnerId;
-    }
-    if (isShopAttendant) {
-      searchParameters.shopId = attendantShopId;
-    }
+
+    setShowFooter(true);
+    setMessage(null);
+
     new BaseApiService("/shop-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
-        let sV = response.records.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
+        const data = [...response.records].filter(
+          (sale) => sale?.balanceGivenOut >= 0
+        ); //to filter out credit sales
+
+        let sV = data.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
 
         if (response.totalItems === 0) {
-          setEmptyMsg("No sales made on this today");
+          setMessage("No sales made on this today");
+          setShowFooter(false);
         }
 
-        [...response.records].forEach((item) => {
+        data.forEach((item) => {
           const { lineItems } = item;
           if (lineItems !== undefined) {
             let cartQty = lineItems.reduce((a, item) => a + item.quantity, 0);
@@ -141,15 +162,12 @@ export default function ViewSales({ navigation }) {
         setDaysProfit(formatNumberWithCommas(Math.round(income)));
         setDaysCapital(formatNumberWithCommas(Math.round(capital)));
         setSalesValue(sV);
+        setShowFooter(false);
         setSales(response?.records);
-
-        setTimeout(() => {
-          setLoading(false);
-        }, 100);
       })
       .catch((error) => {
-        Alert.alert("Cannot get sales!", error?.message);
-        setLoading(false);
+        setShowFooter(false);
+        setMessage("Cannot get sales!", error?.message);
       });
   };
 
@@ -169,17 +187,15 @@ export default function ViewSales({ navigation }) {
 
   useEffect(() => {
     getSales();
-  }, []);
+  }, [selectedShop]);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <Loader loading={loading} />
+      <AppStatusBar />
 
-      <AppStatusBar bgColor="black" content="light-content" />
-
-      <View style={{ flex: 1.2, backgroundColor: "black" }}>
+      <View style={{ backgroundColor: Colors.dark }}>
         <UserProfile />
-        <View style={{ flex: 0.8, marginTop: 5 }}>
+        <View style={{ marginTop: 5, paddingBottom: 10 }}>
           <View
             style={{
               flexDirection: "row",
@@ -260,6 +276,7 @@ export default function ViewSales({ navigation }) {
               )}
             </View>
           </View>
+
           <View
             style={{
               flexDirection: "row",
@@ -297,6 +314,17 @@ export default function ViewSales({ navigation }) {
             />
             <ItemHeader title="Income" value={daysProfit} />
           </View>
+
+          {isShopOwner && (
+            <TouchableOpacity
+              style={{ paddingTop: 10 }}
+              onPress={() => navigation.navigate(SHOP_SELECTION)}
+            >
+              <Text style={{ color: Colors.primary, textAlign: "center" }}>
+                {selectedShop?.name}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -308,33 +336,31 @@ export default function ViewSales({ navigation }) {
           }}
         >
           <View style={{ marginTop: 1, flex: 1 }}>
-            {sales.length > 0 ? (
-              <FlatList
-                containerStyle={{ padding: 5 }}
-                showsHorizontalScrollIndicator={false}
-                data={sales}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item, i }) => (
-                  <SaleTransactionItem
-                    key={i}
-                    data={item}
-                    isShopOwner={isShopOwner}
-                  />
-                )}
-              />
-            ) : (
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text style={{ color: "black", textAlign: "center" }}>
-                  {emptyMsg}
-                </Text>
-              </View>
-            )}
+            <FlatList
+              containerStyle={{ padding: 5 }}
+              showsHorizontalScrollIndicator={false}
+              data={sales}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item, i }) => (
+                <SaleTransactionItem
+                  key={i}
+                  data={item}
+                  isShopOwner={isShopOwner}
+                />
+              )}
+              ListEmptyComponent={() => (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {totalItems === 0 && <Text>{message}</Text>}
+                </View>
+              )}
+              ListFooterComponent={renderFooter}
+            />
           </View>
         </View>
       </View>
@@ -351,36 +377,6 @@ export default function ViewSales({ navigation }) {
         setSelectedStartDate={setSelectedStartDate}
         moreCancelActions={() => {}}
       />
-    </View>
-  );
-}
-
-export function ItemHeader({ title, value, ugx = true }) {
-  return (
-    <View style={{ alignItems: "center" }}>
-      <Text
-        style={{
-          fontSize: 12,
-          color: Colors.primary,
-          alignSelf: "flex-start",
-          opacity: 0.6,
-          marginBottom: 3,
-        }}
-      >
-        {title}
-      </Text>
-      <Text style={{ fontSize: 15, color: Colors.primary, fontWeight: "600" }}>
-        {ugx && (
-          <Text
-            style={{
-              fontSize: 10,
-            }}
-          >
-            UGX
-          </Text>
-        )}{" "}
-        {value}
-      </Text>
     </View>
   );
 }
