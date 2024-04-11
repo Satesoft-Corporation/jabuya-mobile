@@ -40,6 +40,7 @@ export function SaleTransactionItem({ data, isShopOwner }) {
         backgroundColor: "white",
         paddingVertical: 15,
         paddingHorizontal: 10,
+        borderWidth: balanceGivenOut < 0 ? 1 : 0,
       }}
     >
       <View

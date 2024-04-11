@@ -2,7 +2,7 @@ import { View, Text, SafeAreaView, FlatList } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import AppStatusBar from "../../../components/AppStatusBar";
 import TopHeader from "../../../components/TopHeader";
-import { Icon } from "../../../components/Icon";
+import { MenuIcon } from "../../../components/MenuIcon";
 import { BaseApiService } from "../../../utils/BaseApiService";
 import CreditSaleListItem from "../../../components/credit/CreditSaleListItem";
 import Snackbar from "../../../components/Snackbar";

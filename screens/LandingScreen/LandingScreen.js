@@ -6,7 +6,7 @@ import UserProfile from "../../components/UserProfile";
 import { BlackScreen } from "../../components/BlackAndWhiteScreen";
 import AppStatusBar from "../../components/AppStatusBar";
 import SelectShopBar from "../../components/SelectShopBar";
-import { Icon } from "../../components/Icon";
+import { MenuIcon } from "../../components/MenuIcon";
 import { UserContext } from "../../context/UserContext";
 import { BaseApiService } from "../../utils/BaseApiService";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
@@ -196,7 +196,7 @@ const LandingScreen = ({ navigation }) => {
           style={{ marginTop: 10 }}
           data={navList}
           renderItem={({ item }) => (
-            <Icon icon={item} onPress={() => handleTabPress(item)} />
+            <MenuIcon icon={item} onPress={() => handleTabPress(item)} />
           )}
           keyExtractor={(item) => item.id.toString()}
           numColumns={3}

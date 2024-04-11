@@ -18,7 +18,7 @@ import UserProfile from "../../components/UserProfile";
 import { SalesDropdownComponent } from "../../components/DropdownComponents";
 import { formatNumberWithCommas, isValidNumber } from "../../utils/Utils";
 import { BlackScreen } from "../../components/BlackAndWhiteScreen";
-import { IconsComponent } from "../../components/Icon";
+import { IconsComponent } from "../../components/MenuIcon";
 import Loader from "../../components/Loader";
 import Snackbar from "../../components/Snackbar";
 import { useRef } from "react";

@@ -2,7 +2,12 @@ import { View, Text } from "react-native";
 import React from "react";
 import ChipButton2 from "../buttons/ChipButton2";
 
-const CardFooter2 = ({ label, btnTitle = "", onBtnPress }) => {
+const CardFooter2 = ({
+  label,
+  btnTitle = "",
+  onBtnPress,
+  renderBtn = true,
+}) => {
   return (
     <View
       style={{
@@ -25,7 +30,7 @@ const CardFooter2 = ({ label, btnTitle = "", onBtnPress }) => {
           justifyContent: "center",
         }}
       >
-        <ChipButton2 title={btnTitle} onPress={onBtnPress} />
+        {renderBtn && <ChipButton2 title={btnTitle} onPress={onBtnPress} />}
       </View>
     </View>
   );

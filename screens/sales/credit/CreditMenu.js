@@ -3,7 +3,7 @@ import React from "react";
 import TopHeader from "../../../components/TopHeader";
 import AppStatusBar from "../../../components/AppStatusBar";
 import Colors from "../../../constants/Colors";
-import { Icon } from "../../../components/Icon";
+import { MenuIcon } from "../../../components/MenuIcon";
 import {
   CLIENT_FORM,
   CLIENT_REGISTER,
@@ -52,7 +52,7 @@ const CreditMenu = ({ navigation }) => {
           style={{ marginTop: 10 }}
           data={menuItems}
           renderItem={({ item }) => (
-            <Icon icon={item} onPress={() => handleIconPress(item)} />
+            <MenuIcon icon={item} onPress={() => handleIconPress(item)} />
           )}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}

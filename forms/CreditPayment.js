@@ -14,13 +14,13 @@ import DataRow from "../components/stocking/DataRow";
 const CreditPayment = ({ navigation, route }) => {
   const sale = { ...route.params };
 
+  let balance = sale?.amountLoaned - sale?.amountRepaid;
+
   const [paymentDate, setPaymentDate] = useState(new Date());
   const [amount, setAmount] = useState("");
   const [remarks, setRemarks] = useState("");
 
   const [loading, setLoading] = useState(false);
-
-  const { selectedShop } = useContext(UserContext);
 
   const snackRef = useRef(null);
 
@@ -31,7 +31,6 @@ const CreditPayment = ({ navigation, route }) => {
 
   const savePayment = async () => {
     // setSubmitted(true);
-    setLoading(true);
     let payLoad = {
       id: 0,
       creditSaleId: sale?.sale?.id,
@@ -39,7 +38,7 @@ const CreditPayment = ({ navigation, route }) => {
       paymentDate: convertToServerDate(paymentDate),
     };
 
-    const isValidSubmision = true;
+    const isValidSubmision = Number(amount) <= balance;
 
     if (isValidSubmision) {
       setLoading(true);
@@ -53,8 +52,14 @@ const CreditPayment = ({ navigation, route }) => {
           snackRef.current.show("Payment saved succesfully");
         })
         .catch((error) => {
-          snackRef.current.show(error?.message);
+          setLoading(false);
+          snackRef.current.show(error?.message, 5000);
         });
+    } else {
+      snackRef.current.show(
+        `Amount should not exceed UGX ${formatNumberWithCommas(balance)}`,
+        5000
+      );
     }
   };
 
@@ -95,9 +100,7 @@ const CreditPayment = ({ navigation, route }) => {
             <>
               <Text style={{ fontSize: 10 }}>UGX</Text>
               <Text style={{ fontWeight: 600 }}>
-                {formatNumberWithCommas(
-                  sale?.amountLoaned - sale?.amountRepaid
-                )}
+                {formatNumberWithCommas(balance)}
               </Text>
             </>
           }

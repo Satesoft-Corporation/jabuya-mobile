@@ -8,6 +8,8 @@ import { useNavigation } from "@react-navigation/native";
 
 const CreditSaleListItem = ({ sale }) => {
   const navigation = useNavigation();
+
+  const balance = sale?.amountLoaned - sale?.amountRepaid;
   return (
     <View
       style={{
@@ -90,13 +92,12 @@ const CreditSaleListItem = ({ sale }) => {
           >
             Balance
           </Text>
-          <Text>
-            {formatNumberWithCommas(sale?.amountLoaned - sale?.amountRepaid)}
-          </Text>
+          <Text>{formatNumberWithCommas(balance)}</Text>
         </View>
       </View>
 
       <CardFooter2
+        renderBtn={balance > 0}
         label={`Served by: ${sale?.createdByFullName}`}
         btnTitle="Pay"
         onBtnPress={() => {

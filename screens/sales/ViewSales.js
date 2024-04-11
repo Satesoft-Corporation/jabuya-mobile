@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, FlatList, Image } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 
 import { BaseApiService } from "../../utils/BaseApiService";
 
@@ -18,6 +18,8 @@ import { SHOP_SELECTION, SHOP_SUMMARY } from "../../navigation/ScreenNames";
 import { ActivityIndicator } from "react-native";
 import { SaleTransactionItem } from "./SaleTransactionItem";
 import ItemHeader from "./ItemHeader";
+import Icon from "../../components/Icon";
+import SalesPopupMenu from "./SalesPopupMenu";
 
 export default function ViewSales({ navigation }) {
   const [sales, setSales] = useState([]);
@@ -39,6 +41,8 @@ export default function ViewSales({ navigation }) {
   const { userParams, selectedShop } = useContext(UserContext);
 
   const { isShopOwner, isShopAttendant, shopOwnerId } = userParams;
+
+  const menuRef = useRef();
 
   const handleDayPress = (day) => {
     if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
@@ -185,6 +189,24 @@ export default function ViewSales({ navigation }) {
     setTotalSalesQty((prevCount) => prevCount + count);
   };
 
+  const renderMenuIcon = () => {
+    return (
+      <>
+        <Icon
+          groupName="Entypo"
+          name="dots-three-vertical"
+          size={20}
+          color={Colors.primary}
+        />
+
+        <SalesPopupMenu
+          menuRef={menuRef}
+          reload={getSales}
+          showDatePicker={() => setVisible(true)}
+        />
+      </>
+    );
+  };
   useEffect(() => {
     getSales();
   }, [selectedShop]);
@@ -194,7 +216,13 @@ export default function ViewSales({ navigation }) {
       <AppStatusBar />
 
       <View style={{ backgroundColor: Colors.dark }}>
-        <UserProfile />
+        <UserProfile
+          renderNtnIcon={false}
+          renderExtraIcon={true}
+          onPress={() => menuRef.current.open()}
+          extraIcon={renderMenuIcon}
+        />
+
         <View style={{ marginTop: 5, paddingBottom: 10 }}>
           <View
             style={{
@@ -204,77 +232,25 @@ export default function ViewSales({ navigation }) {
               marginVertical: 10,
             }}
           >
-            <View style={{ justifyContent: "center" }}>
-              <Text
-                style={{
-                  color: Colors.primary,
-                  fontSize: 16,
-                  fontWeight: 600,
-                  marginTop: 8,
-                }}
-              >
-                Sales summary
-              </Text>
-              {/* <Text
-                style={{
-                  color: Colors.primary,
-                  fontSize: 16,
-                  fontWeight: 400,
-                  marginTop: 3,
-                }}
-              >
-                Period : {searchPeriod}
-              </Text> */}
-            </View>
-
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            <Text
+              style={{
+                color: Colors.primary,
+                fontSize: 16,
+                fontWeight: 600,
+              }}
             >
-              <TouchableOpacity onPress={handleRefresh}>
-                <Image
-                  source={require("../../assets/icons/icons8-refresh-50.png")}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    tintColor: Colors.primary,
-                    marginEnd: 10,
-                  }}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setVisible(true)}>
-                <Image
-                  source={require("../../assets/icons/icons8-calendar-26.png")}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    tintColor: Colors.primary,
-                    marginEnd: 10,
-                  }}
-                />
-              </TouchableOpacity>
-              {isShopAttendant !== true && (
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: Colors.primary,
-                    borderRadius: 3,
-                    height: 25,
-                    justifyContent: "center",
-                  }}
-                  onPress={() => navigation.navigate(SHOP_SUMMARY)}
-                >
-                  <Text
-                    style={{
-                      color: Colors.dark,
-                      paddingHorizontal: 6,
-                      alignSelf: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    Investment
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
+              Sales summary
+            </Text>
+
+            <Text
+              style={{
+                color: Colors.primary,
+                fontWeight: 600,
+                opacity: 0.7,
+              }}
+            >
+              {selectedShop?.name}
+            </Text>
           </View>
 
           <View
@@ -314,56 +290,24 @@ export default function ViewSales({ navigation }) {
             />
             <ItemHeader title="Income" value={daysProfit} />
           </View>
-
-          {isShopOwner && (
-            <TouchableOpacity
-              style={{ paddingTop: 10 }}
-              onPress={() => navigation.navigate(SHOP_SELECTION)}
-            >
-              <Text style={{ color: Colors.primary, textAlign: "center" }}>
-                {selectedShop?.name}
-              </Text>
-            </TouchableOpacity>
-          )}
         </View>
       </View>
 
-      <View style={{ backgroundColor: Colors.light_2, flex: 3 }}>
-        <View
-          style={{
-            flex: 3,
-            paddingBottom: 20,
-          }}
-        >
-          <View style={{ marginTop: 1, flex: 1 }}>
-            <FlatList
-              containerStyle={{ padding: 5 }}
-              showsHorizontalScrollIndicator={false}
-              data={sales}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item, i }) => (
-                <SaleTransactionItem
-                  key={i}
-                  data={item}
-                  isShopOwner={isShopOwner}
-                />
-              )}
-              ListEmptyComponent={() => (
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {totalItems === 0 && <Text>{message}</Text>}
-                </View>
-              )}
-              ListFooterComponent={renderFooter}
-            />
-          </View>
-        </View>
-      </View>
+      <FlatList
+        containerStyle={{ padding: 5 }}
+        showsHorizontalScrollIndicator={false}
+        data={sales}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item, i }) => (
+          <SaleTransactionItem key={i} data={item} isShopOwner={isShopOwner} />
+        )}
+        ListEmptyComponent={() => (
+          <Text style={{ flex: 1, textAlign: "center", alignSelf: "center" }}>
+            {message}
+          </Text>
+        )}
+        ListFooterComponent={renderFooter}
+      />
 
       <DateCalender
         selectedEndDate={selectedEndDate}

@@ -6,7 +6,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../context/UserContext";
 
-const UserProfile = () => {
+const UserProfile = ({
+  renderNtnIcon = true,
+  renderExtraIcon = false,
+  extraIcon,
+  onPress,
+}) => {
   const [shops, setShops] = useState(null);
   const navigation = useNavigation();
 
@@ -30,7 +35,7 @@ const UserProfile = () => {
         marginTop: 10,
         alignItems: "center",
         paddingHorizontal: 10,
-        backgroundColor:Colors.dark
+        backgroundColor: Colors.dark,
       }}
     >
       <View
@@ -88,13 +93,19 @@ const UserProfile = () => {
         </View>
       </View>
 
-      <TouchableOpacity style={{ marginEnd: 10 }}>
-        <Ionicons
-          name="notifications-outline"
-          size={20}
-          color={Colors.primary_light}
-        />
-      </TouchableOpacity>
+      {renderNtnIcon && (
+        <TouchableOpacity style={{ marginEnd: 10 }}>
+          <Ionicons
+            name="notifications-outline"
+            size={20}
+            color={Colors.primary_light}
+          />
+        </TouchableOpacity>
+      )}
+
+      {renderExtraIcon && (
+        <TouchableOpacity onPress={onPress}>{extraIcon()}</TouchableOpacity>
+      )}
     </View>
   );
 };
