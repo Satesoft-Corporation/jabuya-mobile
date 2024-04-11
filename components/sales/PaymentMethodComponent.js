@@ -45,6 +45,14 @@ const PaymentMethodComponent = ({
       >
         Payment method
       </Text>
+      <View
+        style={{
+          height: 1,
+          backgroundColor: Colors.dark,
+          opacity: 0.2,
+          marginVertical: 5,
+        }}
+      />
       <FlatList
         data={paymentMethods}
         renderItem={({ item }) => (
@@ -79,7 +87,7 @@ const PaymentMethodComponent = ({
               gap: 10,
             }}
           >
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, marginTop: 5 }}>
               <MyDropDown
                 style={{
                   backgroundColor: Colors.light,
@@ -138,7 +146,7 @@ const PaymentMethodComponent = ({
                   marginStart: 6,
                 }}
               >
-                Sold on
+                Date
               </Text>
 
               <SoldOnDateComponent />

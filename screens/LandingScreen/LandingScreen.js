@@ -15,7 +15,7 @@ import DisplayMessage from "../../components/Dialogs/DisplayMessage";
 import Loader from "../../components/Loader";
 import { CommonActions } from "@react-navigation/native";
 import { navList } from "./navList";
-import { LOCK_SCREEN } from "../../navigation/ScreenNames";
+import { LOCK_SCREEN, STOCK_ENTRY } from "../../navigation/ScreenNames";
 
 const LandingScreen = ({ navigation }) => {
   const {
@@ -70,7 +70,7 @@ const LandingScreen = ({ navigation }) => {
 
     if (item.target) {
       if (item.target === "stocking" && userParams?.isShopAttendant === true) {
-        navigation.navigate("stockEntries");
+        navigation.navigate(STOCK_ENTRY);
         return null;
       } else {
         navigation.navigate(item.target);

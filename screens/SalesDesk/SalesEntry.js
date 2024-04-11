@@ -42,7 +42,8 @@ function SalesEntry({ navigation }) {
 
   const snackbarRef = useRef(null);
 
-  const { userParams, selectedShop } = useContext(UserContext);
+  const { userParams, selectedShop, shops, setSelectedShop } =
+    useContext(UserContext);
 
   const {
     selections,
@@ -62,24 +63,17 @@ function SalesEntry({ navigation }) {
     setUnitCost,
   } = useContext(SaleEntryContext);
 
-  const { isShopOwner, isShopAttendant, attendantShopId } = userParams;
+  const { isShopOwner, isShopAttendant, shopOwnerId } = userParams;
 
   const fetchProducts = async () => {
     let searchParameters = {
       offset: 0,
       limit: 10000,
+      shopId: selectedShop?.id,
     };
 
     if (searchTerm !== null) {
       searchParameters.searchTerm = searchTerm;
-    }
-
-    if (isShopOwner) {
-      searchParameters.shopId = selectedShop?.id;
-    }
-
-    if (isShopAttendant) {
-      searchParameters.shopId = attendantShopId;
     }
 
     NetInfo.fetch().then(async (state) => {
@@ -134,6 +128,10 @@ function SalesEntry({ navigation }) {
 
   useEffect(() => {
     clearEverything();
+
+    if (selectedShop?.id === shopOwnerId) {
+      setSelectedShop(shops[1]);
+    }
   }, [selectedShop]);
 
   const handleChange = (value) => {
