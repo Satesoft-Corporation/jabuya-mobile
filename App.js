@@ -35,7 +35,7 @@ import StockPurchase from "./screens/stocking/StockPurchase";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  //changing the borderan text color of the date input fields
+  //changing the border and text color of the date input fields
   const theme = {
     ...DefaultTheme,
     colors: {

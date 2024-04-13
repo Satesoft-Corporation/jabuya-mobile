@@ -162,12 +162,6 @@ const StockPurchaseForm = ({ navigation, route }) => {
           setSubmitted(false);
           setLoading(false);
           snackBarRef.current.show("Stock entry saved successfully", 4000);
-
-          if (edit && reload === false) {
-            //force a reload
-            setReload(true);
-            navigation.goBack();
-          }
         })
         .catch((error) => {
           snackBarRef.current.show(error?.message, 5000);

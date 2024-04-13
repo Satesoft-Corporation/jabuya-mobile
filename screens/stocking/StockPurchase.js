@@ -21,7 +21,7 @@ const StockPurchase = () => {
   const [disable, setDisable] = useState(false);
 
   const snackbarRef = useRef(null);
-  const { userParams, reload, setReload } = useContext(UserContext);
+  const { userParams } = useContext(UserContext);
 
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
     userParams;
@@ -36,7 +36,7 @@ const StockPurchase = () => {
         limit: MAXIMUM_RECORDS_PER_FETCH,
         ...(isShopAttendant && { shopId: attendantShopId }),
         ...(isShopOwner && { shopOwnerId }),
-        offset: reload === true ? 0 : offset,
+        offset: offset,
         ...(searchTerm &&
           searchTerm.trim() !== "" && { searchTerm: searchTerm }),
       };
@@ -61,7 +61,6 @@ const StockPurchase = () => {
         setMessage(`No results found for ${searchTerm}`);
         setShowFooter(false);
       }
-
       setIsFetchingMore(false);
     } catch (error) {
       setDisable(false);
@@ -88,10 +87,7 @@ const StockPurchase = () => {
 
   useEffect(() => {
     fetchStockEntries();
-    if (reload === true) {
-      snackbarRef.current.show("Record saved successfully");
-    }
-  }, [offset, reload]);
+  }, [offset]);
 
   const renderFooter = () => {
     if (showFooter === true) {
