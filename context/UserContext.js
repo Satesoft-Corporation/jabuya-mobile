@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
+import { BaseApiService } from "../utils/BaseApiService";
 
 export const UserContext = createContext();
 
@@ -89,9 +90,16 @@ export const UserProvider = ({ children }) => {
     });
   };
 
+  const getRefreshToken = () => {
+    new BaseApiService("/auth/refresh/token")
+      .refreshTokenRequest()
+      .then((r) => console.log(r));
+  };
+
   useEffect(() => {
     getShopsFromStorage();
     getSessionObj();
+    // getRefreshToken()
   }, [userParams]);
 
   useEffect(() => {
