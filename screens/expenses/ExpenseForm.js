@@ -49,7 +49,7 @@ const ExpenseForm = () => {
       shopId: selectedShop?.id,
     };
 
-    new BaseApiService("/shops/expenses")
+    new BaseApiService("/shop/expenses")
       .saveRequestWithJsonResponse(payload, false)
       .then((response) => {
         setLoading(false);
