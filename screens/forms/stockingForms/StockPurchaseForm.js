@@ -7,27 +7,28 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import Colors from "../constants/Colors";
-import AppStatusBar from "../components/AppStatusBar";
-import { MyDropDown } from "../components/DropdownComponents";
-import { BaseApiService } from "../utils/BaseApiService";
-import { packageOptions } from "../constants/Constants";
-import Loader from "../components/Loader";
+import Colors from "../../../constants/Colors";
+import AppStatusBar from "../../../components/AppStatusBar";
+import { MyDropDown } from "../../../components/DropdownComponents";
+import { BaseApiService } from "../../../utils/BaseApiService";
+import { packageOptions } from "../../../constants/Constants";
+import Loader from "../../../components/Loader";
 import { KeyboardAvoidingView } from "react-native";
 import {
   convertToServerDate,
   formatNumberWithCommas,
   hasNull,
-} from "../utils/Utils";
-import { UserContext } from "../context/UserContext";
+} from "../../../utils/Utils";
+import { UserContext } from "../../../context/UserContext";
 import { useContext } from "react";
-import TopHeader from "../components/TopHeader";
-import Snackbar from "../components/Snackbar";
-import PrimaryButton from "../components/buttons/PrimaryButton";
+import TopHeader from "../../../components/TopHeader";
+import Snackbar from "../../../components/Snackbar";
+import PrimaryButton from "../../../components/buttons/PrimaryButton";
 import { DatePickerInput } from "react-native-paper-dates";
 
 const StockPurchaseForm = ({ navigation, route }) => {
-  const { selectedShop, userParams, setReload } = useContext(UserContext);
+  const { selectedShop, userParams, setReload, reload } =
+    useContext(UserContext);
 
   const { shopOwnerId } = userParams;
 
@@ -161,8 +162,11 @@ const StockPurchaseForm = ({ navigation, route }) => {
           setSubmitted(false);
           setLoading(false);
           snackBarRef.current.show("Stock entry saved successfully", 4000);
-          if (edit) {
+
+          if (edit && reload === false) {
+            //force a reload
             setReload(true);
+            navigation.goBack();
           }
         })
         .catch((error) => {

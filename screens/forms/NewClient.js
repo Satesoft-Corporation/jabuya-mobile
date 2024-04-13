@@ -1,17 +1,17 @@
 import { View, Text, SafeAreaView } from "react-native";
 import React, { useState, useContext, useRef } from "react";
-import TopHeader from "../components/TopHeader";
-import AppStatusBar from "../components/AppStatusBar";
-import Colors from "../constants/Colors";
-import MyInput from "../components/MyInput";
-import { MyDropDown } from "../components/DropdownComponents";
-import ChipButton from "../components/buttons/ChipButton";
-import { UserContext } from "../context/UserContext";
-import { convertToServerDate } from "../utils/Utils";
-import Loader from "../components/Loader";
-import { BaseApiService } from "../utils/BaseApiService";
-import Snackbar from "../components/Snackbar";
-import { BaseStyle } from "../utils/BaseStyle";
+import TopHeader from "../../components/TopHeader";
+import AppStatusBar from "../../components/AppStatusBar";
+import Colors from "../../constants/Colors";
+import MyInput from "../../components/MyInput";
+import { MyDropDown } from "../../components/DropdownComponents";
+import ChipButton from "../../components/buttons/ChipButton";
+import { UserContext } from "../../context/UserContext";
+import { convertToServerDate } from "../../utils/Utils";
+import Loader from "../../components/Loader";
+import { BaseApiService } from "../../utils/BaseApiService";
+import Snackbar from "../../components/Snackbar";
+import { BaseStyle } from "../../utils/BaseStyle";
 
 const NewClient = () => {
   const [firstName, setFirstName] = useState("");

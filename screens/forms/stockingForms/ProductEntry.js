@@ -1,17 +1,17 @@
 import { View, Text, TextInput, ScrollView } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import Colors from "../constants/Colors";
-import AppStatusBar from "../components/AppStatusBar";
-import { MyDropDown } from "../components/DropdownComponents";
-import { BaseApiService } from "../utils/BaseApiService";
-import Loader from "../components/Loader";
+import Colors from "../../../constants/Colors";
+import AppStatusBar from "../../../components/AppStatusBar";
+import { MyDropDown } from "../../../components/DropdownComponents";
+import { BaseApiService } from "../../../utils/BaseApiService";
+import Loader from "../../../components/Loader";
 import { KeyboardAvoidingView } from "react-native";
-import { hasNull } from "../utils/Utils";
-import { UserContext } from "../context/UserContext";
+import { hasNull } from "../../..//utils/Utils";
+import { UserContext } from "../../../context/UserContext";
 import { useContext } from "react";
-import TopHeader from "../components/TopHeader";
-import Snackbar from "../components/Snackbar";
-import PrimaryButton from "../components/buttons/PrimaryButton";
+import TopHeader from "../../../components/TopHeader";
+import Snackbar from "../../../components/Snackbar";
+import PrimaryButton from "../../../components/buttons/PrimaryButton";
 
 const ProductEntry = ({ navigation, route }) => {
   const { selectedShop } = useContext(UserContext);

@@ -1,31 +1,34 @@
 import { View, Text, SafeAreaView } from "react-native";
 import React, { useState, useContext, useRef, useEffect } from "react";
-import TopHeader from "../components/TopHeader";
-import AppStatusBar from "../components/AppStatusBar";
-import Colors from "../constants/Colors";
-import MyInput from "../components/MyInput";
-import ChipButton from "../components/buttons/ChipButton";
-import { UserContext } from "../context/UserContext";
-import { convertToServerDate, formatNumberWithCommas } from "../utils/Utils";
-import Loader from "../components/Loader";
-import { BaseApiService } from "../utils/BaseApiService";
-import Snackbar from "../components/Snackbar";
-import DataRow from "../components/cardComponents/DataRow";
+import TopHeader from "../../components/TopHeader";
+import AppStatusBar from "../../components/AppStatusBar";
+import Colors from "../../constants/Colors";
+import MyInput from "../../components/MyInput";
+import ChipButton from "../../components/buttons/ChipButton";
+import { UserContext } from "../../context/UserContext";
+import { convertToServerDate, formatNumberWithCommas } from "../../utils/Utils";
+import Loader from "../../components/Loader";
+import { BaseApiService } from "../../utils/BaseApiService";
+import Snackbar from "../../components/Snackbar";
+import DataRow from "../../components/cardComponents/DataRow";
+
 const CreditPayment = ({ navigation, route }) => {
   const sale = { ...route.params };
 
   let balance = sale?.amountLoaned - sale?.amountRepaid;
 
   const [paymentDate, setPaymentDate] = useState(new Date());
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState("0");
   const [remarks, setRemarks] = useState("");
 
   const [loading, setLoading] = useState(false);
 
   const snackRef = useRef(null);
 
+  const { reload, setReload } = useContext(UserContext);
+
   const clearForm = () => {
-    setAmount("");
+    setAmount("0");
     setRemarks("");
   };
 
@@ -44,12 +47,12 @@ const CreditPayment = ({ navigation, route }) => {
       setLoading(true);
 
       new BaseApiService(`/credit-sales/${sale?.id}/payments`)
-        .postRequest(payLoad)
-        .then((d) => d.json())
+        .saveRequestWithJsonResponse(payLoad, false)
         .then(async (response) => {
           setLoading(false);
           clearForm();
-          snackRef.current.show("Payment saved succesfully");
+          setReload(true);
+          navigation.goBack();
         })
         .catch((error) => {
           setLoading(false);

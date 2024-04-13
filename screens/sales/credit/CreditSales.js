@@ -22,7 +22,7 @@ const CreditSales = () => {
 
   const snackbarRef = useRef(null);
 
-  const { userParams } = useContext(UserContext);
+  const { userParams, reload, setReload } = useContext(UserContext);
 
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
     userParams;
@@ -32,7 +32,7 @@ const CreditSales = () => {
       limit: MAXIMUM_RECORDS_PER_FETCH,
       ...(isShopAttendant && { shopId: attendantShopId }),
       ...(isShopOwner && { shopOwnerId }),
-      offset: offset,
+      offset: reload === true ? 0 : offset,
       ...(searchTerm && searchTerm.trim() !== "" && { searchTerm: searchTerm }),
     };
 
@@ -47,7 +47,6 @@ const CreditSales = () => {
         setCreditSales((prevEntries) => [...prevEntries, ...response?.records]);
 
         setTotalRecords(response.totalItems);
-        setIsLoading(false);
 
         if (response?.totalItems === 0) {
           setMessage("No shop products found");
@@ -68,7 +67,10 @@ const CreditSales = () => {
 
   useEffect(() => {
     fetchCreditSales();
-  }, [offset]);
+    if (reload === true) {
+      snackbarRef.current.show("Payment saved succesfully");
+    }
+  }, [offset, reload]);
 
   const renderFooter = () => {
     if (showFooter === true) {

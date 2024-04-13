@@ -28,6 +28,7 @@ const StockPurchase = () => {
 
   const fetchStockEntries = async () => {
     try {
+      setStockEntries([]);
       setShowFooter(true);
       setMessage(null);
 
@@ -35,7 +36,7 @@ const StockPurchase = () => {
         limit: MAXIMUM_RECORDS_PER_FETCH,
         ...(isShopAttendant && { shopId: attendantShopId }),
         ...(isShopOwner && { shopOwnerId }),
-        offset: offset,
+        offset: reload === true ? 0 : offset,
         ...(searchTerm &&
           searchTerm.trim() !== "" && { searchTerm: searchTerm }),
       };
@@ -50,7 +51,6 @@ const StockPurchase = () => {
 
       setStockEntryRecords(response?.totalItems);
       setDisable(false);
-      setReload(false);
 
       if (response?.totalItems === 0) {
         setMessage("No stock entries found");
@@ -87,11 +87,9 @@ const StockPurchase = () => {
   };
 
   useEffect(() => {
+    fetchStockEntries();
     if (reload === true) {
-      const reload = () => fetchStockEntries();
-      reload();
-    } else {
-      fetchStockEntries();
+      snackbarRef.current.show("Record saved successfully");
     }
   }, [offset, reload]);
 

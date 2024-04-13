@@ -12,7 +12,7 @@ export const UserProvider = ({ children }) => {
   const [sessionObj, setSessionObj] = useState(null);
   const [logInWithPin, setLoginWithPin] = useState(false);
 
-  const [reload, setReload] = useState(false); // flag for reloading screen when a record edit is made
+  const [reload, setReload] = useState(false); // flag for reloading screen when a record edit or save is made
 
   const getShopsFromStorage = () => {
     UserSessionUtils.getShops().then((ownerShops) => {
