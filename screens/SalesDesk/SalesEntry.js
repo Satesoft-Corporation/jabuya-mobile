@@ -32,7 +32,11 @@ import EnterSaleQtyModal from "../../components/sales/EnterSaleQtyModal";
 import ConfirmSaleModal from "../../components/sales/ConfirmSaleModal";
 import SalesTable from "../../components/sales/SalesTable";
 import { SafeAreaView } from "react-native";
-import { SALES_REPORTS } from "../../navigation/ScreenNames";
+import {
+  BARCODE_SCREEN,
+  SALES_REPORTS,
+  SHOP_SELECTION,
+} from "../../navigation/ScreenNames";
 
 function SalesEntry({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -214,7 +218,7 @@ function SalesEntry({ navigation }) {
           {isShopOwner && (
             <SelectShopBar
               showIcon={false}
-              onPress={() => navigation.navigate("selectShops")}
+              onPress={() => navigation.navigate(SHOP_SELECTION)}
             />
           )}
 
@@ -225,7 +229,7 @@ function SalesEntry({ navigation }) {
             handleChange={(t) => handleChange(t)}
             setLoading={() => setLoading(false)}
             makeSelection={makeSelection}
-            setScanned={() => navigation.navigate("barcodeScreen")}
+            setScanned={() => navigation.navigate(BARCODE_SCREEN)}
           />
         </View>
       </BlackScreen>

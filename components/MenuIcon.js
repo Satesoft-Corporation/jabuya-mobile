@@ -7,6 +7,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { screenWidth } from "../constants/Constants";
 import { useNavigation } from "@react-navigation/native";
+import { CREDIT_SALES } from "../navigation/ScreenNames";
 
 export function MenuIcon({ icon, containerStyle, onPress, iconStyle, titleStyle }) {
   return (
@@ -127,7 +128,7 @@ export const IconsComponent = ({ clear }) => {
         <Text style={{ alignSelf: "center", color }}>Fap</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => navigation.navigate("credit_records")}
+        onPress={() => navigation.navigate(CREDIT_SALES)}
         style={{
           padding: 10,
           backgroundColor: Colors.light,
