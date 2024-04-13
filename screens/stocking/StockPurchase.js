@@ -1,16 +1,16 @@
 import { View, Text, FlatList } from "react-native";
 import React, { useContext, useState, useEffect, useRef } from "react";
-import TopHeader from "../components/TopHeader";
-import AppStatusBar from "../components/AppStatusBar";
-import Colors from "../constants/Colors";
-import StockPurchaseListComponent from "../components/stocking/StockPurchaseListComponent";
-import { UserContext } from "../context/UserContext";
-import { BaseApiService } from "../utils/BaseApiService";
-import { MAXIMUM_RECORDS_PER_FETCH } from "../constants/Constants";
+import TopHeader from "../../components/TopHeader";
+import AppStatusBar from "../../components/AppStatusBar";
+import Colors from "../../constants/Colors";
+import { UserContext } from "../../context/UserContext";
+import { BaseApiService } from "../../utils/BaseApiService";
+import { MAXIMUM_RECORDS_PER_FETCH } from "../../constants/Constants";
 import { ActivityIndicator } from "react-native";
-import Snackbar from "../components/Snackbar";
+import Snackbar from "../../components/Snackbar";
+import StockPurchaseListComponent from "./components/StockPurchaseListComponent";
 
-const StockPurchase = ({ navigation }) => {
+const StockPurchase = () => {
   const [stockEntries, setStockEntries] = useState([]);
   const [stockEntryRecords, setStockEntryRecords] = useState(0);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -129,9 +129,7 @@ const StockPurchase = ({ navigation }) => {
         style={{ marginTop: 5 }}
         keyExtractor={(item) => item.id.toString()}
         data={stockEntries}
-        renderItem={({ item }) => (
-          <StockPurchaseListComponent data={item} navigation={navigation} />
-        )}
+        renderItem={({ item }) => <StockPurchaseListComponent data={item} />}
         ListEmptyComponent={() => (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}

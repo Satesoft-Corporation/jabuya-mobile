@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { View, Text } from "react-native";
-import { formatDate, formatNumberWithCommas } from "../../utils/Utils";
-import Colors from "../../constants/Colors";
-import ChipButton2 from "../buttons/ChipButton2";
-import DataRow from "./DataRow";
-import { STOCK_ENTRY_FORM } from "../../navigation/ScreenNames";
+import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
+import Colors from "../../../constants/Colors";
+import { useNavigation } from "@react-navigation/native";
+import DataRow from "../../../components/cardComponents/DataRow";
+import ChipButton2 from "../../../components/buttons/ChipButton2";
+import { STOCK_ENTRY_FORM } from "../../../navigation/ScreenNames";
 
-const StockPurchaseListComponent = ({ data, navigation }) => {
+const StockPurchaseListComponent = ({ data }) => {
   const [expanded, setExpanded] = useState(false);
+
+  const navigation = useNavigation();
 
   const toggleExpand = () => {
     setExpanded(!expanded);

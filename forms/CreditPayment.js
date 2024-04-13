@@ -10,7 +10,7 @@ import { convertToServerDate, formatNumberWithCommas } from "../utils/Utils";
 import Loader from "../components/Loader";
 import { BaseApiService } from "../utils/BaseApiService";
 import Snackbar from "../components/Snackbar";
-import DataRow from "../components/stocking/DataRow";
+import DataRow from "../components/cardComponents/DataRow";
 const CreditPayment = ({ navigation, route }) => {
   const sale = { ...route.params };
 

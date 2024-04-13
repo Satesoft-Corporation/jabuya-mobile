@@ -5,14 +5,11 @@ import Login from "./screens/Login";
 import ViewSales from "./screens/sales/ViewSales";
 import SalesEntry from "./screens/SalesDesk/SalesEntry";
 import ShopSummary from "./screens/ShopSummary";
-import Stocking from "./screens/Stocking";
+import StockingMenu from "./screens/stocking/StockingMenu";
 import StockPurchaseForm from "./forms/StockPurchaseForm";
 import { UserProvider } from "./context/UserContext";
 import { SaleEntryProvider } from "./context/SaleEntryContext";
 import UpdateScreen from "./screens/UpdateScreen";
-import StockLevels from "./screens/StockLevels";
-import StockListing from "./screens/StockListing";
-import StockPurchase from "./screens/StockPurchase";
 import SelectShops from "./screens/SelectShops";
 import ProductEntry from "./forms/ProductEntry";
 import BarCodeScreen from "./screens/BarCodeScreen";
@@ -32,7 +29,9 @@ import LandingScreen from "./screens/LandingScreen/LandingScreen";
 import Expenses from "./screens/expenses/Expenses";
 import ExpenseForm from "./screens/expenses/ExpenseForm";
 import { MenuProvider } from "react-native-popup-menu";
-
+import StockLevel from "./screens/stocking/StockLevels";
+import StockListing from "./screens/stocking/StockListing";
+import StockPurchase from "./screens/stocking/StockPurchase";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -76,11 +75,11 @@ export default function App() {
 
                 <Stack.Screen name={s.SHOP_SUMMARY} component={ShopSummary} />
 
-                <Stack.Screen name={s.STOCKNG} component={Stocking} />
+                <Stack.Screen name={s.STOCKNG} component={StockingMenu} />
 
                 <Stack.Screen name={s.STOCK_ENTRY} component={StockPurchase} />
 
-                <Stack.Screen name={s.STOCK_LEVELS} component={StockLevels} />
+                <Stack.Screen name={s.STOCK_LEVELS} component={StockLevel} />
 
                 <Stack.Screen name={s.STOCK_LISTING} component={StockListing} />
 

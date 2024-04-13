@@ -1,26 +1,16 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { formatDate } from "../../utils/Utils";
-import Colors from "../../constants/Colors";
-import DataRow from "./DataRow";
+import DataRow from "../../../components/cardComponents/DataRow";
+import { formatDate } from "../../../utils/Utils";
+import Colors from "../../../constants/Colors";
 
-function StockLevelListComponent({ data }) {
+function StockListingListComponent({ data }) {
   const [expanded, setExpanded] = useState(false);
-  const summary = data?.performanceSummary;
+
   const toggleExpand = () => {
     setExpanded(!expanded);
   };
 
-  let remainingStock =
-    summary?.totalQuantityStocked - summary?.totalQuantitySold;
-
-  if (
-    remainingStock === undefined ||
-    isNaN(remainingStock) ||
-    remainingStock < 1
-  ) {
-    remainingStock = 0;
-  }
   return (
     <View
       style={{
@@ -79,7 +69,6 @@ function StockLevelListComponent({ data }) {
             </Text>
             <Text>{data?.productName}</Text>
           </View>
-
           <View style={{ alignItems: "center", flex: 1 }}>
             <Text
               style={{
@@ -87,15 +76,10 @@ function StockLevelListComponent({ data }) {
                 marginBottom: 3,
               }}
             >
-              Sold
+              Category
             </Text>
-            <Text
-              style={{
-                alignSelf: "center",
-                marginEnd: 2,
-              }}
-            >
-              {summary?.totalQuantitySold || 0}
+            <Text style={{ alignSelf: "center" }}>
+              {data?.categoryName || "None"}
             </Text>
           </View>
 
@@ -106,9 +90,17 @@ function StockLevelListComponent({ data }) {
                 marginBottom: 3,
               }}
             >
-              Stock
+              Status
             </Text>
-            <Text style={{ fontWeight: 600 }}>{remainingStock}</Text>
+            <Text
+              style={{
+                marginEnd: 2,
+              }}
+            >
+              {data?.recordStatus
+                .toLowerCase()
+                .replace(/(^|\s)\S/g, (L) => L.toUpperCase())}
+            </Text>
           </View>
         </View>
 
@@ -116,16 +108,39 @@ function StockLevelListComponent({ data }) {
           <View
             style={{
               justifyContent: "space-between",
+              gap: 3,
+              marginEnd: 5,
             }}
           >
+            <DataRow label={"Barcode"} value={data?.barcode} />
             <DataRow
-              label={"Restock date"}
+              label={"Last restocked"}
               value={formatDate(data?.dateChanged, true)}
             />
             <DataRow label={"Manufacturer"} value={data?.manufacturerName} />
+
+            {data?.remarks && (
+              <View style={{ marginBottom: 10 }}>
+                <Text
+                  style={{
+                    fontWeight: 400,
+                    fontSize: 12,
+                  }}
+                >
+                  Remarks:{" "}
+                </Text>
+                <Text
+                  style={{
+                    fontWeight: 300,
+                    fontSize: 12,
+                  }}
+                >
+                  {data?.remarks}
+                </Text>
+              </View>
+            )}
           </View>
         )}
-
         <View
           style={{
             flexDirection: "row",
@@ -140,7 +155,7 @@ function StockLevelListComponent({ data }) {
                 fontSize: 12,
               }}
             >
-              Restock by:{" "}
+              Listed by:{" "}
               <Text
                 style={{
                   fontWeight: 300,
@@ -186,4 +201,4 @@ function StockLevelListComponent({ data }) {
   );
 }
 
-export default StockLevelListComponent;
+export default StockListingListComponent;

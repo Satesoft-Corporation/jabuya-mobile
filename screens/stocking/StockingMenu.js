@@ -1,18 +1,18 @@
 import { View, Text } from "react-native";
 import React from "react";
-import StockingIcon from "../components/StockingIcon";
-import Colors from "../constants/Colors";
+import StockingIcon from "../../components/StockingIcon";
+import Colors from "../../constants/Colors";
 import { FlatList } from "react-native";
-import TopHeader from "../components/TopHeader";
-import AppStatusBar from "../components/AppStatusBar";
+import TopHeader from "../../components/TopHeader";
+import AppStatusBar from "../../components/AppStatusBar";
 import {
   STOCK_ENTRY,
   STOCK_ENTRY_FORM,
   STOCK_LEVELS,
   STOCK_LISTING,
-} from "../navigation/ScreenNames";
+} from "../../navigation/ScreenNames";
 
-const Stocking = ({ navigation }) => {
+const StockingMenu = ({ navigation }) => {
   let list = [
     {
       title: "Stock purchases",
@@ -68,4 +68,4 @@ const Stocking = ({ navigation }) => {
   );
 };
 
-export default Stocking;
+export default StockingMenu;

@@ -1,16 +1,26 @@
 import React, { useState } from "react";
-import Colors from "../../constants/Colors";
-import { formatDate } from "../../utils/Utils";
 import { View, Text, TouchableOpacity } from "react-native";
-import DataRow from "./DataRow";
+import { formatDate } from "../../../utils/Utils";
+import Colors from "../../../constants/Colors";
+import DataRow from "../../../components/cardComponents/DataRow";
 
-function StockListingListComponent({ data }) {
+function StockLevelListComponent({ data }) {
   const [expanded, setExpanded] = useState(false);
-
+  const summary = data?.performanceSummary;
   const toggleExpand = () => {
     setExpanded(!expanded);
   };
 
+  let remainingStock =
+    summary?.totalQuantityStocked - summary?.totalQuantitySold;
+
+  if (
+    remainingStock === undefined ||
+    isNaN(remainingStock) ||
+    remainingStock < 1
+  ) {
+    remainingStock = 0;
+  }
   return (
     <View
       style={{
@@ -69,6 +79,7 @@ function StockListingListComponent({ data }) {
             </Text>
             <Text>{data?.productName}</Text>
           </View>
+
           <View style={{ alignItems: "center", flex: 1 }}>
             <Text
               style={{
@@ -76,10 +87,15 @@ function StockListingListComponent({ data }) {
                 marginBottom: 3,
               }}
             >
-              Category
+              Sold
             </Text>
-            <Text style={{ alignSelf: "center" }}>
-              {data?.categoryName || "None"}
+            <Text
+              style={{
+                alignSelf: "center",
+                marginEnd: 2,
+              }}
+            >
+              {summary?.totalQuantitySold || 0}
             </Text>
           </View>
 
@@ -90,17 +106,9 @@ function StockListingListComponent({ data }) {
                 marginBottom: 3,
               }}
             >
-              Status
+              Stock
             </Text>
-            <Text
-              style={{
-                marginEnd: 2,
-              }}
-            >
-              {data?.recordStatus
-                .toLowerCase()
-                .replace(/(^|\s)\S/g, (L) => L.toUpperCase())}
-            </Text>
+            <Text style={{ fontWeight: 600 }}>{remainingStock}</Text>
           </View>
         </View>
 
@@ -108,39 +116,16 @@ function StockListingListComponent({ data }) {
           <View
             style={{
               justifyContent: "space-between",
-              gap: 3,
-              marginEnd: 5,
             }}
           >
-            <DataRow label={"Barcode"} value={data?.barcode} />
             <DataRow
-              label={"Last restocked"}
+              label={"Restock date"}
               value={formatDate(data?.dateChanged, true)}
             />
             <DataRow label={"Manufacturer"} value={data?.manufacturerName} />
-
-            {data?.remarks && (
-              <View style={{ marginBottom: 10 }}>
-                <Text
-                  style={{
-                    fontWeight: 400,
-                    fontSize: 12,
-                  }}
-                >
-                  Remarks:{" "}
-                </Text>
-                <Text
-                  style={{
-                    fontWeight: 300,
-                    fontSize: 12,
-                  }}
-                >
-                  {data?.remarks}
-                </Text>
-              </View>
-            )}
           </View>
         )}
+
         <View
           style={{
             flexDirection: "row",
@@ -155,7 +140,7 @@ function StockListingListComponent({ data }) {
                 fontSize: 12,
               }}
             >
-              Listed by:{" "}
+              Restock by:{" "}
               <Text
                 style={{
                   fontWeight: 300,
@@ -201,4 +186,4 @@ function StockListingListComponent({ data }) {
   );
 }
 
-export default StockListingListComponent;
+export default StockLevelListComponent;
