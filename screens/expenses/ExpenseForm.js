@@ -42,7 +42,7 @@ const ExpenseForm = () => {
 
   const saveExpense = () => {
     let payload = {
-      id: 0,
+      // id: 0,
       description: remarks,
       amount: Number(amount),
       categoryId: selectedCategory?.id,

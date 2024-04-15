@@ -32,6 +32,7 @@ import { MenuProvider } from "react-native-popup-menu";
 import StockLevel from "./screens/stocking/StockLevels";
 import StockListing from "./screens/stocking/StockListing";
 import StockPurchase from "./screens/stocking/StockPurchase";
+import IncomeGraph from "./screens/perfomnceGraphs/IncomeGraph";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -65,60 +66,47 @@ export default function App() {
                 <Stack.Screen name={s.LOGIN} component={Login} />
 
                 <Stack.Screen name={s.SALES_DESK} component={SalesEntry} />
-
                 <Stack.Screen name={s.SALES_REPORTS} component={ViewSales} />
-
                 <Stack.Screen
                   name={s.BARCODE_SCREEN}
                   component={BarCodeScreen}
                 />
 
                 <Stack.Screen name={s.SHOP_SUMMARY} component={ShopSummary} />
-
-                <Stack.Screen name={s.STOCKNG} component={StockingMenu} />
-
-                <Stack.Screen name={s.STOCK_ENTRY} component={StockPurchase} />
-
-                <Stack.Screen name={s.STOCK_LEVELS} component={StockLevel} />
-
-                <Stack.Screen name={s.STOCK_LISTING} component={StockListing} />
-
                 <Stack.Screen name={s.SHOP_SELECTION} component={SelectShops} />
 
+                <Stack.Screen name={s.STOCKNG} component={StockingMenu} />
+                <Stack.Screen name={s.STOCK_ENTRY} component={StockPurchase} />
+                <Stack.Screen name={s.STOCK_LEVELS} component={StockLevel} />
+                <Stack.Screen name={s.STOCK_LISTING} component={StockListing} />
                 <Stack.Screen name={s.PDT_ENTRY} component={ProductEntry} />
-
                 <Stack.Screen
                   name={s.STOCK_ENTRY_FORM}
                   component={StockPurchaseForm}
                 />
 
                 <Stack.Screen name={s.SETTINGS} component={Settings} />
-
                 <Stack.Screen name={s.LOCK_SCREEN} component={LockScreen} />
-
                 <Stack.Screen name={s.LOCK_SETuP} component={LockSetUp} />
 
                 <Stack.Screen name={s.CREDIT_MENU} component={CreditMenu} />
-
                 <Stack.Screen name={s.CREDIT_SALES} component={CreditSales} />
-
-                <Stack.Screen name={s.CLIENT_FORM} component={NewClient} />
-
-                <Stack.Screen
-                  name={s.CLIENT_REGISTER}
-                  component={ClientRegister}
-                />
-
                 <Stack.Screen
                   name={s.CREDIT_PAYMENTS}
                   component={CreditPayment}
                 />
 
+                <Stack.Screen name={s.CLIENT_FORM} component={NewClient} />
+                <Stack.Screen
+                  name={s.CLIENT_REGISTER}
+                  component={ClientRegister}
+                />
                 <Stack.Screen name={s.CONTACT_BOOK} component={ContactBook} />
 
                 <Stack.Screen name={s.EXPENSES} component={Expenses} />
-
                 <Stack.Screen name={s.EXPENSE_FORM} component={ExpenseForm} />
+
+                <Stack.Screen name={s.INCOME_GRAPHS} component={IncomeGraph} />
               </Stack.Navigator>
             </NavigationContainer>
           </SaleEntryProvider>

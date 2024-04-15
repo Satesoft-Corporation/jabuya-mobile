@@ -5,6 +5,7 @@ import {
   CREDIT_MENU,
   CONTACT_BOOK,
   EXPENSES,
+  INCOME_GRAPHS,
 } from "../../navigation/ScreenNames";
 export const navList = [
   // landing screen icons
@@ -42,6 +43,7 @@ export const navList = [
     id: 6,
     icon: require("../../assets/icons/icons8-chat-50.png"),
     title: "Chat",
+    target:INCOME_GRAPHS
   },
   {
     id: 7,
