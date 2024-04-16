@@ -13,14 +13,14 @@ import { BaseApiService } from "../utils/BaseApiService";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Constants from "expo-constants";
 import CircularProgress from "../components/CircularProgress";
-import { CommonActions, StackActions } from "@react-navigation/native";
+import {  StackActions } from "@react-navigation/native";
 import DisplayMessage from "../components/Dialogs/DisplayMessage";
 import { LANDING_SCREEN } from "../navigation/ScreenNames";
 import { LOGIN_END_POINT } from "../utils/EndPointUtils";
 
 export default function Login({ navigation }) {
-  const [username, setUsername] = useState("ariokoth@gmail.com");
-  const [password, setPassword] = useState("256756900353");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [disabled, setDisabled] = useState(false);
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState(null);
