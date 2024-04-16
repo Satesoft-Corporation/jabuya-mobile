@@ -197,12 +197,12 @@ export class UserSessionUtils {
   static async getShopProducts(shopId) {
     let productList = await AsyncStorage.getItem(StorageParams.SHOP_PRODUCTS);
 
-    if (productList) {
+    if (shopId) {
       let newList = [...JSON.parse(productList)];
       let filtered = newList.filter((item) => item.shopId === shopId);
       return filtered;
     } else {
-      return [];
+      return productList ? JSON.parse(productList) : [];
     }
   }
   /**
@@ -261,8 +261,15 @@ export class UserSessionUtils {
     await AsyncStorage.setItem(StorageParams.SHOP_CLIENTS, data);
   }
 
-  static async getShopClients() {
+  static async getShopClients(shopId) {
     let list = await AsyncStorage.getItem(StorageParams.SHOP_CLIENTS);
-    return list ? JSON.parse(list) : [];
+
+    if (shopId) {
+      let newList = [...JSON.parse(list)];
+      let filtered = newList.filter((item) => item?.shop?.id === shopId);
+      return filtered;
+    } else {
+      return list ? JSON.parse(list) : [];
+    }
   }
 }

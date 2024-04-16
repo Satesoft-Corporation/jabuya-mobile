@@ -13,10 +13,10 @@ import { BaseApiService } from "../utils/BaseApiService";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Constants from "expo-constants";
 import CircularProgress from "../components/CircularProgress";
-import { CommonActions } from "@react-navigation/native";
-import { onDummyLogin } from "../utils/Utils";
+import { CommonActions, StackActions } from "@react-navigation/native";
 import DisplayMessage from "../components/Dialogs/DisplayMessage";
 import { LANDING_SCREEN } from "../navigation/ScreenNames";
+import { LOGIN_END_POINT } from "../utils/EndPointUtils";
 
 export default function Login({ navigation }) {
   const [username, setUsername] = useState("ariokoth@gmail.com");
@@ -34,50 +34,31 @@ export default function Login({ navigation }) {
 
   const onLogin = () => {
     setDisabled(true);
-    const { dispatch } = navigation;
-
-    new BaseApiService("/auth/login")
-      .postRequest(loginInfo)
+    new BaseApiService(LOGIN_END_POINT)
+      .saveRequestWithJsonResponse(loginInfo, false)
       .then(async (response) => {
-        let d = { info: await response.json(), status: response.status };
-        return d;
-      })
-      .then(async (data) => {
-        let { info, status } = data;
-        if (status === 200) {
+        if (response?.accessToken) {
           await UserSessionUtils.setLoggedIn(true);
-          await UserSessionUtils.setUserDetails(info.user);
-          await UserSessionUtils.setUserAuthToken(info.accessToken);
-          await UserSessionUtils.setUserRefreshToken(info.refreshToken);
-          await UserSessionUtils.setFullSessionObject(info);
-          await UserSessionUtils.setShopid(String(info.user.attendantShopId));
+          await UserSessionUtils.setUserDetails(response.user);
+          await UserSessionUtils.setUserAuthToken(response.accessToken);
+          await UserSessionUtils.setUserRefreshToken(response.refreshToken);
+          await UserSessionUtils.setFullSessionObject(response);
+          await UserSessionUtils.setShopid(
+            String(response?.user?.attendantShopId)
+          );
           await UserSessionUtils.setLoginTime(String(date));
           await UserSessionUtils.resetPendingSales();
-          navigation.navigate(LANDING_SCREEN);
+
+          navigation.dispatch(StackActions.replace(LANDING_SCREEN));
           setPassword("");
           setUsername("");
-          setTimeout(() => setDisabled(false), 1000);
-
-          dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: LANDING_SCREEN }],
-            })
-          );
-        } else if (status === 400) {
-          setMessage("Invalid username or password.");
-          setShowModal(true);
-          setDisabled(false);
-        } else {
-          setMessage(`Login failed!, ${info.message}`);
-          setShowModal(true);
           setDisabled(false);
         }
       })
       .catch((error) => {
-        setDisabled(false);
-        setMessage("An unexpected error happened, please try again.");
+        setMessage(`Login failed!, ${error?.message}`);
         setShowModal(true);
+        setDisabled(false);
       });
   };
 

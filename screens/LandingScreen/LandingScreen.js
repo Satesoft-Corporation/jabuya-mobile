@@ -13,9 +13,14 @@ import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import { getTimeDifference } from "../../utils/Utils";
 import DisplayMessage from "../../components/Dialogs/DisplayMessage";
 import Loader from "../../components/Loader";
-import { CommonActions } from "@react-navigation/native";
+import { StackActions } from "@react-navigation/native";
 import { navList } from "./navList";
 import { LOCK_SCREEN, STOCK_ENTRY } from "../../navigation/ScreenNames";
+import {
+  resolveUnsavedSales,
+  saveShopClients,
+  saveShopProductsOnDevice,
+} from "../../controllers/OfflineControllers";
 
 const LandingScreen = ({ navigation }) => {
   const {
@@ -79,41 +84,28 @@ const LandingScreen = ({ navigation }) => {
     }
   };
 
-  const resolveUnsavedSales = async () => {
-    let pendingSales = await UserSessionUtils.getPendingSales();
+  const handlePinLockStatus = async () => {
+    let prevPinTime = await UserSessionUtils.getPinLoginTime();
 
-    if (pendingSales.length > 0) {
-      pendingSales.forEach(async (cart, index) => {
-        await new BaseApiService("/shop-sales")
-          .postRequest(cart)
-          .then(async (response) => {
-            let d = { info: await response.json(), status: response.status };
-            return d;
-          })
-          .then(async (d) => {
-            let { info, status } = d;
-            let id = info?.id;
+    if (prevPinTime !== null) {
+      let pintimeDiff = getTimeDifference(prevPinTime, new Date());
 
-            if (status === 200) {
-              new BaseApiService(`/shop-sales/${id}/confirm`)
-                .postRequest()
-                .then((d) => d.json())
-                .then(async (d) => {
-                  await UserSessionUtils.removePendingSale(index);
-                })
-                .catch((error) => {
-                  console.log(error, cart);
-                });
-            } else {
-              setLoading(false);
-            }
-          })
-          .catch((error) => {
-            setLoading(false);
-          });
-      });
-    } else {
-      setLoading(false);
+      if (pintimeDiff.hours >= 1) {
+        navigation.dispatch(StackActions.replace(LOCK_SCREEN));
+      }
+    }
+  };
+
+  const handleLoginSession = async () => {
+    let prevLoginTime = await UserSessionUtils.getLoginTime();
+
+    let logintimeDifferance = getTimeDifference(prevLoginTime, new Date());
+
+    setTimeDiff(logintimeDifferance);
+
+    if (logintimeDifferance.hours < 24) {
+      //to save if access token is still valid
+      await resolveUnsavedSales();
     }
   };
 
@@ -125,29 +117,23 @@ const LandingScreen = ({ navigation }) => {
           return true;
         }
 
-        let prevPinTime = await UserSessionUtils.getPinLoginTime();
-
-        if (prevPinTime !== null) {
-          let pintimeDiff = getTimeDifference(prevPinTime, new Date());
-
-          if (pintimeDiff.hours >= 1) {
-            const { dispatch } = navigation;
-
-            dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: LOCK_SCREEN }],
-              })
-            );
-          }
-        }
-
+        handlePinLockStatus();
+        handleLoginSession();
         const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
           data?.user;
 
-        let prevLoginTime = await UserSessionUtils.getLoginTime();
+        /**
+         * saving products ondevice
+         */
+        const searchParameters = {
+          offset: 0,
+          limit: 10000,
+          ...(isShopAttendant && { shopId: attendantShopId }),
+          ...(isShopOwner && { shopOwnerId }),
+        };
 
-        let logintimeDifferance = getTimeDifference(prevLoginTime, new Date());
+        const savedproducts = await saveShopProductsOnDevice(searchParameters);
+        const savedClients = await saveShopClients(searchParameters);
 
         setUserParams({
           isShopOwner,
@@ -156,8 +142,6 @@ const LandingScreen = ({ navigation }) => {
           shopOwnerId,
         });
 
-        setTimeDiff(logintimeDifferance);
-
         let shopCount = await UserSessionUtils.getShopCount();
 
         if (isShopOwner) {
@@ -165,13 +149,14 @@ const LandingScreen = ({ navigation }) => {
             fetchShops(shopOwnerId);
           }
         }
-        if (logintimeDifferance.hours < 24) {
-          //to save if access token is still valid
-          resolveUnsavedSales();
+
+        if (savedproducts && savedClients) {
+          setLoading(false);
         }
       })
       .catch(async (error) => {
         //loging the user out if the object is missing
+        console.log(error);
         logOut();
       });
   }, []);

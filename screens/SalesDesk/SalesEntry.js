@@ -70,69 +70,27 @@ function SalesEntry({ navigation }) {
   const { isShopOwner, isShopAttendant, shopOwnerId } = userParams;
 
   const fetchProducts = async () => {
-    let searchParameters = {
-      offset: 0,
-      limit: 10000,
-      shopId: selectedShop?.id,
-    };
-
-    if (searchTerm !== null) {
-      searchParameters.searchTerm = searchTerm;
-    }
+    let pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id); //store the payload in local storage
+    setProducts(pdtList);
+    fetchClients();
+    setLoading(false);
 
     NetInfo.fetch().then(async (state) => {
-      if (state.isConnected) {
-        new BaseApiService("/shop-products")
-          .getRequestWithJsonResponse(searchParameters)
-          .then(async (response) => {
-            setProducts(response.records);
-            setLoading(false);
-
-            if (!searchTerm) {
-              await UserSessionUtils.setShopProducts(response.records); //to keep updating the list locally
-            }
-          })
-          .catch((error) => {
-            setLoading(false);
-            console.log(error);
-          });
-      } else {
-        let pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id); //store the payload in local storage
-        setProducts(pdtList);
-        snackbarRef.current.show("enjoy offline mode", 6000);
+      if (!state.isConnected) {
+        snackbarRef.current.show("Running offline", 5000);
         setLoading(false);
       }
     });
   };
 
-  const fetchClients = () => {
-    const serachParams = {
-      shopId: selectedShop?.id,
-      limit: 0,
-      offset: 0,
-    };
-    NetInfo.fetch().then(async (state) => {
-      if (state.isConnected) {
-        new BaseApiService("/clients-controller")
-          .getRequestWithJsonResponse(serachParams)
-          .then(async (response) => {
-            setClients(response.records);
-
-            await UserSessionUtils.setShopClients(response.records); //to keep updating the list locally
-          })
-          .catch((error) => {
-            setMessage("Error fetching shop clients");
-          });
-      } else {
-        let clients = await UserSessionUtils.getShopClients();
-        setClients(clients);
-      }
-    });
+  const fetchClients = async () => {
+    let clients = await UserSessionUtils.getShopClients(selectedShop?.id);
+    setClients(clients);
   };
 
   useEffect(() => {
     clearEverything();
-
+    fetchProducts();
     if (selectedShop?.id === shopOwnerId) {
       setSelectedShop(shops[1]);
     }
@@ -159,15 +117,6 @@ function SalesEntry({ navigation }) {
       setUnitCost(String(salesPrice));
     }
   };
-
-  useEffect(() => {
-    fetchProducts();
-  }, [searchTerm]);
-
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
