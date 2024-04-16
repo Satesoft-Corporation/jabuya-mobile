@@ -205,6 +205,15 @@ export class UserSessionUtils {
       return productList ? JSON.parse(productList) : [];
     }
   }
+
+  static async getProductByBarcode(barcode) {
+    let productList = await this.getShopProducts();
+
+    let item = productList.find((item) => item.barcode === barcode);
+
+    return item;
+  }
+
   /**
    *
    * @param {*} salePayLoad

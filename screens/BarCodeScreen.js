@@ -3,17 +3,17 @@ import React, { useState, useEffect, useContext } from "react";
 import Colors from "../constants/Colors";
 import { screenHeight, screenWidth } from "../constants/Constants";
 import Loader from "../components/Loader";
-import { SalesQtyInputDialog } from "../components/Dialogs";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import AppStatusBar from "../components/AppStatusBar";
 import { UserContext } from "../context/UserContext";
-import { BaseApiService } from "../utils/BaseApiService";
 import { SaleEntryContext } from "../context/SaleEntryContext";
+import EnterSaleQtyModal from "../components/sales/EnterSaleQtyModal";
+import { UserSessionUtils } from "../utils/UserSessionUtils";
 
 const BarCodeScreen = ({ navigation }) => {
   const [hasPermission, setHasPermission] = useState(null);
 
-  const { userParams, selectedShop } = useContext(UserContext);
+  const { selectedShop } = useContext(UserContext);
 
   const {
     setQuantity,
@@ -29,68 +29,50 @@ const BarCodeScreen = ({ navigation }) => {
     setUnitCost,
   } = useContext(SaleEntryContext);
 
-  const { isShopAttendant, attendantShopId } = userParams;
-
   const handleBarCodeScanned = ({ data }) => {
     setScanned(true);
     fetchProductByBarCode(data);
   };
 
-  const fetchProductByBarCode = (barcode) => {
+  const fetchProductByBarCode = async (barcode) => {
     setLoading(true);
+    const item = await UserSessionUtils.getProductByBarcode(barcode);
 
-    let searchParameters = {
-      offset: 0,
-      limit: 0,
-      shopId: isShopAttendant ? attendantShopId : selectedShop?.id,
-      barCode: barcode,
-    };
+    if (!item) {
+      setLoading(false);
+      setQuantity(null);
+      Alert.alert("Cannot find product in your shop", "", [
+        {
+          text: "Ok",
+          onPress: () => setScanned(false),
+          style: "cancel",
+        },
+      ]);
+    } else {
+      setShowModal(true);
 
-    new BaseApiService("/shop-products")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        if (response.records.length === 0) {
-          Alert.alert("Cannot find product in your shop", "", [
-            {
-              text: "Ok",
-              onPress: () => setScanned(false),
-              style: "cancel",
-            },
-          ]);
-          setLoading(false);
-          setQuantity(null);
-        } else {
-          setShowModal(true);
-          // setUnitCost(String(response.records[0]?.salesPrice));
-          const { multipleSaleUnits, saleUnitName, salesPrice } =
-            response.records[0];
+      const { multipleSaleUnits, saleUnitName, salesPrice } = item;
 
-          let defUnit = {
-            productSaleUnitName: saleUnitName,
-            unitPrice: salesPrice,
-          };
-          setSelection(response.records[0]);
+      let defUnit = {
+        productSaleUnitName: saleUnitName,
+        unitPrice: salesPrice,
+      };
+      setSelection(item);
 
-          setShowModal(true);
+      setShowModal(true);
 
-          if (multipleSaleUnits) {
-            setSaleUnits([defUnit, ...multipleSaleUnits]);
-          } else {
-            setSaleUnits([{ ...defUnit }]);
-            setSelectedSaleUnit(defUnit);
-            setInitialUnitCost(salesPrice);
-            setUnitCost(String(salesPrice));
-          }
-          setScanned(true);
-          setShowModal(true);
-          setLoading(false);
-        }
-      })
-      .catch((error) => {
-        Alert.alert("Error!", error?.message);
-        setLoading(false);
-        setScanned(false);
-      });
+      if (multipleSaleUnits) {
+        setSaleUnits([defUnit, ...multipleSaleUnits]);
+      } else {
+        setSaleUnits([{ ...defUnit }]);
+        setSelectedSaleUnit(defUnit);
+        setInitialUnitCost(salesPrice);
+        setUnitCost(String(salesPrice));
+      }
+      setScanned(true);
+      setShowModal(true);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -108,7 +90,7 @@ const BarCodeScreen = ({ navigation }) => {
 
       <Loader loading={loading} />
 
-      <SalesQtyInputDialog />
+      <EnterSaleQtyModal />
 
       <BarCodeScanner
         height={screenHeight}

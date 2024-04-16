@@ -122,6 +122,13 @@ const LandingScreen = ({ navigation }) => {
         const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
           data?.user;
 
+        setUserParams({
+          isShopOwner,
+          isShopAttendant,
+          attendantShopId,
+          shopOwnerId,
+        });
+
         /**
          * saving products ondevice
          */
@@ -134,13 +141,6 @@ const LandingScreen = ({ navigation }) => {
 
         const savedproducts = await saveShopProductsOnDevice(searchParameters);
         const savedClients = await saveShopClients(searchParameters);
-
-        setUserParams({
-          isShopOwner,
-          isShopAttendant,
-          attendantShopId,
-          shopOwnerId,
-        });
 
         let shopCount = await UserSessionUtils.getShopCount();
 
