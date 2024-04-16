@@ -18,18 +18,7 @@ const StockingMenu = ({ navigation }) => {
       title: "Stock purchases",
       target: STOCK_ENTRY,
     },
-    {
-      title: "Make a purchase",
-      target: STOCK_ENTRY_FORM,
-    },
-    {
-      title: "Shop products",
-      target: STOCK_LISTING,
-    },
-    // {
-    //   title: "Add product",
-    //   // target: "productEntry",
-    // },
+
     {
       title: "Stock levels",
       target: STOCK_LEVELS,

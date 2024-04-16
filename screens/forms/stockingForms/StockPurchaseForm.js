@@ -25,10 +25,15 @@ import TopHeader from "../../../components/TopHeader";
 import Snackbar from "../../../components/Snackbar";
 import PrimaryButton from "../../../components/buttons/PrimaryButton";
 import { DatePickerInput } from "react-native-paper-dates";
+import { STOCK_ENTRY_ENDPOINT } from "../../../utils/EndPointUtils";
+import {
+  resolveUnsavedSales,
+  saveShopProductsOnDevice,
+} from "../../../controllers/OfflineControllers";
+import { UserSessionUtils } from "../../../utils/UserSessionUtils";
 
 const StockPurchaseForm = ({ navigation, route }) => {
-  const { selectedShop, userParams, setReload, reload } =
-    useContext(UserContext);
+  const { selectedShop, userParams } = useContext(UserContext);
 
   const { shopOwnerId } = userParams;
 
@@ -66,6 +71,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
   const fetchProducts = async () => {
     setIsPackedProduct(null);
     setSelectedProduct(null);
+
     let searchParameters = {
       offset: 0,
       limit: 10000,
@@ -73,16 +79,13 @@ const StockPurchaseForm = ({ navigation, route }) => {
     };
     setLoading(true);
 
-    new BaseApiService("/shop-products")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        setProducts(response.records);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        snackBarRef.current.show(error?.message);
-      });
+    let success = await saveShopProductsOnDevice(searchParameters, true);
+
+    if (success) {
+      const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
+      setProducts(pdtList);
+      setLoading(false);
+    }
   };
 
   const onProductChange = (pdt) => {
@@ -152,12 +155,14 @@ const StockPurchaseForm = ({ navigation, route }) => {
 
     if (isValidPayload === true) {
       const apiUrl = edit
-        ? "/stock-entries/" + selectedProduct.id
-        : "/stock-entries";
+        ? STOCK_ENTRY_ENDPOINT + "/" + selectedProduct.id
+        : STOCK_ENTRY_ENDPOINT;
 
       new BaseApiService(apiUrl)
         .saveRequestWithJsonResponse(payload, edit)
-        .then((response) => {
+        .then(async (response) => {
+          fetchProducts();
+          await resolveUnsavedSales(); //to auto saved a pending sale if the purchase was for that specific item
           clearForm();
           setSubmitted(false);
           setLoading(false);
@@ -270,6 +275,40 @@ const StockPurchaseForm = ({ navigation, route }) => {
               style={{
                 marginVertical: 3,
                 marginStart: 6,
+                marginTop: 5,
+              }}
+            >
+              Product
+            </Text>
+            <MyDropDown
+              style={{
+                backgroundColor: Colors.light,
+                borderColor: Colors.dark,
+              }}
+              data={edit ? [{ ...selectedProduct }] : products}
+              onChange={onProductChange}
+              value={selectedProduct}
+              placeholder="Select product"
+              labelField="productName"
+              valueField="id"
+            />
+            {submitted && !selectedProduct && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginStart: 6,
+                  color: Colors.error,
+                }}
+              >
+                Product is required
+              </Text>
+            )}
+          </View>
+          <View>
+            <Text
+              style={{
+                marginVertical: 3,
+                marginStart: 6,
                 marginTop: 10,
               }}
             >
@@ -300,41 +339,6 @@ const StockPurchaseForm = ({ navigation, route }) => {
             )}
           </View>
 
-          <View>
-            <Text
-              style={{
-                marginVertical: 3,
-                marginStart: 6,
-                marginTop: 5,
-              }}
-            >
-              Product
-            </Text>
-            <MyDropDown
-              style={{
-                backgroundColor: Colors.light,
-                borderColor: Colors.dark,
-              }}
-              data={edit ? [{ ...selectedProduct }] : products}
-              onChange={onProductChange}
-              value={selectedProduct}
-              placeholder="Select product"
-              labelField="productName"
-              valueField="id"
-            />
-            {submitted && !selectedProduct && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginStart: 6,
-                  color: Colors.error,
-                }}
-              >
-                Product is required
-              </Text>
-            )}
-          </View>
-
           <View style={{ marginVertical: 8 }}>
             <Text
               style={{
@@ -349,6 +353,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                 backgroundColor: Colors.light,
                 borderColor: Colors.dark,
               }}
+              search={false}
               data={packageOptions}
               disable={selectedProduct === null}
               value={isPackedProduct}

@@ -67,7 +67,6 @@ const ConfirmSaleModal = ({
     };
 
     setLoading(true);
-    setDisabled(true);
 
     NetInfo.fetch().then(async (state) => {
       if (state.isConnected) {
@@ -118,8 +117,8 @@ const ConfirmSaleModal = ({
             setError(`Failed to confirm sale!,${error?.message}`);
           });
       } else {
-        await UserSessionUtils.addPendingSale(payLoad);
         setVisible(false);
+        await UserSessionUtils.addPendingSale(payLoad);
         setTimeout(() => setLoading(false), 1000);
         clearEverything();
         clearForm();

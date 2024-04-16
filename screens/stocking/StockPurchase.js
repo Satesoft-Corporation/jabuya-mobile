@@ -9,8 +9,10 @@ import { MAXIMUM_RECORDS_PER_FETCH } from "../../constants/Constants";
 import { ActivityIndicator } from "react-native";
 import Snackbar from "../../components/Snackbar";
 import StockPurchaseListComponent from "./components/StockPurchaseListComponent";
+import { AddBtn } from "../expenses/Expenses";
+import { STOCK_ENTRY_FORM } from "../../navigation/ScreenNames";
 
-const StockPurchase = () => {
+const StockPurchase = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
   const [stockEntryRecords, setStockEntryRecords] = useState(0);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -117,6 +119,9 @@ const StockPurchase = () => {
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}
         disabled={disable}
+        renderExtraIcon={() => (
+          <AddBtn onPress={() => navigation.navigate(STOCK_ENTRY_FORM)} />
+        )}
       />
 
       <FlatList

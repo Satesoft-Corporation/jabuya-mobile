@@ -53,15 +53,6 @@ const Expenses = ({}) => {
     }
   };
 
-  const addBtn = () => (
-    <TouchableOpacity onPress={() => navigation.navigate(EXPENSE_FORM)}>
-      <Image
-        source={require("../../assets/icons/ic_plus.png")}
-        style={{ height: 40, width: 30, tintColor: Colors.primary }}
-      />
-    </TouchableOpacity>
-  );
-
   const renderFooter = () => {
     if (showFooter === true) {
       if (expenses.length === totalItems && expenses.length > 0) {
@@ -82,7 +73,12 @@ const Expenses = ({}) => {
   return (
     <View style={{ flex: 1 }}>
       <AppStatusBar />
-      <TopHeader title="Expenses" renderExtraIcon={addBtn} />
+      <TopHeader
+        title="Expenses"
+        renderExtraIcon={() => (
+          <AddBtn onPress={() => navigation.navigate(EXPENSE_FORM)} />
+        )}
+      />
 
       <FlatList
         data={expenses}
@@ -99,5 +95,14 @@ const Expenses = ({}) => {
     </View>
   );
 };
+
+export const AddBtn = ({ onPress }) => (
+  <TouchableOpacity onPress={onPress}>
+    <Image
+      source={require("../../assets/icons/ic_plus.png")}
+      style={{ height: 40, width: 30, tintColor: Colors.primary }}
+    />
+  </TouchableOpacity>
+);
 
 export default Expenses;

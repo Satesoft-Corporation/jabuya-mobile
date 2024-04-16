@@ -10,7 +10,7 @@ import { UserContext } from "../../context/UserContext";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import { ActivityIndicator } from "react-native";
-import StockLevelListComponent from "./components/StockLevelListComponent";
+import StockLevelItem from "./components/StockLevelItem";
 
 const StockLevel = ({ navigation }) => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -122,7 +122,7 @@ const StockLevel = ({ navigation }) => {
         style={{ marginTop: 5 }}
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
-        renderItem={({ item }) => <StockLevelListComponent data={item} />}
+        renderItem={({ item }) => <StockLevelItem data={item} />}
         ListEmptyComponent={() => (
           <View
             style={{
