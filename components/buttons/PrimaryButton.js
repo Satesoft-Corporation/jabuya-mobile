@@ -36,10 +36,8 @@ const PrimaryButton = ({
       <Text
         style={[
           {
-            fontSize: 16,
             fontWeight: "bold",
             color: darkMode ? Colors.primary : Colors.dark,
-            letterSpacing: 0.6,
           },
           titleStyle,
         ]}

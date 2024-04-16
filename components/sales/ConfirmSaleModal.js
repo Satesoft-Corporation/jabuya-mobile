@@ -1,7 +1,6 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import { View, Text } from "react-native";
+import React, { useContext, useState } from "react";
 import ModalContent from "../ModalContent";
-import Card from "../Card";
 import {
   convertToServerDate,
   formatDate,
@@ -134,194 +133,154 @@ const ConfirmSaleModal = ({
 
   return (
     <ModalContent visible={visible} style={{ padding: 10 }}>
-      <Card
+      <View
         style={{
-          alignSelf: "center",
-          minHeight: 120,
-          maxHeight: 490,
-          width: 315,
-          paddingBottom: 7,
+          flexDirection: "row",
+          justifyContent: "space-between",
         }}
       >
-        <View
+        <Text
           style={{
-            backgroundColor: Colors.light,
-            padding: 2,
+            marginTop: 10,
+            fontWeight: "bold",
+            fontSize: 18,
+            marginBottom: 12,
+            marginStart: 1,
           }}
         >
-          <View
+          Confirm sale
+        </Text>
+      </View>
+
+      {serverError && (
+        <View style={{ marginVertical: 5 }}>
+          <Text
+            numberOfLines={4}
             style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
+              color: Colors.error,
+              fontWeight: 500,
             }}
           >
-            <Text
-              style={{
-                marginTop: 10,
-                fontWeight: "bold",
-                fontSize: 18,
-                marginBottom: 12,
-                marginStart: 1,
-              }}
-            >
-              Confirm sale
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                setVisible();
-                setError(null);
-              }}
-            >
-              <Image
-                source={require("../../assets/icons/ic_close.png")}
-                style={{
-                  height: 12,
-                  width: 12,
-                  resizeMode: "contain",
-                  marginStart: 15,
-                  alignSelf: "center",
-                  marginTop: 10,
-                }}
-              />
-            </TouchableOpacity>
-          </View>
-
-          {serverError && (
-            <View style={{ marginVertical: 5 }}>
-              <Text
-                numberOfLines={4}
-                style={{
-                  color: Colors.error,
-                  fontWeight: 500,
-                }}
-              >
-                {serverError}
-              </Text>
-            </View>
-          )}
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <Text
-              style={{
-                fontSize: 12,
-                color: Colors.gray,
-                alignSelf: "flex-end",
-              }}
-            >
-              {formatDate(new Date())}
-            </Text>
-            <Text>Currency : UGX</Text>
-          </View>
-
-          <SalesTable sales={selections} fixHeight={false} />
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 10,
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Recieved </Text>
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                fontWeight: "bold",
-                marginEnd: 4,
-              }}
-            >
-              {formatNumberWithCommas(recievedAmount)}
-            </Text>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginVertical: 3,
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>
-              Sold{" "}
-              <Text style={{ fontWeight: "400" }}>
-                {totalQty >= 1 && (
-                  <Text>
-                    {totalQty}
-                    {totalQty > 1 ? <Text> items</Text> : <Text> item</Text>}
-                  </Text>
-                )}
-              </Text>
-            </Text>
-
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                fontWeight: "bold",
-                marginEnd: 4,
-              }}
-            >
-              {formatNumberWithCommas(totalCost)}
-            </Text>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Balance</Text>
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                fontWeight: "bold",
-                marginEnd: 4,
-                fontSize: 15,
-              }}
-            >
-              {formatNumberWithCommas(recievedAmount - totalCost)}
-            </Text>
-          </View>
-
-          <PaymentMethodComponent
-            submitted={submitted}
-            soldOnDate={soldOnDate}
-            setSoldOnDate={setSoldOnDate}
-            amountPaid={amountPaid}
-            setAmountPaid={setAmountPaid}
-            clients={clients}
-            selectedClient={selectedClient}
-            setSelectedClient={setSelectedClient}
-          />
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 20,
-              gap: 10,
-              marginBottom: 5,
-            }}
-          >
-            <PrimaryButton
-              darkMode={false}
-              title={"Cancel"}
-              onPress={() => {
-                setVisible();
-                setError(null);
-                setSelectedClient(null);
-                setAmountPaid(null);
-              }}
-            />
-            <PrimaryButton
-              title={"Save"}
-              onPress={postSales}
-              disabled={disabled}
-            />
-          </View>
+            {serverError}
+          </Text>
         </View>
-      </Card>
+      )}
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Text
+          style={{
+            fontSize: 12,
+            color: Colors.gray,
+            alignSelf: "flex-end",
+          }}
+        >
+          {formatDate(new Date())}
+        </Text>
+        <Text>Currency : UGX</Text>
+      </View>
+
+      <SalesTable sales={selections} fixHeight={false} />
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 10,
+        }}
+      >
+        <Text style={{ fontWeight: "bold" }}>Recieved </Text>
+        <Text
+          style={{
+            alignSelf: "flex-end",
+            fontWeight: "bold",
+            marginEnd: 4,
+          }}
+        >
+          {formatNumberWithCommas(recievedAmount)}
+        </Text>
+      </View>
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginVertical: 3,
+        }}
+      >
+        <Text style={{ fontWeight: "bold" }}>
+          Sold{" "}
+          <Text style={{ fontWeight: "400" }}>
+            {totalQty >= 1 && (
+              <Text>
+                {totalQty}
+                {totalQty > 1 ? <Text> items</Text> : <Text> item</Text>}
+              </Text>
+            )}
+          </Text>
+        </Text>
+
+        <Text
+          style={{
+            alignSelf: "flex-end",
+            fontWeight: "bold",
+            marginEnd: 4,
+          }}
+        >
+          {formatNumberWithCommas(totalCost)}
+        </Text>
+      </View>
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text style={{ fontWeight: "bold" }}>Balance</Text>
+        <Text
+          style={{
+            alignSelf: "flex-end",
+            fontWeight: "bold",
+            marginEnd: 4,
+            fontSize: 15,
+          }}
+        >
+          {formatNumberWithCommas(recievedAmount - totalCost)}
+        </Text>
+      </View>
+
+      <PaymentMethodComponent
+        submitted={submitted}
+        soldOnDate={soldOnDate}
+        setSoldOnDate={setSoldOnDate}
+        amountPaid={amountPaid}
+        setAmountPaid={setAmountPaid}
+        clients={clients}
+        selectedClient={selectedClient}
+        setSelectedClient={setSelectedClient}
+      />
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 20,
+          gap: 10,
+          marginBottom: 5,
+        }}
+      >
+        <PrimaryButton
+          darkMode={false}
+          title={"Cancel"}
+          onPress={() => {
+            setLoading(false);
+            setVisible();
+            setError(null);
+            setSelectedClient(null);
+            setAmountPaid(null);
+          }}
+        />
+        <PrimaryButton title={"Save"} onPress={postSales} disabled={disabled} />
+      </View>
     </ModalContent>
   );
 };
