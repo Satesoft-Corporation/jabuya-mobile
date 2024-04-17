@@ -47,11 +47,11 @@ export const saveShopProductsOnDevice = async (
   refresh = false //to get updated data
 ) => {
   let saved = false;
-
   const currentPdts = await UserSessionUtils.getShopProducts();
 
   if (currentPdts.length === 0 || refresh === true) {
     //only hit the api if no product is stored
+    console.log("saving offline");
     await new BaseApiService(SHOP_PRODUCTS_ENDPOINT)
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {

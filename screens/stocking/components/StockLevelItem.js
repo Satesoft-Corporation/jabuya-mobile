@@ -134,7 +134,7 @@ function StockLevelItem({ data }) {
             btnTitle1="Price"
             btnTitle2="Hide"
             onClick2={toggleExpand}
-            onClick1={() => navigation.navigate(UPDATE_PRICE)}
+            onClick1={() => navigation.navigate(UPDATE_PRICE,data)}
           />
         </View>
       )}
