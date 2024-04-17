@@ -16,7 +16,6 @@ import { SalesDropdownComponent } from "../../components/DropdownComponents";
 import { formatNumberWithCommas, isValidNumber } from "../../utils/Utils";
 import { BlackScreen } from "../../components/BlackAndWhiteScreen";
 import { IconsComponent } from "../../components/MenuIcon";
-import Loader from "../../components/Loader";
 import Snackbar from "../../components/Snackbar";
 import { useRef } from "react";
 import { UserContext } from "../../context/UserContext";
@@ -51,7 +50,6 @@ function SalesEntry({ navigation }) {
     selections,
     selection,
     setSelection,
-    loading,
     setLoading,
     totalQty,
     recievedAmount,
@@ -68,15 +66,14 @@ function SalesEntry({ navigation }) {
   const { isShopOwner, isShopAttendant, shopOwnerId } = userParams;
 
   const fetchProducts = async () => {
+    setLoading(true);
     let pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id); //store the payload in local storage
     setProducts(pdtList);
     fetchClients();
-    setLoading(false);
 
     NetInfo.fetch().then(async (state) => {
       if (!state.isConnected) {
         snackbarRef.current.show("Running offline", 5000);
-        setLoading(false);
       }
     });
   };
@@ -84,6 +81,7 @@ function SalesEntry({ navigation }) {
   const fetchClients = async () => {
     let clients = await UserSessionUtils.getShopClients(selectedShop?.id);
     setClients(clients);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -119,12 +117,9 @@ function SalesEntry({ navigation }) {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
 
-      <Loader loading={loading} />
-
       <ConfirmSaleModal
         visible={showConfirmed}
         setVisible={() => setShowConfirmed(false)}
-        setLoading={setLoading}
         snackbarRef={snackbarRef}
         clients={clients}
       />
@@ -174,7 +169,6 @@ function SalesEntry({ navigation }) {
             value={selection}
             products={products}
             handleChange={(t) => handleChange(t)}
-            setLoading={() => setLoading(false)}
             makeSelection={makeSelection}
             setScanned={() => navigation.navigate(BARCODE_SCREEN)}
           />
@@ -360,7 +354,6 @@ function SalesEntry({ navigation }) {
 
                 if (selections.length > 0) {
                   if (isValidAmount === true) {
-                    setLoading(true);
                     setShowConfirmed(true);
                     return true;
                   }

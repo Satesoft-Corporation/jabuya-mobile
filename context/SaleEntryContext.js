@@ -2,6 +2,7 @@ import { createContext, useState, useEffect } from "react";
 import { isValidNumber } from "../utils/Utils";
 
 import { paymentMethods } from "../constants/Constants";
+import Loader from "../components/Loader";
 
 export const SaleEntryContext = createContext();
 
@@ -15,7 +16,7 @@ export const SaleEntryProvider = ({ children }) => {
   const [unitCost, setUnitCost] = useState(null);
   const [errors, setErrors] = useState(null);
   const [scanned, setScanned] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [totalCost, setTotalCost] = useState(0);
   const [recievedAmount, setRecievedAmount] = useState("");
   const [totalQty, setTotalQty] = useState(0);
@@ -196,7 +197,7 @@ export const SaleEntryProvider = ({ children }) => {
 
   return (
     <SaleEntryContext.Provider value={data}>
-      {/* <Loader loading={loading} /> */}
+      <Loader loading={loading} />
       {children}
     </SaleEntryContext.Provider>
   );

@@ -27,11 +27,12 @@ import ContactBook from "./screens/ContactBook";
 import * as s from "./navigation/ScreenNames";
 import LandingScreen from "./screens/landingScreen/LandingScreen";
 import Expenses from "./screens/expenses/Expenses";
-import ExpenseForm from "./screens/expenses/ExpenseForm";
+import ExpenseForm from "./screens/forms/ExpenseForm";
 import { MenuProvider } from "react-native-popup-menu";
 import StockLevel from "./screens/stocking/StockLevels";
 import StockPurchase from "./screens/stocking/StockPurchase";
 import IncomeGraph from "./screens/perfomanceGraphs/IncomeGraph";
+import UpdatePrice from "./screens/forms/stockingForms/UpdatePrice";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -77,6 +78,8 @@ export default function App() {
                 <Stack.Screen name={s.STOCKNG} component={StockingMenu} />
                 <Stack.Screen name={s.STOCK_ENTRY} component={StockPurchase} />
                 <Stack.Screen name={s.STOCK_LEVELS} component={StockLevel} />
+                <Stack.Screen name={s.UPDATE_PRICE} component={UpdatePrice} />
+
                 <Stack.Screen name={s.PDT_ENTRY} component={ProductEntry} />
                 <Stack.Screen
                   name={s.STOCK_ENTRY_FORM}

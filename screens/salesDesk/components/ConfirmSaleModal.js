@@ -16,19 +16,12 @@ import { UserSessionUtils } from "../../../utils/UserSessionUtils";
 import NetInfo from "@react-native-community/netinfo";
 import { UserContext } from "../../../context/UserContext";
 
-const ConfirmSaleModal = ({
-  setVisible,
-  setLoading,
-  snackbarRef,
-  visible,
-  clients,
-}) => {
+const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
   const [submitted, setSubmitted] = useState(false);
   const [soldOnDate, setSoldOnDate] = useState(new Date());
   const [amountPaid, setAmountPaid] = useState("");
   const [serverError, setError] = useState(null);
   const [selectedClient, setSelectedClient] = useState(null);
-  const [disabled, setDisabled] = useState(false);
 
   const { userParams, selectedShop } = useContext(UserContext);
 
@@ -39,6 +32,8 @@ const ConfirmSaleModal = ({
     clearEverything,
     totalQty,
     selectedPaymentMethod,
+    loading,
+    setLoading,
   } = useContext(SaleEntryContext);
 
   const { isShopAttendant, attendantShopId } = userParams;
@@ -86,11 +81,10 @@ const ConfirmSaleModal = ({
                 .then((d) => d.json())
                 .then((d) => {
                   if (d.status === "Success") {
-                    setVisible(false);
                     setLoading(false);
+                    setVisible(false);
                     clearEverything();
                     clearForm();
-                    setDisabled(false);
                     snackbarRef.current.show(
                       "Sale confirmed successfully",
                       4000
@@ -99,20 +93,17 @@ const ConfirmSaleModal = ({
                 })
                 .catch((error) => {
                   setLoading(false);
-                  setDisabled(false);
 
                   setError(`Failed to confirm sale!, ${error?.message}`);
                 });
             } else {
               setLoading(false);
-              setDisabled(false);
 
               setError(`Failed to confirm sale!, ${info?.message}`);
             }
           })
           .catch((error) => {
             setLoading(false);
-            setDisabled(false);
 
             setError(`Failed to confirm sale!,${error?.message}`);
           });
@@ -278,7 +269,7 @@ const ConfirmSaleModal = ({
             setAmountPaid(null);
           }}
         />
-        <PrimaryButton title={"Save"} onPress={postSales} disabled={disabled} />
+        <PrimaryButton title={"Save"} onPress={postSales} />
       </View>
     </ModalContent>
   );

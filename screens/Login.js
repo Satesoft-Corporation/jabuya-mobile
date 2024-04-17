@@ -19,8 +19,8 @@ import { LANDING_SCREEN } from "../navigation/ScreenNames";
 import { LOGIN_END_POINT } from "../utils/EndPointUtils";
 
 export default function Login({ navigation }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("mosesjespar@gmail.com");
+  const [password, setPassword] = useState("0701807062");
   const [disabled, setDisabled] = useState(false);
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState(null);

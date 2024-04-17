@@ -15,7 +15,6 @@ const screenHeight = Dimensions.get("window").height;
 export const SalesDropdownComponent = ({
   products,
   handleChange,
-  setLoading,
   makeSelection,
   setScanned,
   value,
@@ -50,7 +49,6 @@ export const SalesDropdownComponent = ({
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
           setIsFocus(false);
-          setLoading(false);
           makeSelection(item);
         }}
         onChangeText={(text) => handleChange(text)}

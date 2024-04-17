@@ -11,6 +11,7 @@ export const STOCK_ENTRY = "stock_entry";
 export const STOCK_ENTRY_FORM = "stock_entry_form";
 export const STOCK_LEVELS = "stock_levels";
 export const PDT_ENTRY = "product_entry";
+export const UPDATE_PRICE = "update_price";
 
 export const CREDIT_MENU = "credit_menu";
 export const CREDIT_SALES = "credit_sales";

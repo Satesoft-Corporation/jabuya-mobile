@@ -2,10 +2,8 @@ import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import Colors from "../../constants/Colors";
 import { screenHeight, screenWidth } from "../../constants/Constants";
-import Loader from "../../components/Loader";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import AppStatusBar from "../../components/AppStatusBar";
-import { UserContext } from "../../context/UserContext";
 import { SaleEntryContext } from "../../context/SaleEntryContext";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
@@ -13,14 +11,11 @@ import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
 const BarCodeScreen = ({ navigation }) => {
   const [hasPermission, setHasPermission] = useState(null);
 
-  const { selectedShop } = useContext(UserContext);
-
   const {
     setQuantity,
     setSelection,
     scanned,
     setScanned,
-    loading,
     setLoading,
     setShowModal,
     setSaleUnits,
@@ -87,8 +82,6 @@ const BarCodeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <AppStatusBar />
-
-      <Loader loading={loading} />
 
       <EnterSaleQtyModal />
 

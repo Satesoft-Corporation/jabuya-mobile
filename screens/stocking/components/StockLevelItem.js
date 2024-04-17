@@ -5,9 +5,13 @@ import DataRow from "../../../components/cardComponents/DataRow";
 import CardHeader from "../../../components/cardComponents/CardHeader";
 import CardFooter1 from "../../../components/cardComponents/CardFooter1";
 import CardFooter2 from "../../../components/cardComponents/CardFooter2";
+import { useNavigation } from "@react-navigation/native";
+import { UPDATE_PRICE } from "../../../navigation/ScreenNames";
 
 function StockLevelItem({ data }) {
   const [expanded, setExpanded] = useState(false);
+  const navigation = useNavigation();
+
   const summary = data?.performanceSummary;
   const toggleExpand = () => {
     setExpanded(!expanded);
@@ -130,6 +134,7 @@ function StockLevelItem({ data }) {
             btnTitle1="Price"
             btnTitle2="Hide"
             onClick2={toggleExpand}
+            onClick1={() => navigation.navigate(UPDATE_PRICE)}
           />
         </View>
       )}
