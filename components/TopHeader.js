@@ -12,7 +12,8 @@ const TopHeader = ({
   setSearchTerm,
   onSearch,
   showShopName = true,
-  renderExtraIcon = () => {},
+  showAdd = false,
+  onAddPress,
 }) => {
   const [showBar, setShowBar] = useState(false);
   const { selectedShop } = useContext(UserContext);
@@ -86,7 +87,14 @@ const TopHeader = ({
               </TouchableOpacity>
             )}
 
-            {renderExtraIcon()}
+            {showAdd && (
+              <TouchableOpacity onPress={onAddPress}>
+                <Image
+                  source={require("../assets/icons/ic_plus.png")}
+                  style={{ height: 40, width: 30, tintColor: Colors.primary }}
+                />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 

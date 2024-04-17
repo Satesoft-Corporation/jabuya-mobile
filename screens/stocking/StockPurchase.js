@@ -119,9 +119,8 @@ const StockPurchase = ({ navigation }) => {
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}
         disabled={disable}
-        renderExtraIcon={() => (
-          <AddBtn onPress={() => navigation.navigate(STOCK_ENTRY_FORM)} />
-        )}
+        showAdd
+        onAddPress={() => navigation.navigate(STOCK_ENTRY_FORM)}
       />
 
       <FlatList

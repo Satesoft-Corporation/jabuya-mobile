@@ -75,9 +75,8 @@ const Expenses = ({}) => {
       <AppStatusBar />
       <TopHeader
         title="Expenses"
-        renderExtraIcon={() => (
-          <AddBtn onPress={() => navigation.navigate(EXPENSE_FORM)} />
-        )}
+        showAdd
+        onAddPress={() => navigation.navigate(EXPENSE_FORM)}
       />
 
       <FlatList
@@ -95,14 +94,5 @@ const Expenses = ({}) => {
     </View>
   );
 };
-
-export const AddBtn = ({ onPress }) => (
-  <TouchableOpacity onPress={onPress}>
-    <Image
-      source={require("../../assets/icons/ic_plus.png")}
-      style={{ height: 40, width: 30, tintColor: Colors.primary }}
-    />
-  </TouchableOpacity>
-);
 
 export default Expenses;
