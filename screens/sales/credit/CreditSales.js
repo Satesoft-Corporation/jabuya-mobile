@@ -4,7 +4,7 @@ import AppStatusBar from "../../../components/AppStatusBar";
 import TopHeader from "../../../components/TopHeader";
 import { MenuIcon } from "../../../components/MenuIcon";
 import { BaseApiService } from "../../../utils/BaseApiService";
-import CreditSaleListItem from "../../../components/credit/CreditSaleListItem";
+import CreditSaleListItem from "../components/CreditSaleListItem";
 import Snackbar from "../../../components/Snackbar";
 import { MAXIMUM_RECORDS_PER_FETCH } from "../../../constants/Constants";
 import Colors from "../../../constants/Colors";

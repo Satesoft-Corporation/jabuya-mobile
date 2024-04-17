@@ -16,10 +16,10 @@ import { DateCalender } from "../../components/Dialogs/DateCalendar";
 import { UserContext } from "../../context/UserContext";
 import { SHOP_SELECTION, SHOP_SUMMARY } from "../../navigation/ScreenNames";
 import { ActivityIndicator } from "react-native";
-import { SaleTransactionItem } from "./SaleTransactionItem";
-import ItemHeader from "./ItemHeader";
+import { SaleTransactionItem } from "./components/SaleTransactionItem";
+import ItemHeader from "./components/ItemHeader";
 import Icon from "../../components/Icon";
-import SalesPopupMenu from "./SalesPopupMenu";
+import SalesPopupMenu from "./components/SalesPopupMenu";
 
 export default function ViewSales({ navigation }) {
   const [sales, setSales] = useState([]);

@@ -1,11 +1,11 @@
+import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View, FlatList } from "react-native";
-import Colors from "../constants/Colors";
 import {
   extractTime,
   formatDate,
   formatNumberWithCommas,
-} from "../utils/Utils";
-import { useEffect, useState } from "react";
+} from "../../../utils/Utils";
+import Colors from "../../../constants/Colors";
 
 export function SaleTransactionItem({ data, isShopOwner }) {
   // sales report item card
@@ -39,6 +39,7 @@ export function SaleTransactionItem({ data, isShopOwner }) {
         backgroundColor: "white",
         paddingVertical: 15,
         paddingHorizontal: 10,
+        borderWidth: balanceGivenOut < 0 ? 1 : 0,
       }}
     >
       <View
@@ -367,35 +368,7 @@ export function SaleTransactionItem({ data, isShopOwner }) {
   );
 }
 
-export const SaleListItem = ({ data }) => {
-  // table item on sales entry
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        borderBottomColor: Colors.gray,
-        borderBottomWidth: 0.3,
-        alignItems: "center",
-        height: "fit-content",
-        paddingVertical: 8,
-      }}
-    >
-      <Text style={{ flex: 2.5, justifyContent: "center" }}>
-        {data?.productName}
-      </Text>
-      <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>
-      <Text style={{ flex: 1, textAlign: "right" }}>
-        {formatNumberWithCommas(data?.unitCost)}
-      </Text>
-      <Text style={{ flex: 1, textAlign: "right", paddingEnd: 10 }}>
-        {formatNumberWithCommas(data?.totalCost)}
-      </Text>
-    </View>
-  );
-};
-
-export const SaleItem = ({ data }) => {
+const SaleItem = ({ data }) => {
   //part of SaleTransaction item component
   const { productName, shopProductName, saleUnitName } = data;
 

@@ -1,20 +1,20 @@
 import { View, Text } from "react-native";
 import React, { useContext, useState } from "react";
-import ModalContent from "../ModalContent";
+import ModalContent from "../../../components/ModalContent";
 import {
   convertToServerDate,
   formatDate,
   formatNumberWithCommas,
-} from "../../utils/Utils";
-import Colors from "../../constants/Colors";
+} from "../../../utils/Utils";
+import Colors from "../../../constants/Colors";
 import SalesTable from "./SalesTable";
-import PrimaryButton from "../buttons/PrimaryButton";
+import PrimaryButton from "../../../components/buttons/PrimaryButton";
 import PaymentMethodComponent from "./PaymentMethodComponent";
-import { SaleEntryContext } from "../../context/SaleEntryContext";
-import { BaseApiService } from "../../utils/BaseApiService";
-import { UserSessionUtils } from "../../utils/UserSessionUtils";
+import { SaleEntryContext } from "../../../context/SaleEntryContext";
+import { BaseApiService } from "../../../utils/BaseApiService";
+import { UserSessionUtils } from "../../../utils/UserSessionUtils";
 import NetInfo from "@react-native-community/netinfo";
-import { UserContext } from "../../context/UserContext";
+import { UserContext } from "../../../context/UserContext";
 
 const ConfirmSaleModal = ({
   setVisible,

@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./screens/Login";
 import ViewSales from "./screens/sales/ViewSales";
-import SalesEntry from "./screens/SalesDesk/SalesEntry";
+import SalesEntry from "./screens/salesDesk/SalesEntry";
 import ShopSummary from "./screens/ShopSummary";
 import StockingMenu from "./screens/stocking/StockingMenu";
 import StockPurchaseForm from "./screens/forms/stockingForms/StockPurchaseForm";
@@ -12,7 +12,7 @@ import { SaleEntryProvider } from "./context/SaleEntryContext";
 import UpdateScreen from "./screens/UpdateScreen";
 import SelectShops from "./screens/SelectShops";
 import ProductEntry from "./screens/forms/stockingForms/ProductEntry";
-import BarCodeScreen from "./screens/BarCodeScreen";
+import BarCodeScreen from "./screens/salesDesk/BarCodeScreen";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 import Colors from "./constants/Colors";
 import LockScreen from "./screens/applock/LockScreen";
@@ -25,14 +25,13 @@ import ClientRegister from "./screens/sales/credit/ClientRegister";
 import CreditPayment from "./screens/forms/CreditPayment";
 import ContactBook from "./screens/ContactBook";
 import * as s from "./navigation/ScreenNames";
-import LandingScreen from "./screens/LandingScreen/LandingScreen";
+import LandingScreen from "./screens/landingScreen/LandingScreen";
 import Expenses from "./screens/expenses/Expenses";
 import ExpenseForm from "./screens/expenses/ExpenseForm";
 import { MenuProvider } from "react-native-popup-menu";
 import StockLevel from "./screens/stocking/StockLevels";
-import StockListing from "./screens/stocking/StockListing";
 import StockPurchase from "./screens/stocking/StockPurchase";
-import IncomeGraph from "./screens/perfomnceGraphs/IncomeGraph";
+import IncomeGraph from "./screens/perfomanceGraphs/IncomeGraph";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -78,7 +77,6 @@ export default function App() {
                 <Stack.Screen name={s.STOCKNG} component={StockingMenu} />
                 <Stack.Screen name={s.STOCK_ENTRY} component={StockPurchase} />
                 <Stack.Screen name={s.STOCK_LEVELS} component={StockLevel} />
-                <Stack.Screen name={s.STOCK_LISTING} component={StockListing} />
                 <Stack.Screen name={s.PDT_ENTRY} component={ProductEntry} />
                 <Stack.Screen
                   name={s.STOCK_ENTRY_FORM}

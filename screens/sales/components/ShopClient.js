@@ -1,10 +1,10 @@
 import { View, Text } from "react-native";
 import React from "react";
-import { formatDate } from "../../utils/Utils";
-import Colors from "../../constants/Colors";
-import ChipButton from "../buttons/ChipButton";
-import ChipButton2 from "../buttons/ChipButton2";
-import CardHeader from "../cardComponents/CardHeader";
+import { formatDate } from "../../../utils/Utils";
+import Colors from "../../../constants/Colors";
+import ChipButton from "../../../components/buttons/ChipButton";
+import ChipButton2 from "../../../components/buttons/ChipButton2";
+import CardHeader from "../../../components/cardComponents/CardHeader";
 
 const ShopClient = ({ client }) => {
   return (

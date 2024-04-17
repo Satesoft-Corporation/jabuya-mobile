@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 import React from "react";
-import CardHeader from "../cardComponents/CardHeader";
-import { formatDate, formatNumberWithCommas } from "../../utils/Utils";
-import CardFooter1 from "../cardComponents/CardFooter1";
-import CardFooter2 from "../cardComponents/CardFooter2";
+import CardHeader from "../../../components/cardComponents/CardHeader";
+import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
+import CardFooter1 from "../../../components/cardComponents/CardFooter1";
+import CardFooter2 from "../../../components/cardComponents/CardFooter2";
 import { useNavigation } from "@react-navigation/native";
 
 const CreditSaleListItem = ({ sale }) => {

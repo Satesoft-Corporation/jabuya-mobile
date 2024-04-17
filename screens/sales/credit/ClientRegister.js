@@ -6,7 +6,7 @@ import { UserContext } from "../../../context/UserContext";
 import AppStatusBar from "../../../components/AppStatusBar";
 import { BaseApiService } from "../../../utils/BaseApiService";
 import { ActivityIndicator } from "react-native";
-import ShopClient from "../../../components/credit/ShopClient";
+import ShopClient from "../components/ShopClient";
 
 const ClientRegister = () => {
   const { selectedShop } = useContext(UserContext);

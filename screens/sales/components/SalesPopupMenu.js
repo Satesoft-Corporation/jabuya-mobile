@@ -6,10 +6,10 @@ import {
   MenuOption,
   MenuTrigger,
 } from "react-native-popup-menu";
-import Colors from "../../constants/Colors";
-import { UserContext } from "../../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
-import { SHOP_SUMMARY } from "../../navigation/ScreenNames";
+import { UserContext } from "../../../context/UserContext";
+import { SHOP_SUMMARY } from "../../../navigation/ScreenNames";
+import Colors from "../../../constants/Colors";
 
 const SalesPopupMenu = ({ menuRef, reload, showDatePicker }) => {
   const { shops, selectedShop, setSelectedShop } = useContext(UserContext);

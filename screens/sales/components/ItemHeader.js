@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import React from "react";
-import Colors from "../../constants/Colors";
+import Colors from "../../../constants/Colors";
 
 const ItemHeader = ({ title, value, ugx = true }) => {
   return (

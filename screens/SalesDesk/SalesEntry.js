@@ -5,11 +5,8 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
-  Dimensions,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
-
-import { BaseApiService } from "../../utils/BaseApiService";
 
 import Colors from "../../constants/Colors";
 
@@ -28,15 +25,16 @@ import PrimaryButton from "../../components/buttons/PrimaryButton";
 import { SaleEntryContext } from "../../context/SaleEntryContext";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import NetInfo from "@react-native-community/netinfo";
-import EnterSaleQtyModal from "../../components/sales/EnterSaleQtyModal";
-import ConfirmSaleModal from "../../components/sales/ConfirmSaleModal";
-import SalesTable from "../../components/sales/SalesTable";
+
 import { SafeAreaView } from "react-native";
 import {
   BARCODE_SCREEN,
   SALES_REPORTS,
   SHOP_SELECTION,
 } from "../../navigation/ScreenNames";
+import SalesTable from "./components/SalesTable";
+import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
+import ConfirmSaleModal from "./components/ConfirmSaleModal";
 
 function SalesEntry({ navigation }) {
   const [products, setProducts] = useState([]);

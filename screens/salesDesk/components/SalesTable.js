@@ -1,8 +1,8 @@
 import { View, Text, ScrollView } from "react-native";
 import React from "react";
-import { SaleListItem } from "../TransactionItems";
-import Colors from "../../constants/Colors";
-import { screenHeight } from "../../constants/Constants";
+import Colors from "../../../constants/Colors";
+import { screenHeight } from "../../../constants/Constants";
+import { formatNumberWithCommas } from "../../../utils/Utils";
 
 const SalesTable = ({ sales = [], fixHeight = true }) => {
   return (
@@ -49,4 +49,31 @@ const SalesTable = ({ sales = [], fixHeight = true }) => {
   );
 };
 
+export const SaleListItem = ({ data }) => {
+  // table item on sales entry
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        borderBottomColor: Colors.gray,
+        borderBottomWidth: 0.3,
+        alignItems: "center",
+        height: "fit-content",
+        paddingVertical: 8,
+      }}
+    >
+      <Text style={{ flex: 2.5, justifyContent: "center" }}>
+        {data?.productName}
+      </Text>
+      <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>
+      <Text style={{ flex: 1, textAlign: "right" }}>
+        {formatNumberWithCommas(data?.unitCost)}
+      </Text>
+      <Text style={{ flex: 1, textAlign: "right", paddingEnd: 10 }}>
+        {formatNumberWithCommas(data?.totalCost)}
+      </Text>
+    </View>
+  );
+};
 export default SalesTable;

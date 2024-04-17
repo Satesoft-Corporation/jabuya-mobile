@@ -1,11 +1,11 @@
 import { View, Text, FlatList, TextInput } from "react-native";
 import React, { useContext } from "react";
-import Colors from "../../constants/Colors";
-import { paymentMethods } from "../../constants/Constants";
-import { SaleEntryContext } from "../../context/SaleEntryContext";
-import ChipButton from "../buttons/ChipButton";
+import Colors from "../../../constants/Colors";
+import { paymentMethods } from "../../../constants/Constants";
+import { SaleEntryContext } from "../../../context/SaleEntryContext";
+import ChipButton from "../../../components/buttons/ChipButton";
 import { DatePickerInput } from "react-native-paper-dates";
-import { MyDropDown } from "../DropdownComponents";
+import { MyDropDown } from "../../../components/DropdownComponents";
 
 const PaymentMethodComponent = ({
   soldOnDate,
