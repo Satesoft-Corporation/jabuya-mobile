@@ -131,7 +131,7 @@ function StockLevelItem({ data }) {
             value={data?.changedByFullName}
           />
           <CardFooter1
-            btnTitle1="Price"
+            btnTitle1="Update price"
             btnTitle2="Hide"
             onClick2={toggleExpand}
             onClick1={() => navigation.navigate(UPDATE_PRICE,data)}
