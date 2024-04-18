@@ -28,11 +28,8 @@ const SalesPopupMenu = ({ menuRef, reload, showDatePicker }) => {
       name: "Investment",
       onClick: () => navigation.navigate(SHOP_SUMMARY),
     },
-    // {
-    //   name: "Select shop",
-    //   disabled: true,
-    // },
-    ...shops,
+
+    ...(shops?.length > 1 ? [...shops] : []),
   ];
   return (
     <View>

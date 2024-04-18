@@ -305,6 +305,27 @@ export function SaleTransactionItem({ data, isShopOwner }) {
             </Text>
           </View>
 
+          {balanceGivenOut < 0 && (
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginVertical: 5,
+              }}
+            >
+              <Text style={{ fontWeight: "bold" }}>Client PhoneNumber</Text>
+              <Text
+                style={{
+                  alignSelf: "flex-end",
+                  fontWeight: "bold",
+                  marginEnd: 4,
+                }}
+              >
+                {data?.clientPhoneNumber}
+              </Text>
+            </View>
+          )}
+
           <View
             style={{
               flexDirection: "row",
