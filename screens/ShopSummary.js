@@ -3,11 +3,12 @@ import React, { useContext, useEffect, useState } from "react";
 import AppStatusBar from "../components/AppStatusBar";
 import Colors from "../constants/Colors";
 import { BaseApiService } from "../utils/BaseApiService";
-import { BlackScreen } from "../components/BlackAndWhiteScreen";
 import UserProfile from "../components/UserProfile";
 import Loader from "../components/Loader";
-import { formatNumberWithCommas } from "../utils/Utils";
+import { convertDateFormat, formatNumberWithCommas } from "../utils/Utils";
 import { UserContext } from "../context/UserContext";
+import { UserSessionUtils } from "../utils/UserSessionUtils";
+import { STOCK_ENTRY_ENDPOINT } from "../utils/EndPointUtils";
 
 const ShopSummary = ({ navigation, route }) => {
   const [initialCapital, setInitialCapital] = useState("");
@@ -18,46 +19,37 @@ const ShopSummary = ({ navigation, route }) => {
 
   const { userParams } = useContext(UserContext);
 
-  const { shopOwnerId } = userParams; // changes the id when done
+  const { shopOwnerId } = userParams;
 
-  const fetchShopProducts = () => {
-    let searchParameters = {
-      offset: 0,
-      limit: 0,
-      shopOwnerId: 2453,
-    };
-    let itemsStockValues = [];
-    let itemsSaleValues = [];
+  const fetchShopProducts = async () => {
+    let products = await UserSessionUtils.getShopProducts();
 
-    new BaseApiService("/shop-products")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        response.records.forEach((item) => {
-          const { salesPrice } = item;
-          let summary = item?.performanceSummary;
+    let totalStockValue = [];
+    let totalSaleValue = [];
+    console.log(products);
 
-          let qtyStocked = summary?.totalQuantityStocked || 0;
-          let qtySold = summary?.totalQuantitySold || 0;
+    products.forEach((item) => {
+      const { salesPrice } = item;
+      const summary = item?.performanceSummary;
 
-          let remainingStock = qtyStocked - qtySold;
-          let soldValue = summary?.totalValueSold || 0;
+      const qtyStocked = summary?.totalQuantityStocked || 0;
+      const qtySold = summary?.totalQuantitySold || 0;
 
-          const itemValue = salesPrice * remainingStock; //itemstock value
+      const remainingStock = qtyStocked - qtySold;
 
-          itemsStockValues.push(itemValue);
-          itemsSaleValues.push(soldValue);
-        });
+      const iteSalesValue = qtySold * salesPrice;
+      const itemStockValue = salesPrice * remainingStock; //itemstock value
 
-        let stockValue = itemsStockValues.reduce((a, b) => a + b, 0);
-        let cash = itemsSaleValues.reduce((a, b) => a + b, 0);
-        setStock(stockValue);
-        setTotalSalesValue(cash);
+      totalSaleValue.push(iteSalesValue);
+      totalStockValue.push(itemStockValue);
+    });
 
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-      });
+    let stockValue = totalStockValue.reduce((a, b) => a + b, 0);
+    let cash = totalSaleValue.reduce((a, b) => a + b, 0);
+    setStock(stockValue);
+    setTotalSalesValue(cash);
+
+    setLoading(false);
   };
 
   const fetchShopDetails = () => {
@@ -70,7 +62,7 @@ const ShopSummary = ({ navigation, route }) => {
     new BaseApiService("/shops")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
-        // console.log(response.records);
+        console.log(response.records);
         let totalCapital = 0;
         let stockValue = 0;
         let cashAtHand = 0;
@@ -106,14 +98,39 @@ const ShopSummary = ({ navigation, route }) => {
       });
   };
 
+  const fetchStockEntries = async () => {
+    const monthStartDate = new Date();
+
+    monthStartDate.setDate(1);
+
+    try {
+      const searchParameters = {
+        limit: 0,
+        offset: 0,
+        shopOwnerId: shopOwnerId,
+        startDate: convertDateFormat(monthStartDate),
+      };
+
+      const response = await new BaseApiService(
+        STOCK_ENTRY_ENDPOINT
+      ).getRequestWithJsonResponse(searchParameters);
+      console.log(response?.records);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
     fetchShopProducts();
     fetchShopDetails();
+    fetchStockEntries();
   }, []);
 
   return (
     <View style={{ backgroundColor: Colors.light_2, flex: 1 }}>
-      <BlackScreen flex={0.45}>
+      <AppStatusBar bgColor="black" content="light-content" />
+      <Loader loading={loading} />
+
+      <View style={{ backgroundColor: Colors.dark }}>
         <UserProfile navigation={navigation} />
         <View
           style={{
@@ -192,10 +209,7 @@ const ShopSummary = ({ navigation, route }) => {
             </Text>
           </TouchableOpacity>
         </View>
-      </BlackScreen>
-      <AppStatusBar bgColor="black" content="light-content" />
-      <Loader loading={loading} />
-
+      </View>
       <View style={{ paddingHorizontal: 10, marginTop: 8 }}>
         <View
           style={{

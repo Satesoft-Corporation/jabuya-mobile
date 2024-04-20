@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, FlatList, Image } from "react-native";
+import { View, Text, SafeAreaView, FlatList, Image } from "react-native";
 import React, { useContext, useEffect, useState, useRef } from "react";
 
 import { BaseApiService } from "../../utils/BaseApiService";
@@ -14,20 +14,16 @@ import {
 import UserProfile from "../../components/UserProfile";
 import { DateCalender } from "../../components/Dialogs/DateCalendar";
 import { UserContext } from "../../context/UserContext";
-import { SHOP_SELECTION, SHOP_SUMMARY } from "../../navigation/ScreenNames";
 import { ActivityIndicator } from "react-native";
 import { SaleTransactionItem } from "./components/SaleTransactionItem";
 import ItemHeader from "./components/ItemHeader";
-import Icon from "../../components/Icon";
 import SalesPopupMenu from "./components/SalesPopupMenu";
 
 export default function ViewSales({ navigation }) {
   const [sales, setSales] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [totalSalesQty, setTotalSalesQty] = useState(0); //total quantity for all sold items
-  const [offset, setOffset] = useState(0);
   const [visible, setVisible] = useState(false);
-  const [filtering, setFiltering] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [salesValue, setSalesValue] = useState(0); //total money value sold
@@ -40,7 +36,7 @@ export default function ViewSales({ navigation }) {
 
   const { userParams, selectedShop } = useContext(UserContext);
 
-  const { isShopOwner, isShopAttendant, shopOwnerId } = userParams;
+  const { isShopOwner, shopOwnerId } = userParams;
 
   const menuRef = useRef();
 
@@ -97,7 +93,7 @@ export default function ViewSales({ navigation }) {
     const getAllData = selectedShop?.id === shopOwnerId;
 
     let searchParameters = {
-      offset: offset,
+      offset: 0,
       limit: 0,
       /**
        * conditionally set search parameters based on the shop selections
@@ -189,30 +185,12 @@ export default function ViewSales({ navigation }) {
     setTotalSalesQty((prevCount) => prevCount + count);
   };
 
-  const renderMenuIcon = () => {
-    return (
-      <>
-        <Icon
-          groupName="Entypo"
-          name="dots-three-vertical"
-          size={20}
-          color={Colors.primary}
-        />
-
-        <SalesPopupMenu
-          menuRef={menuRef}
-          reload={getSales}
-          showDatePicker={() => setVisible(true)}
-        />
-      </>
-    );
-  };
   useEffect(() => {
     getSales();
   }, [selectedShop]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar />
 
       <View style={{ backgroundColor: Colors.dark }}>
@@ -220,9 +198,12 @@ export default function ViewSales({ navigation }) {
           renderNtnIcon={false}
           renderExtraIcon={true}
           onPress={() => menuRef.current.open()}
-          extraIcon={renderMenuIcon}
         />
-
+        <SalesPopupMenu
+          menuRef={menuRef}
+          reload={handleRefresh}
+          showDatePicker={() => setVisible(true)}
+        />
         <View style={{ marginTop: 5, paddingBottom: 10 }}>
           <View
             style={{
@@ -262,32 +243,20 @@ export default function ViewSales({ navigation }) {
             }}
           >
             <ItemHeader value={totalSalesQty || 0} title="Qty" ugx={false} />
-            <View
-              style={{
-                width: 1,
-                height: "inherit",
-                backgroundColor: Colors.primary,
-              }}
-            />
+
+            <VerticalSeparator />
+
             <ItemHeader
               title="Sales"
               value={formatNumberWithCommas(salesValue)}
             />
-            <View
-              style={{
-                width: 1,
-                height: "inherit",
-                backgroundColor: Colors.primary,
-              }}
-            />
+
+            <VerticalSeparator />
+
             <ItemHeader title="Capital " value={daysCapital} />
-            <View
-              style={{
-                width: 1,
-                height: "inherit",
-                backgroundColor: Colors.primary,
-              }}
-            />
+
+            <VerticalSeparator />
+
             <ItemHeader title="Income" value={daysProfit} />
           </View>
         </View>
@@ -314,13 +283,12 @@ export default function ViewSales({ navigation }) {
         visible={visible}
         selectedStartDate={selectedStartDate}
         handleDayPress={handleDayPress}
-        setFiltering={setFiltering}
         setVisible={setVisible}
         onFinish={filterSales}
         setSelectedEndDate={setSelectedEndDate}
         setSelectedStartDate={setSelectedStartDate}
         moreCancelActions={() => {}}
       />
-    </View>
+    </SafeAreaView>
   );
 }

@@ -5,6 +5,7 @@ import Colors from "../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../context/UserContext";
+import Icon from "./Icon";
 
 const UserProfile = ({
   renderNtnIcon = true,
@@ -104,7 +105,18 @@ const UserProfile = ({
       )}
 
       {renderExtraIcon && (
-        <TouchableOpacity onPress={onPress}>{extraIcon()}</TouchableOpacity>
+        <TouchableOpacity onPress={onPress}>
+          {extraIcon ? (
+            extraIcon
+          ) : (
+            <Icon
+              groupName="Entypo"
+              name="dots-three-vertical"
+              size={20}
+              color={Colors.primary}
+            />
+          )}
+        </TouchableOpacity>
       )}
     </View>
   );

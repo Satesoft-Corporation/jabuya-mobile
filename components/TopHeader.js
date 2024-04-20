@@ -4,6 +4,7 @@ import Colors from "../constants/Colors";
 import SearchBar from "./SearchBar";
 import { UserContext } from "../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
+import Icon from "./Icon";
 
 const TopHeader = ({
   title = "Details",
@@ -14,6 +15,8 @@ const TopHeader = ({
   showShopName = true,
   showAdd = false,
   onAddPress,
+  showMenuDots = false,
+  onDotPress,
 }) => {
   const [showBar, setShowBar] = useState(false);
   const { selectedShop } = useContext(UserContext);
@@ -92,6 +95,16 @@ const TopHeader = ({
                 <Image
                   source={require("../assets/icons/ic_plus.png")}
                   style={{ height: 40, width: 30, tintColor: Colors.primary }}
+                />
+              </TouchableOpacity>
+            )}
+            {showMenuDots && (
+              <TouchableOpacity onPress={onDotPress}>
+                <Icon
+                  groupName="Entypo"
+                  name="dots-three-vertical"
+                  size={20}
+                  color={Colors.primary}
                 />
               </TouchableOpacity>
             )}

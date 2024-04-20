@@ -1,8 +1,7 @@
-import { View, Text, SafeAreaView, FlatList } from "react-native";
+import { View, Text, SafeAreaView, FlatList, StyleSheet } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import AppStatusBar from "../../../components/AppStatusBar";
 import TopHeader from "../../../components/TopHeader";
-import { MenuIcon } from "../../../components/MenuIcon";
 import { BaseApiService } from "../../../utils/BaseApiService";
 import CreditSaleListItem from "../components/CreditSaleListItem";
 import Snackbar from "../../../components/Snackbar";
@@ -10,33 +9,34 @@ import { MAXIMUM_RECORDS_PER_FETCH } from "../../../constants/Constants";
 import Colors from "../../../constants/Colors";
 import { ActivityIndicator } from "react-native";
 import { UserContext } from "../../../context/UserContext";
+import ItemHeader from "../components/ItemHeader";
+import { formatNumberWithCommas } from "../../../utils/Utils";
+import VerticalSeparator from "../../../components/VerticalSeparator";
 
 const CreditSales = () => {
   const [creditSales, setCreditSales] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
   const [offset, setOffset] = useState(0);
   const [showFooter, setShowFooter] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [message, setMessage] = useState(null);
 
+  const [debtors, setDebtors] = useState(0);
+  const [debt, setDebt] = useState(0);
+  const [paid, setPaid] = useState(0);
+  const [bal, setBal] = useState(0);
+
   const snackbarRef = useRef(null);
 
-  const { userParams, reload, setReload } = useContext(UserContext);
-
-  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-    userParams;
+  const { reload, selectedShop } = useContext(UserContext);
 
   const fetchCreditSales = async () => {
     let searchParameters = {
-      limit: MAXIMUM_RECORDS_PER_FETCH,
-      ...(isShopAttendant && { shopId: attendantShopId }),
-      ...(isShopOwner && { shopOwnerId }),
-      offset: reload === true ? 0 : offset,
-      ...(searchTerm && searchTerm.trim() !== "" && { searchTerm: searchTerm }),
+      limit: 0,
+      shopId: selectedShop?.id,
+      offset: offset,
     };
 
-    setCreditSales([]);
     setShowFooter(true);
 
     setIsFetchingMore(true);
@@ -44,20 +44,32 @@ const CreditSales = () => {
     new BaseApiService("/credit-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
-        setCreditSales((prevEntries) => [...prevEntries, ...response?.records]);
+        setTotalRecords(unPaid);
+        //console.log(response.records);
 
-        setTotalRecords(response.totalItems);
+        const unPaid = response.records?.filter(
+          (item) => item.amountLoaned > item.amountRepaid
+        );
+
+        const debts = unPaid.reduce((a, b) => a + b?.amountLoaned, 0);
+
+        const payments = unPaid.reduce((a, b) => a + b?.amountRepaid, 0);
+
+        setDebtors(unPaid.length);
+        setDebt(debts);
+
+        setPaid(payments);
+
+        setBal(debts - payments);
+        setCreditSales((prevEntries) => [...prevEntries, ...unPaid]);
 
         if (response?.totalItems === 0) {
-          setMessage("No shop products found");
+          setMessage("No debts found");
           setShowFooter(false);
         }
 
-        if (response?.totalItems === 0 && searchTerm !== "") {
-          setMessage(`No results found for ${searchTerm}`);
-          setShowFooter(false);
-        }
         setIsFetchingMore(false);
+        setShowFooter(false);
       })
       .catch((error) => {
         setShowFooter(false);
@@ -96,34 +108,87 @@ const CreditSales = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark }}>
       <AppStatusBar />
-      <TopHeader title="Credited Records" />
-      <View style={{ flex: 1 }}>
+      <TopHeader title="Credited Records" showMenuDots />
+      <View style={{}}>
+        <View style={styles.debtHeader}>
+          <Text
+            style={{
+              color: Colors.primary,
+              fontSize: 16,
+            }}
+          >
+            Debt summary
+          </Text>
+
+          {/* <Text
+            style={{
+              color: Colors.primary,
+              fontWeight: 600,
+              opacity: 0.7,
+            }}
+          >
+            Period {formatDate(new Date(), true)}
+          </Text> */}
+        </View>
+
+        <View style={styles.summaryContainer}>
+          <ItemHeader value={debtors} title="Debtors" ugx={false} />
+
+          <VerticalSeparator />
+
+          <ItemHeader title="Debt" value={formatNumberWithCommas(debt)} />
+
+          <VerticalSeparator />
+
+          <ItemHeader title="Paid " value={formatNumberWithCommas(paid)} />
+
+          <VerticalSeparator />
+
+          <ItemHeader title="Balance" value={formatNumberWithCommas(bal)} />
+        </View>
+      </View>
+
+      <View style={{ flex: 1, backgroundColor: Colors.light }}>
         <FlatList
           style={{ marginTop: 10 }}
           data={creditSales}
           renderItem={({ item }) => <CreditSaleListItem sale={item} />}
           keyExtractor={(item) => item.id.toString()}
           ListEmptyComponent={() => (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+            <View style={styles.errorMsg}>
               <Text>{message}</Text>
             </View>
           )}
-          onEndReached={handleEndReached}
+          // onEndReached={handleEndReached}
           onEndReachedThreshold={0}
           ListFooterComponent={renderFooter}
         />
         <Snackbar ref={snackbarRef} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 export default CreditSales;
+
+const styles = StyleSheet.create({
+  debtHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    marginVertical: 10,
+  },
+  errorMsg: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  summaryContainer: {
+    flexDirection: "row",
+    marginTop: 15,
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
+  },
+});

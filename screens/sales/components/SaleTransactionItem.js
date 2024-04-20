@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View, FlatList } from "react-native";
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+  StyleSheet,
+} from "react-native";
 import {
   extractTime,
   formatDate,

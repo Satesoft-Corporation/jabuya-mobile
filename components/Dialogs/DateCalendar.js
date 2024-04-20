@@ -9,7 +9,6 @@ export function DateCalender({
   visible,
   selectedStartDate,
   handleDayPress,
-  setFiltering,
   setVisible,
   onFinish,
   setSelectedEndDate,
@@ -106,7 +105,6 @@ export function DateCalender({
             color: Colors.primary,
           }}
           buttonPress={() => {
-            setFiltering(true);
             setVisible(false);
             onFinish();
             setSelectedEndDate(null);

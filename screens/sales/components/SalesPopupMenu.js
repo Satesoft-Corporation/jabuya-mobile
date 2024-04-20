@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
 import React, { useRef, useContext } from "react";
 import {
   Menu,
@@ -12,7 +12,9 @@ import { SHOP_SUMMARY } from "../../../navigation/ScreenNames";
 import Colors from "../../../constants/Colors";
 
 const SalesPopupMenu = ({ menuRef, reload, showDatePicker }) => {
-  const { shops, selectedShop, setSelectedShop } = useContext(UserContext);
+  const { shops, selectedShop, setSelectedShop, userParams } =
+    useContext(UserContext);
+
   const navigation = useNavigation();
 
   const menuItems = [
@@ -24,15 +26,14 @@ const SalesPopupMenu = ({ menuRef, reload, showDatePicker }) => {
       name: "Select date range",
       onClick: () => showDatePicker(),
     },
-    {
+    userParams?.isShopOwner && {
       name: "Investment",
       onClick: () => navigation.navigate(SHOP_SUMMARY),
     },
-
     ...(shops?.length > 1 ? [...shops] : []),
   ];
   return (
-    <View>
+    <View style={{ alignSelf: "flex-end", marginTop: -10 }}>
       <Menu ref={menuRef}>
         <MenuTrigger text="" disabled />
         <MenuOptions
@@ -41,8 +42,6 @@ const SalesPopupMenu = ({ menuRef, reload, showDatePicker }) => {
             padding: 10,
             borderRadius: 5,
             marginTop: 5,
-
-            // width: 150,
           }}
         >
           {menuItems.map((item, i) => (
