@@ -18,6 +18,7 @@ import { ActivityIndicator } from "react-native";
 import { SaleTransactionItem } from "./components/SaleTransactionItem";
 import ItemHeader from "./components/ItemHeader";
 import SalesPopupMenu from "./components/SalesPopupMenu";
+import VerticalSeparator from "../../components/VerticalSeparator"; 
 
 export default function ViewSales({ navigation }) {
   const [sales, setSales] = useState([]);
