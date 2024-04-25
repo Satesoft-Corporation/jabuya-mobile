@@ -1,5 +1,5 @@
-import { View, Text, SafeAreaView, FlatList, Image } from "react-native";
-import React, { useContext, useEffect, useState, useRef } from "react";
+import { View, Text, SafeAreaView, FlatList } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
 
 import { BaseApiService } from "../../utils/BaseApiService";
 
@@ -33,7 +33,7 @@ export default function ViewSales({ navigation }) {
   const [daysProfit, setDaysProfit] = useState(0);
   const [daysCapital, setDaysCapital] = useState(0);
   const [message, setMessage] = useState(null);
-  const [showFooter, setShowFooter] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const { userParams, shops, selectedShop, setSelectedShop } =
     useContext(UserContext);
@@ -42,7 +42,7 @@ export default function ViewSales({ navigation }) {
 
   const menuItems = [
     {
-      name: "Reload list",
+      name: "Refresh",
       onClick: () => handleRefresh(),
     },
     {
@@ -63,6 +63,15 @@ export default function ViewSales({ navigation }) {
         })
       : []),
   ];
+
+  const idObject =
+    selectedShop?.id === shopOwnerId
+      ? {
+          shopOwnerId: selectedShop?.id,
+        }
+      : {
+          shopId: selectedShop?.id,
+        };
 
   const handleDayPress = (day) => {
     if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
@@ -99,55 +108,20 @@ export default function ViewSales({ navigation }) {
     setTotalItems(0);
   };
 
-  const renderFooter = () => {
-    if (showFooter === true) {
-      if (sales.length === totalItems && sales.length > 0) {
-        return null;
-      }
-
-      return (
-        <View style={{ paddingVertical: 20 }}>
-          <ActivityIndicator animating size="large" color={Colors.dark} />
-        </View>
-      );
-    }
-  };
-
   const getSales = async (startDate, endDate) => {
-    const getAllData = selectedShop?.id === shopOwnerId;
-
     let searchParameters = {
       offset: 0,
       limit: 0,
-      /**
-       * conditionally set search parameters based on the shop selections
-       */
-      ...(getAllData && {
-        shopOwnerId: selectedShop?.id,
-      }),
-      ...(!getAllData && {
-        shopId: selectedShop?.id,
-      }),
+      ...idObject,
+      ...(!startDate && !endDate && { startDate: getCurrentDay() }),
+      ...(startDate && { startDate: convertDateFormat(startDate) }),
+      ...(endDate && { endDate: convertDateFormat(endDate, true) }),
+      ...(endDate === null &&
+        startDate && { endDate: convertDateFormat(startDate, true) }),
     };
+
     clearFields();
-
-    if (!startDate && !endDate) {
-      searchParameters.startDate = getCurrentDay();
-    }
-
-    if (startDate) {
-      searchParameters.startDate = convertDateFormat(startDate);
-    }
-
-    if (endDate) {
-      searchParameters.endDate = convertDateFormat(endDate, true);
-    }
-    if (endDate === null && startDate) {
-      //specific day setting
-      searchParameters.endDate = convertDateFormat(startDate, true);
-    }
-
-    setShowFooter(true);
+    setLoading(true);
     setMessage(null);
 
     new BaseApiService("/shop-sales")
@@ -161,7 +135,6 @@ export default function ViewSales({ navigation }) {
 
         if (response.totalItems === 0) {
           setMessage("No sales made on this today");
-          setShowFooter(false);
         }
 
         data.forEach((item) => {
@@ -186,11 +159,11 @@ export default function ViewSales({ navigation }) {
         setDaysProfit(formatNumberWithCommas(Math.round(income)));
         setDaysCapital(formatNumberWithCommas(Math.round(capital)));
         setSalesValue(sV);
-        setShowFooter(false);
         setSales(response?.records);
+        setLoading(false);
       })
       .catch((error) => {
-        setShowFooter(false);
+        setLoading(false);
         setMessage("Cannot get sales!", error?.message);
       });
   };
@@ -291,7 +264,8 @@ export default function ViewSales({ navigation }) {
             {message}
           </Text>
         )}
-        ListFooterComponent={renderFooter}
+        onRefresh={() => handleRefresh()}
+        refreshing={loading}
       />
 
       <DateCalender

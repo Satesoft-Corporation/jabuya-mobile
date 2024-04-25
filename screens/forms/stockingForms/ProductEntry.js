@@ -1,19 +1,23 @@
-import { View, Text, TextInput, ScrollView } from "react-native";
+import { View, Text } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Colors from "../../../constants/Colors";
 import AppStatusBar from "../../../components/AppStatusBar";
 import { MyDropDown } from "../../../components/DropdownComponents";
 import { BaseApiService } from "../../../utils/BaseApiService";
 import Loader from "../../../components/Loader";
-import { KeyboardAvoidingView } from "react-native";
 import { hasNull } from "../../..//utils/Utils";
 import { UserContext } from "../../../context/UserContext";
 import { useContext } from "react";
 import TopHeader from "../../../components/TopHeader";
 import Snackbar from "../../../components/Snackbar";
 import PrimaryButton from "../../../components/buttons/PrimaryButton";
+import { SafeAreaView } from "react-native";
+import { StyleSheet } from "react-native";
+import MyInput from "../../../components/MyInput";
+import ChipButton from "../../../components/buttons/ChipButton";
+import { FlatList } from "react-native";
 
-const ProductEntry = ({ navigation, route }) => {
+const ProductEntry = () => {
   const { selectedShop } = useContext(UserContext);
 
   const [manufacturers, setManufacturers] = useState([]);
@@ -21,14 +25,14 @@ const ProductEntry = ({ navigation, route }) => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [remarks, setRemarks] = useState(null);
+  const [remarks, setRemarks] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [disable, setDisable] = useState(false);
   const [saleUnits, setSaleUnits] = useState([]);
-  const [selectedSaleUnit, setSelecetedSaleUnit] = useState(false);
-  const [salesPrice, setSalesPrice] = useState("");
+  const [selectedSaleUnit, setSelectedSaleUnit] = useState(null);
+  const [selectedSaleUnits, setSelectedSaleUnits] = useState([]);
 
-  //
+  const [salesPrice, setSalesPrice] = useState("");
 
   const snackBarRef = useRef(null);
 
@@ -43,20 +47,6 @@ const ProductEntry = ({ navigation, route }) => {
       .catch((error) => {
         setLoading(false);
       });
-  };
-
-  const fetchSaleUnits = async () => {
-    let searchParameters = {
-      offset: 0,
-      limit: 0,
-      commaSeparatedTypeIds: [4],
-    };
-    new BaseApiService("/lookups/lookup-values")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        setSaleUnits(response.records);
-      })
-      .catch((error) => {});
   };
 
   const fetchProducts = async (manufacturerId) => {
@@ -83,47 +73,98 @@ const ProductEntry = ({ navigation, route }) => {
       });
   };
 
+  const onSaleUnitSelect = (unit) => {
+    const { saleUnitName, id } = unit;
+
+    let itemUnit = {
+      id: 0,
+      productSaleUnitId: id,
+      unitPrice: "",
+      saleUnitName,
+    };
+
+    const isSelected = selectedSaleUnits?.find(
+      (item) => item.productSaleUnitId === id
+    );
+
+    if (isSelected) {
+      const newList = selectedSaleUnits.filter(
+        (item) => item.productSaleUnitId !== id
+      );
+
+      setSelectedSaleUnits([...newList]);
+    } else {
+      setSelectedSaleUnits((prevSaleUnits) => [...prevSaleUnits, itemUnit]);
+    }
+  };
+
+  const handleSaleUnitChange = (e) => {
+    setSelectedSaleUnit(e);
+    const newList = selectedSaleUnits.filter(
+      (item) => item.productSaleUnitId !== e?.id
+    );
+
+    setSelectedSaleUnits(newList);
+  };
+
+  const handleUnitPriceChange = (index, value) => {
+    const updatedLineItems = [...selectedSaleUnits];
+    updatedLineItems[index].unitPrice = value;
+    setSelectedSaleUnits([...updatedLineItems]);
+  };
+
   const onManufacturerChange = (e) => {
     setSelectedManufacturer(e);
     fetchProducts(e?.id);
   };
 
-  const onProductChange = (pdt) => {
-    setSelectedProduct(pdt);
+  const onProductChange = (e) => {
+    let { multipleSaleUnits } = e;
+    setSelectedProduct(e);
+    setSelectedSaleUnit(
+      multipleSaleUnits?.find((item) => item?.saleUnitId === 2205)
+    );
+    if (multipleSaleUnits) {
+      setSaleUnits(multipleSaleUnits);
+    } else {
+      setSaleUnits([]);
+      setSelectedSaleUnits([]);
+    }
   };
 
   const clearForm = () => {
     setSelectedManufacturer(null);
     setSelectedProduct(null);
-    setRemarks(null);
+    setRemarks("");
     setProducts([]);
     setSubmitted(false);
     setSalesPrice("");
+    setSelectedSaleUnits([]);
+    setSaleUnits([]);
   };
 
   const saveProduct = () => {
     setSubmitted(true);
     setLoading(true);
-    setDisable(true);
 
     let payload = {
       manufacturerId: selectedManufacturer?.id,
       shopId: selectedShop?.id,
       productId: selectedProduct?.id,
-      saleUnitId: selectedSaleUnit?.id,
+      saleUnitId: selectedSaleUnit?.saleUnitId,
       salesPrice: Number(salesPrice),
       remarks: remarks || "",
-      hasMultipleSaleUnits: false,
+      hasMultipleSaleUnits: selectedSaleUnits.length > 0,
+      multipleSaleUnits: selectedSaleUnits,
     };
 
     const apiUrl = "/shop-products";
 
-    let isValidPayload = hasNull(payload) === false;
+    let isValidPayload = hasNull(payload) === false && salesPrice.trim() !== "";
 
     if (isValidPayload === false) {
       setLoading(false); //removing loader if form is invalid
     }
-
     if (isValidPayload === true) {
       new BaseApiService(apiUrl)
         .saveRequestWithJsonResponse(payload, false)
@@ -145,236 +186,191 @@ const ProductEntry = ({ navigation, route }) => {
 
   useEffect(() => {
     fetchManufacturers();
-    fetchSaleUnits();
   }, []);
 
   return (
-    <KeyboardAvoidingView
-      enabled={true}
-      behavior={"height"}
-      style={{ flex: 1 }}
-    >
-      <View style={{ flex: 1, backgroundColor: Colors.light }}>
-        <AppStatusBar />
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
+      <AppStatusBar />
 
-        <TopHeader
-          title="Add product"
-          
-        />
-        <Loader loading={loading} />
-        <ScrollView
-          style={{
-            paddingHorizontal: 8,
-          }}
-        >
-          <Text
-            style={{
-              marginVertical: 10,
-              fontWeight: 500,
-              fontSize: 16,
-              marginStart: 5,
-            }}
-          >
-            Enter product detail
-          </Text>
+      <TopHeader title="Add product" />
+      <Loader loading={loading} />
+      <View
+        style={{
+          paddingHorizontal: 8,
+          gap: 8,
+          paddingBottom: 30,
+        }}
+      >
+        <Text style={styles.headerText}>Enter product details</Text>
 
-          <View style={{ marginVertical: 8 }}>
-            <Text
-              style={{
-                marginVertical: 3,
-                marginStart: 6,
-              }}
-            >
-              Manufacturer
-            </Text>
+        <View>
+          <Text style={styles.inputLabel}>Manufacturer</Text>
+          <MyDropDown
+            style={styles.dropDown}
+            data={manufacturers}
+            onChange={onManufacturerChange}
+            value={selectedManufacturer}
+            placeholder="Select manufacuturer"
+            labelField="name"
+            valueField="id"
+          />
+          {submitted && !selectedManufacturer && (
+            <Text style={styles.errorText}>Manufacturer is required</Text>
+          )}
+        </View>
+
+        <View>
+          <Text style={styles.inputLabel}>Product</Text>
+          <MyDropDown
+            style={styles.dropDown}
+            disable={disable}
+            data={products}
+            onChange={onProductChange}
+            value={selectedShop}
+            placeholder="Select product"
+            labelField="displayName"
+            valueField="id"
+          />
+          {submitted && !selectedProduct && (
+            <Text style={styles.errorText}>Product is required</Text>
+          )}
+        </View>
+
+        <View style={styles.row}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.inputLabel}>Sale unit</Text>
             <MyDropDown
-              style={{
-                backgroundColor: Colors.light,
-                borderColor: Colors.dark,
-              }}
-              data={manufacturers}
-              onChange={onManufacturerChange}
-              value={selectedManufacturer}
-              placeholder="Select manufacuturer"
-              labelField="name"
-              valueField="id"
-            />
-            {submitted && !selectedManufacturer && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginStart: 6,
-                  color: Colors.error,
-                }}
-              >
-                Manufacturer is required
-              </Text>
-            )}
-          </View>
-
-          <View style={{}}>
-            <Text
-              style={{
-                marginVertical: 3,
-                marginStart: 6,
-              }}
-            >
-              Product
-            </Text>
-            <MyDropDown
-              style={{
-                backgroundColor: Colors.light,
-                borderColor: Colors.dark,
-              }}
-              disable={disable}
-              data={products}
-              onChange={onProductChange}
-              value={selectedShop}
-              placeholder="Select product"
-              labelField="displayName"
-              valueField="id"
-            />
-            {submitted && !selectedProduct && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginStart: 6,
-                  color: Colors.error,
-                }}
-              >
-                Product is required
-              </Text>
-            )}
-          </View>
-
-          <View style={{ marginVertical: 8 }}>
-            <Text
-              style={{
-                marginVertical: 3,
-                marginStart: 6,
-              }}
-            >
-              Sale unit
-            </Text>
-            <MyDropDown
-              style={{
-                backgroundColor: Colors.light,
-                borderColor: Colors.dark,
-              }}
+              style={styles.dropDown}
               data={saleUnits}
-              onChange={(e) => setSelecetedSaleUnit(e)}
-              value={selectedManufacturer}
+              onChange={handleSaleUnitChange}
+              value={selectedSaleUnit}
               placeholder="Select sale unit"
-              labelField="value"
+              labelField="saleUnitName"
               valueField="id"
+              search={false}
             />
             {submitted && !selectedSaleUnit && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginStart: 6,
-                  color: Colors.error,
-                }}
-              >
-                Sale unit is required
-              </Text>
+              <Text style={styles.errorText}>Sale unit is required</Text>
             )}
           </View>
 
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: 10,
-            }}
-          >
-            <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  marginVertical: 3,
-                  marginStart: 6,
-                }}
-              >
-                Sales prie
-              </Text>
-              <TextInput
-                value={salesPrice}
-                onChangeText={(text) => setSalesPrice(text)}
-                cursorColor={Colors.dark}
-                inputMode="numeric"
-                style={{
-                  backgroundColor: Colors.light,
-                  borderRadius: 5,
-                  padding: 6,
-                  borderWidth: 0.6,
-                  borderColor: Colors.dark,
-                  paddingHorizontal: 10,
-                  textAlign: "right",
-                }}
-              />
-              {submitted && salesPrice.trim() === "" && (
-                <Text
-                  style={{
-                    fontSize: 12,
-                    marginStart: 6,
-                    color: Colors.error,
-                  }}
-                >
-                  Sales price is required
-                </Text>
+          <View style={{ flex: 1 }}>
+            <MyInput
+              label={<Text style={styles.inputLabel}>Sales price</Text>}
+              value={salesPrice}
+              onValueChange={(text) => setSalesPrice(text)}
+              inputMode="numeric"
+            />
+
+            {submitted && salesPrice.trim() === "" && (
+              <Text style={styles.errorText}>Sales price is required</Text>
+            )}
+          </View>
+        </View>
+
+        <FlatList
+          data={saleUnits?.filter(
+            (item) => item?.saleUnitName !== selectedSaleUnit?.saleUnitName
+          )}
+          renderItem={({ item }) => (
+            <ChipButton
+              isSelected={selectedSaleUnits?.find(
+                (unit) => item?.saleUnitName === unit?.saleUnitName
               )}
+              key={item.saleUnitName}
+              onPress={() => onSaleUnitSelect(item)}
+              title={item?.saleUnitName}
+              style={{ width: "fit-content" }}
+            />
+          )}
+          keyExtractor={(item) => item.saleUnitName.toString()}
+          numColumns={3}
+          // ListFooterComponent={renderFooter}
+        />
+        {selectedSaleUnits?.length > 0 && (
+          <View style={styles.row}>
+            <View style={{ flex: 1 }}>
+              <Text>Unit</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text>Sales price</Text>
             </View>
           </View>
-
-          <View>
-            <Text
-              style={{
-                marginVertical: 3,
-                marginStart: 6,
-              }}
-            >
-              Remarks
-            </Text>
-            <TextInput
-              value={remarks}
-              onChangeText={(text) => setRemarks(text)}
-              cursorColor={Colors.dark}
-              multiline
-              style={{
-                backgroundColor: Colors.light,
-                borderRadius: 5,
-                padding: 6,
-                borderWidth: 0.6,
-                borderColor: Colors.dark,
-                paddingHorizontal: 10,
-              }}
-            />
+        )}
+        {selectedSaleUnits?.map((item, index) => (
+          <View style={styles.row} key={item?.saleUnitName}>
+            <View style={{ flex: 1 }}>
+              <MyInput label="" value={item?.saleUnitName} editable={false} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <MyInput
+                label=""
+                value={item.unitPrice}
+                onValueChange={(e) => handleUnitPriceChange(index, e.value)}
+              />
+            </View>
           </View>
-        </ScrollView>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            paddingHorizontal: 8,
-            gap: 10,
-            marginBottom: 10,
-          }}
-        >
-          <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} />
-          <PrimaryButton
-            title={"Save"}
-            onPress={saveProduct}
-            disabled={disable}
+        ))}
+        <View>
+          <MyInput
+            label="Remarks"
+            value={remarks}
+            onValueChange={(text) => setRemarks(text)}
+            multiline
           />
         </View>
-        <Snackbar ref={snackBarRef} />
       </View>
-    </KeyboardAvoidingView>
+      <View style={styles.bottomContent}>
+        <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} />
+        <PrimaryButton
+          title={"Save"}
+          onPress={saveProduct}
+          disabled={disable}
+        />
+      </View>
+      <Snackbar ref={snackBarRef} />
+    </SafeAreaView>
   );
 };
 
 export default ProductEntry;
+
+const styles = StyleSheet.create({
+  headerText: {
+    marginVertical: 10,
+    fontWeight: "500",
+    fontSize: 16,
+    marginStart: 5,
+  },
+  inputLabel: {
+    marginVertical: 3,
+    marginStart: 6,
+    marginTop: 5,
+  },
+  dropDown: {
+    backgroundColor: Colors.light,
+    borderColor: Colors.dark,
+  },
+  errorText: {
+    fontSize: 12,
+    marginStart: 6,
+    color: Colors.error,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+    alignItems: "center",
+  },
+  bottomContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 8,
+    gap: 10,
+    marginBottom: 10,
+  },
+});

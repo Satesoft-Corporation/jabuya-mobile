@@ -39,7 +39,6 @@ const UpdatePrice = ({ navigation, route }) => {
       const selectedRecord = {
         ...route.params,
       };
-      console.log(selectedRecord);
       if (selectedRecord?.multipleSaleUnits) {
         setSelectedSaleUnits(selectedRecord?.multipleSaleUnits);
       }

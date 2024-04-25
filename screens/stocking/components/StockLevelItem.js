@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { useState } from "react";
 import { View, Text } from "react-native";
 import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
 import DataRow from "../../../components/cardComponents/DataRow";
@@ -144,4 +144,4 @@ function StockLevelItem({ data }) {
   );
 }
 
-export default memo(StockLevelItem);
+export default StockLevelItem;
