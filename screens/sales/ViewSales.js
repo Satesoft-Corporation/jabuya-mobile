@@ -17,8 +17,8 @@ import { UserContext } from "../../context/UserContext";
 import { ActivityIndicator } from "react-native";
 import { SaleTransactionItem } from "./components/SaleTransactionItem";
 import ItemHeader from "./components/ItemHeader";
-import SalesPopupMenu from "./components/SalesPopupMenu";
-import VerticalSeparator from "../../components/VerticalSeparator"; 
+import VerticalSeparator from "../../components/VerticalSeparator";
+import { SHOP_SUMMARY } from "../../navigation/ScreenNames";
 
 export default function ViewSales({ navigation }) {
   const [sales, setSales] = useState([]);
@@ -35,11 +35,34 @@ export default function ViewSales({ navigation }) {
   const [message, setMessage] = useState(null);
   const [showFooter, setShowFooter] = useState(true);
 
-  const { userParams, selectedShop } = useContext(UserContext);
+  const { userParams, shops, selectedShop, setSelectedShop } =
+    useContext(UserContext);
 
   const { isShopOwner, shopOwnerId } = userParams;
 
-  const menuRef = useRef();
+  const menuItems = [
+    {
+      name: "Reload list",
+      onClick: () => handleRefresh(),
+    },
+    {
+      name: "Select date range",
+      onClick: () => setVisible(true),
+    },
+    isShopOwner && {
+      name: "Investment",
+      onClick: () => navigation.navigate(SHOP_SUMMARY),
+    },
+    ...(shops?.length > 1
+      ? shops?.map((shop) => {
+          return {
+            ...shop,
+            onClick: () => setSelectedShop(shop),
+            bold: shop?.id === selectedShop.id,
+          };
+        })
+      : []),
+  ];
 
   const handleDayPress = (day) => {
     if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
@@ -195,16 +218,8 @@ export default function ViewSales({ navigation }) {
       <AppStatusBar />
 
       <View style={{ backgroundColor: Colors.dark }}>
-        <UserProfile
-          renderNtnIcon={false}
-          renderExtraIcon={true}
-          onPress={() => menuRef.current.open()}
-        />
-        <SalesPopupMenu
-          menuRef={menuRef}
-          reload={handleRefresh}
-          showDatePicker={() => setVisible(true)}
-        />
+        <UserProfile renderNtnIcon={false} renderMenu menuItems={menuItems} />
+
         <View style={{ marginTop: 5, paddingBottom: 10 }}>
           <View
             style={{

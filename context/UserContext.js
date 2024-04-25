@@ -93,7 +93,8 @@ export const UserProvider = ({ children }) => {
   const getRefreshToken = () => {
     new BaseApiService("/auth/refresh/token")
       .refreshTokenRequest()
-      .then((r) => console.log(r));
+      .then((r) => console.log(r))
+      .catch((e) => console.log(e));
   };
 
   useEffect(() => {

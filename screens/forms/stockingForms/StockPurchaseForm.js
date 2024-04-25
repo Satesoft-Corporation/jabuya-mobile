@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  SafeAreaView,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, ScrollView, SafeAreaView, StyleSheet } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Colors from "../../../constants/Colors";
 import AppStatusBar from "../../../components/AppStatusBar";
@@ -24,13 +17,13 @@ import { useContext } from "react";
 import TopHeader from "../../../components/TopHeader";
 import Snackbar from "../../../components/Snackbar";
 import PrimaryButton from "../../../components/buttons/PrimaryButton";
-import { DatePickerInput } from "react-native-paper-dates";
 import { STOCK_ENTRY_ENDPOINT } from "../../../utils/EndPointUtils";
 import {
   resolveUnsavedSales,
   saveShopProductsOnDevice,
 } from "../../../controllers/OfflineControllers";
 import { UserSessionUtils } from "../../../utils/UserSessionUtils";
+import MyInput from "../../../components/MyInput";
 
 const StockPurchaseForm = ({ navigation, route }) => {
   const { selectedShop, userParams } = useContext(UserContext);
@@ -46,10 +39,10 @@ const StockPurchaseForm = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [batchNo, setBatchNo] = useState("");
   const [purchaseDate, setPurchaseDate] = useState(new Date());
-  const [packedPurchasedQuantity, setPackedPurchasedQuantity] = useState(null);
+  const [packedPurchasedQuantity, setPackedPurchasedQuantity] = useState("");
   const [remarks, setRemarks] = useState("");
-  const [purchasePrice, setPurchasePrice] = useState(null);
-  const [unpackedPurchasedQty, setUnpackedPurchasedQty] = useState(null);
+  const [purchasePrice, setPurchasePrice] = useState("");
+  const [unpackedPurchasedQty, setUnpackedPurchasedQty] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [edit, setEdit] = useState(false);
 
@@ -255,36 +248,19 @@ const StockPurchaseForm = ({ navigation, route }) => {
         <TopHeader title="Stock purchase" />
         <Loader loading={loading} />
         <ScrollView
+          contentContainerStyle={{ gap: 8, paddingBottom: 30 }}
           style={{
             paddingHorizontal: 10,
           }}
         >
-          <Text
-            style={{
-              marginVertical: 10,
-              fontWeight: 500,
-              fontSize: 16,
-              marginStart: 5,
-            }}
-          >
+          <Text style={styles.headerText}>
             {edit ? "Edit" : "Enter"} stock detail
           </Text>
 
           <View>
-            <Text
-              style={{
-                marginVertical: 3,
-                marginStart: 6,
-                marginTop: 5,
-              }}
-            >
-              Product
-            </Text>
+            <Text style={styles.inputLabel}>Product</Text>
             <MyDropDown
-              style={{
-                backgroundColor: Colors.light,
-                borderColor: Colors.dark,
-              }}
+              style={styles.dropDown}
               data={edit ? [{ ...selectedProduct }] : products}
               onChange={onProductChange}
               value={selectedProduct}
@@ -293,32 +269,14 @@ const StockPurchaseForm = ({ navigation, route }) => {
               valueField="id"
             />
             {submitted && !selectedProduct && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginStart: 6,
-                  color: Colors.error,
-                }}
-              >
-                Product is required
-              </Text>
+              <Text style={styles.errorText}>Product is required</Text>
             )}
           </View>
+
           <View>
-            <Text
-              style={{
-                marginVertical: 3,
-                marginStart: 6,
-                marginTop: 10,
-              }}
-            >
-              Supplier
-            </Text>
+            <Text style={styles.inputLabel}>Supplier</Text>
             <MyDropDown
-              style={{
-                backgroundColor: Colors.light,
-                borderColor: Colors.dark,
-              }}
+              style={styles.dropDown}
               data={edit ? [{ ...selectedSupplier }] : suppliers}
               onChange={onSupplierChange}
               value={selectedSupplier}
@@ -327,32 +285,14 @@ const StockPurchaseForm = ({ navigation, route }) => {
               valueField="id"
             />
             {submitted && !selectedSupplier && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginStart: 6,
-                  color: Colors.error,
-                }}
-              >
-                Supplier is required
-              </Text>
+              <Text style={styles.errorText}>Supplier is required</Text>
             )}
           </View>
 
-          <View style={{ marginVertical: 8 }}>
-            <Text
-              style={{
-                marginVertical: 3,
-                marginStart: 6,
-              }}
-            >
-              Package type
-            </Text>
+          <View>
+            <Text style={styles.inputLabel}>Package type</Text>
             <MyDropDown
-              style={{
-                backgroundColor: Colors.light,
-                borderColor: Colors.dark,
-              }}
+              style={styles.dropDown}
               search={false}
               data={packageOptions}
               disable={selectedProduct === null}
@@ -365,314 +305,117 @@ const StockPurchaseForm = ({ navigation, route }) => {
               valueField="type"
             />
             {submitted && !isPackedProduct && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginStart: 6,
-                  color: Colors.error,
-                }}
-              >
-                Package type is required
-              </Text>
+              <Text style={styles.errorText}>Package type is required</Text>
             )}
           </View>
 
           {isPackedProduct !== null && (
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: 10,
-                marginBottom: 5,
-              }}
-            >
+            <View style={styles.row}>
               <View style={{ flex: 1 }}>
-                <Text
-                  style={{
-                    marginVertical: 3,
-                    marginStart: 6,
-                  }}
-                >
-                  {isPackedProduct === true
-                    ? `Packed quantity (${
-                        selectedProduct?.packageUnitName || ""
-                      })`
-                    : "Unpacked quantity"}
-                </Text>
-                <TextInput
+                <MyInput
+                  label={
+                    isPackedProduct === true
+                      ? `Packed quantity (${
+                          selectedProduct?.packageUnitName || ""
+                        })`
+                      : "Unpacked quantity"
+                  }
                   value={
                     isPackedProduct === true
                       ? packedPurchasedQuantity
                       : unpackedPurchasedQty
                   }
                   cursorColor={Colors.dark}
-                  onChangeText={(text) => {
+                  onValueChange={(text) => {
                     isPackedProduct === true
                       ? setPackedPurchasedQuantity(text)
                       : setUnpackedPurchasedQty(text);
                   }}
                   inputMode="numeric"
-                  style={{
-                    backgroundColor: Colors.light,
-                    borderRadius: 5,
-                    padding: 6,
-                    borderWidth: 0.6,
-                    borderColor: Colors.dark,
-                    paddingHorizontal: 10,
-                    textAlign: "center",
-                    fontSize: 17,
-                  }}
                 />
                 {submitted &&
                   ((!unpackedPurchasedQty && !isPackedProduct) ||
                     (!packedPurchasedQuantity && isPackedProduct)) && (
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        marginStart: 6,
-                        color: Colors.error,
-                      }}
-                    >
-                      Quantity is required
-                    </Text>
+                    <Text style={styles.errorText}>Quantity is required</Text>
                   )}
               </View>
 
               <View style={{ flex: 1 }}>
-                <Text
-                  style={{
-                    marginVertical: 3,
-                    marginStart: 6,
-                  }}
-                >
-                  {isPackedProduct === true
-                    ? "Purchase price"
-                    : "Purchase amount"}
-                  (UGX)
-                </Text>
-                <TextInput
+                <MyInput
+                  label={
+                    isPackedProduct === true
+                      ? "Purchase price"
+                      : "Purchase amount (UGX)"
+                  }
                   value={purchasePrice}
                   cursorColor={Colors.dark}
-                  onChangeText={(text) => setPurchasePrice(text)}
+                  onValueChange={(text) => setPurchasePrice(text)}
                   inputMode="numeric"
-                  style={{
-                    backgroundColor: Colors.light,
-                    borderRadius: 5,
-                    padding: 6,
-                    borderWidth: 0.6,
-                    borderColor: Colors.dark,
-                    paddingHorizontal: 10,
-                    textAlign: "right",
-                    fontSize: 17,
-                  }}
                 />
                 {submitted && !purchasePrice && (
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      marginStart: 6,
-                      color: Colors.error,
-                    }}
-                  >
-                    Price is required
-                  </Text>
+                  <Text style={styles.errorText}>Price is required</Text>
                 )}
               </View>
             </View>
           )}
 
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: 10,
-            }}
-          >
+          <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  marginVertical: 3,
-                  marginStart: 6,
-                }}
-              >
-                Batch no.
-              </Text>
-              <TextInput
-                value={batchNo || ""}
-                onChangeText={(text) => setBatchNo(text)}
-                cursorColor={Colors.dark}
-                inputMode="text"
-                style={{
-                  backgroundColor: Colors.light,
-                  borderRadius: 5,
-                  padding: 6,
-                  borderWidth: 0.6,
-                  borderColor: Colors.dark,
-                  paddingHorizontal: 10,
-                  textAlign: "center",
-                  fontSize: 17,
-                }}
+              <MyInput
+                label=" Batch no."
+                value={batchNo}
+                onValueChange={(text) => setBatchNo(text)}
               />
               {submitted && batchNo === "" && (
-                <Text
-                  style={{
-                    fontSize: 12,
-                    marginStart: 6,
-                    color: Colors.error,
-                  }}
-                >
-                  Batch number is required
-                </Text>
+                <Text style={styles.errorText}>Batch number is required</Text>
               )}
             </View>
 
             <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  marginVertical: 3,
-                  marginStart: 6,
-                }}
-              >
-                Expiry date
-              </Text>
-
-              <DatePickerInput
-                locale="en"
+              <MyInput
+                isDateInput
                 value={expiryDate}
-                withModal={true}
-                withDateFormatInLabel={false}
-                placeholder="MM-DD-YYYY"
-                onChange={(d) => setExpiryDate(d)}
-                inputMode="start"
-                style={{
-                  height: 40,
-                  justifyContent: "center",
-                }}
-                mode="outlined"
+                label="Expiry Date"
+                onValueChange={(date) => setExpiryDate(date)}
               />
-
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginStart: 6,
-                  color: Colors.error,
-                  opacity: submitted && !expiryDate ? 1 : 0,
-                }}
-              >
-                Expiry date is required
-              </Text>
+              {submitted && !expiryDate && (
+                <Text style={styles.errorText}>Expiry date is required</Text>
+              )}
             </View>
           </View>
 
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: 10,
-              marginTop: 5,
-            }}
-          >
+          <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  marginVertical: 3,
-                  marginStart: 6,
-                }}
-              >
-                Unit purchase price
-              </Text>
-              <TouchableOpacity
-                disabled
-                style={{
-                  backgroundColor: Colors.light,
-                  borderRadius: 5,
-                  padding: 6,
-                  borderWidth: 0.6,
-                  borderColor: Colors.dark,
-                  paddingHorizontal: 10,
-                  height: 40,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text style={{ textAlign: "center" }}>
-                  {" "}
-                  {formatNumberWithCommas(getUnitPurchasePrice())}
-                </Text>
-              </TouchableOpacity>
+              <MyInput
+                label="Unit purchase price"
+                editable={false}
+                value={formatNumberWithCommas(getUnitPurchasePrice())}
+              />
             </View>
 
             <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  marginVertical: 3,
-                  marginStart: 6,
-                }}
-              >
-                Purchase date
-              </Text>
-
-              <DatePickerInput
-                locale="en"
+              <MyInput
+                label="Purchase date"
                 value={purchaseDate}
-                withDateFormatInLabel={false}
-                withModal={true}
-                placeholder="MM-DD-YYYY"
-                onChange={(d) => setPurchaseDate(d)}
-                inputMode="start"
-                style={{
-                  height: 40,
-                  justifyContent: "center",
-                }}
-                mode="outlined"
+                isDateInput
+                onValueChange={(date) => setPurchaseDate(date)}
+                mt={0}
               />
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginStart: 6,
-                  color: Colors.error,
-                  opacity: submitted && !purchaseDate ? 1 : 0,
-                }}
-              >
-                Purchase date is required
-              </Text>
+              {submitted && !purchaseDate && (
+                <Text style={styles.errorText}>Purchase date is required</Text>
+              )}
             </View>
           </View>
 
-          <View>
-            <Text
-              style={{
-                marginVertical: 3,
-                marginStart: 6,
-              }}
-            >
-              Remarks
-            </Text>
-            <TextInput
-              value={remarks}
-              onChangeText={(text) => setRemarks(text)}
-              cursorColor={Colors.dark}
-              multiline
-              style={{
-                backgroundColor: Colors.light,
-                borderRadius: 5,
-                padding: 6,
-                borderWidth: 0.6,
-                borderColor: Colors.dark,
-                paddingHorizontal: 10,
-                minHeight: 80,
-              }}
-            />
-          </View>
+          <MyInput
+            value={remarks}
+            label="Remarks"
+            multiline
+            onValueChange={(text) => setRemarks(text)}
+            numberOfLines={3}
+          />
 
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 20,
-              gap: 10,
-            }}
-          >
+          <View style={styles.row}>
             <PrimaryButton
               darkMode={false}
               title={"Clear"}
@@ -689,3 +432,30 @@ const StockPurchaseForm = ({ navigation, route }) => {
 };
 
 export default StockPurchaseForm;
+const styles = StyleSheet.create({
+  headerText: {
+    marginVertical: 10,
+    fontWeight: "500",
+    fontSize: 16,
+    marginStart: 5,
+  },
+  inputLabel: {
+    marginVertical: 3,
+    marginStart: 6,
+    marginTop: 5,
+  },
+  dropDown: {
+    backgroundColor: Colors.light,
+    borderColor: Colors.dark,
+  },
+  errorText: {
+    fontSize: 12,
+    marginStart: 6,
+    color: Colors.error,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+});

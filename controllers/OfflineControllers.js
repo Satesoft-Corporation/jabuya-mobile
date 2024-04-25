@@ -59,7 +59,10 @@ export const saveShopProductsOnDevice = async (
         saved = true;
       })
       .catch((error) => {
-        alert("Unknown Error");
+        console.log("Unknown Error", error?.message);
+        if (currentPdts.length === 0) {
+          saved = false;
+        }
       });
   }
 
@@ -82,7 +85,10 @@ export const saveShopClients = async (params, refresh = false) => {
         saved = true;
       })
       .catch((error) => {
-        alert("Unknown Error");
+        console.log("Unknown Error", error?.message);
+        if (currentClients.length === 0) {
+          saved = false;
+        }
       });
   }
 

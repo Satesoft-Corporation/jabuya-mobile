@@ -5,6 +5,7 @@ import SearchBar from "./SearchBar";
 import { UserContext } from "../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "./Icon";
+import PopUpmenu from "./PopUpmenu";
 
 const TopHeader = ({
   title = "Details",
@@ -16,7 +17,7 @@ const TopHeader = ({
   showAdd = false,
   onAddPress,
   showMenuDots = false,
-  onDotPress,
+  menuItems,
 }) => {
   const [showBar, setShowBar] = useState(false);
   const { selectedShop } = useContext(UserContext);
@@ -98,16 +99,7 @@ const TopHeader = ({
                 />
               </TouchableOpacity>
             )}
-            {showMenuDots && (
-              <TouchableOpacity onPress={onDotPress}>
-                <Icon
-                  groupName="Entypo"
-                  name="dots-three-vertical"
-                  size={20}
-                  color={Colors.primary}
-                />
-              </TouchableOpacity>
-            )}
+            {showMenuDots && <PopUpmenu menuItems={menuItems} />}
           </View>
         </View>
 

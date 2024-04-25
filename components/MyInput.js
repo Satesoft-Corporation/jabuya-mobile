@@ -1,7 +1,7 @@
 import { View, Text, TextInput } from "react-native";
 import React from "react";
 import Colors from "../constants/Colors";
-import { DatePickerInput, DatePickerModal } from "react-native-paper-dates";
+import { DatePickerInput } from "react-native-paper-dates";
 
 const MyInput = ({
   value,
@@ -18,7 +18,7 @@ const MyInput = ({
 }) => {
   if (isDateInput === false) {
     return (
-      <View style={[{ gap: 5, marginBottom: 10 }, style]}>
+      <View style={[{ gap: 5 }, style]}>
         <Text style={{ paddingHorizontal: 4 }}>{label}</Text>
 
         <TextInput
@@ -56,9 +56,10 @@ const MyInput = ({
           onChange={onValueChange}
           inputMode="start"
           style={{
-            height: 40,
+            height: 35,
             justifyContent: "center",
-            marginTop: mt,
+            paddingVertical: 3,
+            marginTop: -2,
           }}
           mode="outlined"
         />

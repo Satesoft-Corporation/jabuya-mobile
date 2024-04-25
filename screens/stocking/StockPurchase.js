@@ -11,6 +11,7 @@ import Snackbar from "../../components/Snackbar";
 import StockPurchaseListComponent from "./components/StockPurchaseListComponent";
 import { AddBtn } from "../expenses/Expenses";
 import { STOCK_ENTRY_FORM } from "../../navigation/ScreenNames";
+import { tr } from "react-native-paper-dates";
 
 const StockPurchase = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
@@ -19,32 +20,29 @@ const StockPurchase = ({ navigation }) => {
   const [message, setMessage] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [offset, setOffset] = useState(0);
-  const [showFooter, setShowFooter] = useState(true);
+  const [showFooter, setShowFooter] = useState(false);
   const [disable, setDisable] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const snackbarRef = useRef(null);
   const { userParams } = useContext(UserContext);
 
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
     userParams;
 
-  const fetchStockEntries = async () => {
+  const fetchStockEntries = async (offsetToUse = 0) => {
     try {
-      setStockEntries([]);
-      setShowFooter(true);
       setMessage(null);
+      setLoading(true);
 
       const searchParameters = {
         limit: MAXIMUM_RECORDS_PER_FETCH,
         ...(isShopAttendant && { shopId: attendantShopId }),
         ...(isShopOwner && { shopOwnerId }),
-        offset: offset,
+        offset: offsetToUse,
         ...(searchTerm &&
           searchTerm.trim() !== "" && { searchTerm: searchTerm }),
       };
-
       setIsFetchingMore(true);
-
       const response = await new BaseApiService(
         "/stock-entries"
       ).getRequestWithJsonResponse(searchParameters);
@@ -64,16 +62,19 @@ const StockPurchase = ({ navigation }) => {
         setShowFooter(false);
       }
       setIsFetchingMore(false);
+      setLoading(false);
     } catch (error) {
       setDisable(false);
       setShowFooter(false);
       setMessage("Error fetching stock records");
+      setLoading(false);
     }
   };
 
   const handleEndReached = () => {
     if (!isFetchingMore && stockEntries.length < stockEntryRecords) {
       setOffset(offset + MAXIMUM_RECORDS_PER_FETCH);
+      fetchStockEntries(offset + MAXIMUM_RECORDS_PER_FETCH);
     }
     if (stockEntries.length === stockEntryRecords && stockEntries.length > 10) {
       snackbarRef.current.show("No more additional data", 2500);
@@ -89,24 +90,7 @@ const StockPurchase = ({ navigation }) => {
 
   useEffect(() => {
     fetchStockEntries();
-  }, [offset]);
-
-  const renderFooter = () => {
-    if (showFooter === true) {
-      if (
-        stockEntries.length === stockEntryRecords &&
-        stockEntries.length > 0
-      ) {
-        return null;
-      }
-
-      return (
-        <View style={{ paddingVertical: 20 }}>
-          <ActivityIndicator animating size="large" color={Colors.dark} />
-        </View>
-      );
-    }
-  };
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
@@ -128,6 +112,8 @@ const StockPurchase = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
         data={stockEntries}
         renderItem={({ item }) => <StockPurchaseListComponent data={item} />}
+        onRefresh={() => onSearch()}
+        refreshing={loading}
         ListEmptyComponent={() => (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -135,9 +121,8 @@ const StockPurchase = ({ navigation }) => {
             {stockEntryRecords === 0 && <Text>{message}</Text>}
           </View>
         )}
-        ListFooterComponent={renderFooter}
         onEndReached={handleEndReached}
-        onEndReachedThreshold={0}
+        onEndReachedThreshold={0.2}
       />
 
       <Snackbar ref={snackbarRef} />

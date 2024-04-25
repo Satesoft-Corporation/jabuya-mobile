@@ -6,12 +6,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../context/UserContext";
 import Icon from "./Icon";
+import PopUpmenu from "./PopUpmenu";
 
 const UserProfile = ({
   renderNtnIcon = true,
-  renderExtraIcon = false,
-  extraIcon,
-  onPress,
+  renderMenu = false,
+  menuItems,
 }) => {
   const [shops, setShops] = useState(null);
   const navigation = useNavigation();
@@ -103,21 +103,7 @@ const UserProfile = ({
           />
         </TouchableOpacity>
       )}
-
-      {renderExtraIcon && (
-        <TouchableOpacity onPress={onPress}>
-          {extraIcon ? (
-            extraIcon
-          ) : (
-            <Icon
-              groupName="Entypo"
-              name="dots-three-vertical"
-              size={20}
-              color={Colors.primary}
-            />
-          )}
-        </TouchableOpacity>
-      )}
+      {renderMenu && <PopUpmenu menuItems={menuItems} />}
     </View>
   );
 };

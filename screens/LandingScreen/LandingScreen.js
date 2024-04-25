@@ -21,6 +21,7 @@ import {
   saveShopClients,
   saveShopProductsOnDevice,
 } from "../../controllers/OfflineControllers";
+import { Alert } from "react-native";
 
 const LandingScreen = ({ navigation }) => {
   const {
@@ -150,7 +151,10 @@ const LandingScreen = ({ navigation }) => {
           }
         }
 
-        if (savedproducts && savedClients) {
+        if (savedproducts === true && savedClients === true) {
+          setLoading(false);
+        } else {
+          Alert.alert("Unkown error", "Please re login");
           setLoading(false);
         }
       })

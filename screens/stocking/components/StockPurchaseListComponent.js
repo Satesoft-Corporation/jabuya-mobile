@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, memo } from "react";
 import { View, Text } from "react-native";
 import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
 import Colors from "../../../constants/Colors";
@@ -170,4 +170,4 @@ const StockPurchaseListComponent = ({ data }) => {
   );
 };
 
-export default StockPurchaseListComponent;
+export default memo(StockPurchaseListComponent);
