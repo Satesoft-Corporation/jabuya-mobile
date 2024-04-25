@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import { View, Text } from "react-native";
 import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
 import DataRow from "../../../components/cardComponents/DataRow";
@@ -99,7 +99,7 @@ function StockLevelItem({ data }) {
               marginBottom: 3,
             }}
           >
-            Amount
+            Stock value
           </Text>
           <Text style={{ fontWeight: 600 }}>
             {formatNumberWithCommas(remainingStock * data?.salesPrice)}
@@ -134,7 +134,7 @@ function StockLevelItem({ data }) {
             btnTitle1="Update price"
             btnTitle2="Hide"
             onClick2={toggleExpand}
-            onClick1={() => navigation.navigate(UPDATE_PRICE,data)}
+            onClick1={() => navigation.navigate(UPDATE_PRICE, data)}
           />
         </View>
       )}
@@ -144,4 +144,4 @@ function StockLevelItem({ data }) {
   );
 }
 
-export default StockLevelItem;
+export default memo(StockLevelItem);

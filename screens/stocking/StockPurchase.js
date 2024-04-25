@@ -6,12 +6,9 @@ import Colors from "../../constants/Colors";
 import { UserContext } from "../../context/UserContext";
 import { BaseApiService } from "../../utils/BaseApiService";
 import { MAXIMUM_RECORDS_PER_FETCH } from "../../constants/Constants";
-import { ActivityIndicator } from "react-native";
 import Snackbar from "../../components/Snackbar";
 import StockPurchaseListComponent from "./components/StockPurchaseListComponent";
-import { AddBtn } from "../expenses/Expenses";
 import { STOCK_ENTRY_FORM } from "../../navigation/ScreenNames";
-import { tr } from "react-native-paper-dates";
 
 const StockPurchase = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
@@ -20,7 +17,6 @@ const StockPurchase = ({ navigation }) => {
   const [message, setMessage] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [offset, setOffset] = useState(0);
-  const [showFooter, setShowFooter] = useState(false);
   const [disable, setDisable] = useState(false);
   const [loading, setLoading] = useState(false);
   const snackbarRef = useRef(null);
@@ -54,18 +50,16 @@ const StockPurchase = ({ navigation }) => {
 
       if (response?.totalItems === 0) {
         setMessage("No stock entries found");
-        setShowFooter(false);
       }
 
       if (response.totalItems === 0 && searchTerm !== "") {
         setMessage(`No results found for ${searchTerm}`);
-        setShowFooter(false);
       }
       setIsFetchingMore(false);
       setLoading(false);
     } catch (error) {
       setDisable(false);
-      setShowFooter(false);
+
       setMessage("Error fetching stock records");
       setLoading(false);
     }

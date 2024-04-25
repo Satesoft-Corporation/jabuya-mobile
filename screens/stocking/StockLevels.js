@@ -11,15 +11,16 @@ import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import { ActivityIndicator } from "react-native";
 import StockLevelItem from "./components/StockLevelItem";
+import { PDT_ENTRY } from "../../navigation/ScreenNames";
 
 const StockLevel = ({ navigation }) => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [message, setMessage] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [offset, setOffset] = useState(0);
-  const [showFooter, setShowFooter] = useState(true);
   const [stockLevels, setStockLevels] = useState([]);
   const [stockLevelRecords, setStockLevelRecords] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const snackbarRef = useRef(null);
 
@@ -28,15 +29,15 @@ const StockLevel = ({ navigation }) => {
   const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
     userParams;
 
-  const fetchShopProducts = async () => {
+  const fetchShopProducts = async (offsetToUse = 0) => {
     try {
-      setShowFooter(true);
+      setLoading(true);
 
       const searchParameters = {
         limit: MAXIMUM_RECORDS_PER_FETCH,
         ...(isShopAttendant && { shopId: attendantShopId }),
         ...(isShopOwner && { shopOwnerId }),
-        offset: offset,
+        offset: offsetToUse,
         ...(searchTerm &&
           searchTerm.trim() !== "" && { searchTerm: searchTerm }),
       };
@@ -53,18 +54,17 @@ const StockLevel = ({ navigation }) => {
 
       if (response?.totalItems === 0) {
         setMessage("No shop products found");
-        setShowFooter(false);
       }
 
       if (response?.totalItems === 0 && searchTerm !== "") {
         setMessage(`No results found for ${searchTerm}`);
-        setShowFooter(false);
       }
 
       setIsFetchingMore(false);
+      setLoading(false);
     } catch (error) {
-      setShowFooter(false);
       setMessage("Error fetching stock records");
+      setLoading(false);
     }
   };
 
@@ -76,25 +76,12 @@ const StockLevel = ({ navigation }) => {
 
   useEffect(() => {
     fetchShopProducts();
-  }, [offset]);
-
-  const renderFooter = () => {
-    if (showFooter === true) {
-      if (stockLevels.length === stockLevelRecords && stockLevels.length > 0) {
-        return null;
-      }
-
-      return (
-        <View style={{ paddingVertical: 20 }}>
-          <ActivityIndicator animating size="large" color={Colors.dark} />
-        </View>
-      );
-    }
-  };
+  }, []);
 
   const handleEndReached = () => {
     if (!isFetchingMore && stockLevels.length < stockLevelRecords) {
       setOffset(offset + MAXIMUM_RECORDS_PER_FETCH);
+      fetchShopProducts(offset + MAXIMUM_RECORDS_PER_FETCH);
     }
     if (stockLevels.length === stockLevelRecords && stockLevels.length > 10) {
       snackbarRef.current.show("No more additional data", 2500);
@@ -116,6 +103,8 @@ const StockLevel = ({ navigation }) => {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}
+        showAdd
+        onAddPress={() => navigation.navigate(PDT_ENTRY)}
       />
       <FlatList
         keyExtractor={(item) => item.id.toString()}
@@ -123,6 +112,8 @@ const StockLevel = ({ navigation }) => {
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
         renderItem={({ item }) => <StockLevelItem data={item} />}
+        onRefresh={() => onSearch()}
+        refreshing={loading}
         ListEmptyComponent={() => (
           <View
             style={{
@@ -135,8 +126,7 @@ const StockLevel = ({ navigation }) => {
           </View>
         )}
         onEndReached={handleEndReached}
-        onEndReachedThreshold={0}
-        ListFooterComponent={renderFooter}
+        onEndReachedThreshold={0.3}
       />
       <Snackbar ref={snackbarRef} />
     </View>
