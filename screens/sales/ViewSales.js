@@ -39,10 +39,6 @@ export default function ViewSales({ navigation }) {
 
   const menuItems = [
     {
-      name: "Refresh",
-      onClick: () => handleRefresh(),
-    },
-    {
       name: "Select date",
       onClick: () => setVisible(true),
     },
