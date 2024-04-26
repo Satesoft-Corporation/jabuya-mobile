@@ -12,9 +12,8 @@ import {
   getCurrentDay,
 } from "../../utils/Utils";
 import UserProfile from "../../components/UserProfile";
-import { DateCalender } from "../../components/Dialogs/DateCalendar";
 import { UserContext } from "../../context/UserContext";
-import { ActivityIndicator } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { SaleTransactionItem } from "./components/SaleTransactionItem";
 import ItemHeader from "./components/ItemHeader";
 import VerticalSeparator from "../../components/VerticalSeparator";
@@ -25,8 +24,6 @@ export default function ViewSales({ navigation }) {
   const [totalItems, setTotalItems] = useState(0);
   const [totalSalesQty, setTotalSalesQty] = useState(0); //total quantity for all sold items
   const [visible, setVisible] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState(null);
-  const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [salesValue, setSalesValue] = useState(0); //total money value sold
   const [saleCapital, setSaleCapital] = useState([]); //capital list
   const [profits, setProfits] = useState([]); //profits list
@@ -46,7 +43,7 @@ export default function ViewSales({ navigation }) {
       onClick: () => handleRefresh(),
     },
     {
-      name: "Select date range",
+      name: "Select date",
       onClick: () => setVisible(true),
     },
     isShopOwner && {
@@ -64,35 +61,12 @@ export default function ViewSales({ navigation }) {
       : []),
   ];
 
-  const idObject =
-    selectedShop?.id === shopOwnerId
-      ? {
-          shopOwnerId: selectedShop?.id,
-        }
-      : {
-          shopId: selectedShop?.id,
-        };
+  const [date, setDate] = useState(new Date());
 
-  const handleDayPress = (day) => {
-    if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
-      setSelectedStartDate(day.dateString);
-      setSelectedEndDate(null);
-    } else if (
-      selectedStartDate &&
-      !selectedEndDate &&
-      day.dateString !== selectedStartDate
-    ) {
-      setSelectedEndDate(day.dateString);
-    } else {
-      setSelectedStartDate(day.dateString);
-      setSelectedEndDate(day.dateString); // Set both start and end dates to the single selected date
-    }
-  };
-
-  const handleRefresh = () => {
-    setSelectedEndDate(null);
-    setSelectedStartDate(null);
-    getSales();
+  const onChange = (event, selectedDate) => {
+    setVisible(false);
+    getSales(selectedDate);
+    setDate(selectedDate);
   };
 
   const clearFields = () => {
@@ -106,23 +80,29 @@ export default function ViewSales({ navigation }) {
     setDaysProfit(0);
     setMessage(null);
     setTotalItems(0);
+    setDate(new Date());
   };
 
-  const getSales = async (startDate, endDate) => {
+  const getSales = async (day = null) => {
+    setLoading(true);
+    setMessage(null);
+    const allShops = selectedShop?.id === shopOwnerId;
+
     let searchParameters = {
       offset: 0,
       limit: 0,
-      ...idObject,
-      ...(!startDate && !endDate && { startDate: getCurrentDay() }),
-      ...(startDate && { startDate: convertDateFormat(startDate) }),
-      ...(endDate && { endDate: convertDateFormat(endDate, true) }),
-      ...(endDate === null &&
-        startDate && { endDate: convertDateFormat(startDate, true) }),
+      ...(allShops && {
+        shopOwnerId: selectedShop?.id,
+      }),
+      ...(!allShops && { shopId: selectedShop?.id }),
+      startDate: getCurrentDay(),
+      ...(day && {
+        startDate: convertDateFormat(day),
+        endDate: convertDateFormat(day, true),
+      }),
     };
 
     clearFields();
-    setLoading(true);
-    setMessage(null);
 
     new BaseApiService("/shop-sales")
       .getRequestWithJsonResponse(searchParameters)
@@ -166,16 +146,6 @@ export default function ViewSales({ navigation }) {
         setLoading(false);
         setMessage("Cannot get sales!", error?.message);
       });
-  };
-
-  const filterSales = () => {
-    let startDate = selectedStartDate ? new Date(selectedStartDate) : null;
-    let endDate = selectedEndDate ? new Date(selectedEndDate) : null;
-    if (startDate > endDate && endDate) {
-      // if the start date is greater than the end date
-      [startDate, endDate] = [endDate, startDate]; // Swap the dates using destructuring assignment
-    }
-    getSales(startDate, endDate);
   };
 
   const setCount = (count) => {
@@ -264,21 +234,19 @@ export default function ViewSales({ navigation }) {
             {message}
           </Text>
         )}
-        onRefresh={() => handleRefresh()}
+        onRefresh={() => getSales()}
         refreshing={loading}
       />
 
-      <DateCalender
-        selectedEndDate={selectedEndDate}
-        visible={visible}
-        selectedStartDate={selectedStartDate}
-        handleDayPress={handleDayPress}
-        setVisible={setVisible}
-        onFinish={filterSales}
-        setSelectedEndDate={setSelectedEndDate}
-        setSelectedStartDate={setSelectedStartDate}
-        moreCancelActions={() => {}}
-      />
+      {visible && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={date}
+          mode={"date"}
+          onChange={onChange}
+          maximumDate={new Date()}
+        />
+      )}
     </SafeAreaView>
   );
 }

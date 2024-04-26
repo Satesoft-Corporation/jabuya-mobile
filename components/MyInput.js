@@ -1,71 +1,83 @@
 import { View, Text, TextInput } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import Colors from "../constants/Colors";
 import { DatePickerInput } from "react-native-paper-dates";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import Icon from "./Icon";
+import { TouchableOpacity } from "react-native";
+import { formatDateToDDMMYY, toReadableDate } from "../utils/Utils";
 
 const MyInput = ({
-  value,
   onValueChange,
   isPassword = false,
-  label = "Label",
+  label = "",
   inputMode = "text",
   isDateInput = false,
   style,
   editable = true,
-  mt = -5,
   numberOfLines = 1,
   multiline = false,
+  value,
+  dateValue = new Date(),
+  onDateChange,
 }) => {
-  if (isDateInput === false) {
-    return (
-      <View style={[{ gap: 5 }, style]}>
-        <Text style={{ paddingHorizontal: 4 }}>{label}</Text>
+  const [visible, setVisible] = useState(false);
 
+  const onChange = (event, selectedDate) => {
+    setVisible(false);
+    onDateChange(selectedDate);
+  };
+
+  return (
+    <View style={[{ gap: 5 }, style]}>
+      {label !== "" && <Text style={{ paddingHorizontal: 4 }}>{label}</Text>}
+      <View
+        style={{
+          height: 40,
+          alignItems: "center",
+          flexDirection: "row",
+          backgroundColor: Colors.light,
+          borderRadius: 5,
+          padding: 6,
+          borderWidth: 0.6,
+          borderColor: Colors.dark,
+          paddingHorizontal: 10,
+        }}
+      >
         <TextInput
-          value={value}
+          value={isDateInput ? toReadableDate(dateValue) : value}
           onChangeText={onValueChange}
           secureTextEntry={isPassword}
           inputMode={inputMode}
           cursorColor={Colors.dark}
-          editable={editable}
+          editable={isDateInput ? false : editable}
           numberOfLines={numberOfLines}
           multiline={multiline}
           style={{
-            backgroundColor: Colors.light,
-            borderRadius: 5,
-            padding: 6,
-            borderWidth: 0.6,
-            borderColor: Colors.dark,
-            paddingHorizontal: 10,
             color: Colors.dark,
             textAlign: inputMode === "numeric" ? "right" : "left",
+            flex: 1,
           }}
         />
+
+        {isDateInput && (
+          <>
+            <TouchableOpacity onPress={() => setVisible(true)}>
+              <Icon name="calendar-alt" size={20} />
+            </TouchableOpacity>
+            {visible && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={dateValue}
+                mode={"date"}
+                onChange={onChange}
+              />
+            )}
+          </>
+        )}
       </View>
-    );
-  } else {
-    return (
-      <View style={{ flex: 1, gap: 5 }}>
-        <Text style={{ paddingHorizontal: 4 }}>{label}</Text>
-        <DatePickerInput
-          locale="en"
-          value={value}
-          withModal={true}
-          withDateFormatInLabel={false}
-          placeholder="MM-DD-YYYY"
-          onChange={onValueChange}
-          inputMode="start"
-          style={{
-            height: 35,
-            justifyContent: "center",
-            paddingVertical: 3,
-            marginTop: -2,
-          }}
-          mode="outlined"
-        />
-      </View>
-    );
-  }
+    </View>
+  );
 };
 
 export default MyInput;

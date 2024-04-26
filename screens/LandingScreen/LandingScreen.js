@@ -22,14 +22,36 @@ import {
   saveShopProductsOnDevice,
 } from "../../controllers/OfflineControllers";
 import { Alert } from "react-native";
-
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Button } from "react-native";
+import { Text } from "react-native";
 const LandingScreen = ({ navigation }) => {
+  const [date, setDate] = useState(new Date(1598051730000));
+  const [mode, setMode] = useState("date");
+  const [show, setShow] = useState(false);
+
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate;
+    setShow(false);
+    setDate(currentDate);
+  };
+
+  const showMode = (currentMode) => {
+    setShow(true);
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode("date");
+  };
+
   const {
     setUserParams,
     getShopsFromStorage,
     userParams,
     setSelectedShop,
     setShops,
+    getRefreshToken,
   } = useContext(UserContext);
 
   const [loading, setLoading] = useState(true);
@@ -68,7 +90,7 @@ const LandingScreen = ({ navigation }) => {
   const handleTabPress = (item) => {
     const { days, hours } = timeDiff;
 
-    if (hours >= 12 || days > 0) {
+    if (days > 5) {
       //trigger the logout dialog every after 12hr
       logInPrompt();
       return null;
@@ -107,6 +129,9 @@ const LandingScreen = ({ navigation }) => {
     if (logintimeDifferance.hours < 24) {
       //to save if access token is still valid
       await resolveUnsavedSales();
+    }
+    if (logintimeDifferance.hours >= 12) {
+      await getRefreshToken();
     }
   };
 

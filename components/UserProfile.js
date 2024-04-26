@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../context/UserContext";
 import Icon from "./Icon";
-import PopUpmenu from "./PopUpmenu";
+import PopUpmenu from "./PopUpMenu";
 
 const UserProfile = ({
   renderNtnIcon = true,

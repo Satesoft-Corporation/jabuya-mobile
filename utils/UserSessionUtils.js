@@ -270,15 +270,36 @@ export class UserSessionUtils {
     await AsyncStorage.setItem(StorageParams.SHOP_CLIENTS, data);
   }
 
-  static async getShopClients(shopId) {
+  static async getShopClients(shopId, withNumber = false) {
     let list = await AsyncStorage.getItem(StorageParams.SHOP_CLIENTS);
 
     if (shopId) {
       let newList = [...JSON.parse(list)];
       let filtered = newList.filter((item) => item?.shop?.id === shopId);
+      if (withNumber === true) {
+        filtered = filtered.map((item) => {
+          return {
+            ...item,
+            fullName: `${item?.fullName}  ${item?.phoneNumber}`,
+          };
+        });
+      }
       return filtered;
     } else {
       return list ? JSON.parse(list) : [];
     }
+  }
+
+  static async setLoginDetails(data) {
+    await AsyncStorage.setItem(
+      StorageParams.LOGIN_DETAILS,
+      JSON.stringify(data)
+    );
+  }
+
+  static async getLoginDetails() {
+    let data = await AsyncStorage.getItem(StorageParams.LOGIN_DETAILS);
+
+    return JSON.parse(data);
   }
 }

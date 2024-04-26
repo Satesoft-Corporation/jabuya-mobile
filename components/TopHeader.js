@@ -4,8 +4,7 @@ import Colors from "../constants/Colors";
 import SearchBar from "./SearchBar";
 import { UserContext } from "../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
-import Icon from "./Icon";
-import PopUpmenu from "./PopUpmenu";
+import PopUpmenu from "./PopUpMenu";
 
 const TopHeader = ({
   title = "Details",

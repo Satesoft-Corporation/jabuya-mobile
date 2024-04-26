@@ -69,11 +69,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   clientTitle: {
-    fontWeight: 600,
+    fontWeight: "600",
     marginBottom: 3,
   },
   label: {
-    fontWeight: 600,
+    fontWeight: "600",
     marginBottom: 10,
   },
 });

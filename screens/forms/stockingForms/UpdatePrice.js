@@ -151,11 +151,10 @@ const UpdatePrice = ({ navigation, route }) => {
             />
           </View>
           <MyInput
-            mt={-8}
             label="Date "
-            value={dob}
+            dateValue={dob}
             isDateInput
-            onValueChange={(date) => setDOB(date)}
+            onDateChange={(date) => setDOB(date)}
           />
         </View>
 

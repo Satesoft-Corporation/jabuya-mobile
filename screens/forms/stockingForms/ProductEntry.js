@@ -192,7 +192,7 @@ const ProductEntry = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
       <AppStatusBar />
 
-      <TopHeader title="Add product" />
+      <TopHeader title="List product" />
       <Loader loading={loading} />
       <View
         style={{
@@ -236,6 +236,27 @@ const ProductEntry = () => {
           )}
         </View>
 
+        <FlatList
+          data={saleUnits?.filter(
+            (item) => item?.saleUnitName !== selectedSaleUnit?.saleUnitName
+          )}
+          ListHeaderComponent={() => (
+            <Text style={styles.inputLabel}>Container portions</Text>
+          )}
+          renderItem={({ item }) => (
+            <ChipButton
+              isSelected={selectedSaleUnits?.find(
+                (unit) => item?.saleUnitName === unit?.saleUnitName
+              )}
+              key={item.saleUnitName}
+              onPress={() => onSaleUnitSelect(item)}
+              title={item?.saleUnitName}
+              style={{ width: "fit-content" }}
+            />
+          )}
+          keyExtractor={(item) => item.saleUnitName.toString()}
+          numColumns={3}
+        />
         <View style={styles.row}>
           <View style={{ flex: 1 }}>
             <Text style={styles.inputLabel}>Sale unit</Text>
@@ -268,35 +289,6 @@ const ProductEntry = () => {
           </View>
         </View>
 
-        <FlatList
-          data={saleUnits?.filter(
-            (item) => item?.saleUnitName !== selectedSaleUnit?.saleUnitName
-          )}
-          renderItem={({ item }) => (
-            <ChipButton
-              isSelected={selectedSaleUnits?.find(
-                (unit) => item?.saleUnitName === unit?.saleUnitName
-              )}
-              key={item.saleUnitName}
-              onPress={() => onSaleUnitSelect(item)}
-              title={item?.saleUnitName}
-              style={{ width: "fit-content" }}
-            />
-          )}
-          keyExtractor={(item) => item.saleUnitName.toString()}
-          numColumns={3}
-          // ListFooterComponent={renderFooter}
-        />
-        {selectedSaleUnits?.length > 0 && (
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <Text>Unit</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text>Sales price</Text>
-            </View>
-          </View>
-        )}
         {selectedSaleUnits?.map((item, index) => (
           <View style={styles.row} key={item?.saleUnitName}>
             <View style={{ flex: 1 }}>

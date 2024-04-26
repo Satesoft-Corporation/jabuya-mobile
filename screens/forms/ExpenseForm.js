@@ -130,9 +130,9 @@ const ExpenseForm = () => {
           </View>
           <MyInput
             label="Date "
-            value={dob}
+            dateValue={dob}
             isDateInput
-            onValueChange={(date) => setDOB(date)}
+            onDateChange={(date) => setDOB(date)}
           />
         </View>
 

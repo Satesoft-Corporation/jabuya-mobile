@@ -79,7 +79,7 @@ function SalesEntry({ navigation }) {
   };
 
   const fetchClients = async () => {
-    let clients = await UserSessionUtils.getShopClients(selectedShop?.id);
+    let clients = await UserSessionUtils.getShopClients(selectedShop?.id, true);
     setClients(clients);
     setLoading(false);
   };

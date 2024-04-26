@@ -13,7 +13,7 @@ import { BaseApiService } from "../utils/BaseApiService";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Constants from "expo-constants";
 import CircularProgress from "../components/CircularProgress";
-import {  StackActions } from "@react-navigation/native";
+import { StackActions } from "@react-navigation/native";
 import DisplayMessage from "../components/Dialogs/DisplayMessage";
 import { LANDING_SCREEN } from "../navigation/ScreenNames";
 import { LOGIN_END_POINT } from "../utils/EndPointUtils";
@@ -48,10 +48,9 @@ export default function Login({ navigation }) {
           );
           await UserSessionUtils.setLoginTime(String(date));
           await UserSessionUtils.resetPendingSales();
-
+          await UserSessionUtils.setLoginDetails(loginInfo);
           navigation.dispatch(StackActions.replace(LANDING_SCREEN));
-          setPassword("");
-          setUsername("");
+
           setDisabled(false);
         }
       })

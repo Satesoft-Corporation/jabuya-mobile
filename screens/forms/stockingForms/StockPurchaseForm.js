@@ -34,7 +34,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [suppliers, setSuppliers] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
-  const [expiryDate, setExpiryDate] = useState(null);
+  const [expiryDate, setExpiryDate] = useState(new Date());
   const [isPackedProduct, setIsPackedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [batchNo, setBatchNo] = useState("");
@@ -374,9 +374,9 @@ const StockPurchaseForm = ({ navigation, route }) => {
             <View style={{ flex: 1 }}>
               <MyInput
                 isDateInput
-                value={expiryDate}
+                dateValue={expiryDate}
                 label="Expiry Date"
-                onValueChange={(date) => setExpiryDate(date)}
+                onDateChange={(date) => setExpiryDate(date)}
               />
               {submitted && !expiryDate && (
                 <Text style={styles.errorText}>Expiry date is required</Text>
@@ -396,10 +396,9 @@ const StockPurchaseForm = ({ navigation, route }) => {
             <View style={{ flex: 1 }}>
               <MyInput
                 label="Purchase date"
-                value={purchaseDate}
+                dateValue={purchaseDate}
                 isDateInput
-                onValueChange={(date) => setPurchaseDate(date)}
-                mt={0}
+                onDateChange={(date) => setPurchaseDate(date)}
               />
               {submitted && !purchaseDate && (
                 <Text style={styles.errorText}>Purchase date is required</Text>

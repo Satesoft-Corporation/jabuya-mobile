@@ -117,12 +117,14 @@ const NewClient = () => {
               valueField="id"
             />
           </View>
-          <MyInput
-            label="Date of birth"
-            value={dob}
-            isDateInput
-            onValueChange={(date) => setDOB(date)}
-          />
+          <View style={{ flex: 1 }}>
+            <MyInput
+              label="Date of birth"
+              dateValue={dob}
+              isDateInput
+              onDateChange={(date) => setDOB(date)}
+            />
+          </View>
         </View>
 
         <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>

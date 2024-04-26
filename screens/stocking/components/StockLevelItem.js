@@ -117,10 +117,7 @@ function StockLevelItem({ data }) {
             label={"Selling prie"}
             value={`UGX${formatNumberWithCommas(data?.salesPrice)}`}
           />
-          <DataRow
-            label={"Last restock"}
-            value={formatDate(data?.dateChanged, true)}
-          />
+
           <DataRow label={"Barcode"} value={data?.barcode} />
           <DataRow label={"Category"} value={data?.categoryName} />
           <DataRow label={"Status"} value={data?.recordStatus} />
@@ -129,6 +126,10 @@ function StockLevelItem({ data }) {
           <DataRow
             label={"Last restocked by"}
             value={data?.changedByFullName}
+          />
+          <DataRow
+            label={"Last restock"}
+            value={formatDate(data?.dateChanged, true)}
           />
           <CardFooter1
             btnTitle1="Update price"
@@ -139,7 +140,13 @@ function StockLevelItem({ data }) {
         </View>
       )}
 
-      {!expanded && <CardFooter2 btnTitle={"More"} onBtnPress={toggleExpand} />}
+      {!expanded && (
+        <CardFooter2
+          btnTitle={"More"}
+          onBtnPress={toggleExpand}
+          label={<Text>Listed by: {data?.createdByFullName}</Text>}
+        />
+      )}
     </View>
   );
 }

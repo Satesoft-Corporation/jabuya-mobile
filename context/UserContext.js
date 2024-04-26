@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import { BaseApiService } from "../utils/BaseApiService";
+import { LOGIN_END_POINT } from "../utils/EndPointUtils";
 
 export const UserContext = createContext();
 
@@ -90,11 +91,14 @@ export const UserProvider = ({ children }) => {
     });
   };
 
-  const getRefreshToken = () => {
-    new BaseApiService("/auth/refresh/token")
-      .refreshTokenRequest()
-      .then((r) => console.log(r))
-      .catch((e) => console.log(e));
+  const getRefreshToken = async () => {
+    const loginInfo = await UserSessionUtils.getLoginDetails();
+    new BaseApiService(LOGIN_END_POINT)
+      .saveRequestWithJsonResponse(loginInfo, false)
+      .then(async (response) => {
+        await UserSessionUtils.setUserAuthToken(response.accessToken);
+        await UserSessionUtils.setUserRefreshToken(response.refreshToken);
+      });
   };
 
   useEffect(() => {
@@ -129,6 +133,7 @@ export const UserProvider = ({ children }) => {
     setLoginWithPin,
     reload,
     setReload,
+    getRefreshToken,
   };
   return <UserContext.Provider value={data}>{children}</UserContext.Provider>;
 };

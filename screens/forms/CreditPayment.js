@@ -127,10 +127,10 @@ const CreditPayment = ({ navigation, route }) => {
         <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
           <MyInput
             label="Payment date"
-            value={paymentDate}
+            dateValue={paymentDate}
             isDateInput
-            onValueChange={(date) => setPaymentDate(date)}
-            mt={-10}
+            onDateChange={(date) => setPaymentDate(date)}
+            style={{ flex: 1 }}
           />
 
           <MyInput

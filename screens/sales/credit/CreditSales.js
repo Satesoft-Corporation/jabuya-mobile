@@ -17,8 +17,9 @@ const CreditSales = () => {
   const [creditSales, setCreditSales] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [offset, setOffset] = useState(0);
-  const [showFooter, setShowFooter] = useState(true);
-  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+
   const [message, setMessage] = useState(null);
 
   const [debtors, setDebtors] = useState(0);
@@ -28,7 +29,7 @@ const CreditSales = () => {
 
   const snackbarRef = useRef(null);
 
-  const { reload, selectedShop } = useContext(UserContext);
+  const { selectedShop } = useContext(UserContext);
 
   const fetchCreditSales = async () => {
     let searchParameters = {
@@ -37,10 +38,9 @@ const CreditSales = () => {
       offset: offset,
     };
 
-    setShowFooter(true);
+    setCreditSales([]);
 
-    setIsFetchingMore(true);
-
+    setLoading(true);
     new BaseApiService("/credit-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
@@ -65,52 +65,26 @@ const CreditSales = () => {
 
         if (response?.totalItems === 0) {
           setMessage("No debts found");
-          setShowFooter(false);
         }
 
         setIsFetchingMore(false);
-        setShowFooter(false);
+
+        setLoading(false);
       })
       .catch((error) => {
-        setShowFooter(false);
         setMessage("Error fetching credit records");
+        setLoading(false);
       });
   };
 
   useEffect(() => {
     fetchCreditSales();
-    if (reload === true) {
-      snackbarRef.current.show("Payment saved succesfully");
-    }
-  }, [offset, reload]);
-
-  const renderFooter = () => {
-    if (showFooter === true) {
-      if (creditSales.length === totalRecords && creditSales.length > 0) {
-        return null;
-      }
-
-      return (
-        <View style={{ paddingVertical: 20 }}>
-          <ActivityIndicator animating size="large" color={Colors.dark} />
-        </View>
-      );
-    }
-  };
-
-  const handleEndReached = () => {
-    if (!isFetchingMore && creditSales.length < totalRecords) {
-      setOffset(offset + MAXIMUM_RECORDS_PER_FETCH);
-    }
-    if (creditSales.length === totalRecords && creditSales.length > 10) {
-      snackbarRef.current.show("No more additional data", 2500);
-    }
-  };
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark }}>
       <AppStatusBar />
-      <TopHeader title="Credited Records" showMenuDots />
+      <TopHeader title="Credited Records" />
       <View style={{}}>
         <View style={styles.debtHeader}>
           <Text
@@ -121,16 +95,6 @@ const CreditSales = () => {
           >
             Debt summary
           </Text>
-
-          {/* <Text
-            style={{
-              color: Colors.primary,
-              fontWeight: 600,
-              opacity: 0.7,
-            }}
-          >
-            Period {formatDate(new Date(), true)}
-          </Text> */}
         </View>
 
         <View style={styles.summaryContainer}>
@@ -156,14 +120,13 @@ const CreditSales = () => {
           data={creditSales}
           renderItem={({ item }) => <CreditSaleListItem sale={item} />}
           keyExtractor={(item) => item.id.toString()}
+          refreshing={loading}
+          onRefresh={() => fetchCreditSales()}
           ListEmptyComponent={() => (
             <View style={styles.errorMsg}>
               <Text>{message}</Text>
             </View>
           )}
-          // onEndReached={handleEndReached}
-          onEndReachedThreshold={0}
-          ListFooterComponent={renderFooter}
         />
         <Snackbar ref={snackbarRef} />
       </View>

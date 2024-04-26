@@ -16,7 +16,7 @@ const ItemHeader = ({ title, value, ugx = true }) => {
       >
         {title}
       </Text>
-      <Text style={{ fontSize: 15, color: Colors.primary, fontWeight: "600" }}>
+      <Text style={{ fontSize: 15, color: Colors.primary, fontWeight: "bold" }}>
         {ugx && (
           <Text
             style={{

@@ -132,12 +132,19 @@ export function getCurrentDay(getTomorrowDate = false) {
 export function convertDateFormat(dateString, getTomorrowDate = false) {
   const date = new Date(dateString); // Create a Date object from the input string
 
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  let hours = "00";
+  let minutes = "00";
+  let seconds = "00";
+  let milliseconds = "00";
+
   if (getTomorrowDate === true) {
     date.setDate(date.getDate() + 1); // Increment the date by 1 to get tomorrow's date
   }
 
-  const isoDateString = date.toISOString(); // Convert Date object to ISO string
-  return isoDateString;
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
 }
 
 export function getTimeDifference(date1, date2) {
