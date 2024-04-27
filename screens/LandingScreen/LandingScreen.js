@@ -22,29 +22,7 @@ import {
   saveShopProductsOnDevice,
 } from "../../controllers/OfflineControllers";
 import { Alert } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { Button } from "react-native";
-import { Text } from "react-native";
 const LandingScreen = ({ navigation }) => {
-  const [date, setDate] = useState(new Date(1598051730000));
-  const [mode, setMode] = useState("date");
-  const [show, setShow] = useState(false);
-
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate;
-    setShow(false);
-    setDate(currentDate);
-  };
-
-  const showMode = (currentMode) => {
-    setShow(true);
-    setMode(currentMode);
-  };
-
-  const showDatepicker = () => {
-    showMode("date");
-  };
-
   const {
     setUserParams,
     getShopsFromStorage,
@@ -113,7 +91,7 @@ const LandingScreen = ({ navigation }) => {
     if (prevPinTime !== null) {
       let pintimeDiff = getTimeDifference(prevPinTime, new Date());
 
-      if (pintimeDiff.hours >= 1) {
+      if (pintimeDiff.seconds >= 10) {
         navigation.dispatch(StackActions.replace(LOCK_SCREEN));
       }
     }
@@ -130,7 +108,7 @@ const LandingScreen = ({ navigation }) => {
       //to save if access token is still valid
       await resolveUnsavedSales();
     }
-    if (logintimeDifferance.hours >= 12) {
+    if (logintimeDifferance.hours >= 6) {
       await getRefreshToken();
     }
   };

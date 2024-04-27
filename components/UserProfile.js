@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../context/UserContext";
 import Icon from "./Icon";
 import PopUpmenu from "./PopUpMenu";
+import { SETTINGS } from "../navigation/ScreenNames";
 
 const UserProfile = ({
   renderNtnIcon = true,
@@ -47,7 +48,7 @@ const UserProfile = ({
           marginTop: 10,
         }}
       >
-        <TouchableOpacity onPress={() => navigation.navigate("settings")}>
+        <TouchableOpacity onPress={() => navigation.navigate(SETTINGS)}>
           <Image
             source={require("../assets/images/man_placeholder.jpg")}
             style={{

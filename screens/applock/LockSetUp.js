@@ -9,6 +9,7 @@ import { Image } from "react-native";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import { UserContext } from "../../context/UserContext";
 import PrimaryButton from "../../components/buttons/PrimaryButton";
+import Icon from "../../components/Icon";
 
 const LockSetUp = ({ navigation, route }) => {
   const [pinCode, setPinCode] = useState(["", "", "", "", ""]);
@@ -89,6 +90,7 @@ const LockSetUp = ({ navigation, route }) => {
     <SafeAreaView
       style={{
         flex: 1,
+        backgroundColor: Colors.dark,
       }}
     >
       <AppStatusBar />
@@ -96,7 +98,7 @@ const LockSetUp = ({ navigation, route }) => {
       <View
         style={{
           alignItems: "center",
-          height: 170, //100 if logo
+          height: 170,
           justifyContent: "center",
         }}
       >
@@ -105,7 +107,7 @@ const LockSetUp = ({ navigation, route }) => {
             fontSize: 22,
             letterSpacing: 0.34,
             lineHeight: 25,
-            // color: Colors.light,
+            color: Colors.light,
           }}
         >
           {lockText}
@@ -136,8 +138,17 @@ const LockSetUp = ({ navigation, route }) => {
         }}
       >
         <View></View>
-        <TouchableOpacity onPress={onClear}>
-          <Text style={{}}>Clear</Text>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={onClear}
+          style={{ justifyContent: "center" }}
+        >
+          <Icon
+            name="delete"
+            groupName="Feather"
+            color={Colors.light}
+            size={25}
+          />
         </TouchableOpacity>
       </View>
 
@@ -149,7 +160,11 @@ const LockSetUp = ({ navigation, route }) => {
         />
       )}
       <View>
-        {errorText && <Text style={{ alignSelf: "center" }}>{errorText}</Text>}
+        {errorText && (
+          <Text style={{ alignSelf: "center", color: Colors.error }}>
+            {errorText}
+          </Text>
+        )}
       </View>
     </SafeAreaView>
   );

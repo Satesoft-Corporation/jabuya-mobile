@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StorageParams from "../constants/StorageParams";
-import { StackActions } from "@react-navigation/native";
+import { CommonActions } from "@react-navigation/native";
 import { LOGIN } from "../navigation/ScreenNames";
 export class UserSessionUtils {
   /**
@@ -26,7 +26,12 @@ export class UserSessionUtils {
   static async clearLocalStorageAndLogout(navigation) {
     // remove all
     await AsyncStorage.clear();
-    navigation.dispatch(StackActions.replace(LOGIN));
+    navigation?.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: LOGIN }],
+      })
+    );
   }
 
   /**
@@ -254,6 +259,11 @@ export class UserSessionUtils {
 
   static async getUserPinCode() {
     return await AsyncStorage.getItem(StorageParams.PIN_CODE);
+  }
+
+  static async removeUserPinCode() {
+    await AsyncStorage.removeItem(StorageParams.PIN_CODE);
+    await AsyncStorage.removeItem(StorageParams.PIN_LOGIN);
   }
 
   static async setPinLoginTime(time) {

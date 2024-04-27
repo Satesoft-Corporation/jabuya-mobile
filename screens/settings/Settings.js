@@ -15,19 +15,27 @@ import { BaseStyle } from "../../utils/BaseStyle";
 import { Switch } from "react-native-paper";
 
 const Settings = ({ navigation }) => {
-  const { hasUserSetPinCode, sessionObj, logInWithPin, setLoginWithPin } =
-    useContext(UserContext);
+  const {
+    hasUserSetPinCode,
+    sessionObj,
+    logInWithPin,
+    setLoginWithPin,
+    getAppLockStatus,
+  } = useContext(UserContext);
 
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
   const [agreeText, setAgreeText] = useState("");
   const [canCancel, setCanCancel] = useState(false);
 
-  const onToggleSwitch = () => {
+  const onToggleSwitch = async () => {
     setLoginWithPin(!logInWithPin);
 
     if (hasUserSetPinCode === false) {
       navigation.navigate(LOCK_SETuP);
+    } else {
+      await UserSessionUtils.removeUserPinCode();
+      await getAppLockStatus();
     }
   };
   const { role, fullName } = sessionObj;
@@ -116,10 +124,10 @@ const Settings = ({ navigation }) => {
         <View style={{ marginTop: 20 }}>
           <Text style={{ fontSize: 16 }}>Security and Mangement</Text>
           <View style={BaseStyle.shadowedContainer}>
-            <SettingsBar
+            {/* <SettingsBar
               icon={require("../../assets/icons/icons8-shield-50.png")}
               text="Password"
-            />
+            /> */}
 
             <SettingsBar
               icon={require("../../assets/icons/icons8-shield-50.png")}
@@ -129,6 +137,7 @@ const Settings = ({ navigation }) => {
                   style={{ height: 20 }}
                   value={logInWithPin}
                   onValueChange={onToggleSwitch}
+                  color="#000"
                 />
               )}
             />

@@ -4,6 +4,7 @@ import Colors from "../../../constants/Colors";
 import { paymentMethods } from "../../../constants/Constants";
 import { SaleEntryContext } from "../../../context/SaleEntryContext";
 import ChipButton from "../../../components/buttons/ChipButton";
+import { DatePickerInput } from "react-native-paper-dates";
 import { MyDropDown } from "../../../components/DropdownComponents";
 import MyInput from "../../../components/MyInput";
 

@@ -2,6 +2,7 @@ import { createContext, useState, useEffect } from "react";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import { BaseApiService } from "../utils/BaseApiService";
 import { LOGIN_END_POINT } from "../utils/EndPointUtils";
+import { useNavigation } from "@react-navigation/native";
 
 export const UserContext = createContext();
 
@@ -104,7 +105,6 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     getShopsFromStorage();
     getSessionObj();
-    // getRefreshToken()
   }, [userParams]);
 
   useEffect(() => {
@@ -134,6 +134,7 @@ export const UserProvider = ({ children }) => {
     reload,
     setReload,
     getRefreshToken,
+    getAppLockStatus,
   };
   return <UserContext.Provider value={data}>{children}</UserContext.Provider>;
 };

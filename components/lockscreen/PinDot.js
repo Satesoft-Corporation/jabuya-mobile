@@ -14,7 +14,7 @@ const PinDot = ({ number }) => {
         number === ""
           ? {
               ...constants,
-              borderColor: Colors.dark,
+              borderColor: Colors.light,
               borderWidth: 1,
             }
           : {
