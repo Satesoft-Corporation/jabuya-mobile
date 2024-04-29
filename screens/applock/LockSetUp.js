@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView } from "react-native";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import Colors from "../../constants/Colors";
 import PinDot from "./PinDot";
 import NumbersContiner from "./NumbersContiner";
@@ -22,25 +22,28 @@ const LockSetUp = ({ navigation, route }) => {
   const { hasUserSetPinCode, setHasUserSetPinCode, setLoginWithPin } =
     useContext(UserContext);
 
-  const onNumberPress = (num) => {
-    let tempCode = [...pinCode];
-    setErrorText(null);
-    for (let i = 0; i < tempCode.length; i++) {
-      if (tempCode[i] === "") {
-        tempCode[i] = String(num);
-        break;
-      } else {
-        continue;
+  const onNumberPress = useCallback(
+    (num) => {
+      let tempCode = [...pinCode];
+      setErrorText(null);
+      for (let i = 0; i < tempCode.length; i++) {
+        if (tempCode[i] === "") {
+          tempCode[i] = String(num);
+          break;
+        } else {
+          continue;
+        }
       }
-    }
 
-    setPinCode(tempCode);
+      setPinCode(tempCode);
 
-    if (!hasUserSetPinCode) {
-    }
-  };
+      if (!hasUserSetPinCode) {
+      }
+    },
+    [pinCode]
+  );
 
-  const onClear = () => {
+  const onClear = useCallback(() => {
     let tempCode = [...pinCode];
     for (let x = tempCode.length - 1; x >= 0; x--) {
       if (tempCode[x] !== "") {
@@ -51,7 +54,7 @@ const LockSetUp = ({ navigation, route }) => {
       }
     }
     setPinCode(tempCode);
-  };
+  }, [pinCode]);
 
   const onConfirmPin = () => {
     // setErrorText(null);

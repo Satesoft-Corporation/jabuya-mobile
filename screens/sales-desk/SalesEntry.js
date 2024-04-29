@@ -115,7 +115,7 @@ function SalesEntry({ navigation }) {
   };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <AppStatusBar bgColor={Colors.dark} content={"light-content"} />
+      <AppStatusBar />
 
       <ConfirmSaleModal
         visible={showConfirmed}
@@ -293,7 +293,7 @@ function SalesEntry({ navigation }) {
             </View>
           </View>
 
-          <View // selections table
+          <View
             style={{
               backgroundColor: Colors.light,
               borderRadius: 5,
@@ -340,7 +340,7 @@ function SalesEntry({ navigation }) {
             </View>
           </View>
 
-          <IconsComponent clear={() => clearEverything()} />
+          <IconsComponent />
 
           <View style={{ marginTop: 8, height: 40, marginBottom: 20 }}>
             <PrimaryButton

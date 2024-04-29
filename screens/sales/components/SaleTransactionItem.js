@@ -6,7 +6,7 @@ import {
   formatNumberWithCommas,
 } from "../../../utils/Utils";
 import CardHeader from "../../../components/cardComponents/CardHeader";
-import SalesTable from "../../salesDesk/components/SalesTable";
+import SalesTable from "../../sales-desk/components/SalesTable";
 import DataRow from "../../../components/cardComponents/DataRow";
 import CardFooter2 from "../../../components/cardComponents/CardFooter2";
 

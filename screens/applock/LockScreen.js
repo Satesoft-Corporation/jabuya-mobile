@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView } from "react-native";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import Colors from "../../constants/Colors";
 import PinDot from "./PinDot";
 import NumbersContiner from "./NumbersContiner";
@@ -19,23 +19,26 @@ const LockScreen = ({ navigation, route }) => {
 
   const { userPincode } = useContext(UserContext);
 
-  const onNumberPress = (num) => {
-    setErrorText(null);
+  const onNumberPress = useCallback(
+    (num) => {
+      setErrorText(null);
 
-    let tempCode = [...pinCode];
-    for (let i = 0; i < tempCode.length; i++) {
-      if (tempCode[i] === "") {
-        tempCode[i] = String(num);
-        break;
-      } else {
-        continue;
+      let tempCode = [...pinCode];
+      for (let i = 0; i < tempCode.length; i++) {
+        if (tempCode[i] === "") {
+          tempCode[i] = String(num);
+          break;
+        } else {
+          continue;
+        }
       }
-    }
 
-    setPinCode(tempCode);
-  };
+      setPinCode(tempCode);
+    },
+    [pinCode]
+  );
 
-  const onClear = () => {
+  const onClear = useCallback(() => {
     let tempCode = [...pinCode];
     for (let x = tempCode.length - 1; x >= 0; x--) {
       if (tempCode[x] !== "") {
@@ -46,7 +49,7 @@ const LockScreen = ({ navigation, route }) => {
       }
     }
     setPinCode(tempCode);
-  };
+  }, [pinCode]);
 
   const logTheUserIn = async () => {
     await UserSessionUtils.setPinLoginTime(String(new Date()));
@@ -86,7 +89,7 @@ const LockScreen = ({ navigation, route }) => {
       }
 
       const { success } = await LocalAuthentication.authenticateAsync({
-        promptMessage: "Authenticate with fingerprint",
+        promptMessage: "Unlock to use Duqact",
       });
 
       if (success) {

@@ -1,14 +1,18 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  SafeAreaView,
+} from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import AppStatusBar from "../components/AppStatusBar";
-import Colors from "../constants/Colors";
-import { BaseApiService } from "../utils/BaseApiService";
-import UserProfile from "../components/UserProfile";
-import Loader from "../components/Loader";
-import { convertDateFormat, formatNumberWithCommas } from "../utils/Utils";
-import { UserContext } from "../context/UserContext";
-import { UserSessionUtils } from "../utils/UserSessionUtils";
-import { STOCK_ENTRY_ENDPOINT } from "../utils/EndPointUtils";
+import { BaseApiService } from "../../utils/BaseApiService";
+import AppStatusBar from "../../components/AppStatusBar";
+import Colors from "../../constants/Colors";
+import Loader from "../../components/Loader";
+import UserProfile from "../../components/UserProfile";
+import { UserContext } from "../../context/UserContext";
+import Stripe from "./components/Stripe1";
 
 const ShopSummary = ({ navigation, route }) => {
   const [initialCapital, setInitialCapital] = useState("");
@@ -26,7 +30,6 @@ const ShopSummary = ({ navigation, route }) => {
 
     let totalStockValue = [];
     let totalSaleValue = [];
-    console.log(products);
 
     products.forEach((item) => {
       const { salesPrice } = item;
@@ -62,7 +65,6 @@ const ShopSummary = ({ navigation, route }) => {
     new BaseApiService("/shops")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
-        console.log(response.records);
         let totalCapital = 0;
         let stockValue = 0;
         let cashAtHand = 0;
@@ -98,35 +100,13 @@ const ShopSummary = ({ navigation, route }) => {
       });
   };
 
-  const fetchStockEntries = async () => {
-    const monthStartDate = new Date();
-
-    monthStartDate.setDate(1);
-
-    try {
-      const searchParameters = {
-        limit: 0,
-        offset: 0,
-        shopOwnerId: shopOwnerId,
-        startDate: convertDateFormat(monthStartDate),
-      };
-
-      const response = await new BaseApiService(
-        STOCK_ENTRY_ENDPOINT
-      ).getRequestWithJsonResponse(searchParameters);
-      console.log(response?.records);
-    } catch (error) {
-      console.log(error);
-    }
-  };
   useEffect(() => {
     fetchShopProducts();
     fetchShopDetails();
-    fetchStockEntries();
   }, []);
 
   return (
-    <View style={{ backgroundColor: Colors.light_2, flex: 1 }}>
+    <SafeAreaView style={{ backgroundColor: Colors.light_2, flex: 1 }}>
       <AppStatusBar bgColor="black" content="light-content" />
       <Loader loading={loading} />
 
@@ -152,7 +132,7 @@ const ShopSummary = ({ navigation, route }) => {
               Investment
             </Text>
             <Text
-              style={{ fontSize: 15, color: Colors.primary, fontWeight: "600" }}
+              style={{ fontSize: 15, color: Colors.primary, fontWeight: 600 }}
             >
               <Text
                 style={{
@@ -211,38 +191,7 @@ const ShopSummary = ({ navigation, route }) => {
         </View>
       </View>
       <View style={{ paddingHorizontal: 10, marginTop: 8 }}>
-        <View
-          style={{
-            backgroundColor: Colors.primary,
-            flexDirection: "row",
-            alignItems: "center",
-            padding: 6,
-            borderRadius: 3,
-            justifyContent: "space-between",
-          }}
-        >
-          <View style={{ flexDirection: "row", justifyContent: "center" }}>
-            <Image
-              source={require("../assets/icons/icons8-box-501.png")}
-              style={{
-                width: 40,
-                height: 40,
-                tintColor: Colors.dark,
-                marginEnd: 10,
-              }}
-            />
-            <View>
-              <Text style={{ fontWeight: 400, fontWeight: 16 }}>Stock</Text>
-              <Text style={{ fontWeight: 300, fontSize: 10 }}>Total Value</Text>
-            </View>
-          </View>
-
-          <View>
-            <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>
-              {formatNumberWithCommas(stock)}
-            </Text>
-          </View>
-        </View>
+        <Stripe />
 
         <View
           style={{
@@ -266,7 +215,7 @@ const ShopSummary = ({ navigation, route }) => {
             }}
           >
             <Image
-              source={require("../assets/icons/bank1.png")}
+              source={require("../../assets/icons/bank1.png")}
               style={{
                 width: 40,
                 height: 40,
@@ -309,7 +258,7 @@ const ShopSummary = ({ navigation, route }) => {
             }}
           >
             <Image
-              source={require("../assets/icons/open-hand.png")}
+              source={require("../../assets/icons/open-hand.png")}
               style={{
                 width: 40,
                 height: 40,
@@ -363,7 +312,7 @@ const ShopSummary = ({ navigation, route }) => {
             }}
           >
             <Image
-              source={require("../assets/icons/icons8-cash-50.png")}
+              source={require("../../assets/icons/icons8-cash-50.png")}
               style={{
                 width: 40,
                 height: 40,
@@ -406,7 +355,7 @@ const ShopSummary = ({ navigation, route }) => {
             }}
           >
             <Image
-              source={require("../assets/icons/icons8-money-50.png")}
+              source={require("../../assets/icons/icons8-money-50.png")}
               style={{
                 width: 40,
                 height: 40,
@@ -451,7 +400,7 @@ const ShopSummary = ({ navigation, route }) => {
         >
           <View style={{ flexDirection: "row", justifyContent: "center" }}>
             <Image
-              source={require("../assets/icons/icons8-money-bag-64.png")}
+              source={require("../../assets/icons/icons8-money-bag-64.png")}
               style={{
                 width: 40,
                 height: 40,
@@ -489,7 +438,7 @@ const ShopSummary = ({ navigation, route }) => {
         >
           <View style={{ flexDirection: "row", justifyContent: "center" }}>
             <Image
-              source={require("../assets/icons/spending.png")}
+              source={require("../../assets/icons/spending.png")}
               style={{
                 width: 40,
                 height: 40,
@@ -525,7 +474,7 @@ const ShopSummary = ({ navigation, route }) => {
         >
           <View style={{ flexDirection: "row", justifyContent: "center" }}>
             <Image
-              source={require("../assets/icons/icons8-money-bag-48.png")}
+              source={require("../../assets/icons/icons8-money-bag-48.png")}
               style={{
                 width: 40,
                 height: 40,
@@ -561,7 +510,7 @@ const ShopSummary = ({ navigation, route }) => {
           </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

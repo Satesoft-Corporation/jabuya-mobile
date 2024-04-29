@@ -1,15 +1,21 @@
 import { TouchableOpacity, Image, View, Text } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 
 import Colors from "../constants/Colors";
 
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { screenWidth } from "../constants/Constants";
 import { useNavigation } from "@react-navigation/native";
 import { CREDIT_SALES } from "../navigation/ScreenNames";
+import { SaleEntryContext } from "../context/SaleEntryContext";
 
-export function MenuIcon({ icon, containerStyle, onPress, iconStyle, titleStyle }) {
+export function MenuIcon({
+  icon,
+  containerStyle,
+  onPress,
+  iconStyle,
+  titleStyle,
+}) {
   return (
     <TouchableOpacity
       key={icon.id}
@@ -72,7 +78,9 @@ export function MenuIcon({ icon, containerStyle, onPress, iconStyle, titleStyle 
   );
 }
 
-export const IconsComponent = ({ clear }) => {
+export const IconsComponent = () => {
+  const { clearEverything } = useContext(SaleEntryContext);
+
   let color = Colors.gray;
   const navigation = useNavigation();
 
@@ -146,6 +154,8 @@ export const IconsComponent = ({ clear }) => {
         <Text style={{ alignSelf: "center", color: Colors.dark }}>Credit</Text>
       </TouchableOpacity>
       <TouchableOpacity
+        onPress={clearEverything}
+        activeOpacity={0.5}
         style={{
           padding: 10,
           backgroundColor: Colors.primary,
@@ -155,12 +165,7 @@ export const IconsComponent = ({ clear }) => {
           height: 63,
         }}
       >
-        <MaterialCommunityIcons
-          name="broom"
-          size={25}
-          color="black"
-          onPress={clear}
-        />
+        <MaterialCommunityIcons name="broom" size={25} color="black" />
         <Text style={{ alignSelf: "center" }}>Clear</Text>
       </TouchableOpacity>
     </View>

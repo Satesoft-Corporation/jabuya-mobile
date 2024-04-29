@@ -83,7 +83,7 @@ const CreditSales = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark }}>
       <AppStatusBar />
       <TopHeader title="Credited Records" />
-      <View style={{}}>
+      <View style={{ paddingBottom: 10 }}>
         <View style={styles.debtHeader}>
           <Text
             style={{
