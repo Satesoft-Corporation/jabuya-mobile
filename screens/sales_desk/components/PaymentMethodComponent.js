@@ -1,10 +1,9 @@
-import { View, Text, FlatList, TextInput } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import React, { useContext } from "react";
 import Colors from "../../../constants/Colors";
 import { paymentMethods } from "../../../constants/Constants";
 import { SaleEntryContext } from "../../../context/SaleEntryContext";
 import ChipButton from "../../../components/buttons/ChipButton";
-import { DatePickerInput } from "react-native-paper-dates";
 import { MyDropDown } from "../../../components/DropdownComponents";
 import MyInput from "../../../components/MyInput";
 
@@ -83,7 +82,6 @@ const PaymentMethodComponent = ({
                 placeholder="Select client"
                 labelField="fullName"
                 valueField="id"
-                search={false}
               />
             </View>
           </View>

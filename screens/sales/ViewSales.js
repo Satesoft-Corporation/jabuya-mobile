@@ -169,34 +169,24 @@ export default function ViewSales({ navigation }) {
               marginVertical: 10,
             }}
           >
-            <View>
-              <Text
-                style={{
-                  color: Colors.primary,
-                  fontSize: 16,
-                  fontWeight: 600,
-                }}
-              >
-                Sales summary
-              </Text>
-              <Text
-                style={{
-                  color: Colors.primary,
-                  fontSize: 13,
-                  fontWeight: 600,
-                }}
-              >
-                {formatDate(date, true)}
-              </Text>
-            </View>
             <Text
               style={{
                 color: Colors.primary,
+                fontSize: 16,
                 fontWeight: 600,
-                opacity: 0.7,
               }}
             >
-              {selectedShop?.name}
+              Sales summary
+            </Text>
+            <Text
+              style={{
+                color: Colors.primary,
+                fontSize: 13,
+                fontWeight: 600,
+                alignSelf: "flex-end",
+              }}
+            >
+              {formatDate(date, true)}
             </Text>
           </View>
 

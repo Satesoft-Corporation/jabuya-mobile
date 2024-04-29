@@ -7,14 +7,18 @@ const CardFooter2 = ({
   btnTitle = "",
   onBtnPress,
   renderBtn = true,
+  style,
 }) => {
   return (
     <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
+      style={[
+        {
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        },
+        style,
+      ]}
     >
       <Text style={{ fontSize: 13, fontWeight: 600 }}>
         <Text style={{ fontWeight: 400 }}>{label}</Text>

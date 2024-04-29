@@ -5,7 +5,6 @@ import Colors from "../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../context/UserContext";
-import Icon from "./Icon";
 import PopUpmenu from "./PopUpMenu";
 import { SETTINGS } from "../navigation/ScreenNames";
 
@@ -17,9 +16,9 @@ const UserProfile = ({
   const [shops, setShops] = useState(null);
   const navigation = useNavigation();
 
-  const { sessionObj } = useContext(UserContext);
+  const { sessionObj, selectedShop } = useContext(UserContext);
 
-  const { role, fullName, attendantShopName } = { ...sessionObj };
+  const { role, fullName } = { ...sessionObj };
 
   useEffect(() => {
     UserSessionUtils.getShopCount().then((count) => {
@@ -90,21 +89,23 @@ const UserProfile = ({
               fontSize: 11,
             }}
           >
-            {attendantShopName || (shops && `Shops: ${shops}`)}
+            {selectedShop?.name || (shops?.length > 1 && `Shops: ${shops}`)}
           </Text>
         </View>
       </View>
 
-      {renderNtnIcon && (
-        <TouchableOpacity style={{ marginEnd: 10 }}>
-          <Ionicons
-            name="notifications-outline"
-            size={20}
-            color={Colors.primary_light}
-          />
-        </TouchableOpacity>
-      )}
-      {renderMenu && <PopUpmenu menuItems={menuItems} />}
+      <View style={{ flexDirection: "row", gap: 10 }}>
+        {renderNtnIcon && (
+          <TouchableOpacity style={{ marginEnd: 10 }}>
+            <Ionicons
+              name="notifications-outline"
+              size={20}
+              color={Colors.primary_light}
+            />
+          </TouchableOpacity>
+        )}
+        {renderMenu && <PopUpmenu menuItems={menuItems} />}
+      </View>
     </View>
   );
 };

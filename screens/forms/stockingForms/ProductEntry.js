@@ -284,7 +284,7 @@ const ProductEntry = () => {
 
             <View style={{ flex: 1 }}>
               <MyInput
-                label={<Text style={styles.inputLabel}>Sales price</Text>}
+                label={<Text style={styles.inputLabel}>Selling price</Text>}
                 value={salesPrice}
                 onValueChange={(text) => setSalesPrice(text)}
                 inputMode="numeric"

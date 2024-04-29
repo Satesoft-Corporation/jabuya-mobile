@@ -1,11 +1,10 @@
 import { View, Text, TextInput } from "react-native";
 import React, { memo, useState } from "react";
 import Colors from "../constants/Colors";
-import { DatePickerInput } from "react-native-paper-dates";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from "./Icon";
 import { TouchableOpacity } from "react-native";
-import { formatDateToDDMMYY, toReadableDate } from "../utils/Utils";
+import { toReadableDate } from "../utils/Utils";
 
 const MyInput = ({
   onValueChange,

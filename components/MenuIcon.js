@@ -151,7 +151,7 @@ export const IconsComponent = () => {
           size={24}
           color={Colors.dark}
         />
-        <Text style={{ alignSelf: "center", color: Colors.dark }}>Credit</Text>
+        <Text style={{ alignSelf: "center", color: Colors.dark }}>Debt</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={clearEverything}

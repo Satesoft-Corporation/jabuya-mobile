@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { View, Text } from "react-native";
-import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
-import Colors from "../../../constants/Colors";
+import { formatDate } from "../../../utils/Utils";
 import { useNavigation } from "@react-navigation/native";
 import DataRow from "../../../components/cardComponents/DataRow";
 import ChipButton2 from "../../../components/buttons/ChipButton2";
 import { STOCK_ENTRY_FORM } from "../../../navigation/ScreenNames";
+import CardHeader from "../../../components/cardComponents/CardHeader";
+import RenderCurrency from "../../../components/RenderCurrency";
 
 const StockPurchaseListComponent = ({ data }) => {
   const [expanded, setExpanded] = useState(false);
@@ -60,6 +61,19 @@ const StockPurchaseListComponent = ({ data }) => {
           </Text>
           <Text>{purchasedQuantity}</Text>
         </View>
+        <View style={{ alignItems: "center", flex: 1 }}>
+          <Text
+            style={{
+              fontWeight: 600,
+              marginBottom: 3,
+            }}
+          >
+            Cost
+          </Text>
+          <RenderCurrency
+            value={Math.round(purchasePrice / purchasedQuantity)}
+          />
+        </View>
 
         <View style={{ alignItems: "flex-end", flex: 1 }}>
           <Text
@@ -70,9 +84,7 @@ const StockPurchaseListComponent = ({ data }) => {
           >
             Amount
           </Text>
-          <Text style={{ alignSelf: "flex-end", marginEnd: 2 }}>
-            {formatNumberWithCommas(purchasePrice)}
-          </Text>
+          <RenderCurrency value={purchasePrice} />
         </View>
       </View>
     );
@@ -89,49 +101,18 @@ const StockPurchaseListComponent = ({ data }) => {
         paddingHorizontal: 10,
       }}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 12,
-            fontWeight: "bold",
-            color: Colors.dark,
-            marginBottom: 2,
-          }}
-        >
-          SN: {data?.serialNumber}
-        </Text>
-        <Text
-          style={{
-            fontSize: 12,
-            color: Colors.gray,
-            alignSelf: "flex-end",
-          }}
-        >
-          {formatDate(data?.dateCreated)}
-        </Text>
-      </View>
-
+      <CardHeader
+        value1={` SN: ${data?.serialNumber}`}
+        value2={formatDate(data?.dateCreated)}
+      />
       <ItemRow />
 
       {expanded && (
         <View>
-          <DataRow
-            valueTextStyle={{ fontWeight: 600 }}
-            labelTextStyle={{ fontWeight: 600 }}
-            label="Unit purchase cost"
-            value={formatNumberWithCommas(
-              Math.round(purchasePrice / purchasedQuantity)
-            )}
-          />
           <DataRow label="Barcode" value={barcode} />
-          <DataRow label="Restock date" value={formatDate(dateCreated, true)} />
           <DataRow label="Batch no" value={batchNumber} />
           <DataRow label="Expiry date" value={formatDate(expiryDate, true)} />
+          <DataRow label="Restock date" value={formatDate(dateCreated, true)} />
           <DataRow label="Supplier" value={supplierName} />
         </View>
       )}
@@ -141,6 +122,7 @@ const StockPurchaseListComponent = ({ data }) => {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
+          marginTop: 10,
         }}
       >
         <View>

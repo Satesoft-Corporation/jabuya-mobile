@@ -414,7 +414,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
             numberOfLines={3}
           />
 
-          <View style={styles.row}>
+          <View style={[styles.row, { marginTop: 15 }]}>
             <PrimaryButton
               darkMode={false}
               title={"Clear"}
@@ -441,7 +441,6 @@ const styles = StyleSheet.create({
   inputLabel: {
     marginVertical: 3,
     marginStart: 6,
-    marginTop: 5,
   },
   dropDown: {
     backgroundColor: Colors.light,

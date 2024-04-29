@@ -92,6 +92,7 @@ const LandingScreen = ({ navigation }) => {
 
       if (pintimeDiff.minutes >= 10) {
         navigation.dispatch(StackActions.replace(LOCK_SCREEN));
+        return;
       }
     }
   };

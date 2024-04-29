@@ -1,10 +1,9 @@
-import { View, Text, SafeAreaView } from "react-native";
+import { View, Text, SafeAreaView, KeyboardAvoidingView } from "react-native";
 import React, { useContext, useEffect, useState, useRef } from "react";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import { BaseStyle } from "../../utils/BaseStyle";
 import MyInput from "../../components/MyInput";
-import ChipButton from "../../components/buttons/ChipButton";
 import { MyDropDown } from "../../components/DropdownComponents";
 import Colors from "../../constants/Colors";
 import { UserContext } from "../../context/UserContext";
@@ -12,6 +11,7 @@ import Loader from "../../components/Loader";
 import { useNavigation } from "@react-navigation/native";
 import { BaseApiService } from "../../utils/BaseApiService";
 import Snackbar from "../../components/Snackbar";
+import PrimaryButton from "../../components/buttons/PrimaryButton";
 
 const ExpenseForm = () => {
   const [categories, setCategories] = useState([]);
@@ -70,97 +70,101 @@ const ExpenseForm = () => {
     fetchCategories();
   }, []);
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <AppStatusBar />
-      <TopHeader title="Enter Expense" />
+    <KeyboardAvoidingView
+      enabled={true}
+      behavior={"height"}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
+        <AppStatusBar />
+        <TopHeader title="Enter Expense" />
 
-      <Loader loading={loading} />
-      <Snackbar ref={snackRef} />
-      <View style={BaseStyle.container}>
-        <Text
-          style={{
-            marginTop: 10,
-            fontSize: 16,
-          }}
-        >
-          Expense Details
-        </Text>
-
-        <View style={{ marginTop: 20, gap: 5 }}>
-          <Text>Shop</Text>
-          <MyDropDown
-            search={false}
+        <Loader loading={loading} />
+        <Snackbar ref={snackRef} />
+        <View style={{ flex: 1, paddingHorizontal: 10 }}>
+          <Text
             style={{
-              backgroundColor: Colors.light,
-              borderColor: Colors.dark,
+              marginTop: 10,
+              fontSize: 16,
             }}
-            data={shops}
-            value={selectedShop}
-            onChange={(e) => {
-              setSelectedShop(e);
-            }}
-            placeholder="Select "
-            labelField="name"
-            valueField="id"
-          />
-        </View>
+          >
+            Expense Details
+          </Text>
 
-        <View style={{ marginTop: 10, gap: 5 }}>
-          <Text>Category</Text>
-          <MyDropDown
-            search={false}
-            style={{
-              backgroundColor: Colors.light,
-              borderColor: Colors.dark,
-            }}
-            data={categories}
-            value={selectedCategory}
-            onChange={(e) => {
-              setSelectedCategory(e);
-            }}
-            placeholder="Select Category"
-            labelField="value"
-            valueField="id"
-          />
-        </View>
-        <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
-          <View style={{ flex: 1, gap: 5 }}>
+          <View style={{ marginTop: 20, gap: 5 }}>
+            <Text>Shop</Text>
+            <MyDropDown
+              search={false}
+              style={{
+                backgroundColor: Colors.light,
+                borderColor: Colors.dark,
+              }}
+              data={shops}
+              value={selectedShop}
+              onChange={(e) => {
+                setSelectedShop(e);
+              }}
+              placeholder="Select "
+              labelField="name"
+              valueField="id"
+            />
+          </View>
+
+          <View style={{ marginTop: 10, gap: 5 }}>
+            <Text>Category</Text>
+            <MyDropDown
+              search={false}
+              style={{
+                backgroundColor: Colors.light,
+                borderColor: Colors.dark,
+              }}
+              data={categories}
+              value={selectedCategory}
+              onChange={(e) => {
+                setSelectedCategory(e);
+              }}
+              placeholder="Select Category"
+              labelField="value"
+              valueField="id"
+            />
+          </View>
+          <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
+            <View style={{ flex: 1, gap: 5 }}>
+              <MyInput
+                label="Amount"
+                inputMode="numeric"
+                value={amount}
+                onValueChange={(text) => setAmount(text)}
+                style={{ flex: 1 }}
+              />
+            </View>
             <MyInput
-              label="Amount"
-              inputMode="numeric"
-              value={amount}
-              onValueChange={(text) => setAmount(text)}
+              label="Date "
+              dateValue={dob}
+              isDateInput
+              onDateChange={(date) => setDOB(date)}
               style={{ flex: 1 }}
             />
           </View>
+
           <MyInput
-            label="Date "
-            dateValue={dob}
-            isDateInput
-            onDateChange={(date) => setDOB(date)}
-            style={{ flex: 1 }}
+            label="Desciprition"
+            multiline
+            value={remarks}
+            onValueChange={(text) => setRemarks(text)}
           />
-        </View>
 
-        <MyInput
-          label="Desciprition"
-          multiline
-          value={remarks}
-          onValueChange={(text) => setRemarks(text)}
-        />
-
-        <View
-          style={{
-            flexDirection: "row",
-            alignSelf: "flex-end",
-            marginBottom: 10,
-          }}
-        >
-          <ChipButton title={"Cancel"} onPress={() => navigation.goBack()} />
-          <ChipButton darkMode title={"Save"} onPress={saveExpense} />
+          <View style={BaseStyle.bottomContent}>
+            <PrimaryButton
+              darkMode={false}
+              title={"Cancel"}
+              onPress={() => navigation.goBack()}
+            />
+            <PrimaryButton title={"Save"} onPress={saveExpense} />
+          </View>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 

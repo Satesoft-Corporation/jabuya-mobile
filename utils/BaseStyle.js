@@ -26,4 +26,15 @@ export const BaseStyle = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 10,
   },
+  bottomContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 8,
+    gap: 10,
+    marginBottom: 10,
+  },
 });

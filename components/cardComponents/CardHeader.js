@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import Colors from "../../constants/Colors";
 
-const CardHeader = ({ value1, value2 }) => {
+const CardHeader = ({ value1, value2, value1Style }) => {
   return (
     <View
       style={{
@@ -11,12 +11,15 @@ const CardHeader = ({ value1, value2 }) => {
       }}
     >
       <Text
-        style={{
-          fontSize: 12,
-          fontWeight: "bold",
-          color: Colors.dark,
-          marginBottom: 2,
-        }}
+        style={[
+          {
+            fontSize: 12,
+            fontWeight: "bold",
+            color: Colors.dark,
+            marginBottom: 2,
+          },
+          value1Style,
+        ]}
       >
         {value1}
       </Text>

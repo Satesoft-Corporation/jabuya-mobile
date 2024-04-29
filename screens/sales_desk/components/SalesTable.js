@@ -72,9 +72,11 @@ export const SaleListItem = ({ data }) => {
       </Text>
       <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>
       <Text style={{ flex: 1, textAlign: "right" }}>
+        <Text style={{ fontSize: 8, fontWeight: 400 }}>UGX </Text>
         {formatNumberWithCommas(data?.unitCost)}
       </Text>
       <Text style={{ flex: 1, textAlign: "right", paddingEnd: 10 }}>
+        <Text style={{ fontSize: 8, fontWeight: 400 }}>UGX </Text>
         {formatNumberWithCommas(data?.totalCost)}
       </Text>
     </View>

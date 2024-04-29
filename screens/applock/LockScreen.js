@@ -8,7 +8,7 @@ import AppStatusBar from "../../components/AppStatusBar";
 import { Image } from "react-native";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import { UserContext } from "../../context/UserContext";
-import { CommonActions } from "@react-navigation/native";
+import { StackActions } from "@react-navigation/native";
 import Icon from "../../components/Icon";
 import * as LocalAuthentication from "expo-local-authentication";
 import { LANDING_SCREEN } from "../../navigation/ScreenNames";
@@ -53,12 +53,7 @@ const LockScreen = ({ navigation, route }) => {
 
   const logTheUserIn = async () => {
     await UserSessionUtils.setPinLoginTime(String(new Date()));
-    navigation?.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: LANDING_SCREEN }],
-      })
-    );
+    navigation?.dispatch(StackActions.replace(LANDING_SCREEN));
   };
 
   const authWithPin = async () => {

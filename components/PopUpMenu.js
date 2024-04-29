@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Text } from "react-native";
 import React from "react";
 import {
   Menu,
@@ -9,11 +9,21 @@ import {
 
 import Colors from "../constants/Colors";
 import Icon from "./Icon";
+import { StatusBar } from "react-native";
 
 const PopUpmenu = ({ menuItems = [] }) => {
   return (
     <Menu>
-      <MenuTrigger text="">
+      <MenuTrigger
+        text=""
+        style={{
+          width: 40,
+          height: 40,
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 100,
+        }}
+      >
         <Icon
           groupName="Entypo"
           name="dots-three-vertical"
@@ -24,9 +34,9 @@ const PopUpmenu = ({ menuItems = [] }) => {
       <MenuOptions
         optionsContainerStyle={{
           backgroundColor: Colors.light_2,
-          padding: 10,
+          padding: 6,
           borderRadius: 5,
-          marginTop: 5,
+          marginTop: StatusBar.currentHeight,
         }}
       >
         {menuItems.map((item, i) => (
@@ -34,7 +44,7 @@ const PopUpmenu = ({ menuItems = [] }) => {
             <Text
               style={{
                 paddingVertical: 5,
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: item?.bold ? 600 : 400,
                 color: Colors.dark,
               }}

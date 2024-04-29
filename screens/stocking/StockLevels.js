@@ -88,6 +88,13 @@ const StockLevel = ({ navigation }) => {
     }
   };
 
+  const menuItems = [
+    {
+      name: "List product",
+      onClick: () => navigation.navigate(PDT_ENTRY),
+    },
+  ];
+
   return (
     <View
       style={{
@@ -103,8 +110,8 @@ const StockLevel = ({ navigation }) => {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}
-        showAdd
-        onAddPress={() => navigation.navigate(PDT_ENTRY)}
+        showMenuDots
+        menuItems={menuItems}
       />
       <FlatList
         keyExtractor={(item) => item.id.toString()}

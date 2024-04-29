@@ -86,6 +86,13 @@ const StockPurchase = ({ navigation }) => {
     fetchStockEntries();
   }, []);
 
+  const menuItems = [
+    {
+      name: "Add purchase",
+      onClick: () => navigation.navigate(STOCK_ENTRY_FORM),
+    },
+  ];
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar />
@@ -97,8 +104,8 @@ const StockPurchase = ({ navigation }) => {
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}
         disabled={disable}
-        showAdd
-        onAddPress={() => navigation.navigate(STOCK_ENTRY_FORM)}
+        showMenuDots
+        menuItems={menuItems}
       />
 
       <FlatList

@@ -30,13 +30,13 @@ export const navList = [
   {
     id: 4,
     icon: require("../../assets/icons/open-hand.png"),
-    title: "Credit/Debt",
+    title: "Debtors",
     target: CREDIT_MENU,
   },
   {
     id: 5,
     icon: require("../../assets/icons/icons8-contact-book-64.png"),
-    title: "Contact Book",
+    title: "Contacts",
     target: CONTACT_BOOK,
   },
   {

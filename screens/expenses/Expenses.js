@@ -18,18 +18,16 @@ const Expenses = ({}) => {
   const [message, setMessage] = useState(null);
   const [offset, setOffset] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(true);
+
   const snackbarRef = useRef(null);
   const { userParams, reload, setReload, selectedShop } =
     useContext(UserContext);
 
-  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-    userParams;
-
   const fetchExpenses = async () => {
     try {
-      setShowFooter(true);
       setMessage(null);
-
+      setLoading(true);
       const searchParameters = {
         limit: MAXIMUM_RECORDS_PER_FETCH,
         shopId: selectedShop?.id,
@@ -42,28 +40,14 @@ const Expenses = ({}) => {
       setExpenses((prevEntries) => [...prevEntries, ...response?.records]);
 
       setTotalItems(response?.totalItems);
-
+      setLoading(false);
       if (response?.totalItems === 0) {
         setMessage("No expenses found in this shop");
         setShowFooter(false);
       }
     } catch (error) {
-      setShowFooter(false);
       setMessage("Error fetching stock records");
-    }
-  };
-
-  const renderFooter = () => {
-    if (showFooter === true) {
-      if (expenses.length === totalItems && expenses.length > 0) {
-        return null;
-      }
-
-      return (
-        <View style={{ paddingVertical: 20 }}>
-          <ActivityIndicator animating size="large" color={Colors.dark} />
-        </View>
-      );
+      setLoading(false);
     }
   };
 
@@ -75,13 +59,20 @@ const Expenses = ({}) => {
       <AppStatusBar />
       <TopHeader
         title="Expenses"
-        showAdd
-        onAddPress={() => navigation.navigate(EXPENSE_FORM)}
+        showMenuDots
+        menuItems={[
+          {
+            name: "Add expense",
+            onClick: () => navigation.navigate(EXPENSE_FORM),
+          },
+        ]}
       />
 
       <FlatList
         data={expenses}
         renderItem={({ item }) => <ExpenseCard />}
+        refreshing={loading}
+        onRefresh={() => fetchExpenses()}
         ListEmptyComponent={() => (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -89,7 +80,6 @@ const Expenses = ({}) => {
             {totalItems === 0 && <Text>{message}</Text>}
           </View>
         )}
-        ListFooterComponent={renderFooter}
       />
     </View>
   );

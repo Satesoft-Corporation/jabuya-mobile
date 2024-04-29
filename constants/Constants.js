@@ -12,5 +12,5 @@ export const screenHeight = Dimensions.get("window").height;
 
 export const paymentMethods = [
   { name: "Cash", id: 0 },
-  { name: "Credit", id: 1 },
+  { name: "Debt", id: 1 },
 ];

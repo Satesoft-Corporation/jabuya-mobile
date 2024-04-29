@@ -7,6 +7,7 @@ import CardFooter1 from "../../../components/cardComponents/CardFooter1";
 import CardFooter2 from "../../../components/cardComponents/CardFooter2";
 import { useNavigation } from "@react-navigation/native";
 import { UPDATE_PRICE } from "../../../navigation/ScreenNames";
+import RenderCurrency from "../../../components/RenderCurrency";
 
 function StockLevelItem({ data }) {
   const [expanded, setExpanded] = useState(false);
@@ -99,11 +100,9 @@ function StockLevelItem({ data }) {
               marginBottom: 3,
             }}
           >
-            Stock value
+            Value
           </Text>
-          <Text style={{ fontWeight: 600 }}>
-            {formatNumberWithCommas(remainingStock * data?.salesPrice)}
-          </Text>
+          <RenderCurrency value={remainingStock * data?.salesPrice} />
         </View>
       </View>
 
@@ -114,23 +113,30 @@ function StockLevelItem({ data }) {
           }}
         >
           <DataRow
-            label={"Selling prie"}
-            value={`UGX${formatNumberWithCommas(data?.salesPrice)}`}
+            label={"Price"}
+            value={formatNumberWithCommas(data?.salesPrice)}
+            showCurrency
           />
-
+          <DataRow
+            label={"Status"}
+            value={
+              data?.recordStatus[0] +
+              String(data?.recordStatus).slice(1).toLowerCase()
+            }
+          />
+          <DataRow label={"Portion"} value={data?.saleUnitName} />
           <DataRow label={"Barcode"} value={data?.barcode} />
           <DataRow label={"Category"} value={data?.categoryName} />
-          <DataRow label={"Status"} value={data?.recordStatus} />
-          <DataRow label={"Container portion"} value={data?.saleUnitName} />
-          <DataRow label={"Listed by"} value={data?.createdByFullName} />
           <DataRow
-            label={"Last restocked by"}
+            label={"Restocked by"}
             value={data?.changedByFullName}
           />
           <DataRow
             label={"Last restock"}
             value={formatDate(data?.dateChanged, true)}
           />
+          <DataRow label={"Listed by"} value={data?.createdByFullName} />
+
           <CardFooter1
             btnTitle1="Update price"
             btnTitle2="Hide"

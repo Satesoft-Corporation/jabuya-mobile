@@ -7,7 +7,7 @@ const DataRow = ({
   labelTextStyle,
   valueTextStyle,
   showCurrency = false,
-  currencySize = 12,
+  currencySize = 8,
   style,
 }) => {
   return (
@@ -24,7 +24,7 @@ const DataRow = ({
       <Text style={[{ fontWeight: 400, fontSize: 12 }, labelTextStyle]}>
         {label}
       </Text>
-      <Text style={[{ fontWeight: 300, fontSize: 12 }, valueTextStyle]}>
+      <Text style={[{ fontWeight: 600, fontSize: 12 }, valueTextStyle]}>
         {showCurrency && (
           <Text
             style={{

@@ -32,7 +32,6 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
     clearEverything,
     totalQty,
     selectedPaymentMethod,
-    loading,
     setLoading,
   } = useContext(SaleEntryContext);
 

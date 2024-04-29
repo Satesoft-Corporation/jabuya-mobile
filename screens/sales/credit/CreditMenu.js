@@ -2,7 +2,6 @@ import { View, Text, FlatList, SafeAreaView } from "react-native";
 import React from "react";
 import TopHeader from "../../../components/TopHeader";
 import AppStatusBar from "../../../components/AppStatusBar";
-import Colors from "../../../constants/Colors";
 import { MenuIcon } from "../../../components/MenuIcon";
 import {
   CLIENT_FORM,
@@ -46,7 +45,9 @@ const CreditMenu = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <AppStatusBar />
-      <TopHeader title="Credit/Debt" />
+
+      <TopHeader title="Debtors" />
+
       <View>
         <FlatList
           style={{ marginTop: 10 }}

@@ -65,6 +65,13 @@ function SalesEntry({ navigation }) {
 
   const { isShopOwner, isShopAttendant, shopOwnerId } = userParams;
 
+  const menuItems = [
+    {
+      name: "Report",
+      onClick: () => navigation.navigate(SALES_REPORTS),
+    },
+  ];
+
   const fetchProducts = async () => {
     setLoading(true);
     let pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id); //store the payload in local storage
@@ -127,37 +134,10 @@ function SalesEntry({ navigation }) {
       <EnterSaleQtyModal />
 
       <BlackScreen flex={isShopAttendant ? 12 : 10}>
-        <UserProfile />
+        <UserProfile renderMenu renderNtnIcon={false} menuItems={menuItems} />
 
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate(SALES_REPORTS);
-          }}
-          style={{
-            backgroundColor: Colors.primary,
-            borderRadius: 3,
-            height: 25,
-            justifyContent: "center",
-            alignSelf: "flex-end",
-            marginEnd: 10,
-            marginBottom: 7,
-            paddingHorizontal: 5,
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.dark,
-              paddingHorizontal: 6,
-              alignSelf: "center",
-              justifyContent: "center",
-            }}
-          >
-            Report
-          </Text>
-        </TouchableOpacity>
-
-        <View style={{ paddingHorizontal: 0 }}>
-          {isShopOwner && (
+        <View style={{ paddingHorizontal: 0, marginTop: 15}}>
+          {isShopOwner && shops?.length > 1 && (
             <SelectShopBar
               showIcon={false}
               onPress={() => navigation.navigate(SHOP_SELECTION)}

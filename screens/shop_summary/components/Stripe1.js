@@ -1,6 +1,8 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { formatNumberWithCommas } from "../../../utils/Utils";
+import Colors from "../../../constants/Colors";
+import { Image } from "react-native";
 
 const Stripe = ({ label1, label2, value, icon }) => {
   return (
@@ -25,7 +27,7 @@ const Stripe = ({ label1, label2, value, icon }) => {
           }}
         />
         <View>
-          <Text style={{ fontWeight: 400, fontWeight: 16 }}>Stock</Text>
+          <Text style={{ fontWeight: 400, }}>Stock</Text>
           <Text style={{ fontWeight: 300, fontSize: 10 }}>Total Value</Text>
         </View>
       </View>
