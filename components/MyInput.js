@@ -1,5 +1,5 @@
 import { View, Text, TextInput } from "react-native";
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import Colors from "../constants/Colors";
 import { DatePickerInput } from "react-native-paper-dates";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -80,4 +80,4 @@ const MyInput = ({
   );
 };
 
-export default MyInput;
+export default memo(MyInput);

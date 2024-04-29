@@ -1,5 +1,5 @@
-import { View } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import { View, SafeAreaView, Alert } from "react-native";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import Colors from "../../constants/Colors";
 import { FlatList } from "react-native";
 import UserProfile from "../../components/UserProfile";
@@ -21,7 +21,6 @@ import {
   saveShopClients,
   saveShopProductsOnDevice,
 } from "../../controllers/OfflineControllers";
-import { Alert } from "react-native";
 const LandingScreen = ({ navigation }) => {
   const {
     setUserParams,
@@ -39,7 +38,7 @@ const LandingScreen = ({ navigation }) => {
   const [canCancel, setCanCancel] = useState(false);
   const [timeDiff, setTimeDiff] = useState(null);
 
-  const fetchShops = (id) => {
+  const fetchShops = useCallback((id) => {
     new BaseApiService("/shops")
       .getRequestWithJsonResponse({ limit: 0, offset: 0, shopOwnerId: id })
       .then(async (response) => {
@@ -48,7 +47,7 @@ const LandingScreen = ({ navigation }) => {
         getShopsFromStorage();
       })
       .catch((error) => {});
-  };
+  }, []);
 
   const logOut = () => {
     setLoading(false);
@@ -66,10 +65,10 @@ const LandingScreen = ({ navigation }) => {
   };
 
   const handleTabPress = (item) => {
-    const { days, hours } = timeDiff;
+    const { days } = timeDiff;
 
     if (days > 5) {
-      //trigger the logout dialog every after 12hr
+      //trigger the logout dialog every after some time
       logInPrompt();
       return null;
     }
@@ -91,7 +90,7 @@ const LandingScreen = ({ navigation }) => {
     if (prevPinTime !== null) {
       let pintimeDiff = getTimeDifference(prevPinTime, new Date());
 
-      if (pintimeDiff.seconds >= 10) {
+      if (pintimeDiff.minutes >= 5) {
         navigation.dispatch(StackActions.replace(LOCK_SCREEN));
       }
     }
@@ -169,7 +168,7 @@ const LandingScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar />
       <Loader loading={loading} />
       <BlackScreen>
@@ -203,7 +202,7 @@ const LandingScreen = ({ navigation }) => {
         setShowModal={setShowModal}
         canCancel={canCancel}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

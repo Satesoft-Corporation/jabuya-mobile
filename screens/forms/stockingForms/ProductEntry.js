@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, KeyboardAvoidingView } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Colors from "../../../constants/Colors";
 import AppStatusBar from "../../../components/AppStatusBar";
@@ -189,139 +189,147 @@ const ProductEntry = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-      <AppStatusBar />
+    <KeyboardAvoidingView
+      enabled={true}
+      behavior={"height"}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
+        <AppStatusBar />
 
-      <TopHeader title="List product" />
-      <Loader loading={loading} />
-      <View
-        style={{
-          paddingHorizontal: 8,
-          gap: 8,
-          paddingBottom: 30,
-        }}
-      >
-        <Text style={styles.headerText}>Enter product details</Text>
+        <TopHeader title="List product" />
+        <Loader loading={loading} />
+        <View
+          style={{
+            paddingHorizontal: 8,
+            gap: 8,
+            paddingBottom: 30,
+          }}
+        >
+          <Text style={styles.headerText}>Enter product details</Text>
 
-        <View>
-          <Text style={styles.inputLabel}>Manufacturer</Text>
-          <MyDropDown
-            style={styles.dropDown}
-            data={manufacturers}
-            onChange={onManufacturerChange}
-            value={selectedManufacturer}
-            placeholder="Select manufacuturer"
-            labelField="name"
-            valueField="id"
-          />
-          {submitted && !selectedManufacturer && (
-            <Text style={styles.errorText}>Manufacturer is required</Text>
-          )}
-        </View>
-
-        <View>
-          <Text style={styles.inputLabel}>Product</Text>
-          <MyDropDown
-            style={styles.dropDown}
-            disable={disable}
-            data={products}
-            onChange={onProductChange}
-            value={selectedShop}
-            placeholder="Select product"
-            labelField="displayName"
-            valueField="id"
-          />
-          {submitted && !selectedProduct && (
-            <Text style={styles.errorText}>Product is required</Text>
-          )}
-        </View>
-
-        <FlatList
-          data={saleUnits?.filter(
-            (item) => item?.saleUnitName !== selectedSaleUnit?.saleUnitName
-          )}
-          ListHeaderComponent={() => (
-            <Text style={styles.inputLabel}>Container portions</Text>
-          )}
-          renderItem={({ item }) => (
-            <ChipButton
-              isSelected={selectedSaleUnits?.find(
-                (unit) => item?.saleUnitName === unit?.saleUnitName
-              )}
-              key={item.saleUnitName}
-              onPress={() => onSaleUnitSelect(item)}
-              title={item?.saleUnitName}
-              style={{ width: "fit-content" }}
-            />
-          )}
-          keyExtractor={(item) => item.saleUnitName.toString()}
-          numColumns={3}
-        />
-        <View style={styles.row}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.inputLabel}>Sale unit</Text>
+          <View>
+            <Text style={styles.inputLabel}>Manufacturer</Text>
             <MyDropDown
               style={styles.dropDown}
-              data={saleUnits}
-              onChange={handleSaleUnitChange}
-              value={selectedSaleUnit}
-              placeholder="Select sale unit"
-              labelField="saleUnitName"
+              data={manufacturers}
+              onChange={onManufacturerChange}
+              value={selectedManufacturer}
+              placeholder="Select manufacuturer"
+              labelField="name"
               valueField="id"
-              search={false}
             />
-            {submitted && !selectedSaleUnit && (
-              <Text style={styles.errorText}>Sale unit is required</Text>
+            {submitted && !selectedManufacturer && (
+              <Text style={styles.errorText}>Manufacturer is required</Text>
             )}
           </View>
 
-          <View style={{ flex: 1 }}>
-            <MyInput
-              label={<Text style={styles.inputLabel}>Sales price</Text>}
-              value={salesPrice}
-              onValueChange={(text) => setSalesPrice(text)}
-              inputMode="numeric"
+          <View>
+            <Text style={styles.inputLabel}>Product</Text>
+            <MyDropDown
+              style={styles.dropDown}
+              disable={disable}
+              data={products}
+              onChange={onProductChange}
+              value={selectedShop}
+              placeholder="Select product"
+              labelField="displayName"
+              valueField="id"
             />
-
-            {submitted && salesPrice.trim() === "" && (
-              <Text style={styles.errorText}>Sales price is required</Text>
+            {submitted && !selectedProduct && (
+              <Text style={styles.errorText}>Product is required</Text>
             )}
           </View>
-        </View>
 
-        {selectedSaleUnits?.map((item, index) => (
-          <View style={styles.row} key={item?.saleUnitName}>
+          <FlatList
+            data={saleUnits?.filter(
+              (item) => item?.saleUnitName !== selectedSaleUnit?.saleUnitName
+            )}
+            ListHeaderComponent={() =>
+              saleUnits?.length > 1 && (
+                <Text style={styles.inputLabel}>Container portions</Text>
+              )
+            }
+            renderItem={({ item }) => (
+              <ChipButton
+                isSelected={selectedSaleUnits?.find(
+                  (unit) => item?.saleUnitName === unit?.saleUnitName
+                )}
+                key={item.saleUnitName}
+                onPress={() => onSaleUnitSelect(item)}
+                title={item?.saleUnitName}
+                style={{ width: "fit-content" }}
+              />
+            )}
+            keyExtractor={(item) => item.saleUnitName.toString()}
+            numColumns={3}
+          />
+          <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <MyInput label="" value={item?.saleUnitName} editable={false} />
+              <Text style={styles.inputLabel}>Sale unit</Text>
+              <MyDropDown
+                style={styles.dropDown}
+                data={saleUnits}
+                onChange={handleSaleUnitChange}
+                value={selectedSaleUnit}
+                placeholder="Select sale unit"
+                labelField="saleUnitName"
+                valueField="id"
+                search={false}
+              />
+              {submitted && !selectedSaleUnit && (
+                <Text style={styles.errorText}>Sale unit is required</Text>
+              )}
             </View>
+
             <View style={{ flex: 1 }}>
               <MyInput
-                label=""
-                value={item.unitPrice}
-                onValueChange={(e) => handleUnitPriceChange(index, e.value)}
+                label={<Text style={styles.inputLabel}>Sales price</Text>}
+                value={salesPrice}
+                onValueChange={(text) => setSalesPrice(text)}
+                inputMode="numeric"
               />
+
+              {submitted && salesPrice.trim() === "" && (
+                <Text style={styles.errorText}>Sales price is required</Text>
+              )}
             </View>
           </View>
-        ))}
-        <View>
-          <MyInput
-            label="Remarks"
-            value={remarks}
-            onValueChange={(text) => setRemarks(text)}
-            multiline
+
+          {selectedSaleUnits?.map((item, index) => (
+            <View style={styles.row} key={item?.saleUnitName}>
+              <View style={{ flex: 1 }}>
+                <MyInput label="" value={item?.saleUnitName} editable={false} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <MyInput
+                  label=""
+                  value={item.unitPrice}
+                  onValueChange={(e) => handleUnitPriceChange(index, e.value)}
+                />
+              </View>
+            </View>
+          ))}
+          <View>
+            <MyInput
+              label="Remarks"
+              value={remarks}
+              onValueChange={(text) => setRemarks(text)}
+              multiline
+            />
+          </View>
+        </View>
+        <View style={styles.bottomContent}>
+          <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} />
+          <PrimaryButton
+            title={"Save"}
+            onPress={saveProduct}
+            disabled={disable}
           />
         </View>
-      </View>
-      <View style={styles.bottomContent}>
-        <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} />
-        <PrimaryButton
-          title={"Save"}
-          onPress={saveProduct}
-          disabled={disable}
-        />
-      </View>
-      <Snackbar ref={snackBarRef} />
-    </SafeAreaView>
+        <Snackbar ref={snackBarRef} />
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 

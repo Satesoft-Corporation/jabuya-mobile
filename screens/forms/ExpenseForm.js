@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import { BaseStyle } from "../../utils/BaseStyle";
@@ -11,6 +11,7 @@ import { UserContext } from "../../context/UserContext";
 import Loader from "../../components/Loader";
 import { useNavigation } from "@react-navigation/native";
 import { BaseApiService } from "../../utils/BaseApiService";
+import Snackbar from "../../components/Snackbar";
 
 const ExpenseForm = () => {
   const [categories, setCategories] = useState([]);
@@ -22,6 +23,7 @@ const ExpenseForm = () => {
 
   const { selectedShop, setSelectedShop, shops } = useContext(UserContext);
 
+  const snackRef = useRef(null);
   const navigation = useNavigation();
   const fetchCategories = async () => {
     let searchParameters = {
@@ -29,6 +31,7 @@ const ExpenseForm = () => {
       limit: 0,
       commaSeparatedTypeIds: [5],
     };
+
     new BaseApiService("/lookups/lookup-values")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
@@ -48,18 +51,18 @@ const ExpenseForm = () => {
       categoryId: selectedCategory?.id,
       shopId: selectedShop?.id,
     };
+    setLoading(true);
 
     new BaseApiService("/shop/expenses")
       .saveRequestWithJsonResponse(payload, false)
       .then((response) => {
         setLoading(false);
-        // clearForm();
-        // snackRef.current.show("Client details saved", 4000);
+        clearForm();
+        snackRef.current.show("Details saved", 4000);
       })
       .catch((e) => {
         setLoading(false);
-
-        // snackRef.current.show(e?.message, 4000);
+        snackRef.current.show(e?.message, 4000);
       });
   };
 
@@ -72,7 +75,8 @@ const ExpenseForm = () => {
       <TopHeader title="Enter Expense" />
 
       <Loader loading={loading} />
-      <View style={BaseStyle.shadowedContainer}>
+      <Snackbar ref={snackRef} />
+      <View style={BaseStyle.container}>
         <Text
           style={{
             marginTop: 10,
@@ -126,6 +130,7 @@ const ExpenseForm = () => {
               inputMode="numeric"
               value={amount}
               onValueChange={(text) => setAmount(text)}
+              style={{ flex: 1 }}
             />
           </View>
           <MyInput
@@ -133,11 +138,12 @@ const ExpenseForm = () => {
             dateValue={dob}
             isDateInput
             onDateChange={(date) => setDOB(date)}
+            style={{ flex: 1 }}
           />
         </View>
 
         <MyInput
-          label="Remarks"
+          label="Desciprition"
           multiline
           value={remarks}
           onValueChange={(text) => setRemarks(text)}

@@ -8,13 +8,14 @@ import Colors from "../../constants/Colors";
 import AppStatusBar from "../../components/AppStatusBar";
 import {
   convertDateFormat,
+  formatDate,
   formatNumberWithCommas,
   getCurrentDay,
 } from "../../utils/Utils";
 import UserProfile from "../../components/UserProfile";
 import { UserContext } from "../../context/UserContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { SaleTransactionItem } from "./components/SaleTransactionItem";
+import SaleTransactionItem from "./components/SaleTransactionItem";
 import ItemHeader from "./components/ItemHeader";
 import VerticalSeparator from "../../components/VerticalSeparator";
 import { SHOP_SUMMARY } from "../../navigation/ScreenNames";
@@ -168,16 +169,26 @@ export default function ViewSales({ navigation }) {
               marginVertical: 10,
             }}
           >
-            <Text
-              style={{
-                color: Colors.primary,
-                fontSize: 16,
-                fontWeight: 600,
-              }}
-            >
-              Sales summary
-            </Text>
-
+            <View>
+              <Text
+                style={{
+                  color: Colors.primary,
+                  fontSize: 16,
+                  fontWeight: 600,
+                }}
+              >
+                Sales summary
+              </Text>
+              <Text
+                style={{
+                  color: Colors.primary,
+                  fontSize: 13,
+                  fontWeight: 600,
+                }}
+              >
+                {formatDate(date, true)}
+              </Text>
+            </View>
             <Text
               style={{
                 color: Colors.primary,

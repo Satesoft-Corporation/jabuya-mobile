@@ -5,9 +5,7 @@ import TopHeader from "../../../components/TopHeader";
 import { BaseApiService } from "../../../utils/BaseApiService";
 import CreditSaleListItem from "../components/CreditSaleListItem";
 import Snackbar from "../../../components/Snackbar";
-import { MAXIMUM_RECORDS_PER_FETCH } from "../../../constants/Constants";
 import Colors from "../../../constants/Colors";
-import { ActivityIndicator } from "react-native";
 import { UserContext } from "../../../context/UserContext";
 import ItemHeader from "../components/ItemHeader";
 import { formatNumberWithCommas } from "../../../utils/Utils";
@@ -39,7 +37,7 @@ const CreditSales = () => {
     };
 
     setCreditSales([]);
-
+    setMessage(null);
     setLoading(true);
     new BaseApiService("/credit-sales")
       .getRequestWithJsonResponse(searchParameters)
@@ -114,7 +112,7 @@ const CreditSales = () => {
         </View>
       </View>
 
-      <View style={{ flex: 1, backgroundColor: Colors.light }}>
+      <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
         <FlatList
           style={{ marginTop: 10 }}
           data={creditSales}

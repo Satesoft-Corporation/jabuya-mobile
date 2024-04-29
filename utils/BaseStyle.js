@@ -12,6 +12,12 @@ export const BaseStyle = StyleSheet.create({
     shadowOpacity: 0.2,
     borderRadius: 8,
   },
+  container: {
+    marginHorizontal: 5,
+    paddingHorizontal: 5,
+    marginVertical: 10,
+    backgroundColor: Colors.light,
+  },
   card: {
     marginTop: 10,
     marginHorizontal: 10,

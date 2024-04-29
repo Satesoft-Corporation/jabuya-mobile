@@ -1,8 +1,8 @@
 import { View, Text, SafeAreaView } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import Colors from "../../constants/Colors";
-import PinDot from "../../components/lockscreen/PinDot";
-import NumbersContiner from "../../components/lockscreen/NumbersContiner";
+import PinDot from "./PinDot";
+import NumbersContiner from "./NumbersContiner";
 import { TouchableOpacity } from "react-native";
 import AppStatusBar from "../../components/AppStatusBar";
 import { Image } from "react-native";

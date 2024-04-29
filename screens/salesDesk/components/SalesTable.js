@@ -51,8 +51,12 @@ const SalesTable = ({ sales = [], fixHeight = true }) => {
 
 export const SaleListItem = ({ data }) => {
   // table item on sales entry
+  const { productName, shopProductName, saleUnitName } = data;
+
+  let unitName = saleUnitName ? " - " + saleUnitName : "";
   return (
     <View
+      key={productName}
       style={{
         flexDirection: "row",
         justifyContent: "space-between",
@@ -64,7 +68,7 @@ export const SaleListItem = ({ data }) => {
       }}
     >
       <Text style={{ flex: 2.5, justifyContent: "center" }}>
-        {data?.productName}
+        {productName || shopProductName + unitName}
       </Text>
       <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>
       <Text style={{ flex: 1, textAlign: "right" }}>

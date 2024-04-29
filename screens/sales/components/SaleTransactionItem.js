@@ -1,19 +1,16 @@
-import { useEffect, useState } from "react";
-import {
-  Text,
-  TouchableOpacity,
-  View,
-  FlatList,
-  StyleSheet,
-} from "react-native";
+import { memo, useCallback, useEffect, useState } from "react";
+import { Text, View, StyleSheet } from "react-native";
 import {
   extractTime,
   formatDate,
   formatNumberWithCommas,
 } from "../../../utils/Utils";
-import Colors from "../../../constants/Colors";
+import CardHeader from "../../../components/cardComponents/CardHeader";
+import SalesTable from "../../salesDesk/components/SalesTable";
+import DataRow from "../../../components/cardComponents/DataRow";
+import CardFooter2 from "../../../components/cardComponents/CardFooter2";
 
-export function SaleTransactionItem({ data, isShopOwner }) {
+function SaleTransactionItem({ data, isShopOwner }) {
   // sales report item card
 
   const { lineItems, totalCost, amountPaid, balanceGivenOut, shopName } = data;
@@ -22,9 +19,9 @@ export function SaleTransactionItem({ data, isShopOwner }) {
   const [itemCount, setItemCount] = useState(0);
   const [profit, setProfit] = useState(0);
 
-  const toggleExpand = () => {
+  const toggleExpand = useCallback(() => {
     setExpanded(!expanded);
-  };
+  }, [expanded]);
 
   useEffect(() => {
     if (lineItems !== undefined) {
@@ -35,60 +32,40 @@ export function SaleTransactionItem({ data, isShopOwner }) {
       setProfit(Math.round(cartProfit));
     }
   }, [data]);
+
+  const servedBy = () => (
+    <Text style={styles.footerText1}>
+      Served by:{" "}
+      <Text style={styles.footerText2}>{data?.createdByFullName}</Text>
+    </Text>
+  );
+
+  const renderShopName = () => (
+    <Text style={styles.footerText2}>{shopName}</Text>
+  );
+
   return (
     <View
-      style={{
-        flex: 1,
-        marginTop: 10,
-        marginHorizontal: 10,
-        borderRadius: 3,
-        backgroundColor: "white",
-        paddingVertical: 15,
-        paddingHorizontal: 10,
-        borderWidth: balanceGivenOut < 0 ? 1 : 0,
-      }}
+      style={[styles.container, { borderWidth: balanceGivenOut < 0 ? 1 : 0 }]}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
+      <CardHeader
+        value1={`SN: ${data?.serialNumber}`}
+        value2={`${formatDate(data?.soldOnDate, true)}`}
+      />
+      <CardHeader
+        value1={renderShopName()}
+        value2={`${extractTime(data.dateCreated)}`}
+      />
+      {expanded && (
         <Text
           style={{
+            alignSelf: "flex-end",
             fontSize: 12,
-            fontWeight: "bold",
-            color: Colors.dark,
-            marginBottom: 2,
           }}
         >
-          SN: {data?.serialNumber}
+          Currency : UGX
         </Text>
-
-        <View>
-          <Text
-            style={{
-              fontSize: 12,
-              color: Colors.gray,
-              alignSelf: "flex-end",
-            }}
-          >
-            {formatDate(data?.soldOnDate, true) +
-              ", " +
-              extractTime(data.dateCreated)}
-          </Text>
-          {expanded && (
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                fontSize: 12,
-              }}
-            >
-              Currency : UGX
-            </Text>
-          )}
-        </View>
-      </View>
+      )}
       {!expanded && (
         <>
           <View
@@ -125,308 +102,94 @@ export function SaleTransactionItem({ data, isShopOwner }) {
               <Text>{formatNumberWithCommas(profit)}</Text>
             </View>
           </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <View>
-              <Text
-                style={{
-                  fontWeight: 600,
-                  fontSize: 12,
-                }}
-              >
-                Served by:{" "}
-                <Text
-                  style={{
-                    fontWeight: 300,
-                    fontSize: 12,
-                  }}
-                >
-                  {data?.createdByFullName}
-                </Text>
-              </Text>
-              {isShopOwner && (
-                <Text
-                  style={{
-                    fontWeight: 300,
-                    fontSize: 12,
-                  }}
-                >
-                  {shopName}
-                </Text>
-              )}
-            </View>
-            <TouchableOpacity
-              onPress={toggleExpand}
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: Colors.dark,
-                borderRadius: 3,
-                paddingHorizontal: 10,
-                paddingVertical: 4,
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.primary,
-                  fontSize: 13,
-                  fontWeight: 300,
-                }}
-              >
-                More
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <CardFooter2
+            onBtnPress={toggleExpand}
+            btnTitle="More"
+            label={servedBy()}
+          />
         </>
       )}
-
       {expanded && (
         <View style={{ flex: 1 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              height: 25,
-              paddingEnd: 10,
-              borderBottomColor: Colors.gray,
-              borderBottomWidth: 0.3,
-              marginTop: 10,
-            }}
-          >
-            <Text style={{ flex: 2.5, fontWeight: 600 }}>Item</Text>
-            <Text style={{ flex: 0.5, textAlign: "center", fontWeight: 600 }}>
-              Qty
-            </Text>
-            <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
-              Cost
-            </Text>
-
-            <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
-              Amount
-            </Text>
-          </View>
-          <FlatList
-            data={lineItems}
-            renderItem={({ item }) => <SaleItem data={item} />}
+          <SalesTable sales={lineItems} fixHeight={false} />
+          <DataRow
+            label={"Total"}
+            value={formatNumberWithCommas(totalCost)}
+            labelTextStyle={styles.label}
+            style={{ marginTop: 5, marginBottom: 10 }}
+            valueTextStyle={styles.value}
           />
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingEnd: 5,
-              marginTop: 5,
-              marginBottom: 10,
-            }}
-          >
-            <Text style={{ fontWeight: 600 }}>Total</Text>
 
-            <Text style={{ textAlign: "center", fontWeight: 600 }}>
-              {formatNumberWithCommas(totalCost)}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Recieved </Text>
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                fontWeight: "bold",
-                marginEnd: 4,
-              }}
-            >
-              {formatNumberWithCommas(amountPaid)}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginVertical: 3,
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>
-              Purchased{" "}
-              <Text style={{ fontWeight: "400" }}>
-                {itemCount >= 1 && (
-                  <Text>
-                    {itemCount}
-                    {itemCount > 1 ? <Text> items</Text> : <Text> item</Text>}
-                  </Text>
-                )}
-              </Text>
-            </Text>
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                fontWeight: "bold",
-                marginEnd: 4,
-              }}
-            >
-              {formatNumberWithCommas(totalCost)}
-            </Text>
-          </View>
+          <DataRow
+            label={"Recieved"}
+            value={formatNumberWithCommas(amountPaid)}
+            labelTextStyle={styles.label}
+            valueTextStyle={styles.value}
+          />
+          <DataRow
+            label={`Purchased ${
+              itemCount > 1 ? `${itemCount} items` : `${itemCount} item`
+            }`}
+            value={formatNumberWithCommas(totalCost)}
+            labelTextStyle={styles.label}
+            valueTextStyle={styles.value}
+          />
 
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Balance</Text>
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                fontWeight: "bold",
-                marginEnd: 4,
-              }}
-            >
-              {formatNumberWithCommas(balanceGivenOut)}
-            </Text>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginVertical: 5,
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Income</Text>
-            <Text
-              style={{
-                alignSelf: "flex-end",
-                fontWeight: "bold",
-                marginEnd: 4,
-              }}
-            >
-              {formatNumberWithCommas(profit)}
-            </Text>
-          </View>
+          <DataRow
+            label={"Balance"}
+            value={formatNumberWithCommas(balanceGivenOut)}
+            labelTextStyle={styles.label}
+            valueTextStyle={styles.value}
+          />
+          <DataRow
+            label={"Income"}
+            value={formatNumberWithCommas(profit)}
+            labelTextStyle={styles.label}
+            valueTextStyle={styles.value}
+          />
 
           {balanceGivenOut < 0 && (
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginVertical: 5,
-              }}
-            >
-              <Text style={{ fontWeight: "bold" }}>Client PhoneNumber</Text>
-              <Text
-                style={{
-                  alignSelf: "flex-end",
-                  fontWeight: "bold",
-                  marginEnd: 4,
-                }}
-              >
-                {data?.clientPhoneNumber}
-              </Text>
-            </View>
+            <DataRow
+              label={"Client PhoneNumber"}
+              value={data?.clientPhoneNumber}
+              labelTextStyle={styles.label}
+              valueTextStyle={styles.value}
+            />
           )}
 
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 10,
-            }}
-          >
-            <View>
-              <Text
-                style={{
-                  fontWeight: 600,
-                  fontSize: 12,
-                }}
-              >
-                Served by:{" "}
-                <Text
-                  style={{
-                    fontWeight: 300,
-                    fontSize: 12,
-                  }}
-                >
-                  {data?.createdByFullName}
-                </Text>
-              </Text>
-              {isShopOwner && (
-                <Text
-                  style={{
-                    fontWeight: 300,
-                    fontSize: 12,
-                  }}
-                >
-                  {shopName}
-                </Text>
-              )}
-            </View>
-            <TouchableOpacity
-              onPress={toggleExpand}
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: Colors.dark,
-                borderRadius: 3,
-                paddingHorizontal: 10,
-                paddingVertical: 4,
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.primary,
-                  fontSize: 13,
-                  fontWeight: 300,
-                }}
-              >
-                Hide
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <CardFooter2
+            onBtnPress={toggleExpand}
+            btnTitle="Hide"
+            label={servedBy(false)}
+          />
         </View>
       )}
     </View>
   );
 }
 
-const SaleItem = ({ data }) => {
-  //part of SaleTransaction item component
-  const { productName, shopProductName, saleUnitName } = data;
-
-  let unitName = saleUnitName ? " - " + saleUnitName : "";
-
-  return (
-    <>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          borderBottomColor: Colors.gray,
-          borderBottomWidth: 0.3,
-          alignItems: "center",
-          height: "fit-content",
-          paddingVertical: 8,
-        }}
-      >
-        <Text style={{ flex: 2.5, justifyContent: "center" }}>
-          {productName || shopProductName + unitName}
-        </Text>
-
-        <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>
-
-        <Text style={{ flex: 1, textAlign: "right" }}>
-          {formatNumberWithCommas(data?.unitCost)}
-        </Text>
-        <Text style={{ flex: 1, textAlign: "right", paddingEnd: 10 }}>
-          {formatNumberWithCommas(data?.totalCost)}
-        </Text>
-      </View>
-    </>
-  );
-};
+export default memo(SaleTransactionItem);
+const styles = StyleSheet.create({
+  label: {
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  value: { fontWeight: "600", fontSize: 14 },
+  footerText1: {
+    fontWeight: "600",
+    fontSize: 12,
+  },
+  footerText2: {
+    fontWeight: "300",
+    fontSize: 12,
+  },
+  container: {
+    flex: 1,
+    marginTop: 10,
+    marginHorizontal: 10,
+    borderRadius: 3,
+    backgroundColor: "white",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+  },
+});

@@ -2,7 +2,6 @@ import { createContext, useState, useEffect } from "react";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import { BaseApiService } from "../utils/BaseApiService";
 import { LOGIN_END_POINT } from "../utils/EndPointUtils";
-import { useNavigation } from "@react-navigation/native";
 
 export const UserContext = createContext();
 
@@ -20,7 +19,6 @@ export const UserProvider = ({ children }) => {
   const getShopsFromStorage = () => {
     UserSessionUtils.getShops().then((ownerShops) => {
       if (ownerShops) {
-        setSelectedShop(ownerShops[0]);
         if (ownerShops?.length > 1) {
           const allShops = {
             name: "All shops",
@@ -28,7 +26,9 @@ export const UserProvider = ({ children }) => {
           };
 
           setShops([allShops, ...ownerShops]);
+          setSelectedShop(allShops);
         } else {
+          setSelectedShop(ownerShops[0]);
           setShops(ownerShops);
         }
       }
@@ -51,29 +51,18 @@ export const UserProvider = ({ children }) => {
   const getSessionObj = async () => {
     await UserSessionUtils.getFullSessionObject().then((data) => {
       if (data) {
-        const {
-          roles,
-          firstName,
-          lastName,
-          attendantShopName,
-          phoneNumber,
-          dateCreated,
-          username,
-          emailAddress,
-          isShopAttendant,
-          isShopOwner,
-        } = data?.user;
+        const { roles, firstName, lastName } = data?.user;
 
         setSessionObj({
           fullName: firstName + " " + lastName,
           role: roles[0].name,
-          phoneNumber,
-          dateCreated,
-          username,
-          emailAddress,
-          isShopAttendant,
-          isShopOwner,
-          attendantShopName,
+          phoneNumber: data?.phoneNumber,
+          dateCreated: data?.dateCreated,
+          username: data?.userParams,
+          emailAddress: data?.emailAddress,
+          isShopAttendant: data?.isShopAttendant,
+          isShopOwner: data?.isShopOwner,
+          attendantShopName: data?.attendantShopName,
         });
       }
     });
@@ -94,12 +83,16 @@ export const UserProvider = ({ children }) => {
 
   const getRefreshToken = async () => {
     const loginInfo = await UserSessionUtils.getLoginDetails();
-    new BaseApiService(LOGIN_END_POINT)
-      .saveRequestWithJsonResponse(loginInfo, false)
-      .then(async (response) => {
-        await UserSessionUtils.setUserAuthToken(response.accessToken);
-        await UserSessionUtils.setUserRefreshToken(response.refreshToken);
-      });
+    if (loginInfo) {
+      new BaseApiService(LOGIN_END_POINT)
+        .saveRequestWithJsonResponse(loginInfo, false)
+        .then(async (response) => {
+          await UserSessionUtils.setUserAuthToken(response.accessToken);
+          await UserSessionUtils.setUserRefreshToken(response.refreshToken);
+          await UserSessionUtils.setLoginTime(JSON.stringify(new Date()));
+          console.log("token refreshed");
+        });
+    }
   };
 
   useEffect(() => {

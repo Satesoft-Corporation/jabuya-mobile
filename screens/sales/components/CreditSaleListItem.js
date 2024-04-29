@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import React, { memo } from "react";
 import CardHeader from "../../../components/cardComponents/CardHeader";
 import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
 import CardFooter2 from "../../../components/cardComponents/CardFooter2";
@@ -52,7 +52,7 @@ const CreditSaleListItem = ({ sale }) => {
   );
 };
 
-export default CreditSaleListItem;
+export default memo(CreditSaleListItem);
 
 const styles = StyleSheet.create({
   container: {

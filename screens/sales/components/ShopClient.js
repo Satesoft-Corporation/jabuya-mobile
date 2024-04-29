@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React from "react";
+import React, { memo } from "react";
 import { formatDate } from "../../../utils/Utils";
 import Colors from "../../../constants/Colors";
 import ChipButton from "../../../components/buttons/ChipButton";
@@ -88,4 +88,4 @@ const ShopClient = ({ client }) => {
   );
 };
 
-export default ShopClient;
+export default memo(ShopClient);

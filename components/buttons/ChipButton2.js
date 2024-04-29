@@ -1,10 +1,11 @@
-import { View, Text, TouchableOpacity } from "react-native";
-import React from "react";
+import { Text, TouchableOpacity } from "react-native";
+import React, { memo } from "react";
 import Colors from "../../constants/Colors";
 
 const ChipButton2 = ({ onPress, title = "", darkMode = true }) => {
   return (
     <TouchableOpacity
+      activeOpacity={0.6}
       onPress={onPress}
       style={{
         alignItems: "center",
@@ -29,4 +30,4 @@ const ChipButton2 = ({ onPress, title = "", darkMode = true }) => {
   );
 };
 
-export default ChipButton2;
+export default memo(ChipButton2);

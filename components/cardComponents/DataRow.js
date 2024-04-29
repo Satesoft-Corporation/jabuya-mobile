@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React from "react";
+import React, { memo } from "react";
 
 const DataRow = ({
   label,
@@ -8,17 +8,21 @@ const DataRow = ({
   valueTextStyle,
   showCurrency = false,
   currencySize = 12,
+  style,
 }) => {
   return (
     <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginVertical: 2,
-      }}
+      style={[
+        {
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginVertical: 2,
+        },
+        style,
+      ]}
     >
       <Text style={[{ fontWeight: 400, fontSize: 12 }, labelTextStyle]}>
-        {label}:
+        {label}
       </Text>
       <Text style={[{ fontWeight: 300, fontSize: 12 }, valueTextStyle]}>
         {showCurrency && (
@@ -36,4 +40,4 @@ const DataRow = ({
   );
 };
 
-export default DataRow;
+export default memo(DataRow);

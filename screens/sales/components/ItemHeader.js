@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React from "react";
+import React, { memo } from "react";
 import Colors from "../../../constants/Colors";
 
 const ItemHeader = ({ title, value, ugx = true }) => {
@@ -32,4 +32,4 @@ const ItemHeader = ({ title, value, ugx = true }) => {
   );
 };
 
-export default ItemHeader;
+export default memo(ItemHeader);

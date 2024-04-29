@@ -1,8 +1,8 @@
 import { View, Text, FlatList, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
-import Colors from "../../constants/Colors";
-import Icon from "../Icon";
+import React, { memo, useEffect, useState } from "react";
 import * as LocalAuthentication from "expo-local-authentication";
+import Colors from "../../constants/Colors";
+import Icon from "../../components/Icon";
 
 const NumbersContiner = ({ onPress, fpAuth, showFpIcon = false }) => {
   const [hasFP, setHasFp] = useState(false);
@@ -86,4 +86,4 @@ const NumbersContiner = ({ onPress, fpAuth, showFpIcon = false }) => {
   );
 };
 
-export default NumbersContiner;
+export default memo(NumbersContiner);
