@@ -73,7 +73,7 @@ const NewClient = () => {
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
         <AppStatusBar />
-        <TopHeader title="Add Client" />
+        <TopHeader title="Add Debtor" />
         <Loader loading={loading} />
         <View style={{ paddingHorizontal: 10, flex: 1 }}>
           <Text

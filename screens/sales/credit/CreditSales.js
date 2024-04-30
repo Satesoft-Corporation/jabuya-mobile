@@ -8,10 +8,19 @@ import Snackbar from "../../../components/Snackbar";
 import Colors from "../../../constants/Colors";
 import { UserContext } from "../../../context/UserContext";
 import ItemHeader from "../components/ItemHeader";
-import { formatNumberWithCommas } from "../../../utils/Utils";
+import {
+  convertDateFormat,
+  formatDate,
+  formatNumberWithCommas,
+  getCurrentDay,
+} from "../../../utils/Utils";
 import VerticalSeparator from "../../../components/VerticalSeparator";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { CLIENT_FORM } from "../../../navigation/ScreenNames";
+import { useNavigation } from "@react-navigation/native";
 
 const CreditSales = () => {
+  const navigation = useNavigation();
   const [creditSales, setCreditSales] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [offset, setOffset] = useState(0);
@@ -24,19 +33,38 @@ const CreditSales = () => {
   const [debt, setDebt] = useState(0);
   const [paid, setPaid] = useState(0);
   const [bal, setBal] = useState(0);
+  const [date, setDate] = useState(new Date());
+  const [visible, setVisible] = useState(false);
+  const [filtering, setFiltering] = useState(false);
 
   const snackbarRef = useRef(null);
 
   const { selectedShop } = useContext(UserContext);
 
-  const fetchCreditSales = async () => {
+  const onChange = (event, selectedDate) => {
+    setVisible(false);
+    fetchCreditSales(selectedDate);
+    setDate(selectedDate);
+    setFiltering(true);
+  };
+
+  const fetchCreditSales = async (day = null) => {
     let searchParameters = {
       limit: 0,
       shopId: selectedShop?.id,
       offset: offset,
+      // startDate: getCurrentDay(),
+      ...(day && {
+        startDate: convertDateFormat(day),
+        endDate: convertDateFormat(day, true),
+      }),
     };
 
     setCreditSales([]);
+    setDebt(0);
+    setPaid(0);
+    setBal(0);
+    setDebtors(0);
     setMessage(null);
     setLoading(true);
     new BaseApiService("/credit-sales")
@@ -62,27 +90,42 @@ const CreditSales = () => {
         setCreditSales((prevEntries) => [...prevEntries, ...unPaid]);
 
         if (response?.totalItems === 0) {
-          setMessage("No debts found");
+          setMessage(`No debts found on ${formatDate(date, true)}`);
         }
-
-        setIsFetchingMore(false);
 
         setLoading(false);
       })
       .catch((error) => {
         setMessage("Error fetching credit records");
         setLoading(false);
+        console.log(error);
       });
   };
 
+  const handleRefresh = () => {
+    setFiltering(false);
+    setDate(new Date());
+    fetchCreditSales();
+  };
   useEffect(() => {
     fetchCreditSales();
   }, []);
 
+  const menuItems = [
+    {
+      name: "Add debtor",
+      onClick: () => navigation.navigate(CLIENT_FORM),
+    },
+    {
+      name: "Select date",
+      onClick: () => setVisible(true),
+    },
+  ];
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark }}>
       <AppStatusBar />
-      <TopHeader title="Credited Records" />
+      <TopHeader title="Credited Records" showMenuDots menuItems={menuItems} />
       <View style={{ paddingBottom: 10 }}>
         <View style={styles.debtHeader}>
           <Text
@@ -92,6 +135,17 @@ const CreditSales = () => {
             }}
           >
             Debt summary
+          </Text>
+
+          <Text
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              alignSelf: "flex-end",
+              color: Colors.primary,
+            }}
+          >
+            {filtering ? formatDate(date, true) : "Overrall"}
           </Text>
         </View>
 
@@ -119,7 +173,7 @@ const CreditSales = () => {
           renderItem={({ item }) => <CreditSaleListItem sale={item} />}
           keyExtractor={(item) => item.id.toString()}
           refreshing={loading}
-          onRefresh={() => fetchCreditSales()}
+          onRefresh={() => handleRefresh()}
           ListEmptyComponent={() => (
             <View style={styles.errorMsg}>
               <Text>{message}</Text>
@@ -127,6 +181,16 @@ const CreditSales = () => {
           )}
         />
         <Snackbar ref={snackbarRef} />
+
+        {visible && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={date}
+            mode={"date"}
+            onChange={onChange}
+            maximumDate={new Date()}
+          />
+        )}
       </View>
     </SafeAreaView>
   );

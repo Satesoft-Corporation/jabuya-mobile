@@ -5,6 +5,8 @@ import {
   FlatList,
   ActivityIndicator,
   Image,
+  Linking,
+  TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 import TopHeader from "../components/TopHeader";
@@ -90,6 +92,13 @@ const ContactBook = () => {
 };
 
 function Card({ client }) {
+  const makePhoneCall = () => {
+    Linking.openURL(`tel:${client?.phoneNumber}`);
+  };
+
+  const openWhatsApp = () => {
+    Linking.openURL(`whatsapp://send?phone=${client?.phoneNumber}`);
+  };
   return (
     <View
       style={{
@@ -127,14 +136,18 @@ function Card({ client }) {
       </View>
 
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <Image
-          source={require("../assets/icons/icons8-phone-50.png")}
-          style={{ height: 25, width: 25 }}
-        />
-        <Image
-          source={require("../assets/icons/icons8-message-48.png")}
-          style={{ height: 25, width: 25 }}
-        />
+        <TouchableOpacity onPress={makePhoneCall}>
+          <Image
+            source={require("../assets/icons/icons8-phone-50.png")}
+            style={{ height: 25, width: 25 }}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={openWhatsApp}>
+          <Image
+            source={require("../assets/icons/icons8-message-48.png")}
+            style={{ height: 25, width: 25 }}
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );

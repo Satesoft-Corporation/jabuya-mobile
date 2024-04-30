@@ -17,23 +17,23 @@ const CreditMenu = ({ navigation }) => {
       title: "Credit Records",
       target: CREDIT_SALES,
     },
-    {
-      id: 2,
-      icon: require("../../../assets/icons/icons8-user-plus-48.png"),
-      title: "Add Client",
-      target: CLIENT_FORM,
-    },
+    // {
+    //   id: 2,
+    //   icon: require("../../../assets/icons/icons8-user-plus-48.png"),
+    //   title: "Add Client",
+    //   target: CLIENT_FORM,
+    // },
     {
       id: 3,
       icon: require("../../../assets/icons/icons8-book-48.png"),
       title: "Register",
       target: CLIENT_REGISTER,
     },
-    {
-      id: 4,
-      icon: require("../../../assets/icons/icons8-chat-50.png"),
-      title: "Suppliers",
-    },
+    // {
+    //   id: 4,
+    //   icon: require("../../../assets/icons/icons8-chat-50.png"),
+    //   title: "Suppliers",
+    // },
   ];
 
   const handleIconPress = (item) => {

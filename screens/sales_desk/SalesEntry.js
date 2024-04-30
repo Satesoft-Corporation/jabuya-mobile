@@ -136,7 +136,7 @@ function SalesEntry({ navigation }) {
       <BlackScreen flex={isShopAttendant ? 12 : 10}>
         <UserProfile renderMenu renderNtnIcon={false} menuItems={menuItems} />
 
-        <View style={{ paddingHorizontal: 0, marginTop: 15}}>
+        <View style={{ paddingHorizontal: 0, marginTop: 15 }}>
           {isShopOwner && shops?.length > 1 && (
             <SelectShopBar
               showIcon={false}
