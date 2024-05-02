@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+} from "react-native";
 import React, { useContext, useEffect } from "react";
 import AppStatusBar from "../components/AppStatusBar";
 import TopHeader from "../components/TopHeader";
@@ -16,7 +22,7 @@ const SelectShopBars = ({ navigation }) => {
   }, []);
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
         backgroundColor: Colors.light_2,
@@ -24,13 +30,9 @@ const SelectShopBars = ({ navigation }) => {
     >
       <AppStatusBar />
 
-      <TopHeader
-        title="Select shop"
-        
-        showShopName={false}
-      />
+      <TopHeader title="Select shop" showShopName={false} />
 
-      <View
+      <ScrollView
         style={{
           paddingHorizontal: 5,
           marginTop: 10,
@@ -46,14 +48,15 @@ const SelectShopBars = ({ navigation }) => {
             }}
           />
         ))}
-      </View>
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 function ShopItem({ shop, onItemPress, selected }) {
   return (
     <TouchableOpacity
+      activeOpacity={0.8}
       onPress={onItemPress}
       style={{
         flexDirection: "row",

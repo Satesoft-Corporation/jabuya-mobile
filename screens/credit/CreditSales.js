@@ -3,7 +3,11 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../../context/UserContext";
-import { convertDateFormat, formatNumberWithCommas } from "../../utils/Utils";
+import {
+  convertDateFormat,
+  formatDate,
+  formatNumberWithCommas,
+} from "../../utils/Utils";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import ItemHeader from "../sales/components/ItemHeader";
@@ -12,6 +16,7 @@ import Snackbar from "../../components/Snackbar";
 import Colors from "../../constants/Colors";
 import { BaseApiService } from "../../utils/BaseApiService";
 import CreditSaleCard from "./components/CreditSaleCard";
+import { CLIENT_FORM } from "../../navigation/ScreenNames";
 
 const CreditSales = () => {
   const navigation = useNavigation();
@@ -33,7 +38,8 @@ const CreditSales = () => {
 
   const snackbarRef = useRef(null);
 
-  const { selectedShop } = useContext(UserContext);
+  const { shops, selectedShop, setSelectedShop, userParams } =
+    useContext(UserContext);
 
   const onChange = (event, selectedDate) => {
     setVisible(false);
@@ -45,9 +51,8 @@ const CreditSales = () => {
   const fetchCreditSales = async (day = null) => {
     let searchParameters = {
       limit: 0,
-      shopId: selectedShop?.id,
+      ...(selectedShop?.id !== 0 && { shopId: selectedShop?.id }),
       offset: offset,
-      // startDate: getCurrentDay(),
       ...(day && {
         startDate: convertDateFormat(day),
         endDate: convertDateFormat(day, true),
@@ -61,6 +66,11 @@ const CreditSales = () => {
     setDebtors(0);
     setMessage(null);
     setLoading(true);
+
+    if (day === null) {
+      setFiltering(false);
+      setDate(new Date());
+    }
     new BaseApiService("/credit-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
@@ -84,13 +94,13 @@ const CreditSales = () => {
         setCreditSales((prevEntries) => [...prevEntries, ...unPaid]);
 
         if (response?.totalItems === 0) {
-          setMessage(`No debts found on ${formatDate(date, true)}`);
+          setMessage(`No debts found on ${formatDate(date, true)} for`);
         }
 
         setLoading(false);
       })
       .catch((error) => {
-        setMessage("Error fetching credit records");
+        setMessage("Error fetching credit records for");
         setLoading(false);
         console.log(error);
       });
@@ -103,23 +113,36 @@ const CreditSales = () => {
   };
   useEffect(() => {
     fetchCreditSales();
-  }, []);
+  }, [selectedShop]);
 
   const menuItems = [
-    {
-      name: "Add debtor",
-      onClick: () => navigation.navigate(CLIENT_FORM),
-    },
+    ...(userParams?.isShopOwner === true
+      ? [
+          {
+            name: "Add debtor",
+            onClick: () => navigation.navigate(CLIENT_FORM),
+          },
+        ]
+      : []),
     {
       name: "Select date",
       onClick: () => setVisible(true),
     },
+    ...(shops?.length > 1
+      ? shops?.map((shop) => {
+          return {
+            ...shop,
+            onClick: () => setSelectedShop(shop),
+            bold: shop?.id === selectedShop.id,
+          };
+        })
+      : []),
   ];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark }}>
       <AppStatusBar />
-      <TopHeader title="Credited Records" showMenuDots menuItems={menuItems} />
+      <TopHeader title="Debt records" showMenuDots menuItems={menuItems} />
       <View style={{ paddingBottom: 10 }}>
         <View style={styles.debtHeader}>
           <Text
@@ -171,6 +194,7 @@ const CreditSales = () => {
           ListEmptyComponent={() => (
             <View style={styles.errorMsg}>
               <Text>{message}</Text>
+              {message && <Text>{selectedShop?.name}</Text>}
             </View>
           )}
         />

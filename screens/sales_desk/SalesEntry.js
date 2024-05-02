@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-} from "react-native";
+import { Text, View, TextInput, ScrollView, Alert } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import Colors from "../../constants/Colors";
@@ -43,8 +37,7 @@ function SalesEntry({ navigation }) {
 
   const snackbarRef = useRef(null);
 
-  const { userParams, selectedShop, shops, setSelectedShop } =
-    useContext(UserContext);
+  const { userParams, selectedShop, shops } = useContext(UserContext);
 
   const {
     selections,
@@ -93,9 +86,20 @@ function SalesEntry({ navigation }) {
 
   useEffect(() => {
     clearEverything();
-    fetchProducts();
     if (selectedShop?.id === shopOwnerId) {
-      setSelectedShop(shops[1]);
+      //if all shops are selected
+      Alert.alert("Please select a Shop", "", [
+        {
+          text: "Cancel",
+          onPress: () => navigation.goBack(),
+        },
+        {
+          text: "Yes",
+          onPress: () => navigation.navigate(SHOP_SELECTION),
+        },
+      ]);
+    } else {
+      fetchProducts();
     }
   }, [selectedShop]);
 
@@ -109,6 +113,7 @@ function SalesEntry({ navigation }) {
     let defUnit = { productSaleUnitName: saleUnitName, unitPrice: salesPrice };
 
     setSelection(item);
+    console.log(item)
     setShowModal(true);
 
     if (multipleSaleUnits) {

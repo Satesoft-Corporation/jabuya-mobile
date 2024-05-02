@@ -1,8 +1,6 @@
-import { View, Text } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 import React from "react";
-import MaterialButton from "../MaterialButton";
 import Colors from "../../constants/Colors";
-import { TouchableOpacity } from "react-native";
 
 const PrimaryButton = ({
   onPress,

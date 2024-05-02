@@ -43,10 +43,14 @@ export default function ViewSales({ navigation }) {
       name: "Select date",
       onClick: () => setVisible(true),
     },
-    isShopOwner && {
-      name: "Investment",
-      onClick: () => navigation.navigate(SHOP_SUMMARY),
-    },
+    ...(isShopOwner === true
+      ? [
+          {
+            name: "Investment",
+            onClick: () => navigation.navigate(SHOP_SUMMARY),
+          },
+        ]
+      : []),
     ...(shops?.length > 1
       ? shops?.map((shop) => {
           return {
@@ -88,9 +92,10 @@ export default function ViewSales({ navigation }) {
     let searchParameters = {
       offset: 0,
       limit: 0,
-      ...(allShops && {
-        shopOwnerId: selectedShop?.id,
-      }),
+      ...(allShops &&
+        isShopOwner && {
+          shopOwnerId: selectedShop?.id,
+        }),
       ...(!allShops && { shopId: selectedShop?.id }),
       startDate: getCurrentDay(),
       ...(day && {

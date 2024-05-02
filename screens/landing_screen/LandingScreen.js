@@ -19,6 +19,7 @@ import { LOCK_SCREEN, STOCK_ENTRY } from "../../navigation/ScreenNames";
 import {
   resolveUnsavedSales,
   saveShopClients,
+  saveShopDetails,
   saveShopProductsOnDevice,
 } from "../../controllers/OfflineControllers";
 const LandingScreen = ({ navigation }) => {
@@ -37,17 +38,6 @@ const LandingScreen = ({ navigation }) => {
   const [agreeText, setAgreeText] = useState("");
   const [canCancel, setCanCancel] = useState(false);
   const [timeDiff, setTimeDiff] = useState(null);
-
-  const fetchShops = useCallback((id) => {
-    new BaseApiService("/shops")
-      .getRequestWithJsonResponse({ limit: 0, offset: 0, shopOwnerId: id })
-      .then(async (response) => {
-        await UserSessionUtils.setShopCount(String(response.totalItems));
-        await UserSessionUtils.setShops(response.records);
-        getShopsFromStorage();
-      })
-      .catch((error) => {});
-  }, []);
 
   const logOut = () => {
     setLoading(false);
@@ -148,9 +138,10 @@ const LandingScreen = ({ navigation }) => {
 
         let shopCount = await UserSessionUtils.getShopCount();
 
-        if (isShopOwner) {
+        if (!isShopAttendant) {
           if (shopCount === null) {
-            fetchShops(shopOwnerId);
+            await saveShopDetails(isShopOwner, shopOwnerId);
+            getShopsFromStorage();
           }
         }
 
@@ -175,7 +166,7 @@ const LandingScreen = ({ navigation }) => {
       <BlackScreen>
         <UserProfile />
 
-        {userParams?.isShopOwner && <SelectShopBar />}
+        {!userParams?.isShopAttendant && <SelectShopBar />}
       </BlackScreen>
 
       <View

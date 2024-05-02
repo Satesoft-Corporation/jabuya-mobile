@@ -20,10 +20,7 @@ const StockPurchase = ({ navigation }) => {
   const [disable, setDisable] = useState(false);
   const [loading, setLoading] = useState(false);
   const snackbarRef = useRef(null);
-  const { userParams } = useContext(UserContext);
-
-  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-    userParams;
+  const { selectedShop } = useContext(UserContext);
 
   const fetchStockEntries = async (offsetToUse = 0) => {
     try {
@@ -32,8 +29,7 @@ const StockPurchase = ({ navigation }) => {
 
       const searchParameters = {
         limit: MAXIMUM_RECORDS_PER_FETCH,
-        ...(isShopAttendant && { shopId: attendantShopId }),
-        ...(isShopOwner && { shopOwnerId }),
+        ...(selectedShop?.id !== 0 && { shopId: selectedShop?.id }),
         offset: offsetToUse,
         ...(searchTerm &&
           searchTerm.trim() !== "" && { searchTerm: searchTerm }),

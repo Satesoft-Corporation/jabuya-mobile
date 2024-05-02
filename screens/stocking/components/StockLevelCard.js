@@ -135,7 +135,7 @@ function StockLevelCard({ data }) {
           <DataRow label={"Listed by"} value={data?.createdByFullName} />
 
           <CardFooter1
-            btnTitle1="Update price"
+            btnTitle1="Price"
             btnTitle2="Hide"
             onClick2={toggleExpand}
             onClick1={() => navigation.navigate(UPDATE_PRICE, data)}

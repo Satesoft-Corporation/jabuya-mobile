@@ -2,10 +2,10 @@ import {
   SALES_DESK,
   SALES_REPORTS,
   STOCKNG,
-  CREDIT_MENU,
   CONTACT_BOOK,
   EXPENSES,
   INCOME_GRAPHS,
+  CREDIT_SALES,
 } from "../../navigation/ScreenNames";
 export const navList = [
   // landing screen icons
@@ -31,7 +31,7 @@ export const navList = [
     id: 4,
     icon: require("../../assets/icons/open-hand.png"),
     title: "Debtors",
-    target: CREDIT_MENU,
+    target: CREDIT_SALES,
   },
   {
     id: 5,
@@ -43,7 +43,7 @@ export const navList = [
     id: 6,
     icon: require("../../assets/icons/icons8-chat-50.png"),
     title: "Chat",
-   // target:INCOME_GRAPHS
+    // target:INCOME_GRAPHS
   },
   {
     id: 7,

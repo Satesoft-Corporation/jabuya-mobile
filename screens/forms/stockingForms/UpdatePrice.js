@@ -91,14 +91,14 @@ const UpdatePrice = ({ navigation, route }) => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
       <AppStatusBar />
 
-      <TopHeader title="Update " />
+      <TopHeader title="Update price" />
       <Snackbar ref={snackBarRef} />
 
       <Loader loading={loading} />
-      <View style={BaseStyle.shadowedContainer}>
+      <View style={BaseStyle.container}>
         <Text
           style={{
             marginTop: 10,
@@ -148,6 +148,7 @@ const UpdatePrice = ({ navigation, route }) => {
               inputMode="numeric"
               value={price}
               onValueChange={(text) => setPrice(text)}
+              style={{ flex: 1 }}
             />
           </View>
           <MyInput
@@ -155,6 +156,7 @@ const UpdatePrice = ({ navigation, route }) => {
             dateValue={dob}
             isDateInput
             onDateChange={(date) => setDOB(date)}
+            style={{ flex: 1 }}
           />
         </View>
 
@@ -166,9 +168,13 @@ const UpdatePrice = ({ navigation, route }) => {
           onValueChange={(text) => setRemarks(text)}
         />
 
-        <View style={styles.btnContainer}>
-          <ChipButton title={"Cancel"} onPress={() => navigation.goBack()} />
-          <ChipButton darkMode title={"Confirm"} onPress={saveProduct} />
+        <View style={{ marginTop: 15, flexDirection: "row" }}>
+          <PrimaryButton
+            darkMode={false}
+            title={"Clear"}
+            onPress={() => navigation.goBack()}
+          />
+          <PrimaryButton title={"Save"} onPress={saveProduct} />
         </View>
       </View>
     </SafeAreaView>

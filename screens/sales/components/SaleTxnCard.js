@@ -115,6 +115,7 @@ function SaleTxnCard({ data }) {
         <View style={{ flex: 1, marginTop: 10 }}>
           <SalesTable sales={lineItems} fixHeight={false} />
           <DataRow
+            key={1}
             label={"Total"}
             value={formatNumberWithCommas(totalCost)}
             labelTextStyle={styles.label}
@@ -124,6 +125,7 @@ function SaleTxnCard({ data }) {
           />
 
           <DataRow
+            key={2}
             label={"Recieved"}
             value={formatNumberWithCommas(amountPaid)}
             labelTextStyle={styles.label}
@@ -131,6 +133,7 @@ function SaleTxnCard({ data }) {
             showCurrency
           />
           <DataRow
+            key={3}
             label={`Purchased ${
               itemCount > 1 ? `${itemCount} items` : `${itemCount} item`
             }`}
@@ -141,6 +144,7 @@ function SaleTxnCard({ data }) {
           />
 
           <DataRow
+            key={4}
             label={"Balance"}
             value={balText}
             labelTextStyle={styles.label}
@@ -148,6 +152,7 @@ function SaleTxnCard({ data }) {
             showCurrency
           />
           <DataRow
+            key={5}
             label={"Income"}
             value={formatNumberWithCommas(profit)}
             labelTextStyle={styles.label}
@@ -157,6 +162,7 @@ function SaleTxnCard({ data }) {
 
           {balanceGivenOut < 0 && (
             <DataRow
+              key={6}
               label={"Client's mobile"}
               value={data?.clientPhoneNumber}
               labelTextStyle={styles.label}

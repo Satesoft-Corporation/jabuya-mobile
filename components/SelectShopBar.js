@@ -12,6 +12,7 @@ const SelectShopBar = ({ onPress, showIcon = true }) => {
   const navigation = useNavigation();
   return (
     <TouchableOpacity
+      activeOpacity={0.9}
       onPress={() => navigation.navigate(SHOP_SELECTION)}
       style={{
         flexDirection: "row",

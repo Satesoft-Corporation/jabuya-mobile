@@ -24,10 +24,7 @@ const StockLevel = ({ navigation }) => {
 
   const snackbarRef = useRef(null);
 
-  const { userParams } = useContext(UserContext);
-
-  const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-    userParams;
+  const { selectedShop } = useContext(UserContext);
 
   const fetchShopProducts = async (offsetToUse = 0) => {
     try {
@@ -35,8 +32,7 @@ const StockLevel = ({ navigation }) => {
 
       const searchParameters = {
         limit: MAXIMUM_RECORDS_PER_FETCH,
-        ...(isShopAttendant && { shopId: attendantShopId }),
-        ...(isShopOwner && { shopOwnerId }),
+        ...(selectedShop?.id !== 0 && { shopId: selectedShop?.id }),
         offset: offsetToUse,
         ...(searchTerm &&
           searchTerm.trim() !== "" && { searchTerm: searchTerm }),
@@ -105,7 +101,7 @@ const StockLevel = ({ navigation }) => {
       <AppStatusBar />
 
       <TopHeader
-        title="Stock Levels"
+        title="Stock levels"
         showSearch={true}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}

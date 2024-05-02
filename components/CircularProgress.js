@@ -23,7 +23,6 @@ export default function CircularProgress({ bgColor = Colors.primary }) {
       disabled
       style={{
         backgroundColor: bgColor,
-        marginTop: 30,
         borderRadius: 5,
         borderWidth: 1,
         borderColor: bgColor,
@@ -31,6 +30,7 @@ export default function CircularProgress({ bgColor = Colors.primary }) {
         justifyContent: "center",
         alignItems: "center",
         justifyContent: "center",
+        height: 40,
       }}
     >
       <View

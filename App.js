@@ -1,7 +1,7 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Login from "./screens/Login";
+import Login from "./screens/auth/Login";
 import ViewSales from "./screens/sales/ViewSales";
 import SalesEntry from "./screens/sales_desk/SalesEntry";
 import ShopSummary from "./screens/shop_summary/ShopSummary";
@@ -30,7 +30,6 @@ import StockPurchase from "./screens/stocking/StockPurchase";
 import IncomeGraph from "./screens/perfomance_graphs/IncomeGraph";
 import UpdatePrice from "./screens/forms/stockingForms/UpdatePrice";
 import CreditSales from "./screens/credit/CreditSales";
-import CreditMenu from "./screens/credit/CreditMenu";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -70,7 +69,6 @@ export default function App() {
               <Stack.Screen name={s.LOCK_SCREEN} component={LockScreen} />
               <Stack.Screen name={s.LOCK_SETuP} component={LockSetUp} />
 
-              <Stack.Screen name={s.CREDIT_MENU} component={CreditMenu} />
               <Stack.Screen name={s.CREDIT_SALES} component={CreditSales} />
               <Stack.Screen
                 name={s.CREDIT_PAYMENTS}

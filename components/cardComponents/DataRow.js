@@ -12,6 +12,7 @@ const DataRow = ({
 }) => {
   return (
     <View
+      key={label}
       style={[
         {
           flexDirection: "row",

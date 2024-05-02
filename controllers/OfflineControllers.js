@@ -98,3 +98,19 @@ export const saveShopClients = async (params, refresh = false) => {
 
   return saved;
 };
+
+export const saveShopDetails = async (isShopOwner, shopOwnerId) => {
+  const searchParameters = {
+    limit: 0,
+    offset: 0,
+    ...(isShopOwner === true && { shopOwnerId: shopOwnerId }),
+  };
+
+  await new BaseApiService("/shops")
+    .getRequestWithJsonResponse(searchParameters)
+    .then(async (response) => {
+      await UserSessionUtils.setShopCount(String(response.totalItems));
+      await UserSessionUtils.setShops(response.records);
+    })
+    .catch((error) => {});
+};
