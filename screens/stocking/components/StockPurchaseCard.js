@@ -8,7 +8,7 @@ import { STOCK_ENTRY_FORM } from "../../../navigation/ScreenNames";
 import CardHeader from "../../../components/cardComponents/CardHeader";
 import RenderCurrency from "../../../components/RenderCurrency";
 
-const StockPurchaseListComponent = ({ data }) => {
+const StockPurchaseCard = ({ data }) => {
   const [expanded, setExpanded] = useState(false);
 
   const navigation = useNavigation();
@@ -152,4 +152,4 @@ const StockPurchaseListComponent = ({ data }) => {
   );
 };
 
-export default StockPurchaseListComponent;
+export default StockPurchaseCard;

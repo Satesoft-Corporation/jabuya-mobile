@@ -10,7 +10,7 @@ import { UserContext } from "../../context/UserContext";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import { ActivityIndicator } from "react-native";
-import StockLevelItem from "./components/StockLevelItem";
+import StockLevelCard from "./components/StockLevelCard";
 import { PDT_ENTRY } from "../../navigation/ScreenNames";
 
 const StockLevel = ({ navigation }) => {
@@ -118,7 +118,7 @@ const StockLevel = ({ navigation }) => {
         style={{ marginTop: 5 }}
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
-        renderItem={({ item }) => <StockLevelItem data={item} />}
+        renderItem={({ item }) => <StockLevelCard data={item} />}
         onRefresh={() => onSearch()}
         refreshing={loading}
         ListEmptyComponent={() => (

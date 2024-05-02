@@ -9,7 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 import { UPDATE_PRICE } from "../../../navigation/ScreenNames";
 import RenderCurrency from "../../../components/RenderCurrency";
 
-function StockLevelItem({ data }) {
+function StockLevelCard({ data }) {
   const [expanded, setExpanded] = useState(false);
   const navigation = useNavigation();
 
@@ -127,10 +127,7 @@ function StockLevelItem({ data }) {
           <DataRow label={"Portion"} value={data?.saleUnitName} />
           <DataRow label={"Barcode"} value={data?.barcode} />
           <DataRow label={"Category"} value={data?.categoryName} />
-          <DataRow
-            label={"Restocked by"}
-            value={data?.changedByFullName}
-          />
+          <DataRow label={"Restocked by"} value={data?.changedByFullName} />
           <DataRow
             label={"Last restock"}
             value={formatDate(data?.dateChanged, true)}
@@ -157,4 +154,4 @@ function StockLevelItem({ data }) {
   );
 }
 
-export default StockLevelItem;
+export default StockLevelCard;

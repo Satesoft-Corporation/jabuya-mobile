@@ -1,12 +1,12 @@
 import { View, Text, SafeAreaView, FlatList } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import TopHeader from "../../../components/TopHeader";
-import Colors from "../../../constants/Colors";
-import { UserContext } from "../../../context/UserContext";
-import AppStatusBar from "../../../components/AppStatusBar";
-import { BaseApiService } from "../../../utils/BaseApiService";
+import TopHeader from "../../components/TopHeader";
+import Colors from "../../constants/Colors";
+import { UserContext } from "../../context/UserContext";
+import AppStatusBar from "../../components/AppStatusBar";
+import { BaseApiService } from "../../utils/BaseApiService";
 import { ActivityIndicator } from "react-native";
-import ShopClient from "../components/ShopClient";
+import ShopClient from "./components/ShopClient";
 
 const ClientRegister = () => {
   const { selectedShop } = useContext(UserContext);

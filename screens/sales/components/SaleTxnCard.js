@@ -10,7 +10,7 @@ import SalesTable from "../../sales_desk/components/SalesTable";
 import DataRow from "../../../components/cardComponents/DataRow";
 import CardFooter2 from "../../../components/cardComponents/CardFooter2";
 
-function SaleTransactionItem({ data }) {
+function SaleTxnCard({ data }) {
   // sales report item card
 
   const { lineItems, totalCost, amountPaid, balanceGivenOut, shopName } = data;
@@ -176,7 +176,7 @@ function SaleTransactionItem({ data }) {
   );
 }
 
-export default memo(SaleTransactionItem);
+export default memo(SaleTxnCard);
 const styles = StyleSheet.create({
   label: {
     fontWeight: "600",

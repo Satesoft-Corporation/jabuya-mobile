@@ -1,23 +1,17 @@
 import { View, Text, SafeAreaView, FlatList, StyleSheet } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import AppStatusBar from "../../../components/AppStatusBar";
-import TopHeader from "../../../components/TopHeader";
-import { BaseApiService } from "../../../utils/BaseApiService";
-import CreditSaleListItem from "../components/CreditSaleListItem";
-import Snackbar from "../../../components/Snackbar";
-import Colors from "../../../constants/Colors";
-import { UserContext } from "../../../context/UserContext";
-import ItemHeader from "../components/ItemHeader";
-import {
-  convertDateFormat,
-  formatDate,
-  formatNumberWithCommas,
-  getCurrentDay,
-} from "../../../utils/Utils";
-import VerticalSeparator from "../../../components/VerticalSeparator";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { CLIENT_FORM } from "../../../navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
+import { UserContext } from "../../context/UserContext";
+import { convertDateFormat, formatNumberWithCommas } from "../../utils/Utils";
+import AppStatusBar from "../../components/AppStatusBar";
+import TopHeader from "../../components/TopHeader";
+import ItemHeader from "../sales/components/ItemHeader";
+import VerticalSeparator from "../../components/VerticalSeparator";
+import Snackbar from "../../components/Snackbar";
+import Colors from "../../constants/Colors";
+import { BaseApiService } from "../../utils/BaseApiService";
+import CreditSaleCard from "./components/CreditSaleCard";
 
 const CreditSales = () => {
   const navigation = useNavigation();
@@ -170,7 +164,7 @@ const CreditSales = () => {
         <FlatList
           style={{ marginTop: 10 }}
           data={creditSales}
-          renderItem={({ item }) => <CreditSaleListItem sale={item} />}
+          renderItem={({ item }) => <CreditSaleCard sale={item} />}
           keyExtractor={(item) => item.id.toString()}
           refreshing={loading}
           onRefresh={() => handleRefresh()}

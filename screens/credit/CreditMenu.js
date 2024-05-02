@@ -1,19 +1,19 @@
 import { View, Text, FlatList, SafeAreaView } from "react-native";
 import React from "react";
-import TopHeader from "../../../components/TopHeader";
-import AppStatusBar from "../../../components/AppStatusBar";
-import { MenuIcon } from "../../../components/MenuIcon";
+import TopHeader from "../../components/TopHeader";
+import AppStatusBar from "../../components/AppStatusBar";
+import { MenuIcon } from "../../components/MenuIcon";
 import {
   CLIENT_FORM,
   CLIENT_REGISTER,
   CREDIT_SALES,
-} from "../../../navigation/ScreenNames";
+} from "../../navigation/ScreenNames";
 
 const CreditMenu = ({ navigation }) => {
   const menuItems = [
     {
       id: 1,
-      icon: require("../../../assets/icons/open-hand.png"),
+      icon: require("../../assets/icons/open-hand.png"),
       title: "Credit Records",
       target: CREDIT_SALES,
     },
@@ -25,7 +25,7 @@ const CreditMenu = ({ navigation }) => {
     // },
     {
       id: 3,
-      icon: require("../../../assets/icons/icons8-book-48.png"),
+      icon: require("../../assets/icons/icons8-book-48.png"),
       title: "Register",
       target: CLIENT_REGISTER,
     },

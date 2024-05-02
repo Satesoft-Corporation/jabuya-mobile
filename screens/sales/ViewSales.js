@@ -15,10 +15,10 @@ import {
 import UserProfile from "../../components/UserProfile";
 import { UserContext } from "../../context/UserContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import SaleTransactionItem from "./components/SaleTransactionItem";
 import ItemHeader from "./components/ItemHeader";
 import VerticalSeparator from "../../components/VerticalSeparator";
 import { SHOP_SUMMARY } from "../../navigation/ScreenNames";
+import SaleTxnCard from "./components/SaleTxnCard";
 
 export default function ViewSales({ navigation }) {
   const [sales, setSales] = useState([]);
@@ -224,7 +224,7 @@ export default function ViewSales({ navigation }) {
         data={sales}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item, i }) => (
-          <SaleTransactionItem key={i} data={item} isShopOwner={isShopOwner} />
+          <SaleTxnCard key={i} data={item} isShopOwner={isShopOwner} />
         )}
         ListEmptyComponent={() => (
           <Text style={{ flex: 1, textAlign: "center", alignSelf: "center" }}>

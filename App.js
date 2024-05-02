@@ -16,10 +16,8 @@ import BarCodeScreen from "./screens/sales_desk/BarCodeScreen";
 import LockScreen from "./screens/applock/LockScreen";
 import Settings from "./screens/settings/Settings";
 import LockSetUp from "./screens/applock/LockSetUp";
-import CreditMenu from "./screens/sales/credit/CreditMenu";
-import CreditSales from "./screens/sales/credit/CreditSales";
 import NewClient from "./screens/forms/NewClient";
-import ClientRegister from "./screens/sales/credit/ClientRegister";
+import ClientRegister from "./screens/credit/ClientRegister";
 import CreditPayment from "./screens/forms/CreditPayment";
 import ContactBook from "./screens/ContactBook";
 import * as s from "./navigation/ScreenNames";
@@ -31,6 +29,8 @@ import StockLevel from "./screens/stocking/StockLevels";
 import StockPurchase from "./screens/stocking/StockPurchase";
 import IncomeGraph from "./screens/perfomance_graphs/IncomeGraph";
 import UpdatePrice from "./screens/forms/stockingForms/UpdatePrice";
+import CreditSales from "./screens/credit/CreditSales";
+import CreditMenu from "./screens/credit/CreditMenu";
 const Stack = createNativeStackNavigator();
 
 export default function App() {

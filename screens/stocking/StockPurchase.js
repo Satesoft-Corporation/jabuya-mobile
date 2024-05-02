@@ -7,7 +7,7 @@ import { UserContext } from "../../context/UserContext";
 import { BaseApiService } from "../../utils/BaseApiService";
 import { MAXIMUM_RECORDS_PER_FETCH } from "../../constants/Constants";
 import Snackbar from "../../components/Snackbar";
-import StockPurchaseListComponent from "./components/StockPurchaseListComponent";
+import StockPurchaseCard from "./components/StockPurchaseCard";
 import { STOCK_ENTRY_FORM } from "../../navigation/ScreenNames";
 
 const StockPurchase = ({ navigation }) => {
@@ -112,7 +112,7 @@ const StockPurchase = ({ navigation }) => {
         style={{ marginTop: 5 }}
         keyExtractor={(item) => item.id.toString()}
         data={stockEntries}
-        renderItem={({ item }) => <StockPurchaseListComponent data={item} />}
+        renderItem={({ item }) => <StockPurchaseCard data={item} />}
         onRefresh={() => onSearch()}
         refreshing={loading}
         ListEmptyComponent={() => (
