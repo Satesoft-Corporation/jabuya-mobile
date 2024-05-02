@@ -19,6 +19,7 @@ import { BaseApiService } from "../../../utils/BaseApiService";
 import Snackbar from "../../../components/Snackbar";
 import { StackActions } from "@react-navigation/native";
 import { LANDING_SCREEN } from "../../../navigation/ScreenNames";
+import PrimaryButton from "../../../components/buttons/PrimaryButton";
 
 const UpdatePrice = ({ navigation, route }) => {
   const [dob, setDOB] = useState(new Date());
@@ -43,6 +44,7 @@ const UpdatePrice = ({ navigation, route }) => {
         setSelectedSaleUnits(selectedRecord?.multipleSaleUnits);
       }
       setSelectedProduct(selectedRecord);
+      setPrice(String(selectedRecord?.salesPrice));
       setLoading(false);
     }
   };
@@ -168,10 +170,16 @@ const UpdatePrice = ({ navigation, route }) => {
           onValueChange={(text) => setRemarks(text)}
         />
 
-        <View style={{ marginTop: 15, flexDirection: "row" }}>
+        <View
+          style={{
+            marginTop: 15,
+            flexDirection: "row",
+            gap: 10,
+          }}
+        >
           <PrimaryButton
             darkMode={false}
-            title={"Clear"}
+            title={"Cancel"}
             onPress={() => navigation.goBack()}
           />
           <PrimaryButton title={"Save"} onPress={saveProduct} />
