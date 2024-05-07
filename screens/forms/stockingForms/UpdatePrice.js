@@ -1,19 +1,14 @@
-import { View, Text, SafeAreaView, StyleSheet, Animated } from "react-native";
+import { View, Text, SafeAreaView, StyleSheet } from "react-native";
 import React, { useContext, useState, useEffect, useRef } from "react";
 import TopHeader from "../../../components/TopHeader";
 import AppStatusBar from "../../../components/AppStatusBar";
 import { BaseStyle } from "../../../utils/BaseStyle";
-import ChipButton from "../../../components/buttons/ChipButton";
 import { UserContext } from "../../../context/UserContext";
 import Colors from "../../../constants/Colors";
 import MyInput from "../../../components/MyInput";
 import Loader from "../../../components/Loader";
 import DataRow from "../../../components/cardComponents/DataRow";
-import {
-  formatNumberWithCommas,
-  hasNull,
-  isValidNumber,
-} from "../../../utils/Utils";
+import { formatNumberWithCommas, isValidNumber } from "../../../utils/Utils";
 import { SHOP_PRODUCTS_ENDPOINT } from "../../../utils/EndPointUtils";
 import { BaseApiService } from "../../../utils/BaseApiService";
 import Snackbar from "../../../components/Snackbar";

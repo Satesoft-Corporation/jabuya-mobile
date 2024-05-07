@@ -6,7 +6,7 @@ import DataRow from "../../../components/cardComponents/DataRow";
 import ChipButton2 from "../../../components/buttons/ChipButton2";
 import { STOCK_ENTRY_FORM } from "../../../navigation/ScreenNames";
 import CardHeader from "../../../components/cardComponents/CardHeader";
-import RenderCurrency from "../../../components/RenderCurrency";
+import DataColumn from "../../../components/cardComponents/DataColumn";
 
 const StockPurchaseCard = ({ data }) => {
   const [expanded, setExpanded] = useState(false);
@@ -29,67 +29,6 @@ const StockPurchaseCard = ({ data }) => {
     batchNumber,
   } = data ?? {};
 
-  const ItemRow = () => {
-    return (
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginVertical: 10,
-        }}
-      >
-        <View style={{ alignItems: "left", flex: 2 }}>
-          <Text
-            style={{
-              fontWeight: 600,
-              marginBottom: 3,
-            }}
-          >
-            Product
-          </Text>
-          <Text>{productName}</Text>
-        </View>
-
-        <View style={{ alignItems: "center", flex: 1 }}>
-          <Text
-            style={{
-              fontWeight: 600,
-              marginBottom: 3,
-            }}
-          >
-            Qty
-          </Text>
-          <Text>{purchasedQuantity}</Text>
-        </View>
-        <View style={{ alignItems: "center", flex: 1 }}>
-          <Text
-            style={{
-              fontWeight: 600,
-              marginBottom: 3,
-            }}
-          >
-            Cost
-          </Text>
-          <RenderCurrency
-            value={Math.round(purchasePrice / purchasedQuantity)}
-          />
-        </View>
-
-        <View style={{ alignItems: "flex-end", flex: 1 }}>
-          <Text
-            style={{
-              fontWeight: 600,
-              marginBottom: 3,
-            }}
-          >
-            Amount
-          </Text>
-          <RenderCurrency value={purchasePrice} />
-        </View>
-      </View>
-    );
-  };
-
   return (
     <View
       style={{
@@ -105,7 +44,38 @@ const StockPurchaseCard = ({ data }) => {
         value1={` SN: ${data?.serialNumber}`}
         value2={formatDate(data?.dateCreated)}
       />
-      <ItemRow />
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginVertical: 10,
+        }}
+      >
+        <DataColumn
+          title={"Product"}
+          left
+          value={productName}
+          flex={2}
+          key={1}
+        />
+
+        <DataColumn title={"Qty"} value={purchasedQuantity} key={2} />
+
+        <DataColumn
+          title={"Cost"}
+          value={Math.round(purchasePrice / purchasedQuantity)}
+          key={3}
+          isCurrency
+        />
+
+        <DataColumn
+          title={"Amount"}
+          value={purchasePrice}
+          key={4}
+          isCurrency
+          end
+        />
+      </View>
 
       {expanded && (
         <View>

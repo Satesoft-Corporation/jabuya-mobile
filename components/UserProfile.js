@@ -12,6 +12,7 @@ const UserProfile = ({
   renderNtnIcon = true,
   renderMenu = false,
   menuItems,
+  showShops,
 }) => {
   const [shops, setShops] = useState(null);
   const navigation = useNavigation();
@@ -104,7 +105,9 @@ const UserProfile = ({
             />
           </TouchableOpacity>
         )}
-        {renderMenu && <PopUpmenu menuItems={menuItems} />}
+        {renderMenu && (
+          <PopUpmenu menuItems={menuItems} showShops={showShops} />
+        )}
       </View>
     </View>
   );

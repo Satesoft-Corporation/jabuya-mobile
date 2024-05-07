@@ -1,5 +1,6 @@
 import { View, Text } from "react-native";
 import React, { memo } from "react";
+import RenderCurrency from "../RenderCurrency";
 
 const DataRow = ({
   label,

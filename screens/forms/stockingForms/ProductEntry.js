@@ -17,7 +17,7 @@ import MyInput from "../../../components/MyInput";
 import ChipButton from "../../../components/buttons/ChipButton";
 import { FlatList } from "react-native";
 
-const ProductEntry = () => {
+const ProductEntry = ({ route }) => {
   const { selectedShop } = useContext(UserContext);
 
   const [manufacturers, setManufacturers] = useState([]);
@@ -31,6 +31,7 @@ const ProductEntry = () => {
   const [saleUnits, setSaleUnits] = useState([]);
   const [selectedSaleUnit, setSelectedSaleUnit] = useState(null);
   const [selectedSaleUnits, setSelectedSaleUnits] = useState([]);
+  const [edit, setEdit] = useState(false);
 
   const [salesPrice, setSalesPrice] = useState("");
 
@@ -82,7 +83,7 @@ const ProductEntry = () => {
       unitPrice: "",
       saleUnitName,
     };
-
+    console.log(unit,selectedSaleUnits);
     const isSelected = selectedSaleUnits?.find(
       (item) => item.productSaleUnitId === id
     );
@@ -143,6 +144,60 @@ const ProductEntry = () => {
     setSaleUnits([]);
   };
 
+  const populateForm = () => {
+    if (route.params) {
+      const selectedRecord = {
+        ...route.params,
+      };
+      setEdit(true);
+
+      if (selectedRecord?.multipleSaleUnits) {
+        setSelectedSaleUnits(selectedRecord?.multipleSaleUnits);
+      }
+      setRemarks(selectedRecord.remarks);
+      fetchProductDetails(selectedRecord?.productId);
+      setSalesPrice(String(selectedRecord?.salesPrice));
+    } else {
+      fetchManufacturers();
+    }
+  };
+
+  const fetchProductDetails = async (id) => {
+    new BaseApiService(`/products/${id}`)
+      .getRequestWithJsonResponse()
+      .then(async (response) => {
+        const { multipleSaleUnits, manufacturerName, manufacturerId } =
+          response;
+        setSelectedProduct(response);
+        setSelectedManufacturer({ name: manufacturerName, id: manufacturerId });
+
+        console.log(route.params, response);
+
+        if (multipleSaleUnits?.length > 1) {
+          let defaultUnit = multipleSaleUnits.find(
+            (unit) => unit.saleUnitName === route?.params?.saleUnitName
+          ); //looking for the default sale unit
+
+          setSelectedSaleUnit(defaultUnit);
+          setSaleUnits(multipleSaleUnits);
+        } else {
+          let unit = {
+            saleUnitName: route.params?.saleUnitName,
+            saleUnitId: route.params?.saleUnitId,
+          };
+
+          setSelectedSaleUnit(unit);
+          setSaleUnits([{ ...unit }]);
+        }
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+
+        // showErrorMessage(dialogMessage, "Unexpected Error, try again.");
+      });
+  };
+
   const saveProduct = () => {
     setSubmitted(true);
     setLoading(true);
@@ -185,7 +240,7 @@ const ProductEntry = () => {
   };
 
   useEffect(() => {
-    fetchManufacturers();
+    populateForm();
   }, []);
 
   return (
@@ -212,7 +267,7 @@ const ProductEntry = () => {
             <Text style={styles.inputLabel}>Manufacturer</Text>
             <MyDropDown
               style={styles.dropDown}
-              data={manufacturers}
+              data={edit ? [{ ...selectedManufacturer }] : manufacturers}
               onChange={onManufacturerChange}
               value={selectedManufacturer}
               placeholder="Select manufacuturer"
@@ -229,9 +284,9 @@ const ProductEntry = () => {
             <MyDropDown
               style={styles.dropDown}
               disable={disable}
-              data={products}
+              data={edit ? [{ ...selectedProduct }] : products}
               onChange={onProductChange}
-              value={selectedShop}
+              value={selectedProduct}
               placeholder="Select product"
               labelField="displayName"
               valueField="id"
@@ -243,7 +298,10 @@ const ProductEntry = () => {
 
           <FlatList
             data={saleUnits?.filter(
-              (item) => item?.saleUnitName !== selectedSaleUnit?.saleUnitName
+              (item) =>
+                item?.productSaleUnitName !==
+                  selectedSaleUnit?.productSaleUnitName ||
+                item?.saleUnitName !== selectedSaleUnit?.saleUnitName
             )}
             ListHeaderComponent={() =>
               saleUnits?.length > 1 && (
@@ -253,7 +311,9 @@ const ProductEntry = () => {
             renderItem={({ item }) => (
               <ChipButton
                 isSelected={selectedSaleUnits?.find(
-                  (unit) => item?.saleUnitName === unit?.saleUnitName
+                  (unit) =>
+                    item?.saleUnitName === unit?.productSaleUnitName ||
+                    item?.saleUnitName === unit?.saleUnitName
                 )}
                 key={item.saleUnitName}
                 onPress={() => onSaleUnitSelect(item)}
@@ -297,9 +357,13 @@ const ProductEntry = () => {
           </View>
 
           {selectedSaleUnits?.map((item, index) => (
-            <View style={styles.row} key={item?.saleUnitName}>
+            <View style={styles.row} key={index}>
               <View style={{ flex: 1 }}>
-                <MyInput label="" value={item?.saleUnitName} editable={false} />
+                <MyInput
+                  label=""
+                  value={item.saleUnitName || item?.productSaleUnitName}
+                  editable={false}
+                />
               </View>
               <View style={{ flex: 1 }}>
                 <MyInput

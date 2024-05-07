@@ -17,6 +17,7 @@ const TopHeader = ({
   onAddPress,
   showMenuDots = false,
   menuItems,
+  showShops = false,
 }) => {
   const [showBar, setShowBar] = useState(false);
   const { selectedShop } = useContext(UserContext);
@@ -98,7 +99,9 @@ const TopHeader = ({
                 />
               </TouchableOpacity>
             )}
-            {showMenuDots && <PopUpmenu menuItems={menuItems} />}
+            {showMenuDots && (
+              <PopUpmenu menuItems={menuItems} showShops={showShops} />
+            )}
           </View>
         </View>
 

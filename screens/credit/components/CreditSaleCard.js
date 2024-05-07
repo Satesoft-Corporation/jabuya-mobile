@@ -1,14 +1,18 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React, { memo } from "react";
 import CardHeader from "../../../components/cardComponents/CardHeader";
-import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
+import { formatDate } from "../../../utils/Utils";
 import CardFooter2 from "../../../components/cardComponents/CardFooter2";
 import { useNavigation } from "@react-navigation/native";
+import DataColumn from "../../../components/cardComponents/DataColumn";
 
 const CreditSaleListItem = ({ sale }) => {
   const navigation = useNavigation();
 
   const balance = sale?.amountLoaned - sale?.amountRepaid;
+
+  const name = sale?.shopClient?.fullName;
+  const mob = sale?.shopClient?.phoneNumber;
   return (
     <View style={styles.container}>
       <CardHeader
@@ -16,28 +20,17 @@ const CreditSaleListItem = ({ sale }) => {
         value2={formatDate(sale?.dateCreated)}
       />
       <View style={styles.content}>
-        <View style={{ alignItems: "left" }}>
-          <Text style={styles.clientTitle}>Client</Text>
-          <Text style={{ fontWeight: 500 }}>{sale?.shopClient?.fullName}</Text>
-          <Text style={{ fontWeight: 400, fontSize: 12 }}>
-            Mob: {sale?.shopClient?.phoneNumber}
-          </Text>
-        </View>
+        <DataColumn
+          title={"Client"}
+          value={name}
+          left
+          flex={2}
+          value2={`Mob: ${mob}`}
+        />
 
-        <View style={{ alignItems: "center" }}>
-          <Text style={styles.label}>Credit</Text>
-          <Text>{formatNumberWithCommas(sale?.amountLoaned)}</Text>
-        </View>
-
-        <View style={{ alignItems: "center" }}>
-          <Text style={styles.label}>Paid</Text>
-          <Text>{formatNumberWithCommas(sale?.amountRepaid)}</Text>
-        </View>
-
-        <View style={{ alignItems: "center" }}>
-          <Text style={styles.label}>Balance</Text>
-          <Text>{formatNumberWithCommas(balance)}</Text>
-        </View>
+        <DataColumn title={"Debt"} value={sale?.amountLoaned} isCurrency />
+        <DataColumn title={"Paid"} value={sale?.amountRepaid} isCurrency />
+        <DataColumn title={"Balance"} value={balance} isCurrency end />
       </View>
 
       <CardFooter2
@@ -67,13 +60,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginVertical: 10,
     justifyContent: "space-between",
-  },
-  clientTitle: {
-    fontWeight: "600",
-    marginBottom: 3,
-  },
-  label: {
-    fontWeight: "600",
-    marginBottom: 10,
   },
 });

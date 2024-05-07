@@ -56,8 +56,7 @@ const LandingScreen = ({ navigation }) => {
 
   const handleTabPress = (item) => {
     const { days } = timeDiff;
-
-    if (days > 5) {
+    if (days >= 7) {
       //trigger the logout dialog every after some time
       logInPrompt();
       return null;
@@ -91,14 +90,15 @@ const LandingScreen = ({ navigation }) => {
     let prevLoginTime = await UserSessionUtils.getLoginTime();
 
     let logintimeDifferance = getTimeDifference(prevLoginTime, new Date());
+    const { days, hours } = logintimeDifferance;
 
     setTimeDiff(logintimeDifferance);
 
-    if (logintimeDifferance.hours < 24) {
+    if (hours < 24) {
       //to save if access token is still valid
       await resolveUnsavedSales();
     }
-    if (logintimeDifferance.hours >= 6) {
+    if (hours >= 6 || days >= 1) {
       await getRefreshToken();
     }
   };

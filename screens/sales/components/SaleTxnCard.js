@@ -9,6 +9,7 @@ import CardHeader from "../../../components/cardComponents/CardHeader";
 import SalesTable from "../../sales_desk/components/SalesTable";
 import DataRow from "../../../components/cardComponents/DataRow";
 import CardFooter2 from "../../../components/cardComponents/CardFooter2";
+import DataColumn from "../../../components/cardComponents/DataColumn";
 
 function SaleTxnCard({ data }) {
   // sales report item card
@@ -22,11 +23,6 @@ function SaleTxnCard({ data }) {
   const toggleExpand = useCallback(() => {
     setExpanded(!expanded);
   }, [expanded]);
-
-  const balText =
-    balanceGivenOut < 0
-      ? `(${formatNumberWithCommas(Math.abs(balanceGivenOut))})`
-      : formatNumberWithCommas(Math.abs(balanceGivenOut));
 
   useEffect(() => {
     if (lineItems !== undefined) {
@@ -43,13 +39,6 @@ function SaleTxnCard({ data }) {
       Served by:{" "}
       <Text style={styles.footerText2}>{data?.createdByFullName}</Text>
     </Text>
-  );
-
-  const renderCurrencyValue = (value) => (
-    <>
-      <Text style={{ fontSize: 8, fontWeight: 400 }}>UGX </Text>
-      {formatNumberWithCommas(value)}
-    </>
   );
 
   return (
@@ -75,34 +64,34 @@ function SaleTxnCard({ data }) {
               margin: 10,
             }}
           >
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ fontWeight: 600 }}>Items</Text>
-              <Text>{itemCount}</Text>
-            </View>
+            <DataColumn title={"Items"} value={itemCount} flex={0} />
 
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ fontWeight: 600 }}>Recieved</Text>
-              <Text>{renderCurrencyValue(amountPaid)}</Text>
-            </View>
+            <DataColumn
+              title={"Recieved"}
+              value={amountPaid}
+              isCurrency
+              flex={0}
+            />
 
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ fontWeight: 600 }}>Amount</Text>
-              <Text style={{ fontWeight: 600 }}>
-                {renderCurrencyValue(totalCost)}
-              </Text>
-            </View>
-
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ fontWeight: 600 }}>Balance</Text>
-              <Text style={{ fontSize: 8, fontWeight: 400 }}>
-                UGX <Text style={{ fontSize: 14 }}>{balText}</Text>
-              </Text>
-            </View>
-
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ fontWeight: 600 }}>Income</Text>
-              <Text>{renderCurrencyValue(profit)}</Text>
-            </View>
+            <DataColumn
+              title={"Amount"}
+              value={totalCost}
+              isCurrency
+              flex={0}
+            />
+            <DataColumn
+              title={"Balance"}
+              value={balanceGivenOut}
+              flex={0}
+              isCurrency
+            />
+            <DataColumn
+              title={"Income"}
+              value={profit}
+              isCurrency
+              end
+              flex={0}
+            />
           </View>
           <CardFooter2
             onBtnPress={toggleExpand}
@@ -146,7 +135,7 @@ function SaleTxnCard({ data }) {
           <DataRow
             key={4}
             label={"Balance"}
-            value={balText}
+            value={balanceGivenOut}
             labelTextStyle={styles.label}
             valueTextStyle={styles.value}
             showCurrency

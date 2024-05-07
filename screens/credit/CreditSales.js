@@ -38,8 +38,9 @@ const CreditSales = () => {
 
   const snackbarRef = useRef(null);
 
-  const { shops, selectedShop, setSelectedShop, userParams } =
-    useContext(UserContext);
+  const { selectedShop, userParams } = useContext(UserContext);
+
+  const { isShopOwner, shopOwnerId } = userParams;
 
   const onChange = (event, selectedDate) => {
     setVisible(false);
@@ -49,10 +50,13 @@ const CreditSales = () => {
   };
 
   const fetchCreditSales = async (day = null) => {
+    const allShops = selectedShop?.id === shopOwnerId;
+
     let searchParameters = {
       limit: 0,
-      ...(selectedShop?.id !== 0 && { shopId: selectedShop?.id }),
-      offset: offset,
+      ...(allShops && { shopOwnerId: selectedShop?.id }),
+      ...(!allShops && { shopId: selectedShop?.id }),
+      offset,
       ...(day && {
         startDate: convertDateFormat(day),
         endDate: convertDateFormat(day, true),
@@ -128,21 +132,17 @@ const CreditSales = () => {
       name: "Select date",
       onClick: () => setVisible(true),
     },
-    ...(shops?.length > 1
-      ? shops?.map((shop) => {
-          return {
-            ...shop,
-            onClick: () => setSelectedShop(shop),
-            bold: shop?.id === selectedShop.id,
-          };
-        })
-      : []),
   ];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark }}>
       <AppStatusBar />
-      <TopHeader title="Debt records" showMenuDots menuItems={menuItems} />
+      <TopHeader
+        title="Debt records"
+        showMenuDots
+        menuItems={menuItems}
+        showShops
+      />
       <View style={{ paddingBottom: 10 }}>
         <View style={styles.debtHeader}>
           <Text

@@ -113,7 +113,6 @@ function SalesEntry({ navigation }) {
     let defUnit = { productSaleUnitName: saleUnitName, unitPrice: salesPrice };
 
     setSelection(item);
-    console.log(item)
     setShowModal(true);
 
     if (multipleSaleUnits) {

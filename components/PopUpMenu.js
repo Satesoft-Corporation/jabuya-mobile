@@ -1,5 +1,5 @@
 import { Text, FlatList } from "react-native";
-import React, { useCallback } from "react";
+import React, { useCallback, useContext } from "react";
 import {
   Menu,
   MenuOptions,
@@ -11,8 +11,21 @@ import Colors from "../constants/Colors";
 import Icon from "./Icon";
 import { StatusBar } from "react-native";
 import { screenHeight } from "../constants/Constants";
+import { UserContext } from "../context/UserContext";
 
-const PopUpmenu = ({ menuItems = [] }) => {
+const PopUpmenu = ({ menuItems = [], showShops = false }) => {
+  const { setSelectedShop, shops, selectedShop } = useContext(UserContext);
+
+  const modifiedShopList = showShops
+    ? shops?.map((shop) => {
+        return {
+          ...shop,
+          onClick: () => setSelectedShop(shop),
+          bold: shop?.id === selectedShop.id,
+        };
+      })
+    : [];
+
   const renderItem = useCallback(
     ({ item, i }) => (
       <MenuOption key={i} onSelect={() => item?.onClick()}>
@@ -30,6 +43,7 @@ const PopUpmenu = ({ menuItems = [] }) => {
     ),
     []
   );
+
   return (
     <Menu>
       <MenuTrigger
@@ -58,7 +72,7 @@ const PopUpmenu = ({ menuItems = [] }) => {
         }}
       >
         <FlatList
-          data={menuItems}
+          data={[...menuItems, ...modifiedShopList]}
           renderItem={renderItem}
           keyExtractor={(item) => item.name.toString()}
         />

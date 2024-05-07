@@ -41,8 +41,8 @@ const SalesTable = ({ sales = [], fixHeight = true }) => {
               }
         }
       >
-        {[...sales]?.map((item) => (
-          <SaleListItem data={item} key={item.productName} />
+        {[...sales]?.map((item, i) => (
+          <SaleListItem data={item} key={i} />
         ))}
       </ScrollView>
     </View>

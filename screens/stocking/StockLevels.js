@@ -9,7 +9,6 @@ import Snackbar from "../../components/Snackbar";
 import { UserContext } from "../../context/UserContext";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
-import { ActivityIndicator } from "react-native";
 import StockLevelCard from "./components/StockLevelCard";
 import { PDT_ENTRY } from "../../navigation/ScreenNames";
 
@@ -24,15 +23,22 @@ const StockLevel = ({ navigation }) => {
 
   const snackbarRef = useRef(null);
 
-  const { selectedShop } = useContext(UserContext);
+  const { userParams, selectedShop } = useContext(UserContext);
+
+  const { isShopOwner, shopOwnerId } = userParams;
 
   const fetchShopProducts = async (offsetToUse = 0) => {
     try {
       setLoading(true);
+      const allShops = selectedShop?.id === shopOwnerId;
 
       const searchParameters = {
         limit: MAXIMUM_RECORDS_PER_FETCH,
-        ...(selectedShop?.id !== 0 && { shopId: selectedShop?.id }),
+        ...(allShops &&
+          isShopOwner && {
+            shopOwnerId: selectedShop?.id,
+          }),
+        ...(!allShops && { shopId: selectedShop?.id }),
         offset: offsetToUse,
         ...(searchTerm &&
           searchTerm.trim() !== "" && { searchTerm: searchTerm }),
@@ -44,7 +50,11 @@ const StockLevel = ({ navigation }) => {
         "/shop-products"
       ).getRequestWithJsonResponse(searchParameters);
 
-      setStockLevels((prevEntries) => [...prevEntries, ...response?.records]);
+      if (offsetToUse === 0) {
+        setStockLevels(response.records);
+      } else {
+        setStockLevels((prevEntries) => [...prevEntries, ...response?.records]);
+      }
 
       setStockLevelRecords(response?.totalItems);
 
@@ -72,7 +82,7 @@ const StockLevel = ({ navigation }) => {
 
   useEffect(() => {
     fetchShopProducts();
-  }, []);
+  }, [selectedShop]);
 
   const handleEndReached = () => {
     if (!isFetchingMore && stockLevels.length < stockLevelRecords) {
@@ -108,6 +118,7 @@ const StockLevel = ({ navigation }) => {
         onSearch={onSearch}
         showMenuDots
         menuItems={menuItems}
+        showShops
       />
       <FlatList
         keyExtractor={(item) => item.id.toString()}

@@ -6,8 +6,8 @@ import CardHeader from "../../../components/cardComponents/CardHeader";
 import CardFooter1 from "../../../components/cardComponents/CardFooter1";
 import CardFooter2 from "../../../components/cardComponents/CardFooter2";
 import { useNavigation } from "@react-navigation/native";
-import { UPDATE_PRICE } from "../../../navigation/ScreenNames";
-import RenderCurrency from "../../../components/RenderCurrency";
+import { PDT_ENTRY, UPDATE_PRICE } from "../../../navigation/ScreenNames";
+import DataColumn from "../../../components/cardComponents/DataColumn";
 
 function StockLevelCard({ data }) {
   const [expanded, setExpanded] = useState(false);
@@ -50,60 +50,19 @@ function StockLevelCard({ data }) {
           marginVertical: 10,
         }}
       >
-        <View style={{ alignItems: "left", flex: 2 }}>
-          <Text
-            style={{
-              fontWeight: 600,
-              marginBottom: 3,
-            }}
-          >
-            Product
-          </Text>
-          <Text>{data?.productName}</Text>
-        </View>
+        <DataColumn title={"Product"} value={data?.productName} left flex={2} />
 
-        <View style={{ alignItems: "center", flex: 1 }}>
-          <Text
-            style={{
-              fontWeight: 600,
-              marginBottom: 3,
-            }}
-          >
-            Sold
-          </Text>
-          <Text
-            style={{
-              alignSelf: "center",
-              marginEnd: 2,
-            }}
-          >
-            {summary?.totalQuantitySold || 0}
-          </Text>
-        </View>
-
-        <View style={{ alignItems: "center", flex: 1 }}>
-          <Text
-            style={{
-              fontWeight: 600,
-              marginBottom: 3,
-            }}
-          >
-            Stock
-          </Text>
-          <Text style={{ fontWeight: 600 }}>{remainingStock}</Text>
-        </View>
-
-        <View style={{ alignItems: "flex-end", flex: 1, marginEnd: 0 }}>
-          <Text
-            style={{
-              fontWeight: 600,
-              marginBottom: 3,
-            }}
-          >
-            Value
-          </Text>
-          <RenderCurrency value={remainingStock * data?.salesPrice} />
-        </View>
+        <DataColumn
+          title={"Sold"}
+          value={Math.round(summary?.totalQuantitySold) || 0}
+        />
+        <DataColumn title={"Stock"} value={Math.round(remainingStock)} />
+        <DataColumn
+          title={"Value"}
+          value={Math.round(remainingStock * data?.salesPrice)}
+          end
+          isCurrency
+        />
       </View>
 
       {expanded && (
@@ -135,10 +94,10 @@ function StockLevelCard({ data }) {
           <DataRow label={"Listed by"} value={data?.createdByFullName} />
 
           <CardFooter1
-            btnTitle1="Price"
+            btnTitle1="Edit"
             btnTitle2="Hide"
             onClick2={toggleExpand}
-            onClick1={() => navigation.navigate(UPDATE_PRICE, data)}
+            onClick1={() => navigation.navigate(PDT_ENTRY, data)}
           />
         </View>
       )}

@@ -33,8 +33,7 @@ export default function ViewSales({ navigation }) {
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const { userParams, shops, selectedShop, setSelectedShop } =
-    useContext(UserContext);
+  const { userParams, selectedShop } = useContext(UserContext);
 
   const { isShopOwner, shopOwnerId } = userParams;
 
@@ -50,15 +49,6 @@ export default function ViewSales({ navigation }) {
             onClick: () => navigation.navigate(SHOP_SUMMARY),
           },
         ]
-      : []),
-    ...(shops?.length > 1
-      ? shops?.map((shop) => {
-          return {
-            ...shop,
-            onClick: () => setSelectedShop(shop),
-            bold: shop?.id === selectedShop.id,
-          };
-        })
       : []),
   ];
 
@@ -100,7 +90,7 @@ export default function ViewSales({ navigation }) {
       startDate: getCurrentDay(),
       ...(day && {
         startDate: convertDateFormat(day),
-        endDate: convertDateFormat(day, true),
+        endDate: convertDateFormat(day),
       }),
     };
 
@@ -116,7 +106,7 @@ export default function ViewSales({ navigation }) {
         let sV = data.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
 
         if (response.totalItems === 0) {
-          setMessage("No sales made on this today");
+          setMessage(`No sales made on this today for ${selectedShop?.name}`);
         }
 
         data.forEach((item) => {
@@ -163,7 +153,12 @@ export default function ViewSales({ navigation }) {
       <AppStatusBar />
 
       <View style={{ backgroundColor: Colors.dark }}>
-        <UserProfile renderNtnIcon={false} renderMenu menuItems={menuItems} />
+        <UserProfile
+          renderNtnIcon={false}
+          renderMenu
+          menuItems={menuItems}
+          showShops
+        />
 
         <View style={{ marginTop: 5, paddingBottom: 10 }}>
           <View
