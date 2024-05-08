@@ -11,6 +11,7 @@ import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import StockLevelCard from "./components/StockLevelCard";
 import { PDT_ENTRY } from "../../navigation/ScreenNames";
+import { SHOP_PRODUCTS_ENDPOINT } from "../../utils/EndPointUtils";
 
 const StockLevel = ({ navigation }) => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -47,7 +48,7 @@ const StockLevel = ({ navigation }) => {
       setIsFetchingMore(true);
 
       const response = await new BaseApiService(
-        "/shop-products"
+        SHOP_PRODUCTS_ENDPOINT
       ).getRequestWithJsonResponse(searchParameters);
 
       if (offsetToUse === 0) {
@@ -69,6 +70,7 @@ const StockLevel = ({ navigation }) => {
       setIsFetchingMore(false);
       setLoading(false);
     } catch (error) {
+      console.log(error)
       setMessage("Error fetching stock records");
       setLoading(false);
     }
@@ -94,10 +96,18 @@ const StockLevel = ({ navigation }) => {
     }
   };
 
+  const toProductEntry = () => {
+    if (selectedShop?.name.includes("All")) {
+      snackbarRef.current.show("Please select a shop before listing");
+    } else {
+      navigation.navigate(PDT_ENTRY);
+    }
+  };
+
   const menuItems = [
     {
       name: "List product",
-      onClick: () => navigation.navigate(PDT_ENTRY),
+      onClick: () => toProductEntry(),
     },
   ];
 

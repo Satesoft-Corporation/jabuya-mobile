@@ -17,7 +17,7 @@ import { UserContext } from "../../context/UserContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ItemHeader from "./components/ItemHeader";
 import VerticalSeparator from "../../components/VerticalSeparator";
-import { SHOP_SUMMARY } from "../../navigation/ScreenNames";
+import { INCOME_GRAPHS, SHOP_SUMMARY } from "../../navigation/ScreenNames";
 import SaleTxnCard from "./components/SaleTxnCard";
 
 export default function ViewSales({ navigation }) {
@@ -44,6 +44,10 @@ export default function ViewSales({ navigation }) {
     },
     ...(isShopOwner === true
       ? [
+          {
+            name: "Income graphs",
+            onClick: () => navigation.navigate(INCOME_GRAPHS),
+          },
           {
             name: "Investment",
             onClick: () => navigation.navigate(SHOP_SUMMARY),

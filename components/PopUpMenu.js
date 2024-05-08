@@ -16,15 +16,16 @@ import { UserContext } from "../context/UserContext";
 const PopUpmenu = ({ menuItems = [], showShops = false }) => {
   const { setSelectedShop, shops, selectedShop } = useContext(UserContext);
 
-  const modifiedShopList = showShops
-    ? shops?.map((shop) => {
-        return {
-          ...shop,
-          onClick: () => setSelectedShop(shop),
-          bold: shop?.id === selectedShop.id,
-        };
-      })
-    : [];
+  const modifiedShopList =
+    showShops && shops?.length > 1
+      ? shops?.map((shop) => {
+          return {
+            ...shop,
+            onClick: () => setSelectedShop(shop),
+            bold: shop?.id === selectedShop.id,
+          };
+        })
+      : [];
 
   const renderItem = useCallback(
     ({ item, i }) => (

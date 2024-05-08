@@ -9,6 +9,7 @@ import { MAXIMUM_RECORDS_PER_FETCH } from "../../constants/Constants";
 import Snackbar from "../../components/Snackbar";
 import StockPurchaseCard from "./components/StockPurchaseCard";
 import { STOCK_ENTRY_FORM } from "../../navigation/ScreenNames";
+import { STOCK_ENTRY_ENDPOINT } from "../../utils/EndPointUtils";
 
 const StockPurchase = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
@@ -20,27 +21,40 @@ const StockPurchase = ({ navigation }) => {
   const [disable, setDisable] = useState(false);
   const [loading, setLoading] = useState(false);
   const snackbarRef = useRef(null);
-  const { selectedShop } = useContext(UserContext);
+
+  const { selectedShop, userParams } = useContext(UserContext);
+  const { isShopOwner, shopOwnerId } = userParams;
 
   const fetchStockEntries = async (offsetToUse = 0) => {
     try {
       setMessage(null);
       setLoading(true);
 
+      const allShops = selectedShop?.id === shopOwnerId;
+
       const searchParameters = {
         limit: MAXIMUM_RECORDS_PER_FETCH,
-        ...(selectedShop?.id !== 0 && { shopId: selectedShop?.id }),
+        ...(allShops &&
+          isShopOwner && {
+            shopOwnerId: selectedShop?.id,
+          }),
+        ...(!allShops && { shopId: selectedShop?.id }),
         offset: offsetToUse,
         ...(searchTerm &&
           searchTerm.trim() !== "" && { searchTerm: searchTerm }),
       };
+
       setIsFetchingMore(true);
+
       const response = await new BaseApiService(
-        "/stock-entries"
+        STOCK_ENTRY_ENDPOINT
       ).getRequestWithJsonResponse(searchParameters);
 
-      setStockEntries((prevEntries) => [...prevEntries, ...response?.records]);
-
+      if (offsetToUse === 0) {
+        setStockEntries(response.records);
+      } else {
+        setStockEntries((prev) => [...prev, ...response?.records]);
+      }
       setStockEntryRecords(response?.totalItems);
       setDisable(false);
 
@@ -80,7 +94,7 @@ const StockPurchase = ({ navigation }) => {
 
   useEffect(() => {
     fetchStockEntries();
-  }, []);
+  }, [selectedShop]);
 
   const menuItems = [
     {
@@ -102,6 +116,7 @@ const StockPurchase = ({ navigation }) => {
         disabled={disable}
         showMenuDots
         menuItems={menuItems}
+        showShops
       />
 
       <FlatList

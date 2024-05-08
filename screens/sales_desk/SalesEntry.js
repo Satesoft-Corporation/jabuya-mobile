@@ -86,21 +86,7 @@ function SalesEntry({ navigation }) {
 
   useEffect(() => {
     clearEverything();
-    if (selectedShop?.id === shopOwnerId) {
-      //if all shops are selected
-      Alert.alert("Please select a Shop", "", [
-        {
-          text: "Cancel",
-          onPress: () => navigation.goBack(),
-        },
-        {
-          text: "Yes",
-          onPress: () => navigation.navigate(SHOP_SELECTION),
-        },
-      ]);
-    } else {
-      fetchProducts();
-    }
+    fetchProducts();
   }, [selectedShop]);
 
   const handleChange = (value) => {
@@ -141,7 +127,7 @@ function SalesEntry({ navigation }) {
         <UserProfile renderMenu renderNtnIcon={false} menuItems={menuItems} />
 
         <View style={{ paddingHorizontal: 0, marginTop: 15 }}>
-          {isShopOwner && shops?.length > 1 && (
+          {!isShopAttendant && shops?.length > 1 && (
             <SelectShopBar
               showIcon={false}
               onPress={() => navigation.navigate(SHOP_SELECTION)}

@@ -16,10 +16,12 @@ import { StyleSheet } from "react-native";
 import MyInput from "../../../components/MyInput";
 import ChipButton from "../../../components/buttons/ChipButton";
 import { FlatList } from "react-native";
+import { SHOP_PRODUCTS_ENDPOINT } from "../../../utils/EndPointUtils";
 
-const ProductEntry = ({ route }) => {
+const ProductEntry = ({ navigation, route }) => {
   const { selectedShop } = useContext(UserContext);
 
+  const [edit, setEdit] = useState(false);
   const [manufacturers, setManufacturers] = useState([]);
   const [selectedManufacturer, setSelectedManufacturer] = useState(null);
   const [products, setProducts] = useState([]);
@@ -31,7 +33,6 @@ const ProductEntry = ({ route }) => {
   const [saleUnits, setSaleUnits] = useState([]);
   const [selectedSaleUnit, setSelectedSaleUnit] = useState(null);
   const [selectedSaleUnits, setSelectedSaleUnits] = useState([]);
-  const [edit, setEdit] = useState(false);
 
   const [salesPrice, setSalesPrice] = useState("");
 
@@ -80,10 +81,9 @@ const ProductEntry = ({ route }) => {
     let itemUnit = {
       id: 0,
       productSaleUnitId: id,
-      unitPrice: "",
+      unitPrice: "0",
       saleUnitName,
     };
-    console.log(unit,selectedSaleUnits);
     const isSelected = selectedSaleUnits?.find(
       (item) => item.productSaleUnitId === id
     );
@@ -120,13 +120,30 @@ const ProductEntry = ({ route }) => {
   };
 
   const onProductChange = (e) => {
-    let { multipleSaleUnits } = e;
+    const { multipleSaleUnits } = e;
+
     setSelectedProduct(e);
-    setSelectedSaleUnit(
-      multipleSaleUnits?.find((item) => item?.saleUnitId === 2205)
-    );
+    const itemToEdit = route?.params;
+
     if (multipleSaleUnits) {
       setSaleUnits(multipleSaleUnits);
+
+      if (itemToEdit) {
+        const defaultUnit = multipleSaleUnits.find(
+          (unit) => unit?.saleUnitName === itemToEdit?.saleUnitName
+        );
+        setSelectedSaleUnit(defaultUnit);
+        setRemarks(itemToEdit?.remarks);
+        setSalesPrice(String(itemToEdit?.salesPrice));
+
+        if (itemToEdit?.hasMultipleSaleUnits) {
+          setSelectedSaleUnits(itemToEdit?.multipleSaleUnits);
+        }
+      } else {
+        setSelectedSaleUnit(
+          multipleSaleUnits?.find((item) => item?.saleUnitId === 2205) //if it contains Whole
+        );
+      }
     } else {
       setSaleUnits([]);
       setSelectedSaleUnits([]);
@@ -146,55 +163,28 @@ const ProductEntry = ({ route }) => {
 
   const populateForm = () => {
     if (route.params) {
-      const selectedRecord = {
-        ...route.params,
-      };
+      const record = { ...route.params };
       setEdit(true);
-
-      if (selectedRecord?.multipleSaleUnits) {
-        setSelectedSaleUnits(selectedRecord?.multipleSaleUnits);
-      }
-      setRemarks(selectedRecord.remarks);
-      fetchProductDetails(selectedRecord?.productId);
-      setSalesPrice(String(selectedRecord?.salesPrice));
+      fetchProductDetails(record?.productId);
     } else {
       fetchManufacturers();
     }
   };
 
   const fetchProductDetails = async (id) => {
-    new BaseApiService(`/products/${id}`)
+    await new BaseApiService(`/products/${id}`)
       .getRequestWithJsonResponse()
       .then(async (response) => {
-        const { multipleSaleUnits, manufacturerName, manufacturerId } =
-          response;
-        setSelectedProduct(response);
+        setEdit(true);
+
+        const { manufacturerName, manufacturerId } = response;
         setSelectedManufacturer({ name: manufacturerName, id: manufacturerId });
-
-        console.log(route.params, response);
-
-        if (multipleSaleUnits?.length > 1) {
-          let defaultUnit = multipleSaleUnits.find(
-            (unit) => unit.saleUnitName === route?.params?.saleUnitName
-          ); //looking for the default sale unit
-
-          setSelectedSaleUnit(defaultUnit);
-          setSaleUnits(multipleSaleUnits);
-        } else {
-          let unit = {
-            saleUnitName: route.params?.saleUnitName,
-            saleUnitId: route.params?.saleUnitId,
-          };
-
-          setSelectedSaleUnit(unit);
-          setSaleUnits([{ ...unit }]);
-        }
+        onProductChange(response);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
-
-        // showErrorMessage(dialogMessage, "Unexpected Error, try again.");
+        snackBarRef.current.show("Error fetching product infomation");
       });
   };
 
@@ -204,7 +194,7 @@ const ProductEntry = ({ route }) => {
 
     let payload = {
       manufacturerId: selectedManufacturer?.id,
-      shopId: selectedShop?.id,
+      shopId: edit ? route?.params?.shopId : selectedShop?.id,
       productId: selectedProduct?.id,
       saleUnitId: selectedSaleUnit?.saleUnitId,
       salesPrice: Number(salesPrice),
@@ -213,7 +203,9 @@ const ProductEntry = ({ route }) => {
       multipleSaleUnits: selectedSaleUnits,
     };
 
-    const apiUrl = "/shop-products";
+    const apiUrl = edit
+      ? `${SHOP_PRODUCTS_ENDPOINT}/${route?.params?.id}`
+      : SHOP_PRODUCTS_ENDPOINT;
 
     let isValidPayload = hasNull(payload) === false && salesPrice.trim() !== "";
 
@@ -222,13 +214,14 @@ const ProductEntry = ({ route }) => {
     }
     if (isValidPayload === true) {
       new BaseApiService(apiUrl)
-        .saveRequestWithJsonResponse(payload, false)
+        .saveRequestWithJsonResponse(payload, edit)
         .then((response) => {
           clearForm();
           setLoading(false);
           setSubmitted(false);
           snackBarRef.current.show("Product saved successfully", 5000);
           setDisable(false);
+          navigation?.goBack();
         })
         .catch((error) => {
           snackBarRef.current.show(error?.message, 5000);
@@ -369,7 +362,7 @@ const ProductEntry = ({ route }) => {
                 <MyInput
                   label=""
                   value={item.unitPrice}
-                  onValueChange={(e) => handleUnitPriceChange(index, e.value)}
+                  onValueChange={(e) => handleUnitPriceChange(index, e)}
                 />
               </View>
             </View>

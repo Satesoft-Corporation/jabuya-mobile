@@ -43,7 +43,7 @@ export default function App() {
                 headerShown: false,
               }}
             >
-              <Stack.Screen name={s.LANDING_SCREEN} component={StockLevel} />
+              <Stack.Screen name={s.LANDING_SCREEN} component={LandingScreen} />
 
               <Stack.Screen name={s.LOGIN} component={Login} />
 
