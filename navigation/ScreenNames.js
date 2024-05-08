@@ -5,6 +5,7 @@ export const LOGIN = "login";
 export const SALES_DESK = "sales_desk";
 export const SALES_REPORTS = "sales_reports";
 export const BARCODE_SCREEN = "barcode_screen";
+export const OFFLINE_SALES = "offline_sales";
 
 export const STOCKNG = "stocking";
 export const STOCK_ENTRY = "stock_entry";

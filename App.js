@@ -30,6 +30,7 @@ import StockPurchase from "./screens/stocking/StockPurchase";
 import IncomeGraph from "./screens/perfomance_graphs/IncomeGraph";
 import UpdatePrice from "./screens/forms/stockingForms/UpdatePrice";
 import CreditSales from "./screens/credit/CreditSales";
+import OfflineSales from "./screens/sales/OfflineSales";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -86,6 +87,8 @@ export default function App() {
               <Stack.Screen name={s.EXPENSE_FORM} component={ExpenseForm} />
 
               <Stack.Screen name={s.INCOME_GRAPHS} component={IncomeGraph} />
+
+              <Stack.Screen name={s.OFFLINE_SALES} component={OfflineSales} />
             </Stack.Navigator>
           </NavigationContainer>
         </SaleEntryProvider>

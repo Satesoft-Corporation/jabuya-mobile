@@ -17,7 +17,11 @@ import { UserContext } from "../../context/UserContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ItemHeader from "./components/ItemHeader";
 import VerticalSeparator from "../../components/VerticalSeparator";
-import { INCOME_GRAPHS, SHOP_SUMMARY } from "../../navigation/ScreenNames";
+import {
+  INCOME_GRAPHS,
+  OFFLINE_SALES,
+  SHOP_SUMMARY,
+} from "../../navigation/ScreenNames";
 import SaleTxnCard from "./components/SaleTxnCard";
 
 export default function ViewSales({ navigation }) {
@@ -41,6 +45,10 @@ export default function ViewSales({ navigation }) {
     {
       name: "Select date",
       onClick: () => setVisible(true),
+    },
+    {
+      name: "Offline sales",
+      onClick: () => navigation.navigate(OFFLINE_SALES),
     },
     ...(isShopOwner === true
       ? [
