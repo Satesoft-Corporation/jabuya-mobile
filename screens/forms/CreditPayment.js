@@ -11,6 +11,7 @@ import Loader from "../../components/Loader";
 import { BaseApiService } from "../../utils/BaseApiService";
 import Snackbar from "../../components/Snackbar";
 import DataRow from "../../components/cardComponents/DataRow";
+import PrimaryButton from "../../components/buttons/PrimaryButton";
 
 const CreditPayment = ({ navigation, route }) => {
   const sale = { ...route.params };
@@ -67,96 +68,98 @@ const CreditPayment = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: Colors.light,
+      }}
+    >
       <AppStatusBar />
       <TopHeader title={`Credit payment for ${sale?.shopClient?.fullName}`} />
       <Loader loading={loading} />
       <View
         style={{
           marginHorizontal: 5,
-          paddingHorizontal: 12,
           marginVertical: 10,
-          backgroundColor: Colors.light,
-          elevation: 1,
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.2,
-          borderRadius: 8,
+          paddingHorizontal: 12,
+          justifyContent: "space-between",
+          flex: 1,
         }}
       >
-        <View style={{ gap: 5, marginBottom: 5, paddingHorizontal: 2 }}>
-          <Text
-            style={{
-              marginTop: 10,
-              fontSize: 16,
-              fontWeight: 600,
-            }}
-          >
-            Credit Payment
-          </Text>
+        <View>
+          <View style={{ gap: 5, marginBottom: 5, paddingHorizontal: 2 }}>
+            <Text
+              style={{
+                marginTop: 10,
+                fontSize: 16,
+                fontWeight: 600,
+              }}
+            >
+              Credit Payment
+            </Text>
+          </View>
+
+          <DataRow
+            label={"Balance "}
+            labelTextStyle={{ fontSize: 15, paddingHorizontal: 4 }}
+            valueTextStyle={{ fontSize: 15 }}
+            value={
+              <>
+                <Text style={{ fontSize: 10 }}>UGX</Text>
+                <Text style={{ fontWeight: 600 }}>
+                  {formatNumberWithCommas(balance)}
+                </Text>
+              </>
+            }
+          />
+          <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+            <MyInput
+              label="Client name"
+              value={sale?.shopClient?.fullName}
+              style={{ flex: 1 }}
+              editable={false}
+            />
+            <MyInput
+              label="Id number"
+              value={sale?.serialNumber}
+              style={{ flex: 1 }}
+              editable={false}
+              // onValueChange={(text) => setFirstName(text)}
+            />
+          </View>
+
+          <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
+            <MyInput
+              label="Payment date"
+              dateValue={paymentDate}
+              isDateInput
+              onDateChange={(date) => setPaymentDate(date)}
+              style={{ flex: 1 }}
+            />
+
+            <MyInput
+              label="Amount"
+              value={amount}
+              style={{ flex: 1 }}
+              onValueChange={(text) => setAmount(text)}
+              inputMode="numeric"
+            />
+          </View>
+
+          <MyInput
+            label="Remarks"
+            numberOfLines={4}
+            value={remarks}
+            onValueChange={(text) => setRemarks(text)}
+          />
         </View>
-
-        <DataRow
-          label={"Balance "}
-          labelTextStyle={{ fontSize: 15, paddingHorizontal: 4 }}
-          valueTextStyle={{ fontSize: 15 }}
-          value={
-            <>
-              <Text style={{ fontSize: 10 }}>UGX</Text>
-              <Text style={{ fontWeight: 600 }}>
-                {formatNumberWithCommas(balance)}
-              </Text>
-            </>
-          }
-        />
-        <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
-          <MyInput
-            label="Client name"
-            value={sale?.shopClient?.fullName}
-            style={{ flex: 1 }}
-            editable={false}
-          />
-          <MyInput
-            label="Id number"
-            value={sale?.serialNumber}
-            style={{ flex: 1 }}
-            editable={false}
-            // onValueChange={(text) => setFirstName(text)}
-          />
-        </View>
-
-        <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
-          <MyInput
-            label="Payment date"
-            dateValue={paymentDate}
-            isDateInput
-            onDateChange={(date) => setPaymentDate(date)}
-            style={{ flex: 1 }}
-          />
-
-          <MyInput
-            label="Amount"
-            value={amount}
-            style={{ flex: 1 }}
-            onValueChange={(text) => setAmount(text)}
-            inputMode="numeric"
-          />
-        </View>
-
-        <MyInput
-          label="Remarks"
-          numberOfLines={4}
-          value={remarks}
-          onValueChange={(text) => setRemarks(text)}
-        />
 
         <View
           style={{
             flexDirection: "row",
-            alignSelf: "flex-end",
-            marginBottom: 10,
           }}
         >
-          <ChipButton darkMode title={"Save"} onPress={savePayment} />
+          <PrimaryButton title={"Save"} onPress={savePayment} />
         </View>
       </View>
 

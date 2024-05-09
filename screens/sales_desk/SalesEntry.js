@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Text, View, TextInput, ScrollView, Alert } from "react-native";
+import { Text, View, TextInput, ScrollView } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import Colors from "../../constants/Colors";
@@ -17,7 +17,7 @@ import SelectShopBar from "../../components/SelectShopBar";
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 import { SaleEntryContext } from "../../context/SaleEntryContext";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
-import NetInfo from "@react-native-community/netinfo";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 import { SafeAreaView } from "react-native";
 import {
@@ -34,6 +34,7 @@ function SalesEntry({ navigation }) {
   const [searchTerm, setSearchTerm] = useState(null);
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
   const [clients, setClients] = useState([]);
+  const netinfo = useNetInfo();
 
   const snackbarRef = useRef(null);
 
@@ -71,11 +72,9 @@ function SalesEntry({ navigation }) {
     setProducts(pdtList);
     fetchClients();
 
-    NetInfo.fetch().then(async (state) => {
-      if (!state.isConnected) {
-        snackbarRef.current.show("Running offline", 5000);
-      }
-    });
+    if (!netinfo?.isConnected) {
+      snackbarRef.current.show("Running offline", 5000);
+    }
   };
 
   const fetchClients = async () => {

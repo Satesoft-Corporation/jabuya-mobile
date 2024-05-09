@@ -6,11 +6,18 @@ import SalesTable from "../../sales_desk/components/SalesTable";
 import DataRow from "../../../components/cardComponents/DataRow";
 import CardFooter2 from "../../../components/cardComponents/CardFooter2";
 import { UserContext } from "../../../context/UserContext";
+import CardFooter1 from "../../../components/cardComponents/CardFooter1";
 
 function OfflineSaleTxnCard({ data, onRemove }) {
   const { lineItems, soldOnDate, onCredit, shopId } = data;
 
+  const [expanded, setExpanded] = useState(false);
+
   const { shops } = useContext(UserContext);
+
+  const toggleExpand = useCallback(() => {
+    setExpanded(!expanded);
+  }, [expanded]);
 
   const shopName = shops?.find((s) => s?.id === shopId)?.name;
   return (
@@ -22,8 +29,18 @@ function OfflineSaleTxnCard({ data, onRemove }) {
 
       <SalesTable sales={lineItems} fixHeight={false} />
 
-      <TxnCashSummary data={data} />
-      <CardFooter2 onBtnPress={onRemove} btnTitle="Remove" label={""} />
+      {expanded && <TxnCashSummary data={data} />}
+
+      {!expanded && <CardFooter2 onBtnPress={toggleExpand} btnTitle="More" />}
+
+      {expanded && (
+        <CardFooter1
+          btnTitle1="Remove"
+          btnTitle2="Hide"
+          onClick2={toggleExpand}
+          onClick1={onRemove}
+        />
+      )}
     </View>
   );
 }

@@ -13,7 +13,7 @@ import PaymentMethodComponent from "./PaymentMethodComponent";
 import { SaleEntryContext } from "../../../context/SaleEntryContext";
 import { BaseApiService } from "../../../utils/BaseApiService";
 import { UserSessionUtils } from "../../../utils/UserSessionUtils";
-import NetInfo from "@react-native-community/netinfo";
+import NetInfo, { useNetInfo } from "@react-native-community/netinfo";
 import { UserContext } from "../../../context/UserContext";
 
 const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
@@ -24,6 +24,8 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
   const [selectedClient, setSelectedClient] = useState(null);
 
   const { userParams, selectedShop } = useContext(UserContext);
+
+  const netinfo = useNetInfo();
 
   const {
     selections,
@@ -43,7 +45,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
     setError(null);
   };
 
-  const postSales = () => {
+  const postSales = async () => {
     setSubmitted(true);
     setError(null);
     const onCredit = selectedPaymentMethod?.id === 1;
@@ -62,62 +64,53 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
 
     setLoading(true);
 
-    NetInfo.fetch().then(async (state) => {
-      if (state.isConnected) {
-        new BaseApiService("/shop-sales")
-          .postRequest(payLoad)
-          .then(async (response) => {
-            let d = { info: await response.json(), status: response.status };
-            return d;
-          })
-          .then(async (d) => {
-            let { info, status } = d;
-            let id = info?.id;
+    if (netinfo?.isConnected === true) {
+      new BaseApiService("/shop-sales")
+        .postRequest(payLoad)
+        .then(async (response) => {
+          let d = { info: await response.json(), status: response.status };
+          return d;
+        })
+        .then(async (d) => {
+          let { info, status } = d;
+          let id = info?.id;
 
-            if (status === 200) {
-              new BaseApiService(`/shop-sales/${id}/confirm`)
-                .postRequest()
-                .then((d) => d.json())
-                .then((d) => {
-                  if (d.status === "Success") {
-                    setLoading(false);
-                    setVisible(false);
-                    clearEverything();
-                    clearForm();
-                    snackbarRef.current.show(
-                      "Sale confirmed successfully",
-                      4000
-                    );
-                  }
-                })
-                .catch((error) => {
+          if (status === 200) {
+            new BaseApiService(`/shop-sales/${id}/confirm`)
+              .postRequest()
+              .then((d) => d.json())
+              .then((d) => {
+                if (d.status === "Success") {
                   setLoading(false);
+                  setVisible(false);
+                  clearEverything();
+                  clearForm();
+                  snackbarRef.current.show("Sale confirmed successfully", 4000);
+                }
+              })
+              .catch((error) => {
+                setLoading(false);
 
-                  setError(`Failed to confirm sale!, ${error?.message}`);
-                });
-            } else {
-              setLoading(false);
-
-              setError(`Failed to confirm sale!, ${info?.message}`);
-            }
-          })
-          .catch((error) => {
+                setError(`Failed to confirm sale!, ${error?.message}`);
+              });
+          } else {
             setLoading(false);
 
-            setError(`Failed to confirm sale!,${error?.message}`);
-          });
-      } else {
-        setVisible(false);
-        await UserSessionUtils.addPendingSale(payLoad);
-        setTimeout(() => setLoading(false), 1000);
-        clearEverything();
-        clearForm();
-        snackbarRef.current.show(
-          "Sale record will be saved when online.",
-          4000
-        );
-      }
-    });
+            setError(`Failed to confirm sale!, ${info?.message}`);
+          }
+        })
+        .catch((error) => {
+          setLoading(false);
+          setError(`Failed to confirm sale!,${error?.message}`);
+        });
+    } else {
+      setVisible(false);
+      await UserSessionUtils.addPendingSale(payLoad);
+      setTimeout(() => setLoading(false), 1000);
+      clearEverything();
+      clearForm();
+      snackbarRef.current.show("Sale record will be saved when online.", 4000);
+    }
   };
 
   return (

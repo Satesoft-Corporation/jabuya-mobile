@@ -24,6 +24,7 @@ const OfflineSales = () => {
     const salesList = await UserSessionUtils.getPendingSales();
 
     setSales(salesList);
+    setLoading(false);
   };
 
   const handleRemove = (item, index) => {
@@ -98,7 +99,7 @@ const RemoveSaleModal = ({
             marginStart: 1,
           }}
         >
-          Confirm
+          Confirm, remove sale record
         </Text>
       </View>
 
