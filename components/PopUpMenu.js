@@ -22,7 +22,7 @@ const PopUpmenu = ({ menuItems = [], showShops = false }) => {
           return {
             ...shop,
             onClick: () => setSelectedShop(shop),
-            bold: shop?.id === selectedShop.id,
+            bold: shop?.id === selectedShop?.id,
           };
         })
       : [];

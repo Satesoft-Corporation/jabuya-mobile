@@ -15,6 +15,7 @@ import { BaseApiService } from "../../../utils/BaseApiService";
 import { UserSessionUtils } from "../../../utils/UserSessionUtils";
 import NetInfo, { useNetInfo } from "@react-native-community/netinfo";
 import { UserContext } from "../../../context/UserContext";
+import { saveShopProductsOnDevice } from "../../../controllers/OfflineControllers";
 
 const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
   const [submitted, setSubmitted] = useState(false);
@@ -37,7 +38,8 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
     setLoading,
   } = useContext(SaleEntryContext);
 
-  const { isShopAttendant, attendantShopId } = userParams;
+  const { isShopAttendant, attendantShopId, isShopOwner, shopOwnerId } =
+    userParams;
 
   const clearForm = () => {
     setAmountPaid("");
@@ -48,6 +50,14 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
   const postSales = async () => {
     setSubmitted(true);
     setError(null);
+
+    const searchParameters = {
+      offset: 0,
+      limit: 10000,
+      ...(isShopAttendant && { shopId: attendantShopId }),
+      ...(isShopOwner && { shopOwnerId }),
+    };
+
     const onCredit = selectedPaymentMethod?.id === 1;
 
     let payLoad = {
@@ -79,13 +89,14 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
             new BaseApiService(`/shop-sales/${id}/confirm`)
               .postRequest()
               .then((d) => d.json())
-              .then((d) => {
-                if (d.status === "Success") {
+              .then(async (response) => {
+                if (response.status === "Success") {
                   setLoading(false);
                   setVisible(false);
                   clearEverything();
                   clearForm();
                   snackbarRef.current.show("Sale confirmed successfully", 4000);
+                  await saveShopProductsOnDevice(searchParameters); // updating offline products
                 }
               })
               .catch((error) => {

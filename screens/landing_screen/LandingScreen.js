@@ -30,6 +30,7 @@ const LandingScreen = ({ navigation }) => {
     setSelectedShop,
     setShops,
     getRefreshToken,
+    shops,
   } = useContext(UserContext);
 
   const [loading, setLoading] = useState(true);
@@ -131,6 +132,7 @@ const LandingScreen = ({ navigation }) => {
           limit: 10000,
           ...(isShopAttendant && { shopId: attendantShopId }),
           ...(isShopOwner && { shopOwnerId }),
+          showOnlyStocked: true,
         };
 
         const savedproducts = await saveShopProductsOnDevice(searchParameters);
@@ -164,9 +166,11 @@ const LandingScreen = ({ navigation }) => {
       <AppStatusBar />
       <Loader loading={loading} />
       <BlackScreen>
-        <UserProfile />
-
-        {!userParams?.isShopAttendant && <SelectShopBar />}
+        <UserProfile
+          renderMenu={shops?.length > 1}
+          renderNtnIcon={false}
+          showShops
+        />
       </BlackScreen>
 
       <View

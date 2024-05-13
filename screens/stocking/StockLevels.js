@@ -1,100 +1,106 @@
 import { View, FlatList } from "react-native";
 import React, { useState, useEffect, useContext, useRef } from "react";
-
-import { MAXIMUM_RECORDS_PER_FETCH } from "../../constants/Constants";
 import { Text } from "react-native";
 import Colors from "../../constants/Colors";
-import { BaseApiService } from "../../utils/BaseApiService";
 import Snackbar from "../../components/Snackbar";
 import { UserContext } from "../../context/UserContext";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import StockLevelCard from "./components/StockLevelCard";
 import { PDT_ENTRY } from "../../navigation/ScreenNames";
-import { SHOP_PRODUCTS_ENDPOINT } from "../../utils/EndPointUtils";
+import VerticalSeparator from "../../components/VerticalSeparator";
+import ItemHeader from "../sales/components/ItemHeader";
+import { formatNumberWithCommas } from "../../utils/Utils";
+import { UserSessionUtils } from "../../utils/UserSessionUtils";
 
 const StockLevel = ({ navigation }) => {
-  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [message, setMessage] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [offset, setOffset] = useState(0);
   const [stockLevels, setStockLevels] = useState([]);
   const [stockLevelRecords, setStockLevelRecords] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  const [filtered, setFiltered] = useState([]);
+
+  const [sold, setSold] = useState(0);
+
+  const [stock, setStock] = useState(0);
+
+  const [pdtValue, setPdtValue] = useState(0);
+
   const snackbarRef = useRef(null);
 
-  const { userParams, selectedShop } = useContext(UserContext);
+  const { selectedShop } = useContext(UserContext);
 
-  const { isShopOwner, shopOwnerId } = userParams;
-
-  const fetchShopProducts = async (offsetToUse = 0) => {
+  const fetchShopProducts = async () => {
     try {
       setLoading(true);
-      const allShops = selectedShop?.id === shopOwnerId;
+      const id = selectedShop?.name.includes("All") ? null : selectedShop?.id;
 
-      const searchParameters = {
-        limit: MAXIMUM_RECORDS_PER_FETCH,
-        ...(allShops &&
-          isShopOwner && {
-            shopOwnerId: selectedShop?.id,
-          }),
-        ...(!allShops && { shopId: selectedShop?.id }),
-        offset: offsetToUse,
-        ...(searchTerm &&
-          searchTerm.trim() !== "" && { searchTerm: searchTerm }),
-      };
+      let list = await UserSessionUtils.getShopProducts(id);
 
-      setIsFetchingMore(true);
+      setStockLevels(list);
+      setStockLevelRecords(list.length);
 
-      const response = await new BaseApiService(
-        SHOP_PRODUCTS_ENDPOINT
-      ).getRequestWithJsonResponse(searchParameters);
+      const newList = list.map((data) => {
+        const summary = data?.performanceSummary;
+        const productSoldQty = summary?.totalQuantitySold || 0;
+        const productStockedQty = summary?.totalQuantityStocked || 0;
+        const price = data?.salesPrice;
 
-      if (offsetToUse === 0) {
-        setStockLevels(response.records);
-      } else {
-        setStockLevels((prevEntries) => [...prevEntries, ...response?.records]);
-      }
+        let remainingStock = Math.round(productStockedQty - productSoldQty);
 
-      setStockLevelRecords(response?.totalItems);
+        if (
+          remainingStock === undefined ||
+          isNaN(remainingStock) ||
+          remainingStock < 1
+        ) {
+          remainingStock = 0;
+        }
 
-      if (response?.totalItems === 0) {
+        return {
+          soldQty: Math.round(productSoldQty),
+          stockValue: Math.round(remainingStock * price),
+          items: Math.round(remainingStock),
+        };
+      });
+
+      const soldQty = newList.reduce((a, b) => a + b?.soldQty, 0);
+      const items = newList.reduce((a, b) => a + b?.items, 0);
+      const stock = newList.reduce((a, b) => a + b?.stockValue, 0);
+
+      setSold(soldQty);
+      setPdtValue(items);
+      setStock(stock);
+      setLoading(false);
+
+      if (list.length === 0) {
         setMessage("No shop products found");
       }
 
-      if (response?.totalItems === 0 && searchTerm !== "") {
+      if (list.length === 0 && searchTerm !== "") {
         setMessage(`No results found for ${searchTerm}`);
       }
-
-      setIsFetchingMore(false);
-      setLoading(false);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setMessage("Error fetching stock records");
       setLoading(false);
     }
   };
 
   const onSearch = () => {
-    setStockLevels([]);
-    setOffset(0);
-    fetchShopProducts();
-  };
+    const pool = [...stockLevels];
+    setLoading(true);
+    const filter = pool.filter((item) =>
+      item?.productName?.toLowerCase()?.includes(searchTerm.toLowerCase())
+    );
 
+    setStockLevels(filter);
+    setLoading(false);
+  };
   useEffect(() => {
     fetchShopProducts();
   }, [selectedShop]);
-
-  const handleEndReached = () => {
-    if (!isFetchingMore && stockLevels.length < stockLevelRecords) {
-      setOffset(offset + MAXIMUM_RECORDS_PER_FETCH);
-      fetchShopProducts(offset + MAXIMUM_RECORDS_PER_FETCH);
-    }
-    if (stockLevels.length === stockLevelRecords && stockLevels.length > 10) {
-      snackbarRef.current.show("No more additional data", 2500);
-    }
-  };
 
   const toProductEntry = () => {
     if (selectedShop?.name.includes("All")) {
@@ -122,21 +128,51 @@ const StockLevel = ({ navigation }) => {
 
       <TopHeader
         title="Stock levels"
-        showSearch={true}
+        // showSearch={true}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        onSearch={onSearch}
         showMenuDots
         menuItems={menuItems}
         showShops
+        onSearch={onSearch}
       />
+      <View
+        style={{
+          flexDirection: "row",
+          paddingTop: 15,
+          justifyContent: "space-between",
+          paddingHorizontal: 12,
+          backgroundColor: "#000",
+          paddingBottom: 10,
+        }}
+      >
+        <ItemHeader
+          title="Sold"
+          value={formatNumberWithCommas(sold)}
+          ugx={false}
+        />
+
+        <VerticalSeparator />
+
+        <ItemHeader
+          title="Products"
+          value={formatNumberWithCommas(stockLevelRecords)}
+          ugx={false}
+        />
+
+        <VerticalSeparator />
+        <ItemHeader value={pdtValue} title="Items" ugx={false} />
+
+        <VerticalSeparator />
+        <ItemHeader title="Value " value={formatNumberWithCommas(stock)} />
+      </View>
       <FlatList
         keyExtractor={(item) => item.id.toString()}
         style={{ marginTop: 5 }}
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
         renderItem={({ item }) => <StockLevelCard data={item} />}
-        onRefresh={() => onSearch()}
+        onRefresh={() => fetchShopProducts()}
         refreshing={loading}
         ListEmptyComponent={() => (
           <View
@@ -149,8 +185,6 @@ const StockLevel = ({ navigation }) => {
             <Text>{message}</Text>
           </View>
         )}
-        onEndReached={handleEndReached}
-        onEndReachedThreshold={0.3}
       />
       <Snackbar ref={snackbarRef} />
     </View>

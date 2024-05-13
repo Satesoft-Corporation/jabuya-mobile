@@ -23,6 +23,7 @@ import {
   SHOP_SUMMARY,
 } from "../../navigation/ScreenNames";
 import SaleTxnCard from "./components/SaleTxnCard";
+import { UserSessionUtils } from "../../utils/UserSessionUtils";
 
 export default function ViewSales({ navigation }) {
   const [sales, setSales] = useState([]);
@@ -36,26 +37,37 @@ export default function ViewSales({ navigation }) {
   const [daysCapital, setDaysCapital] = useState(0);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [offlineSales, setOfflineSales] = useState(false);
 
   const { userParams, selectedShop } = useContext(UserContext);
 
   const { isShopOwner, shopOwnerId } = userParams;
+
+  const unsavedSales = async () => {
+    let list = await UserSessionUtils.getPendingSales();
+    setOfflineSales(list?.length > 0);
+  };
 
   const menuItems = [
     {
       name: "Select date",
       onClick: () => setVisible(true),
     },
-    {
-      name: "Offline sales",
-      onClick: () => navigation.navigate(OFFLINE_SALES),
-    },
-    ...(isShopOwner === true
+
+    ...(offlineSales === true
       ? [
           {
-            name: "Income graphs",
-            onClick: () => navigation.navigate(INCOME_GRAPHS),
+            name: "Offline sales",
+            onClick: () => navigation.navigate(OFFLINE_SALES),
           },
+        ]
+      : []),
+    ...(isShopOwner === true
+      ? [
+          // {
+          //   name: "Income graphs",
+          //   onClick: () => navigation.navigate(INCOME_GRAPHS),
+          // },
           {
             name: "Investment",
             onClick: () => navigation.navigate(SHOP_SUMMARY),
@@ -158,6 +170,7 @@ export default function ViewSales({ navigation }) {
 
   useEffect(() => {
     getSales();
+    unsavedSales();
   }, [selectedShop]);
 
   return (

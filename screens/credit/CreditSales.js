@@ -1,13 +1,8 @@
 import { View, Text, SafeAreaView, FlatList, StyleSheet } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../../context/UserContext";
-import {
-  convertDateFormat,
-  formatDate,
-  formatNumberWithCommas,
-} from "../../utils/Utils";
+import { formatDate, formatNumberWithCommas } from "../../utils/Utils";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import ItemHeader from "../sales/components/ItemHeader";
@@ -20,103 +15,79 @@ import { CLIENT_FORM } from "../../navigation/ScreenNames";
 
 const CreditSales = () => {
   const navigation = useNavigation();
-  const [creditSales, setCreditSales] = useState([]);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [offset, setOffset] = useState(0);
 
   const [loading, setLoading] = useState(false);
 
   const [message, setMessage] = useState(null);
 
-  const [debtors, setDebtors] = useState(0);
   const [debt, setDebt] = useState(0);
   const [paid, setPaid] = useState(0);
   const [bal, setBal] = useState(0);
   const [date, setDate] = useState(new Date());
-  const [visible, setVisible] = useState(false);
   const [filtering, setFiltering] = useState(false);
+  const [clients, setClients] = useState([]);
 
   const snackbarRef = useRef(null);
 
   const { selectedShop, userParams } = useContext(UserContext);
 
-  const { isShopOwner, shopOwnerId } = userParams;
-
-  const onChange = (event, selectedDate) => {
-    setVisible(false);
-    fetchCreditSales(selectedDate);
-    setDate(selectedDate);
-    setFiltering(true);
-  };
-
-  const fetchCreditSales = async (day = null) => {
-    const allShops = selectedShop?.id === shopOwnerId;
-
-    let searchParameters = {
-      limit: 0,
-      ...(allShops && { shopOwnerId: selectedShop?.id }),
-      ...(!allShops && { shopId: selectedShop?.id }),
-      offset,
-      ...(day && {
-        startDate: convertDateFormat(day),
-        endDate: convertDateFormat(day, true),
-      }),
-    };
-
-    setCreditSales([]);
-    setDebt(0);
-    setPaid(0);
-    setBal(0);
-    setDebtors(0);
+  const fetchClients = () => {
     setMessage(null);
     setLoading(true);
+    setBal(0);
+    setDebt(0);
+    setPaid(0);
+    setClients([]);
+    const allShops = selectedShop?.id === userParams?.shopOwnerId;
 
-    if (day === null) {
-      setFiltering(false);
-      setDate(new Date());
-    }
-    new BaseApiService("/credit-sales")
-      .getRequestWithJsonResponse(searchParameters)
+    const serachParams = {
+      limit: 0,
+      ...(allShops &&
+        userParams?.isShopOwner && {
+          shopOwnerId: selectedShop?.id,
+        }),
+      ...(!allShops && { shopId: selectedShop?.id }),
+      offset: 0,
+    };
+
+    new BaseApiService("/clients-controller")
+      .getRequestWithJsonResponse(serachParams)
       .then((response) => {
-        setTotalRecords(unPaid);
-        //console.log(response.records);
-
-        const unPaid = response.records?.filter(
-          (item) => item.amountLoaned > item.amountRepaid
-        );
-
-        const debts = unPaid.reduce((a, b) => a + b?.amountLoaned, 0);
-
-        const payments = unPaid.reduce((a, b) => a + b?.amountRepaid, 0);
-
-        setDebtors(unPaid.length);
-        setDebt(debts);
-
-        setPaid(payments);
-
-        setBal(debts - payments);
-        setCreditSales((prevEntries) => [...prevEntries, ...unPaid]);
+        setClients(response.records);
 
         if (response?.totalItems === 0) {
-          setMessage(`No debts found on ${formatDate(date, true)} for`);
+          setMessage("No shop clients found");
+          setShowFooter(false);
         }
 
         setLoading(false);
       })
       .catch((error) => {
-        setMessage("Error fetching credit records for");
         setLoading(false);
-        console.log(error);
+
+        setShowFooter(false);
+        setMessage("Error fetching shop clients");
       });
+  };
+
+  const appendDebtValue = (value = 0) => {
+    setDebt((prev) => prev + debt + value);
+  };
+
+  const appendPaidValue = (value = 0) => {
+    setPaid((prev) => prev + paid + value);
+  };
+  const appendBalValue = (value = 0) => {
+    setBal((prev) => prev + bal + value);
   };
 
   const handleRefresh = () => {
     setFiltering(false);
     setDate(new Date());
-    fetchCreditSales();
+    fetchClients();
   };
   useEffect(() => {
-    fetchCreditSales();
+    fetchClients();
   }, [selectedShop]);
 
   const menuItems = [
@@ -128,10 +99,6 @@ const CreditSales = () => {
           },
         ]
       : []),
-    {
-      name: "Select date",
-      onClick: () => setVisible(true),
-    },
   ];
 
   return (
@@ -167,7 +134,7 @@ const CreditSales = () => {
         </View>
 
         <View style={styles.summaryContainer}>
-          <ItemHeader value={debtors} title="Debtors" ugx={false} />
+          <ItemHeader value={clients?.length} title="Debtors" ugx={false} />
 
           <VerticalSeparator />
 
@@ -186,8 +153,15 @@ const CreditSales = () => {
       <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
         <FlatList
           style={{ marginTop: 10 }}
-          data={creditSales}
-          renderItem={({ item }) => <CreditSaleCard sale={item} />}
+          data={clients}
+          renderItem={({ item }) => (
+            <CreditSaleCard
+              client={item}
+              appendDebtValue={appendDebtValue}
+              appendBalValue={appendBalValue}
+              appendPaidValue={appendPaidValue}
+            />
+          )}
           keyExtractor={(item) => item.id.toString()}
           refreshing={loading}
           onRefresh={() => handleRefresh()}
@@ -199,16 +173,6 @@ const CreditSales = () => {
           )}
         />
         <Snackbar ref={snackbarRef} />
-
-        {visible && (
-          <DateTimePicker
-            testID="dateTimePicker"
-            value={date}
-            mode={"date"}
-            onChange={onChange}
-            maximumDate={new Date()}
-          />
-        )}
       </View>
     </SafeAreaView>
   );

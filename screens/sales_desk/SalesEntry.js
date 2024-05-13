@@ -17,8 +17,6 @@ import SelectShopBar from "../../components/SelectShopBar";
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 import { SaleEntryContext } from "../../context/SaleEntryContext";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
-import { useNetInfo } from "@react-native-community/netinfo";
-
 import { SafeAreaView } from "react-native";
 import {
   BARCODE_SCREEN,
@@ -34,7 +32,6 @@ function SalesEntry({ navigation }) {
   const [searchTerm, setSearchTerm] = useState(null);
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
   const [clients, setClients] = useState([]);
-  const netinfo = useNetInfo();
 
   const snackbarRef = useRef(null);
 
@@ -68,13 +65,10 @@ function SalesEntry({ navigation }) {
 
   const fetchProducts = async () => {
     setLoading(true);
-    let pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id); //store the payload in local storage
+    const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id); //store the payload in local storage
+
     setProducts(pdtList);
     fetchClients();
-
-    if (!netinfo?.isConnected) {
-      snackbarRef.current.show("Running offline", 5000);
-    }
   };
 
   const fetchClients = async () => {

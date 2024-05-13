@@ -53,6 +53,7 @@ const MyInput = ({
           borderWidth: 0.6,
           borderColor: darkMode ? Colors.primary : Colors.dark,
           paddingHorizontal: 10,
+          justifyContent:'space-between'
         }}
       >
         <TextInput

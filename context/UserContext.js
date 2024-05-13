@@ -26,7 +26,7 @@ export const UserProvider = ({ children }) => {
           };
 
           setShops([allShops, ...ownerShops]);
-          setSelectedShop(allShops);
+          setSelectedShop(ownerShops[0]);
         } else {
           setSelectedShop(ownerShops[0]);
           setShops(ownerShops);
@@ -83,7 +83,7 @@ export const UserProvider = ({ children }) => {
 
   const getRefreshToken = async () => {
     const loginInfo = await UserSessionUtils.getLoginDetails();
-    console.log('Getting refresh token')
+    console.log("Getting refresh token");
     if (loginInfo) {
       new BaseApiService(LOGIN_END_POINT)
         .saveRequestWithJsonResponse(loginInfo, false)
