@@ -21,8 +21,7 @@ const Expenses = ({}) => {
   const [loading, setLoading] = useState(true);
 
   const snackbarRef = useRef(null);
-  const { userParams, reload, setReload, selectedShop } =
-    useContext(UserContext);
+  const { userParams, selectedShop } = useContext(UserContext);
 
   const fetchExpenses = async () => {
     try {
@@ -37,29 +36,29 @@ const Expenses = ({}) => {
       const response = await new BaseApiService(
         "/shop/expenses"
       ).getRequestWithJsonResponse(searchParameters);
-      setExpenses((prevEntries) => [...prevEntries, ...response?.records]);
-
-      setTotalItems(response?.totalItems);
+      console.log(response?.records);
+      setExpenses(response?.records);
       setLoading(false);
       if (response?.totalItems === 0) {
-        setMessage("No expenses found in this shop");
+        setMessage("No expenses found");
         setShowFooter(false);
       }
     } catch (error) {
-      setMessage("Error fetching stock records");
+      setMessage("Error fetching expense records");
       setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchExpenses();
-  }, []);
+  }, [selectedShop]);
   return (
     <View style={{ flex: 1 }}>
       <AppStatusBar />
       <TopHeader
         title="Expenses"
         showMenuDots
+        showShops
         menuItems={[
           {
             name: "Add expense",
@@ -70,7 +69,7 @@ const Expenses = ({}) => {
 
       <FlatList
         data={expenses}
-        renderItem={({ item }) => <ExpenseCard />}
+        renderItem={({ item }) => <ExpenseCard exp={item} />}
         refreshing={loading}
         onRefresh={() => fetchExpenses()}
         ListEmptyComponent={() => (

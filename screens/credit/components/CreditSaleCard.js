@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import DataColumn from "../../../components/cardComponents/DataColumn";
 import { BaseApiService } from "../../../utils/BaseApiService";
 import CardFooter2 from "../../../components/cardComponents/CardFooter2";
+import { CLIENT_DEBTS } from "../../../navigation/ScreenNames";
 
 const CreditSaleListItem = ({
   client,
@@ -36,7 +37,6 @@ const CreditSaleListItem = ({
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
         setSales(response?.records);
-
         const debt = response.records.reduce((a, b) => a + b?.amountLoaned, 0);
         const paid = response.records.reduce((a, b) => a + b?.amountRepaid, 0);
         const bal = debt - paid;
@@ -80,11 +80,11 @@ const CreditSaleListItem = ({
         </View>
 
         <CardFooter2
-          // label={`Served by: ${sale?.createdByFullName}`}
           btnTitle="More"
-          // onBtnPress={() => {
-          //   navigation.navigate("credit_payments", sale);
-          // }}
+          renderBtn={sales?.length > 0}
+          onBtnPress={() =>
+            navigation.navigate(CLIENT_DEBTS, { client, sales })
+          }
         />
       </View>
     );
@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingVertical: 15,
     paddingHorizontal: 10,
+    elevation: 1,
   },
   content: {
     flexDirection: "row",

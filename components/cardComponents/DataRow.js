@@ -23,10 +23,10 @@ const DataRow = ({
         style,
       ]}
     >
-      <Text style={[{ fontWeight: 400, fontSize: 12 }, labelTextStyle]}>
+      <Text style={[{ fontWeight: 600, fontSize: 14 }, labelTextStyle]}>
         {label}
       </Text>
-      <Text style={[{ fontWeight: 600, fontSize: 12 }, valueTextStyle]}>
+      <Text style={[{ fontWeight: 600, fontSize: 14 }, valueTextStyle]}>
         {showCurrency && (
           <Text
             style={{

@@ -1,67 +1,35 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import React from "react";
 import { BaseStyle } from "../../utils/BaseStyle";
 import CardHeader from "../../components/cardComponents/CardHeader";
-import { formatNumberWithCommas } from "../../utils/Utils";
-import CardFooter1 from "../../components/cardComponents/CardFooter1";
+import { formatDate } from "../../utils/Utils";
 import CardFooter2 from "../../components/cardComponents/CardFooter2";
+import DataColumn from "../../components/cardComponents/DataColumn";
 
-const ExpenseCard = () => {
-  let data = {};
+const ExpenseCard = ({ exp }) => {
   return (
     <View style={BaseStyle.card}>
-      <CardHeader value1={"test"} value2={"info"} />
+      <CardHeader
+        value1={exp?.shopName}
+        value2={formatDate(exp?.dateCreated)}
+      />
       <View
         style={{
           flexDirection: "row",
           marginVertical: 10,
         }}
       >
-        <View style={{ alignItems: "left", flex: 2 }}>
-          <Text
-            style={{
-              fontWeight: 600,
-              marginBottom: 3,
-            }}
-          >
-            Description
-          </Text>
-          <Text>Description</Text>
-        </View>
-        <View style={{ alignItems: "center", flex: 1 }}>
-          <Text
-            style={{
-              fontWeight: 600,
-              marginBottom: 3,
-            }}
-          >
-            Category
-          </Text>
-          <Text style={{ alignSelf: "center" }}>
-            {data?.categoryName || "None"}
-          </Text>
-        </View>
+        <DataColumn value={exp?.description} title={"Description"} left />
 
-        <View style={{ alignItems: "flex-end", flex: 1, marginEnd: 5 }}>
-          <Text
-            style={{
-              fontWeight: 600,
-              marginBottom: 3,
-            }}
-          >
-            Amount
-          </Text>
-          <Text
-            style={{
-              marginEnd: 2,
-            }}
-          >
-            {formatNumberWithCommas(20000)}
-          </Text>
-        </View>
+        <DataColumn value={exp?.categoryName} title={"Category"} />
+        <DataColumn value={exp?.amount} title={"Amount"} end isCurrency />
       </View>
 
-      <CardFooter2 btnTitle="More" label={"Entered by"} />
+      <CardFooter2
+        btnTitle="More"
+        label={`Entered by ${exp?.createdByFullName}`}
+        renderBtn={false}
+      />
     </View>
   );
 };

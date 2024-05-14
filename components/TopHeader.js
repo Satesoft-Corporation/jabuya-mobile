@@ -13,8 +13,6 @@ const TopHeader = ({
   setSearchTerm,
   onSearch,
   showShopName = true,
-  showAdd = false,
-  onAddPress,
   showMenuDots = false,
   menuItems,
   showShops = false,
@@ -91,14 +89,6 @@ const TopHeader = ({
               </TouchableOpacity>
             )}
 
-            {showAdd && (
-              <TouchableOpacity onPress={onAddPress}>
-                <Image
-                  source={require("../assets/icons/ic_plus.png")}
-                  style={{ height: 40, width: 30, tintColor: Colors.primary }}
-                />
-              </TouchableOpacity>
-            )}
             {showMenuDots && (
               <PopUpmenu menuItems={menuItems} showShops={showShops} />
             )}

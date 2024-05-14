@@ -1,11 +1,9 @@
 import { View, Text, SafeAreaView } from "react-native";
-import React, { useState, useContext, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import TopHeader from "../../components/TopHeader";
 import AppStatusBar from "../../components/AppStatusBar";
 import Colors from "../../constants/Colors";
 import MyInput from "../../components/MyInput";
-import ChipButton from "../../components/buttons/ChipButton";
-import { UserContext } from "../../context/UserContext";
 import { convertToServerDate, formatNumberWithCommas } from "../../utils/Utils";
 import Loader from "../../components/Loader";
 import { BaseApiService } from "../../utils/BaseApiService";
@@ -13,7 +11,7 @@ import Snackbar from "../../components/Snackbar";
 import DataRow from "../../components/cardComponents/DataRow";
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 
-const CreditPayment = ({ navigation, route }) => {
+const CreditPayment = ({ route }) => {
   const sale = { ...route.params };
 
   let balance = sale?.amountLoaned - sale?.amountRepaid;
@@ -25,8 +23,6 @@ const CreditPayment = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
 
   const snackRef = useRef(null);
-
-  const { reload, setReload } = useContext(UserContext);
 
   const clearForm = () => {
     setAmount("0");
@@ -52,8 +48,7 @@ const CreditPayment = ({ navigation, route }) => {
         .then(async (response) => {
           setLoading(false);
           clearForm();
-          setReload(true);
-          navigation.goBack();
+          snackRef.current.show(`Payment saved successfully`, 5000);
         })
         .catch((error) => {
           setLoading(false);
@@ -79,7 +74,6 @@ const CreditPayment = ({ navigation, route }) => {
       <Loader loading={loading} />
       <View
         style={{
-          marginHorizontal: 5,
           marginVertical: 10,
           paddingHorizontal: 12,
           justifyContent: "space-between",

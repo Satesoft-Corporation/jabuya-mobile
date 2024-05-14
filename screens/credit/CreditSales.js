@@ -2,7 +2,7 @@ import { View, Text, SafeAreaView, FlatList, StyleSheet } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../../context/UserContext";
-import { formatDate, formatNumberWithCommas } from "../../utils/Utils";
+import { formatNumberWithCommas } from "../../utils/Utils";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import ItemHeader from "../sales/components/ItemHeader";
@@ -12,6 +12,7 @@ import Colors from "../../constants/Colors";
 import { BaseApiService } from "../../utils/BaseApiService";
 import CreditSaleCard from "./components/CreditSaleCard";
 import { CLIENT_FORM } from "../../navigation/ScreenNames";
+import { CLIENTS_ENDPOINT } from "../../utils/EndPointUtils";
 
 const CreditSales = () => {
   const navigation = useNavigation();
@@ -23,21 +24,20 @@ const CreditSales = () => {
   const [debt, setDebt] = useState(0);
   const [paid, setPaid] = useState(0);
   const [bal, setBal] = useState(0);
-  const [date, setDate] = useState(new Date());
-  const [filtering, setFiltering] = useState(false);
   const [clients, setClients] = useState([]);
+  const [adds, setAdds] = useState(0);
 
   const snackbarRef = useRef(null);
-
   const { selectedShop, userParams } = useContext(UserContext);
 
-  const fetchClients = () => {
+  const fetchClients = async () => {
     setMessage(null);
     setLoading(true);
     setBal(0);
     setDebt(0);
     setPaid(0);
     setClients([]);
+    setAdds(0);
     const allShops = selectedShop?.id === userParams?.shopOwnerId;
 
     const serachParams = {
@@ -50,40 +50,34 @@ const CreditSales = () => {
       offset: 0,
     };
 
-    new BaseApiService("/clients-controller")
+    await new BaseApiService(CLIENTS_ENDPOINT)
       .getRequestWithJsonResponse(serachParams)
       .then((response) => {
-        setClients(response.records);
-
+        setClients(response?.records);
         if (response?.totalItems === 0) {
-          setMessage("No shop clients found");
-          setShowFooter(false);
+          setMessage("No records found");
         }
-
-        setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
-
-        setShowFooter(false);
         setMessage("Error fetching shop clients");
+        console.log(error);
       });
   };
 
   const appendDebtValue = (value = 0) => {
-    setDebt((prev) => prev + debt + value);
+    setDebt((prev) => prev + value);
+    setAdds((prev) => prev + 1);
   };
 
   const appendPaidValue = (value = 0) => {
-    setPaid((prev) => prev + paid + value);
+    setPaid((prev) => prev + value);
   };
   const appendBalValue = (value = 0) => {
-    setBal((prev) => prev + bal + value);
+    setBal((prev) => prev + value);
   };
 
   const handleRefresh = () => {
-    setFiltering(false);
-    setDate(new Date());
     fetchClients();
   };
   useEffect(() => {
@@ -106,7 +100,7 @@ const CreditSales = () => {
       <AppStatusBar />
       <TopHeader
         title="Debt records"
-        showMenuDots
+        showMenuDots={!userParams?.isShopAttendant}
         menuItems={menuItems}
         showShops
       />
@@ -119,17 +113,6 @@ const CreditSales = () => {
             }}
           >
             Debt summary
-          </Text>
-
-          <Text
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              alignSelf: "flex-end",
-              color: Colors.primary,
-            }}
-          >
-            {filtering ? formatDate(date, true) : "Overrall"}
           </Text>
         </View>
 
@@ -154,21 +137,25 @@ const CreditSales = () => {
         <FlatList
           style={{ marginTop: 10 }}
           data={clients}
-          renderItem={({ item }) => (
-            <CreditSaleCard
-              client={item}
-              appendDebtValue={appendDebtValue}
-              appendBalValue={appendBalValue}
-              appendPaidValue={appendPaidValue}
-            />
-          )}
+          renderItem={({ item }) => {
+            if (clients?.length === adds) {
+              setLoading(false);
+            }
+            return (
+              <CreditSaleCard
+                client={item}
+                appendDebtValue={appendDebtValue}
+                appendBalValue={appendBalValue}
+                appendPaidValue={appendPaidValue}
+              />
+            );
+          }}
           keyExtractor={(item) => item.id.toString()}
           refreshing={loading}
           onRefresh={() => handleRefresh()}
           ListEmptyComponent={() => (
             <View style={styles.errorMsg}>
               <Text>{message}</Text>
-              {message && <Text>{selectedShop?.name}</Text>}
             </View>
           )}
         />

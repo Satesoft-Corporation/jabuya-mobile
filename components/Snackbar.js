@@ -43,6 +43,10 @@ class Snackbar extends Component {
     }, duration);
   };
 
+  isVisible = () => {
+    return this.ShowSnackBar === true;
+  };
+
   render() {
     return (
       <Animated.View

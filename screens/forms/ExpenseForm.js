@@ -106,7 +106,7 @@ const ExpenseForm = () => {
                   backgroundColor: Colors.light,
                   borderColor: Colors.dark,
                 }}
-                data={shops}
+                data={shops?.filter((shop) => !shop?.name?.includes("All"))}
                 value={selectedShop}
                 onChange={(e) => {
                   setSelectedShop(e);

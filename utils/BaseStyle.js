@@ -25,6 +25,7 @@ export const BaseStyle = StyleSheet.create({
     backgroundColor: "white",
     paddingVertical: 15,
     paddingHorizontal: 10,
+    elevation:1
   },
   bottomContent: {
     flexDirection: "row",
