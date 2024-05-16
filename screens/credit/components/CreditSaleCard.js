@@ -81,7 +81,6 @@ const CreditSaleListItem = ({
 
         <CardFooter2
           btnTitle="More"
-          renderBtn={sales?.length > 0}
           onBtnPress={() =>
             navigation.navigate(CLIENT_DEBTS, { client, sales })
           }

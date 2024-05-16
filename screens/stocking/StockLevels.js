@@ -161,7 +161,11 @@ const StockLevel = ({ navigation }) => {
         />
 
         <VerticalSeparator />
-        <ItemHeader value={pdtValue} title="Items" ugx={false} />
+        <ItemHeader
+          value={formatNumberWithCommas(pdtValue)}
+          title="Items"
+          ugx={false}
+        />
 
         <VerticalSeparator />
         <ItemHeader title="Value " value={formatNumberWithCommas(stock)} />

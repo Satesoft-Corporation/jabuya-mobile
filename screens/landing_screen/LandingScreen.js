@@ -132,7 +132,6 @@ const LandingScreen = ({ navigation }) => {
           limit: 10000,
           ...(isShopAttendant && { shopId: attendantShopId }),
           ...(isShopOwner && { shopOwnerId }),
-          showOnlyStocked: true,
         };
 
         const savedproducts = await saveShopProductsOnDevice(searchParameters);
