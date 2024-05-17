@@ -1,9 +1,18 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import { BaseApiService } from "../utils/BaseApiService";
 import { LOGIN_END_POINT } from "../utils/EndPointUtils";
+import {
+  saveShopClients,
+  saveShopDetails,
+  saveShopProductsOnDevice,
+} from "../controllers/OfflineControllers";
 
 export const UserContext = createContext();
+
+export const userData = () => {
+  return useContext(UserContext);
+};
 
 export const UserProvider = ({ children }) => {
   const [userParams, setUserParams] = useState({});
@@ -16,8 +25,8 @@ export const UserProvider = ({ children }) => {
 
   const [reload, setReload] = useState(false); // flag for reloading screen when a record edit or save is made
 
-  const getShopsFromStorage = () => {
-    UserSessionUtils.getShops().then((ownerShops) => {
+  const getShopsFromStorage = async () => {
+    await UserSessionUtils.getShops().then(async (ownerShops) => {
       if (ownerShops) {
         if (ownerShops?.length > 1) {
           const allShops = {
@@ -33,39 +42,71 @@ export const UserProvider = ({ children }) => {
         }
       }
     });
-
-    if (userParams?.isShopAttendant === true) {
-      UserSessionUtils.getFullSessionObject().then((data) => {
-        if (data) {
-          const { attendantShopId, attendantShopName } = data?.user;
-
-          setSelectedShop({
-            name: attendantShopName,
-            id: attendantShopId,
-          });
-        }
-      });
-    }
   };
 
-  const getSessionObj = async () => {
-    await UserSessionUtils.getFullSessionObject().then((data) => {
+  const configureUserData = async () => {
+    let isConfigured = false;
+    await UserSessionUtils.getUserDetails().then(async (data) => {
       if (data) {
-        const { roles, firstName, lastName } = data?.user;
+        const {
+          roles,
+          firstName,
+          lastName,
+          isShopOwner,
+          isShopAttendant,
+          attendantShopId,
+          shopOwnerId,
+          attendantShopName,
+        } = data;
+
+        setUserParams({
+          isShopOwner,
+          isShopAttendant,
+          attendantShopId,
+          shopOwnerId,
+        });
 
         setSessionObj({
           fullName: firstName + " " + lastName,
           role: roles[0].name,
           phoneNumber: data?.phoneNumber,
           dateCreated: data?.dateCreated,
-          username: data?.userParams,
           emailAddress: data?.emailAddress,
-          isShopAttendant: data?.isShopAttendant,
-          isShopOwner: data?.isShopOwner,
           attendantShopName: data?.attendantShopName,
         });
+
+        if (isShopAttendant == true) {
+          setSelectedShop({
+            name: attendantShopName,
+            id: attendantShopId,
+          });
+        }
+        const searchParameters = {
+          offset: 0,
+          limit: 10000,
+          ...(isShopAttendant && { shopId: attendantShopId }),
+          ...(isShopOwner && { shopOwnerId }),
+        };
+
+        await saveShopProductsOnDevice(searchParameters);
+        await saveShopClients(searchParameters);
+
+        let shopCount = await UserSessionUtils.getShopCount();
+
+        if (!isShopAttendant && shopCount === null) {
+          await saveShopDetails(isShopOwner, shopOwnerId);
+        }
+
+        isConfigured = true;
+      } else {
+        console.log("No user data available");
+        setUserParams({});
+        setSessionObj(null);
+        isConfigured = false;
       }
     });
+
+    return isConfigured;
   };
 
   const getAppLockStatus = () => {
@@ -97,11 +138,6 @@ export const UserProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    getShopsFromStorage();
-    getSessionObj();
-  }, [userParams]);
-
-  useEffect(() => {
     getAppLockStatus();
   }, [hasUserSetPinCode, userParams]);
 
@@ -129,6 +165,7 @@ export const UserProvider = ({ children }) => {
     setReload,
     getRefreshToken,
     getAppLockStatus,
+    configureUserData,
   };
   return <UserContext.Provider value={data}>{children}</UserContext.Provider>;
 };

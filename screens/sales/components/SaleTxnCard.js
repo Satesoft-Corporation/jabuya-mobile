@@ -84,14 +84,15 @@ function SaleTxnCard({ data }) {
               value={balanceGivenOut}
               flex={0}
               isCurrency
+              end
             />
-            <DataColumn
+            {/* <DataColumn
               title={"Income"}
               value={profit}
               isCurrency
               end
               flex={0}
-            />
+            /> */}
           </View>
           <CardFooter2
             onBtnPress={toggleExpand}

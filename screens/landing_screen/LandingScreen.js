@@ -5,10 +5,7 @@ import { FlatList } from "react-native";
 import UserProfile from "../../components/UserProfile";
 import { BlackScreen } from "../../components/BlackAndWhiteScreen";
 import AppStatusBar from "../../components/AppStatusBar";
-import SelectShopBar from "../../components/SelectShopBar";
 import { MenuIcon } from "../../components/MenuIcon";
-import { UserContext } from "../../context/UserContext";
-import { BaseApiService } from "../../utils/BaseApiService";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import { getTimeDifference } from "../../utils/Utils";
 import DisplayMessage from "../../components/Dialogs/DisplayMessage";
@@ -16,22 +13,18 @@ import Loader from "../../components/Loader";
 import { StackActions } from "@react-navigation/native";
 import { navList } from "./navList";
 import { LOCK_SCREEN, STOCK_ENTRY } from "../../navigation/ScreenNames";
-import {
-  resolveUnsavedSales,
-  saveShopClients,
-  saveShopDetails,
-  saveShopProductsOnDevice,
-} from "../../controllers/OfflineControllers";
+import { resolveUnsavedSales } from "../../controllers/OfflineControllers";
+
+import { userData } from "../../context/UserContext";
+
 const LandingScreen = ({ navigation }) => {
   const {
-    setUserParams,
     getShopsFromStorage,
     userParams,
-    setSelectedShop,
-    setShops,
+    configureUserData,
     getRefreshToken,
     shops,
-  } = useContext(UserContext);
+  } = userData();
 
   const [loading, setLoading] = useState(true);
   const [showMoodal, setShowModal] = useState(false);
@@ -43,9 +36,6 @@ const LandingScreen = ({ navigation }) => {
   const logOut = () => {
     setLoading(false);
     UserSessionUtils.clearLocalStorageAndLogout(navigation);
-    setUserParams(null);
-    setSelectedShop(null);
-    setShops([]);
   };
 
   const logInPrompt = () => {
@@ -104,60 +94,22 @@ const LandingScreen = ({ navigation }) => {
     }
   };
 
+  const start = async () => {
+    const isUserConfigured = await configureUserData(); //configuring up the user
+
+    if (isUserConfigured === false) {
+      logOut();
+      return true;
+    } else {
+      handlePinLockStatus();
+      handleLoginSession();
+      await getShopsFromStorage();
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    UserSessionUtils.getFullSessionObject()
-      .then(async (data) => {
-        if (data === null) {
-          logOut();
-          return true;
-        }
-
-        handlePinLockStatus();
-        handleLoginSession();
-        const { isShopOwner, isShopAttendant, attendantShopId, shopOwnerId } =
-          data?.user;
-
-        setUserParams({
-          isShopOwner,
-          isShopAttendant,
-          attendantShopId,
-          shopOwnerId,
-        });
-
-        /**
-         * saving products ondevice
-         */
-        const searchParameters = {
-          offset: 0,
-          limit: 10000,
-          ...(isShopAttendant && { shopId: attendantShopId }),
-          ...(isShopOwner && { shopOwnerId }),
-        };
-
-        const savedproducts = await saveShopProductsOnDevice(searchParameters);
-        const savedClients = await saveShopClients(searchParameters);
-
-        let shopCount = await UserSessionUtils.getShopCount();
-
-        if (!isShopAttendant) {
-          if (shopCount === null) {
-            await saveShopDetails(isShopOwner, shopOwnerId);
-            getShopsFromStorage();
-          }
-        }
-
-        if (savedproducts === true && savedClients === true) {
-          setLoading(false);
-        } else {
-          Alert.alert("Unkown error", "Please re login");
-          setLoading(false);
-        }
-      })
-      .catch(async (error) => {
-        //loging the user out if the object is missing
-        console.log(error);
-        logOut();
-      });
+    start();
   }, []);
 
   return (
