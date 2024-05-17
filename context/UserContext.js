@@ -88,13 +88,18 @@ export const UserProvider = ({ children }) => {
           ...(isShopOwner && { shopOwnerId }),
         };
 
-        await saveShopProductsOnDevice(searchParameters);
-        await saveShopClients(searchParameters);
+        const savedproducts = await saveShopProductsOnDevice(searchParameters);
+        const savedClients = await saveShopClients(searchParameters);
+
+        if (savedproducts === true && savedClients === true) {
+          isConfigured = true;
+        }
 
         let shopCount = await UserSessionUtils.getShopCount();
 
         if (!isShopAttendant && shopCount === null) {
-          await saveShopDetails(isShopOwner, shopOwnerId);
+          const savedShops = await saveShopDetails(isShopOwner, shopOwnerId);
+          isConfigured = savedShops;
         }
 
         isConfigured = true;

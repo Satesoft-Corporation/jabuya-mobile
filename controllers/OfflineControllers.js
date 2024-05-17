@@ -95,6 +95,8 @@ export const saveShopClients = async (params, refresh = false) => {
 };
 
 export const saveShopDetails = async (isShopOwner, shopOwnerId) => {
+  let saved = false;
+
   const searchParameters = {
     limit: 0,
     offset: 0,
@@ -106,6 +108,11 @@ export const saveShopDetails = async (isShopOwner, shopOwnerId) => {
     .then(async (response) => {
       await UserSessionUtils.setShopCount(String(response.totalItems));
       await UserSessionUtils.setShops(response.records);
+      saved = true;
     })
-    .catch((error) => {});
+    .catch((error) => {
+      saved = false;
+    });
+
+  return saved;
 };

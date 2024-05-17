@@ -97,14 +97,14 @@ const LandingScreen = ({ navigation }) => {
   const start = async () => {
     const isUserConfigured = await configureUserData(); //configuring up the user
 
-    if (isUserConfigured === false) {
-      logOut();
-      return true;
-    } else {
+    if (isUserConfigured === true) {
       handlePinLockStatus();
       handleLoginSession();
       await getShopsFromStorage();
       setLoading(false);
+    } else {
+      logOut();
+      return true;
     }
   };
 
