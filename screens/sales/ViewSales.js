@@ -130,7 +130,7 @@ export default function ViewSales({ navigation }) {
         let sV = data.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
 
         if (response.totalItems === 0) {
-          setMessage(`No sales made on this today for ${selectedShop?.name}`);
+          setMessage(`No sales made on this day for ${selectedShop?.name}`);
         }
 
         data.forEach((item) => {

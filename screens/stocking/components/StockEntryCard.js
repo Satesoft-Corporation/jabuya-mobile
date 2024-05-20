@@ -8,7 +8,7 @@ import { STOCK_ENTRY_FORM } from "../../../navigation/ScreenNames";
 import CardHeader from "../../../components/cardComponents/CardHeader";
 import DataColumn from "../../../components/cardComponents/DataColumn";
 
-const StockPurchaseCard = ({ data }) => {
+const StockEntryCard = ({ data }) => {
   const [expanded, setExpanded] = useState(false);
 
   const navigation = useNavigation();
@@ -27,6 +27,7 @@ const StockPurchaseCard = ({ data }) => {
     expiryDate,
     supplierName,
     batchNumber,
+    remarks,
   } = data ?? {};
 
   return (
@@ -84,6 +85,12 @@ const StockPurchaseCard = ({ data }) => {
           <DataRow label="Expiry date" value={formatDate(expiryDate, true)} />
           <DataRow label="Restock date" value={formatDate(dateCreated, true)} />
           <DataRow label="Supplier" value={supplierName} />
+          {remarks && (
+            <>
+              <DataRow label="Remarks" />
+              <Text>{remarks}</Text>
+            </>
+          )}
         </View>
       )}
 
@@ -122,4 +129,4 @@ const StockPurchaseCard = ({ data }) => {
   );
 };
 
-export default StockPurchaseCard;
+export default StockEntryCard;

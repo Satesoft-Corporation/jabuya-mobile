@@ -20,8 +20,6 @@ const StockLevel = ({ navigation }) => {
   const [stockLevelRecords, setStockLevelRecords] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const [filtered, setFiltered] = useState([]);
-
   const [sold, setSold] = useState(0);
 
   const [stock, setStock] = useState(0);
@@ -146,14 +144,6 @@ const StockLevel = ({ navigation }) => {
           paddingBottom: 10,
         }}
       >
-        <ItemHeader
-          title="Sold"
-          value={formatNumberWithCommas(sold)}
-          ugx={false}
-        />
-
-        <VerticalSeparator />
-
         <ItemHeader
           title="Products"
           value={formatNumberWithCommas(stockLevelRecords)}

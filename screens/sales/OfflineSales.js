@@ -1,7 +1,6 @@
 import { View, Text, FlatList, SafeAreaView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
-import SaleTxnCard from "./components/SaleTxnCard";
 import OfflineSaleTxnCard, {
   TxnCashSummary,
 } from "./components/OfflineSaleTxnCard";

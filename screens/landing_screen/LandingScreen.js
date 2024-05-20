@@ -1,5 +1,5 @@
-import { View, SafeAreaView, Alert } from "react-native";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import { View, SafeAreaView } from "react-native";
+import React, { useEffect, useState } from "react";
 import Colors from "../../constants/Colors";
 import { FlatList } from "react-native";
 import UserProfile from "../../components/UserProfile";
@@ -65,7 +65,7 @@ const LandingScreen = ({ navigation }) => {
   };
 
   const handlePinLockStatus = async () => {
-    let prevPinTime = await UserSessionUtils.getPinLoginTime();
+    let prevPinTime = await UserSessionUtils.getPinLoginTime(); //time when app lock was last used
 
     if (prevPinTime !== null) {
       let pintimeDiff = getTimeDifference(prevPinTime, new Date());
@@ -80,10 +80,11 @@ const LandingScreen = ({ navigation }) => {
   const handleLoginSession = async () => {
     let prevLoginTime = await UserSessionUtils.getLoginTime();
 
-    let logintimeDifferance = getTimeDifference(prevLoginTime, new Date());
+    const logintimeDifferance = getTimeDifference(prevLoginTime, new Date());
     const { days, hours } = logintimeDifferance;
 
     setTimeDiff(logintimeDifferance);
+    console.log(logintimeDifferance);
 
     if (hours < 24) {
       //to save if access token is still valid

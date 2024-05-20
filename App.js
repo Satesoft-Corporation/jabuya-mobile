@@ -26,7 +26,7 @@ import Expenses from "./screens/expenses/Expenses";
 import ExpenseForm from "./screens/forms/ExpenseForm";
 import { MenuProvider } from "react-native-popup-menu";
 import StockLevel from "./screens/stocking/StockLevels";
-import StockPurchase from "./screens/stocking/StockPurchase";
+import StockEntries from "./screens/stocking/StockEntries";
 import IncomeGraph from "./screens/perfomance_graphs/IncomeGraph";
 import UpdatePrice from "./screens/forms/stockingForms/UpdatePrice";
 import CreditSales from "./screens/credit/CreditSales";
@@ -45,7 +45,7 @@ export default function App() {
                 headerShown: false,
               }}
             >
-              <Stack.Screen name={s.LANDING_SCREEN} component={LandingScreen} />
+              <Stack.Screen name={s.LANDING_SCREEN} component={StockEntries} />
 
               <Stack.Screen name={s.LOGIN} component={Login} />
 
@@ -57,7 +57,7 @@ export default function App() {
               <Stack.Screen name={s.SHOP_SELECTION} component={SelectShops} />
 
               <Stack.Screen name={s.STOCKNG} component={StockingMenu} />
-              <Stack.Screen name={s.STOCK_ENTRY} component={StockPurchase} />
+              <Stack.Screen name={s.STOCK_ENTRY} component={StockEntries} />
               <Stack.Screen name={s.STOCK_LEVELS} component={StockLevel} />
               <Stack.Screen name={s.UPDATE_PRICE} component={UpdatePrice} />
 

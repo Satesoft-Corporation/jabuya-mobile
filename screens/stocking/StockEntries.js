@@ -7,11 +7,11 @@ import { UserContext } from "../../context/UserContext";
 import { BaseApiService } from "../../utils/BaseApiService";
 import { MAXIMUM_RECORDS_PER_FETCH } from "../../constants/Constants";
 import Snackbar from "../../components/Snackbar";
-import StockPurchaseCard from "./components/StockPurchaseCard";
+import StockEntryCard from "./components/StockEntryCard";
 import { STOCK_ENTRY_FORM } from "../../navigation/ScreenNames";
 import { STOCK_ENTRY_ENDPOINT } from "../../utils/EndPointUtils";
 
-const StockPurchase = ({ navigation }) => {
+const StockEntries = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
   const [stockEntryRecords, setStockEntryRecords] = useState(0);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -50,6 +50,7 @@ const StockPurchase = ({ navigation }) => {
         STOCK_ENTRY_ENDPOINT
       ).getRequestWithJsonResponse(searchParameters);
 
+      console.log(response?.records);
       if (offsetToUse === 0) {
         setStockEntries(response.records);
       } else {
@@ -123,7 +124,7 @@ const StockPurchase = ({ navigation }) => {
         style={{ marginTop: 5 }}
         keyExtractor={(item) => item.id.toString()}
         data={stockEntries}
-        renderItem={({ item }) => <StockPurchaseCard data={item} />}
+        renderItem={({ item }) => <StockEntryCard data={item} />}
         onRefresh={() => onSearch()}
         refreshing={loading}
         ListEmptyComponent={() => (
@@ -142,4 +143,4 @@ const StockPurchase = ({ navigation }) => {
   );
 };
 
-export default StockPurchase;
+export default StockEntries;
