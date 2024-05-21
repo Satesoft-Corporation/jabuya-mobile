@@ -8,6 +8,7 @@ const Colors = {
   lime: "#5ca30e",
   gray: "#a3a4ac",
   error: "red",
+  green: "#00B474",
 };
 
 export default Colors;

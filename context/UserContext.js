@@ -22,8 +22,7 @@ export const UserProvider = ({ children }) => {
   const [userPincode, setUserPinCode] = useState("");
   const [sessionObj, setSessionObj] = useState(null);
   const [logInWithPin, setLoginWithPin] = useState(false);
-
-  const [reload, setReload] = useState(false); // flag for reloading screen when a record edit or save is made
+  const [offlineParams, setOfflineParams] = useState(null);
 
   const getShopsFromStorage = async () => {
     await UserSessionUtils.getShops().then(async (ownerShops) => {
@@ -35,7 +34,7 @@ export const UserProvider = ({ children }) => {
           };
 
           setShops([allShops, ...ownerShops]);
-          setSelectedShop(ownerShops[0]);
+          setSelectedShop(allShops);
         } else {
           setSelectedShop(ownerShops[0]);
           setShops(ownerShops);
@@ -81,6 +80,7 @@ export const UserProvider = ({ children }) => {
             id: attendantShopId,
           });
         }
+
         const searchParameters = {
           offset: 0,
           limit: 10000,
@@ -88,6 +88,7 @@ export const UserProvider = ({ children }) => {
           ...(isShopOwner && { shopOwnerId }),
         };
 
+        setOfflineParams(searchParameters);
         const savedproducts = await saveShopProductsOnDevice(searchParameters);
         const savedClients = await saveShopClients(searchParameters);
 
@@ -136,14 +137,31 @@ export const UserProvider = ({ children }) => {
         .then(async (response) => {
           await UserSessionUtils.setUserAuthToken(response.accessToken);
           await UserSessionUtils.setUserRefreshToken(response.refreshToken);
-          await UserSessionUtils.setLoginTime(JSON.stringify(new Date()));
+          await UserSessionUtils.setLoginTime(String(new Date()));
           console.log("token refreshed");
         });
     }
   };
 
+  /**
+   *
+   * returns and object of search params basing on the selected shop and the current user type
+   */
+  const getRequestParams = () => {
+    const allShops = selectedShop?.id === userParams?.shopOwnerId;
+
+    return {
+      ...(allShops &&
+        userParams?.isShopOwner && {
+          shopOwnerId: selectedShop?.id,
+        }),
+      ...(!allShops && { shopId: selectedShop?.id }),
+    };
+  };
+
   useEffect(() => {
     getAppLockStatus();
+    getShopsFromStorage();
   }, [hasUserSetPinCode, userParams]);
 
   useEffect(() => {
@@ -166,11 +184,11 @@ export const UserProvider = ({ children }) => {
     getShopsFromStorage,
     logInWithPin,
     setLoginWithPin,
-    reload,
-    setReload,
     getRefreshToken,
     getAppLockStatus,
     configureUserData,
+    offlineParams,
+    getRequestParams,
   };
   return <UserContext.Provider value={data}>{children}</UserContext.Provider>;
 };

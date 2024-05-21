@@ -9,7 +9,6 @@ import AppStatusBar from "../../components/AppStatusBar";
 import {
   convertDateFormat,
   formatDate,
-  formatNumberWithCommas,
   getCurrentDay,
 } from "../../utils/Utils";
 import UserProfile from "../../components/UserProfile";
@@ -152,8 +151,8 @@ export default function ViewSales({ navigation }) {
         let income = profits.reduce((a, b) => a + b, 0); //getting the sum profit in all carts
         let capital = saleCapital.reduce((a, b) => a + b, 0);
 
-        setDaysProfit(formatNumberWithCommas(Math.round(income)));
-        setDaysCapital(formatNumberWithCommas(Math.round(capital)));
+        setDaysProfit(Math.round(income));
+        setDaysCapital(Math.round(capital));
         setSalesValue(sV);
         setSales(response?.records);
         setLoading(false);
@@ -223,22 +222,19 @@ export default function ViewSales({ navigation }) {
               paddingHorizontal: 12,
             }}
           >
-            <ItemHeader value={totalSalesQty || 0} title="Qty" ugx={false} />
+            <ItemHeader value={totalSalesQty || 0} title="Qty" />
 
             <VerticalSeparator />
 
-            <ItemHeader
-              title="Sales"
-              value={formatNumberWithCommas(salesValue)}
-            />
+            <ItemHeader title="Sales" value={salesValue} isCurrency />
 
             <VerticalSeparator />
 
-            <ItemHeader title="Capital " value={daysCapital} />
+            <ItemHeader title="Capital " value={daysCapital} isCurrency />
 
             <VerticalSeparator />
 
-            <ItemHeader title="Income" value={daysProfit} />
+            <ItemHeader title="Income" value={daysProfit} isCurrency />
           </View>
         </View>
       </View>

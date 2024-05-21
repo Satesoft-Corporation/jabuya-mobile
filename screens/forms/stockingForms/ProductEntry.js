@@ -6,8 +6,7 @@ import { MyDropDown } from "../../../components/DropdownComponents";
 import { BaseApiService } from "../../../utils/BaseApiService";
 import Loader from "../../../components/Loader";
 import { hasNull } from "../../..//utils/Utils";
-import { UserContext } from "../../../context/UserContext";
-import { useContext } from "react";
+import { userData } from "../../../context/UserContext";
 import TopHeader from "../../../components/TopHeader";
 import Snackbar from "../../../components/Snackbar";
 import PrimaryButton from "../../../components/buttons/PrimaryButton";
@@ -17,9 +16,10 @@ import MyInput from "../../../components/MyInput";
 import ChipButton from "../../../components/buttons/ChipButton";
 import { FlatList } from "react-native";
 import { SHOP_PRODUCTS_ENDPOINT } from "../../../utils/EndPointUtils";
+import { saveShopProductsOnDevice } from "../../../controllers/OfflineControllers";
 
 const ProductEntry = ({ navigation, route }) => {
-  const { selectedShop } = useContext(UserContext);
+  const { selectedShop, offlineParams } = userData();
 
   const [edit, setEdit] = useState(false);
   const [manufacturers, setManufacturers] = useState([]);
@@ -215,13 +215,13 @@ const ProductEntry = ({ navigation, route }) => {
     if (isValidPayload === true) {
       new BaseApiService(apiUrl)
         .saveRequestWithJsonResponse(payload, edit)
-        .then((response) => {
+        .then(async (response) => {
+          await saveShopProductsOnDevice(offlineParams, true);
           clearForm();
           setLoading(false);
           setSubmitted(false);
           snackBarRef.current.show("Product saved successfully", 5000);
           setDisable(false);
-          navigation?.goBack();
         })
         .catch((error) => {
           snackBarRef.current.show(error?.message, 5000);

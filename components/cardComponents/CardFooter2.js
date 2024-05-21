@@ -8,6 +8,7 @@ const CardFooter2 = ({
   onBtnPress,
   renderBtn = true,
   style,
+  renderLeft = () => {},
 }) => {
   return (
     <View
@@ -20,6 +21,7 @@ const CardFooter2 = ({
         style,
       ]}
     >
+      {renderLeft()}
       <Text style={{ fontSize: 13, fontWeight: 600 }}>
         <Text style={{ fontWeight: 400 }}>{label}</Text>
       </Text>

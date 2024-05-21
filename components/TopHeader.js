@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { memo, useContext, useState } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import Colors from "../constants/Colors";
 import SearchBar from "./SearchBar";
@@ -26,7 +26,7 @@ const TopHeader = ({
   };
 
   return (
-    <View>
+    <View style={{ backgroundColor: "#000" }}>
       <View style={{ paddingHorizontal: 10, backgroundColor: Colors.dark }}>
         <View
           style={{
@@ -126,4 +126,4 @@ const TopHeader = ({
   );
 };
 
-export default TopHeader;
+export default memo(TopHeader);

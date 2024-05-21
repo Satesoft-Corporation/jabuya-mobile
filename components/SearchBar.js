@@ -1,8 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
-import React from "react";
+import React, { memo } from "react";
 import Colors from "../constants/Colors";
-
-export default function SearchBar({
+function SearchBar({
   value,
   onChangeText,
   placeholder = "Search...",
@@ -46,3 +45,5 @@ export default function SearchBar({
     </View>
   );
 }
+
+export default memo(SearchBar);

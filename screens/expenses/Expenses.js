@@ -1,46 +1,58 @@
-import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
-import React, { useState, useEffect, useRef, useContext } from "react";
+import { View, Text, FlatList } from "react-native";
+import React, { useState, useEffect } from "react";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
-import Colors from "../../constants/Colors";
 import { useNavigation } from "@react-navigation/native";
 import { EXPENSE_FORM } from "../../navigation/ScreenNames";
 import ExpenseCard from "./ExpenseCard";
 import { BaseApiService } from "../../utils/BaseApiService";
-import { MAXIMUM_RECORDS_PER_FETCH } from "../../constants/Constants";
-import { ActivityIndicator } from "react-native";
-import { UserContext } from "../../context/UserContext";
+import { userData } from "../../context/UserContext";
+import { EXPENSES_ENDPOINT } from "../../utils/EndPointUtils";
+import ItemHeader from "../sales/components/ItemHeader";
+import VerticalSeparator from "../../components/VerticalSeparator";
 
 const Expenses = ({}) => {
   const navigation = useNavigation();
   const [expenses, setExpenses] = useState([]);
-  const [showFooter, setShowFooter] = useState(true);
   const [message, setMessage] = useState(null);
-  const [offset, setOffset] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
+
+  const [expenseValue, setExpenseValue] = useState(0);
+  const [categories, setCategories] = useState(0);
+
   const [loading, setLoading] = useState(true);
 
-  const snackbarRef = useRef(null);
-  const { userParams, selectedShop } = useContext(UserContext);
+  const { getRequestParams, selectedShop } = userData();
 
   const fetchExpenses = async () => {
     try {
       setMessage(null);
       setLoading(true);
+
       const searchParameters = {
-        limit: MAXIMUM_RECORDS_PER_FETCH,
-        shopId: selectedShop?.id,
-        offset: offset,
+        limit: 0,
+        offset: 0,
+        ...getRequestParams(),
       };
 
       const response = await new BaseApiService(
-        "/shop/expenses"
+        EXPENSES_ENDPOINT
       ).getRequestWithJsonResponse(searchParameters);
+
       setExpenses(response?.records);
+      setTotalItems(response?.totalItems);
+
+      setExpenseValue(response?.records?.reduce((a, b) => a + b?.amount, 0));
+
+      let cats = [
+        ...new Set(response?.records?.map((exp) => exp?.categoryName)),
+      ]?.length;
+
+      setCategories(cats);
+
       setLoading(false);
       if (response?.totalItems === 0) {
         setMessage("No expenses found");
-        setShowFooter(false);
       }
     } catch (error) {
       setMessage("Error fetching expense records");
@@ -65,6 +77,25 @@ const Expenses = ({}) => {
           },
         ]}
       />
+
+      <View
+        style={{
+          flexDirection: "row",
+          paddingTop: 15,
+          justifyContent: "space-between",
+          paddingHorizontal: 12,
+          backgroundColor: "#000",
+          paddingBottom: 10,
+        }}
+      >
+        <ItemHeader value={categories} title="Categories" />
+
+        <VerticalSeparator />
+        <ItemHeader title="Qty" value={totalItems} />
+
+        <VerticalSeparator />
+        <ItemHeader title="Value " value={expenseValue} isCurrency />
+      </View>
 
       <FlatList
         data={expenses}

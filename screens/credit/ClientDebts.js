@@ -1,34 +1,67 @@
-import { View, Text, SafeAreaView, FlatList } from "react-native";
+import { View, Text, SafeAreaView, FlatList, StyleSheet } from "react-native";
 import React, { useRef, useState } from "react";
 import Colors from "../../constants/Colors";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import ClientDebtsCard from "./components/ClientDebtsCard";
 import Snackbar from "../../components/Snackbar";
+import ItemHeader from "../sales/components/ItemHeader";
+import VerticalSeparator from "../../components/VerticalSeparator";
 
 const ClientDebts = ({ route }) => {
-  const { sales, client } = route?.params ?? {};
+  const { client, sales, debt, paid, bal } = route?.params ?? {};
 
   const [loading, setLoading] = useState(true);
 
   const snackbarRef = useRef(null);
-
-  const removeLoader = () => setLoading(false);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark }}>
       <AppStatusBar />
       <TopHeader title={`Debts for ${client?.fullName}`} />
 
+      <View style={{ paddingBottom: 10 }}>
+        <View style={styles.debtHeader}>
+          <Text
+            style={{
+              color: Colors.primary,
+              fontSize: 16,
+            }}
+          >
+            Debt summary
+          </Text>
+        </View>
+
+        <View style={styles.summaryContainer}>
+          <ItemHeader value={sales?.length} title="Qty" />
+
+          <VerticalSeparator />
+
+          <ItemHeader title="Debt" value={debt} isCurrency />
+
+          <VerticalSeparator />
+
+          <ItemHeader title="Paid " value={paid} isCurrency />
+
+          <VerticalSeparator />
+
+          <ItemHeader title="Balance" value={bal} isCurrency />
+        </View>
+      </View>
+
       <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
         <FlatList
           style={{ marginTop: 10 }}
           data={sales}
           renderItem={({ item, index }) => {
-            if (index === sales?.length - 1) {
-              removeLoader();
-            }
-            return <ClientDebtsCard debt={item} snackbarRef={snackbarRef} />;
+            return (
+              <ClientDebtsCard
+                debt={item}
+                snackbarRef={snackbarRef}
+                lastItem={index === sales?.length - 1}
+                removeLoader={() => setLoading(false)}
+              />
+            );
           }}
           keyExtractor={(item) => item.id.toString()}
           refreshing={loading}
@@ -41,3 +74,18 @@ const ClientDebts = ({ route }) => {
 };
 
 export default ClientDebts;
+
+const styles = StyleSheet.create({
+  debtHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    marginVertical: 10,
+  },
+  summaryContainer: {
+    flexDirection: "row",
+    marginTop: 15,
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
+  },
+});

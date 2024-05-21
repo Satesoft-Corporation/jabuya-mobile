@@ -93,6 +93,13 @@ function StockLevelCard({ data }) {
           />
           <DataRow label={"Listed by"} value={data?.createdByFullName} />
 
+          {data?.remarks && (
+            <>
+              <DataRow label="Remarks" />
+              <Text>{data?.remarks}</Text>
+            </>
+          )}
+
           <CardFooter1
             btnTitle1="Edit"
             btnTitle2="Hide"

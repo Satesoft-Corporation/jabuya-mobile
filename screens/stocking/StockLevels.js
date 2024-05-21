@@ -1,9 +1,9 @@
 import { View, FlatList } from "react-native";
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Text } from "react-native";
 import Colors from "../../constants/Colors";
 import Snackbar from "../../components/Snackbar";
-import { UserContext } from "../../context/UserContext";
+import { userData } from "../../context/UserContext";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import StockLevelCard from "./components/StockLevelCard";
@@ -20,15 +20,13 @@ const StockLevel = ({ navigation }) => {
   const [stockLevelRecords, setStockLevelRecords] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const [sold, setSold] = useState(0);
-
   const [stock, setStock] = useState(0);
 
   const [pdtValue, setPdtValue] = useState(0);
 
   const snackbarRef = useRef(null);
 
-  const { selectedShop } = useContext(UserContext);
+  const { selectedShop } = userData();
 
   const fetchShopProducts = async () => {
     try {
@@ -37,10 +35,13 @@ const StockLevel = ({ navigation }) => {
 
       let list = await UserSessionUtils.getShopProducts(id);
 
-      setStockLevels(list);
-      setStockLevelRecords(list.length);
+      list = list?.filter(filterCallback);
 
-      const newList = list.map((data) => {
+      setStockLevels(list);
+
+      setStockLevelRecords(list?.length);
+
+      const newList = list?.map((data) => {
         const summary = data?.performanceSummary;
         const productSoldQty = summary?.totalQuantitySold || 0;
         const productStockedQty = summary?.totalQuantityStocked || 0;
@@ -57,17 +58,14 @@ const StockLevel = ({ navigation }) => {
         }
 
         return {
-          soldQty: Math.round(productSoldQty),
           stockValue: Math.round(remainingStock * price),
           items: Math.round(remainingStock),
         };
       });
 
-      const soldQty = newList.reduce((a, b) => a + b?.soldQty, 0);
       const items = newList.reduce((a, b) => a + b?.items, 0);
       const stock = newList.reduce((a, b) => a + b?.stockValue, 0);
 
-      setSold(soldQty);
       setPdtValue(items);
       setStock(stock);
       setLoading(false);
@@ -86,16 +84,9 @@ const StockLevel = ({ navigation }) => {
     }
   };
 
-  const onSearch = () => {
-    const pool = [...stockLevels];
-    setLoading(true);
-    const filter = pool.filter((item) =>
-      item?.productName?.toLowerCase()?.includes(searchTerm.toLowerCase())
-    );
+  const filterCallback = (item) =>
+    item?.productName?.toLowerCase()?.includes(searchTerm.toLowerCase());
 
-    setStockLevels(filter);
-    setLoading(false);
-  };
   useEffect(() => {
     fetchShopProducts();
   }, [selectedShop]);
@@ -126,13 +117,13 @@ const StockLevel = ({ navigation }) => {
 
       <TopHeader
         title="Stock levels"
-        // showSearch={true}
+        showSearch={true}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         showMenuDots
         menuItems={menuItems}
         showShops
-        onSearch={onSearch}
+        onSearch={() => fetchShopProducts()}
       />
       <View
         style={{
@@ -144,21 +135,13 @@ const StockLevel = ({ navigation }) => {
           paddingBottom: 10,
         }}
       >
-        <ItemHeader
-          title="Products"
-          value={formatNumberWithCommas(stockLevelRecords)}
-          ugx={false}
-        />
+        <ItemHeader title="Products" value={stockLevelRecords} />
 
         <VerticalSeparator />
-        <ItemHeader
-          value={formatNumberWithCommas(pdtValue)}
-          title="Items"
-          ugx={false}
-        />
+        <ItemHeader value={formatNumberWithCommas(pdtValue)} title="Items" />
 
         <VerticalSeparator />
-        <ItemHeader title="Value " value={formatNumberWithCommas(stock)} />
+        <ItemHeader title="Value " value={stock} isCurrency />
       </View>
       <FlatList
         keyExtractor={(item) => item.id.toString()}
@@ -166,7 +149,10 @@ const StockLevel = ({ navigation }) => {
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
         renderItem={({ item }) => <StockLevelCard data={item} />}
-        onRefresh={() => fetchShopProducts()}
+        onRefresh={() => {
+          setSearchTerm("");
+          fetchShopProducts();
+        }}
         refreshing={loading}
         ListEmptyComponent={() => (
           <View

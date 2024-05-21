@@ -10,8 +10,16 @@ import SalesTable from "../../sales_desk/components/SalesTable";
 import DataRow from "../../../components/cardComponents/DataRow";
 import CardFooter1 from "../../../components/cardComponents/CardFooter1";
 import { CREDIT_PAYMENTS } from "../../../navigation/ScreenNames";
+import Icon from "../../../components/Icon";
+import { Text } from "react-native";
+import Colors from "../../../constants/Colors";
 
-const ClientDebtsCard = ({ debt, snackbarRef }) => {
+const ClientDebtsCard = ({
+  debt,
+  snackbarRef,
+  removeLoader,
+  lastItem = false,
+}) => {
   const navigation = useNavigation();
 
   const [items, setItems] = useState([]);
@@ -21,18 +29,38 @@ const ClientDebtsCard = ({ debt, snackbarRef }) => {
     setExpanded(!expanded);
   }, [expanded]);
 
-  const isFullyPaid = debt?.amountLoaned - debt?.amountRepaid <= 0;
+  const isFullyPaid = Math.abs(debt?.amountLoaned - debt?.amountRepaid) <= 0;
 
   const fetchLineItems = async () => {
     await new BaseApiService(`${SHOP_SALES_ENDPOINT}/${debt?.sale?.id}`)
       .getRequestWithJsonResponse()
       .then((response) => {
         setItems(response?.lineItems);
+
+        if (lastItem === true) {
+          removeLoader();
+        }
       })
       .catch((error) => {
         console.log(error);
       });
   };
+
+  const renderLeft = useCallback(() => {
+    if (isFullyPaid) {
+      return (
+        <View style={{ flexDirection: "row", gap: 5, alignItems: "center" }}>
+          <Icon
+            name="checkcircleo"
+            groupName="AntDesign"
+            color={Colors.green}
+          />
+
+          <Text style={{ color: Colors.green }}>Cleared</Text>
+        </View>
+      );
+    }
+  }, [isFullyPaid]);
 
   useEffect(() => {
     fetchLineItems();
@@ -73,6 +101,12 @@ const ClientDebtsCard = ({ debt, snackbarRef }) => {
               showCurrency
             />
 
+            <DataRow
+              key={5}
+              label={"Served by"}
+              value={debt?.createdByFullName}
+            />
+
             <CardFooter1
               btnTitle2="Hide"
               btnTitle1="Pay"
@@ -93,7 +127,7 @@ const ClientDebtsCard = ({ debt, snackbarRef }) => {
           <CardFooter2
             btnTitle="More"
             onBtnPress={toggleExpand}
-            label={isFullyPaid ? "Debt cleared" : ""}
+            renderLeft={renderLeft}
           />
         )}
       </View>

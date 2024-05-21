@@ -2,7 +2,6 @@ import { View, Text, SafeAreaView, FlatList, StyleSheet } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../../context/UserContext";
-import { formatNumberWithCommas } from "../../utils/Utils";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import ItemHeader from "../sales/components/ItemHeader";
@@ -84,6 +83,12 @@ const CreditSales = () => {
     fetchClients();
   }, [selectedShop]);
 
+  useEffect(() => {
+    if (clients?.length === adds && clients.length > 0) {
+      setLoading(false);
+    }
+  }, [adds]);
+
   const menuItems = [
     ...(userParams?.isShopOwner === true
       ? [
@@ -117,19 +122,19 @@ const CreditSales = () => {
         </View>
 
         <View style={styles.summaryContainer}>
-          <ItemHeader value={clients?.length} title="Debtors" ugx={false} />
+          <ItemHeader value={clients?.length} title="Debtors" />
 
           <VerticalSeparator />
 
-          <ItemHeader title="Debt" value={formatNumberWithCommas(debt)} />
+          <ItemHeader title="Debt" value={debt} isCurrency />
 
           <VerticalSeparator />
 
-          <ItemHeader title="Paid " value={formatNumberWithCommas(paid)} />
+          <ItemHeader title="Paid " value={paid} isCurrency />
 
           <VerticalSeparator />
 
-          <ItemHeader title="Balance" value={formatNumberWithCommas(bal)} />
+          <ItemHeader title="Balance" value={bal} isCurrency />
         </View>
       </View>
 
@@ -138,9 +143,6 @@ const CreditSales = () => {
           style={{ marginTop: 10 }}
           data={clients}
           renderItem={({ item }) => {
-            if (clients?.length === adds) {
-              setLoading(false);
-            }
             return (
               <CreditSaleCard
                 client={item}

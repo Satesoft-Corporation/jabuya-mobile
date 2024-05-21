@@ -14,7 +14,6 @@ import { StackActions } from "@react-navigation/native";
 import { navList } from "./navList";
 import { LOCK_SCREEN, STOCK_ENTRY } from "../../navigation/ScreenNames";
 import { resolveUnsavedSales } from "../../controllers/OfflineControllers";
-
 import { userData } from "../../context/UserContext";
 
 const LandingScreen = ({ navigation }) => {
@@ -84,12 +83,12 @@ const LandingScreen = ({ navigation }) => {
     const { days, hours } = logintimeDifferance;
 
     setTimeDiff(logintimeDifferance);
-    console.log(logintimeDifferance);
 
     if (hours < 24) {
       //to save if access token is still valid
       await resolveUnsavedSales();
     }
+
     if (hours >= 6 || days >= 1) {
       await getRefreshToken();
     }

@@ -82,7 +82,13 @@ const CreditSaleListItem = ({
         <CardFooter2
           btnTitle="More"
           onBtnPress={() =>
-            navigation.navigate(CLIENT_DEBTS, { client, sales })
+            navigation.navigate(CLIENT_DEBTS, {
+              client,
+              sales,
+              debt,
+              paid,
+              bal,
+            })
           }
         />
       </View>
