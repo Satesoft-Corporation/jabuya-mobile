@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native";
 import Colors from "../../constants/Colors";
 import SettingsBar from "./SettingsBar";
 import Constants from "expo-constants";
-import { UserContext } from "../../context/UserContext";
+import { UserContext, userData } from "../../context/UserContext";
 import DisplayMessage from "../../components/Dialogs/DisplayMessage";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import { LOCK_SETuP } from "../../navigation/ScreenNames";
@@ -20,7 +20,8 @@ const Settings = ({ navigation }) => {
     logInWithPin,
     setLoginWithPin,
     getAppLockStatus,
-  } = useContext(UserContext);
+    setUserParams,
+  } = userData();
 
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
@@ -42,8 +43,11 @@ const Settings = ({ navigation }) => {
   const logOut = () => {
     UserSessionUtils.clearLocalStorageAndLogout(navigation);
   };
+
   const handleLogout = () => {
-    setMessage("Are you sure you want to log out?");
+    setMessage(
+      "Are you sure you want to log out?, all unsaved data will be lost."
+    );
     setAgreeText("Yes");
     setCanCancel(true);
     setShowModal(true);
