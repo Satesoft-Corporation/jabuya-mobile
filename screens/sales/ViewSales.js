@@ -12,7 +12,7 @@ import {
   getCurrentDay,
 } from "../../utils/Utils";
 import UserProfile from "../../components/UserProfile";
-import { UserContext } from "../../context/UserContext";
+import { UserContext, userData } from "../../context/UserContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ItemHeader from "./components/ItemHeader";
 import VerticalSeparator from "../../components/VerticalSeparator";
@@ -38,9 +38,9 @@ export default function ViewSales({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [offlineSales, setOfflineSales] = useState(false);
 
-  const { userParams, selectedShop } = useContext(UserContext);
+  const { userParams, selectedShop, filterParams } = userData();
 
-  const { isShopOwner, shopOwnerId } = userParams;
+  const { isShopOwner } = userParams;
 
   const unsavedSales = async () => {
     let list = await UserSessionUtils.getPendingSales();
@@ -100,16 +100,11 @@ export default function ViewSales({ navigation }) {
   const getSales = async (day = null) => {
     setLoading(true);
     setMessage(null);
-    const allShops = selectedShop?.id === shopOwnerId;
 
     let searchParameters = {
       offset: 0,
       limit: 0,
-      ...(allShops &&
-        isShopOwner && {
-          shopOwnerId: selectedShop?.id,
-        }),
-      ...(!allShops && { shopId: selectedShop?.id }),
+      ...filterParams(),
       startDate: getCurrentDay(),
       ...(day && {
         startDate: convertDateFormat(day),

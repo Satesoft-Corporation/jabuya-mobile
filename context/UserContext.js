@@ -147,16 +147,19 @@ export const UserProvider = ({ children }) => {
    *
    * returns and object of search params basing on the selected shop and the current user type
    */
-  const getRequestParams = () => {
-    const allShops = selectedShop?.id === userParams?.shopOwnerId;
+  const filterParams = () => {
+    let obj = {};
+    const allShops = selectedShop?.name === "All shops";
 
-    return {
-      ...(allShops &&
-        userParams?.isShopOwner && {
-          shopOwnerId: selectedShop?.id,
-        }),
-      ...(!allShops && { shopId: selectedShop?.id }),
-    };
+    if (userParams?.isShopOwner === true && allShops) {
+      obj.shopOwnerId = selectedShop?.id;
+    }
+
+    if (!allShops) {
+      obj.shopId = selectedShop?.id;
+    }
+
+    return obj;
   };
 
   useEffect(() => {
@@ -188,7 +191,7 @@ export const UserProvider = ({ children }) => {
     getAppLockStatus,
     configureUserData,
     offlineParams,
-    getRequestParams,
+    filterParams,
   };
   return <UserContext.Provider value={data}>{children}</UserContext.Provider>;
 };

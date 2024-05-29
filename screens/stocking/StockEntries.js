@@ -1,9 +1,9 @@
 import { View, Text, FlatList } from "react-native";
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import TopHeader from "../../components/TopHeader";
 import AppStatusBar from "../../components/AppStatusBar";
 import Colors from "../../constants/Colors";
-import { UserContext } from "../../context/UserContext";
+import { userData } from "../../context/UserContext";
 import { BaseApiService } from "../../utils/BaseApiService";
 import { MAXIMUM_RECORDS_PER_FETCH } from "../../constants/Constants";
 import Snackbar from "../../components/Snackbar";
@@ -22,23 +22,16 @@ const StockEntries = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const snackbarRef = useRef(null);
 
-  const { selectedShop, userParams } = useContext(UserContext);
-  const { isShopOwner, shopOwnerId } = userParams;
+  const { selectedShop, filterParams } = userData();
 
   const fetchStockEntries = async (offsetToUse = 0) => {
     try {
       setMessage(null);
       setLoading(true);
 
-      const allShops = selectedShop?.id === shopOwnerId;
-
       const searchParameters = {
         limit: MAXIMUM_RECORDS_PER_FETCH,
-        ...(allShops &&
-          isShopOwner && {
-            shopOwnerId: selectedShop?.id,
-          }),
-        ...(!allShops && { shopId: selectedShop?.id }),
+        ...filterParams(),
         offset: offsetToUse,
         ...(searchTerm &&
           searchTerm.trim() !== "" && { searchTerm: searchTerm }),

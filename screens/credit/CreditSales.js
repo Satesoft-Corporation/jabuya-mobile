@@ -1,7 +1,7 @@
 import { View, Text, SafeAreaView, FlatList, StyleSheet } from "react-native";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { UserContext } from "../../context/UserContext";
+import { userData } from "../../context/UserContext";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
 import ItemHeader from "../sales/components/ItemHeader";
@@ -27,7 +27,7 @@ const CreditSales = () => {
   const [adds, setAdds] = useState(0);
 
   const snackbarRef = useRef(null);
-  const { selectedShop, userParams } = useContext(UserContext);
+  const { selectedShop, userParams, filterParams } = userData();
 
   const fetchClients = async () => {
     setMessage(null);
@@ -37,16 +37,11 @@ const CreditSales = () => {
     setPaid(0);
     setClients([]);
     setAdds(0);
-    const allShops = selectedShop?.id === userParams?.shopOwnerId;
 
     const serachParams = {
       limit: 0,
-      ...(allShops &&
-        userParams?.isShopOwner && {
-          shopOwnerId: selectedShop?.id,
-        }),
-      ...(!allShops && { shopId: selectedShop?.id }),
       offset: 0,
+      ...filterParams(),
     };
 
     await new BaseApiService(CLIENTS_ENDPOINT)

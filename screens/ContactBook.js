@@ -8,24 +8,24 @@ import {
   Linking,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import TopHeader from "../components/TopHeader";
 import AppStatusBar from "../components/AppStatusBar";
 import Colors from "../constants/Colors";
 import { UserSessionUtils } from "../utils/UserSessionUtils";
 import { BaseApiService } from "../utils/BaseApiService";
-import { UserContext } from "../context/UserContext";
+import { userData } from "../context/UserContext";
 
 const ContactBook = () => {
   const [clients, setClients] = useState([]);
   const [message, setMessage] = useState(null);
   const [showFooter, setShowFooter] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
-  const { selectedShop } = useContext(UserContext);
+  const { filterParams } = userData();
 
   const fetchClients = () => {
     const serachParams = {
-      shopId: selectedShop?.id,
+      ...filterParams(),
       limit: 0,
       offset: 0,
     };
