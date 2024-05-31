@@ -45,72 +45,76 @@ export const UserProvider = ({ children }) => {
 
   const configureUserData = async () => {
     let isConfigured = false;
-    await UserSessionUtils.getUserDetails().then(async (data) => {
-      if (data) {
-        const {
-          roles,
-          firstName,
-          lastName,
-          isShopOwner,
-          isShopAttendant,
-          attendantShopId,
-          shopOwnerId,
-          attendantShopName,
-        } = data;
+    await UserSessionUtils.getUserDetails()
+      .then(async (data) => {
+        if (data) {
+          const {
+            roles,
+            firstName,
+            lastName,
+            isShopOwner,
+            isShopAttendant,
+            attendantShopId,
+            shopOwnerId,
+            attendantShopName,
+          } = data;
 
-        setUserParams({
-          isShopOwner,
-          isShopAttendant,
-          attendantShopId,
-          shopOwnerId,
-        });
-
-        setSessionObj({
-          fullName: firstName + " " + lastName,
-          role: roles[0].name,
-          phoneNumber: data?.phoneNumber,
-          dateCreated: data?.dateCreated,
-          emailAddress: data?.emailAddress,
-          attendantShopName: data?.attendantShopName,
-        });
-
-        if (isShopAttendant == true) {
-          setSelectedShop({
-            name: attendantShopName,
-            id: attendantShopId,
+          setUserParams({
+            isShopOwner,
+            isShopAttendant,
+            attendantShopId,
+            shopOwnerId,
           });
-        }
 
-        const searchParameters = {
-          offset: 0,
-          limit: 10000,
-          ...(isShopAttendant && { shopId: attendantShopId }),
-          ...(isShopOwner && { shopOwnerId }),
-        };
+          setSessionObj({
+            fullName: firstName + " " + lastName,
+            role: roles[0].name,
+            phoneNumber: data?.phoneNumber,
+            dateCreated: data?.dateCreated,
+            emailAddress: data?.emailAddress,
+            attendantShopName: data?.attendantShopName,
+          });
 
-        setOfflineParams(searchParameters);
-        const savedproducts = await saveShopProductsOnDevice(searchParameters);
-        const savedClients = await saveShopClients(searchParameters);
+          if (isShopAttendant == true) {
+            setSelectedShop({
+              name: attendantShopName,
+              id: attendantShopId,
+            });
+          }
 
-        if (savedproducts === true && savedClients === true) {
+          const searchParameters = {
+            offset: 0,
+            limit: 10000,
+            ...(isShopAttendant && { shopId: attendantShopId }),
+            ...(isShopOwner && { shopOwnerId }),
+          };
+
+          setOfflineParams(searchParameters);
+          const savedproducts = await saveShopProductsOnDevice(
+            searchParameters
+          );
+          const savedClients = await saveShopClients(searchParameters);
+
+          if (savedproducts === true && savedClients === true) {
+            isConfigured = true;
+          }
+
+          let shopCount = await UserSessionUtils.getShopCount();
+
+          if (!isShopAttendant && shopCount === null) {
+            const savedShops = await saveShopDetails(isShopOwner, shopOwnerId);
+            isConfigured = savedShops;
+          }
+
           isConfigured = true;
         }
-
-        let shopCount = await UserSessionUtils.getShopCount();
-
-        if (!isShopAttendant && shopCount === null) {
-          const savedShops = await saveShopDetails(isShopOwner, shopOwnerId);
-          isConfigured = savedShops;
-        }
-
-        isConfigured = true;
-      } else {
+      })
+      .catch((error) => {
         console.log("No user data available");
         setUserParams({});
         setSessionObj(null);
         isConfigured = false;
-      }
-    });
+      });
 
     return isConfigured;
   };
@@ -152,7 +156,7 @@ export const UserProvider = ({ children }) => {
     const allShops = selectedShop?.name === "All shops";
 
     if (userParams?.isShopOwner === true && allShops) {
-      obj.shopOwnerId = selectedShop?.id;
+      obj.shopOwnerId = userParams?.shopOwnerId;
     }
 
     if (!allShops) {

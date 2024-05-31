@@ -1,12 +1,12 @@
 import { memo, useCallback, useContext, useEffect, useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
-import CardHeader from "../../../components/cardComponents/CardHeader";
+import CardHeader from "../../../components/card_components/CardHeader";
 import SalesTable from "../../sales_desk/components/SalesTable";
-import DataRow from "../../../components/cardComponents/DataRow";
-import CardFooter2 from "../../../components/cardComponents/CardFooter2";
+import DataRow from "../../../components/card_components/DataRow";
+import CardFooter2 from "../../../components/card_components/CardFooter2";
 import { UserContext } from "../../../context/UserContext";
-import CardFooter1 from "../../../components/cardComponents/CardFooter1";
+import CardFooter1 from "../../../components/card_components/CardFooter1";
 
 function OfflineSaleTxnCard({ data, onRemove }) {
   const { lineItems, soldOnDate, onCredit, shopId } = data;

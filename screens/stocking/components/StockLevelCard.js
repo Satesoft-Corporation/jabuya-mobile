@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { View, Text } from "react-native";
 import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
-import DataRow from "../../../components/cardComponents/DataRow";
-import CardHeader from "../../../components/cardComponents/CardHeader";
-import CardFooter1 from "../../../components/cardComponents/CardFooter1";
-import CardFooter2 from "../../../components/cardComponents/CardFooter2";
+import DataRow from "../../../components/card_components/DataRow";
+import CardHeader from "../../../components/card_components/CardHeader";
+import CardFooter1 from "../../../components/card_components/CardFooter1";
+import CardFooter2 from "../../../components/card_components/CardFooter2";
 import { useNavigation } from "@react-navigation/native";
 import { PDT_ENTRY, UPDATE_PRICE } from "../../../navigation/ScreenNames";
-import DataColumn from "../../../components/cardComponents/DataColumn";
+import DataColumn from "../../../components/card_components/DataColumn";
 
 function StockLevelCard({ data }) {
   const [expanded, setExpanded] = useState(false);
@@ -41,7 +41,8 @@ function StockLevelCard({ data }) {
     >
       <CardHeader
         value1={`SN: ${data?.serialNumber}`}
-        value2={formatDate(data?.dateCreated)}
+        date={data?.dateCreated}
+        shop={data?.shopName}
       />
 
       <View

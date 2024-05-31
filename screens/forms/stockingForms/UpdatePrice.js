@@ -7,7 +7,7 @@ import { UserContext } from "../../../context/UserContext";
 import Colors from "../../../constants/Colors";
 import MyInput from "../../../components/MyInput";
 import Loader from "../../../components/Loader";
-import DataRow from "../../../components/cardComponents/DataRow";
+import DataRow from "../../../components/card_components/DataRow";
 import { formatNumberWithCommas, isValidNumber } from "../../../utils/Utils";
 import { SHOP_PRODUCTS_ENDPOINT } from "../../../utils/EndPointUtils";
 import { BaseApiService } from "../../../utils/BaseApiService";

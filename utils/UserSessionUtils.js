@@ -199,10 +199,9 @@ export class UserSessionUtils {
     );
   }
 
-  static async getShopProducts(shopId) {
+  static async getShopProducts(shopId = null) {
     let productList = await AsyncStorage.getItem(StorageParams.SHOP_PRODUCTS);
-
-    if (shopId) {
+    if (shopId !== null) {
       let newList = [...JSON.parse(productList)];
       let filtered = newList.filter((item) => item.shopId === shopId);
       return filtered;
@@ -280,10 +279,10 @@ export class UserSessionUtils {
     await AsyncStorage.setItem(StorageParams.SHOP_CLIENTS, data);
   }
 
-  static async getShopClients(shopId, withNumber = false) {
+  static async getShopClients(shopId = null, withNumber = false) {
     let list = await AsyncStorage.getItem(StorageParams.SHOP_CLIENTS);
 
-    if (shopId) {
+    if (shopId !== null) {
       let newList = [...JSON.parse(list)];
       let filtered = newList.filter((item) => item?.shop?.id === shopId);
       if (withNumber === true) {
@@ -316,6 +315,6 @@ export class UserSessionUtils {
 
 /**
  * git commands and origin,clon, add,comit,push,fetch,pull,PR
- * 
- * 
+ *
+ *
  */

@@ -6,13 +6,16 @@ import Colors from "../../constants/Colors";
 
 import AppStatusBar from "../../components/AppStatusBar";
 import UserProfile from "../../components/UserProfile";
-import { SalesDropdownComponent } from "../../components/DropdownComponents";
+import {
+  MyDropDown,
+  SalesDropdownComponent,
+} from "../../components/DropdownComponents";
 import { formatNumberWithCommas, isValidNumber } from "../../utils/Utils";
 import { BlackScreen } from "../../components/BlackAndWhiteScreen";
 import { IconsComponent } from "../../components/MenuIcon";
 import Snackbar from "../../components/Snackbar";
 import { useRef } from "react";
-import { UserContext } from "../../context/UserContext";
+import { UserContext, userData } from "../../context/UserContext";
 import SelectShopBar from "../../components/SelectShopBar";
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 import { SaleEntryContext } from "../../context/SaleEntryContext";
@@ -35,7 +38,7 @@ function SalesEntry({ navigation }) {
 
   const snackbarRef = useRef(null);
 
-  const { userParams, selectedShop, shops } = useContext(UserContext);
+  const { userParams, selectedShop, shops, setSelectedShop } = userData();
 
   const {
     selections,
@@ -54,7 +57,7 @@ function SalesEntry({ navigation }) {
     setUnitCost,
   } = useContext(SaleEntryContext);
 
-  const { isShopOwner, isShopAttendant, shopOwnerId } = userParams;
+  const { isShopAttendant } = userParams;
 
   const menuItems = [
     {
@@ -119,16 +122,22 @@ function SalesEntry({ navigation }) {
       <BlackScreen flex={isShopAttendant ? 12 : 10}>
         <UserProfile renderMenu renderNtnIcon={false} menuItems={menuItems} />
 
-        <View style={{ paddingHorizontal: 0, marginTop: 15 }}>
+        <View style={{ marginTop: 15 }}>
           {!isShopAttendant && shops?.length > 1 && (
-            <SelectShopBar
-              showIcon={false}
-              onPress={() => navigation.navigate(SHOP_SELECTION)}
-            />
+            <View style={{ paddingHorizontal: 10 }}>
+              <MyDropDown
+                data={shops?.filter((s) => !s?.name?.includes("All"))}
+                labelField={"name"}
+                valueField="id"
+                onChange={(e) => setSelectedShop(e)}
+                value={selectedShop}
+                search={false}
+              />
+            </View>
           )}
 
           <SalesDropdownComponent
-            disable={isShopOwner && selectedShop === null}
+            disable={!isShopAttendant && selectedShop?.name?.includes("All")}
             value={selection}
             products={products}
             handleChange={(t) => handleChange(t)}

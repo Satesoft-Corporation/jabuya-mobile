@@ -8,10 +8,9 @@ import ItemHeader from "../sales/components/ItemHeader";
 import VerticalSeparator from "../../components/VerticalSeparator";
 import Snackbar from "../../components/Snackbar";
 import Colors from "../../constants/Colors";
-import { BaseApiService } from "../../utils/BaseApiService";
 import CreditSaleCard from "./components/CreditSaleCard";
 import { CLIENT_FORM } from "../../navigation/ScreenNames";
-import { CLIENTS_ENDPOINT } from "../../utils/EndPointUtils";
+import { UserSessionUtils } from "../../utils/UserSessionUtils";
 
 const CreditSales = () => {
   const navigation = useNavigation();
@@ -27,9 +26,10 @@ const CreditSales = () => {
   const [adds, setAdds] = useState(0);
 
   const snackbarRef = useRef(null);
-  const { selectedShop, userParams, filterParams } = userData();
+  const { selectedShop, userParams } = userData();
 
   const fetchClients = async () => {
+    const { name, id } = selectedShop;
     setMessage(null);
     setLoading(true);
     setBal(0);
@@ -38,18 +38,12 @@ const CreditSales = () => {
     setClients([]);
     setAdds(0);
 
-    const serachParams = {
-      limit: 0,
-      offset: 0,
-      ...filterParams(),
-    };
-
-    await new BaseApiService(CLIENTS_ENDPOINT)
-      .getRequestWithJsonResponse(serachParams)
+    await UserSessionUtils.getShopClients(name?.includes("All") ? null : id)
       .then((response) => {
-        setClients(response?.records);
-        if (response?.totalItems === 0) {
+        setClients(response);
+        if (response.length === 0) {
           setMessage("No records found");
+          setLoading(false);
         }
       })
       .catch((error) => {

@@ -19,7 +19,7 @@ import { SHOP_PRODUCTS_ENDPOINT } from "../../../utils/EndPointUtils";
 import { saveShopProductsOnDevice } from "../../../controllers/OfflineControllers";
 
 const ProductEntry = ({ navigation, route }) => {
-  const { selectedShop, offlineParams } = userData();
+  const { selectedShop, offlineParams, shops, setSelectedShop } = userData();
 
   const [edit, setEdit] = useState(false);
   const [manufacturers, setManufacturers] = useState([]);
@@ -255,6 +255,25 @@ const ProductEntry = ({ navigation, route }) => {
           }}
         >
           <Text style={styles.headerText}>Enter product details</Text>
+
+          <View style={{ marginTop: 20, gap: 5 }}>
+            <Text>Shop</Text>
+            <MyDropDown
+              search={false}
+              style={{
+                backgroundColor: Colors.light,
+                borderColor: Colors.dark,
+              }}
+              data={shops?.filter((shop) => !shop?.name?.includes("All"))}
+              value={selectedShop}
+              onChange={(e) => {
+                setSelectedShop(e);
+              }}
+              placeholder="Select "
+              labelField="name"
+              valueField="id"
+            />
+          </View>
 
           <View>
             <Text style={styles.inputLabel}>Manufacturer</Text>

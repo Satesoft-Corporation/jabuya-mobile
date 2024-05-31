@@ -10,6 +10,7 @@ import Snackbar from "../../components/Snackbar";
 import StockEntryCard from "./components/StockEntryCard";
 import { STOCK_ENTRY_FORM } from "../../navigation/ScreenNames";
 import { STOCK_ENTRY_ENDPOINT } from "../../utils/EndPointUtils";
+import { saveShopProductsOnDevice } from "../../controllers/OfflineControllers";
 
 const StockEntries = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
@@ -22,7 +23,7 @@ const StockEntries = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const snackbarRef = useRef(null);
 
-  const { selectedShop, filterParams } = userData();
+  const { selectedShop, filterParams, offlineParams } = userData();
 
   const fetchStockEntries = async (offsetToUse = 0) => {
     try {
@@ -43,7 +44,6 @@ const StockEntries = ({ navigation }) => {
         STOCK_ENTRY_ENDPOINT
       ).getRequestWithJsonResponse(searchParameters);
 
-      console.log(response?.records);
       if (offsetToUse === 0) {
         setStockEntries(response.records);
       } else {
@@ -89,6 +89,10 @@ const StockEntries = ({ navigation }) => {
   useEffect(() => {
     fetchStockEntries();
   }, [selectedShop]);
+
+  useEffect(() => {
+    saveShopProductsOnDevice(offlineParams, true);
+  }, []);
 
   const menuItems = [
     {

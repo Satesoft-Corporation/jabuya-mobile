@@ -3,7 +3,7 @@ import React, { memo } from "react";
 import { formatDate } from "../../../utils/Utils";
 import Colors from "../../../constants/Colors";
 import ChipButton2 from "../../../components/buttons/ChipButton2";
-import CardHeader from "../../../components/cardComponents/CardHeader";
+import CardHeader from "../../../components/card_components/CardHeader";
 
 const ShopClient = ({ client }) => {
   return (

@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { View, Text } from "react-native";
 import { formatDate } from "../../../utils/Utils";
 import { useNavigation } from "@react-navigation/native";
-import DataRow from "../../../components/cardComponents/DataRow";
+import DataRow from "../../../components/card_components/DataRow";
 import ChipButton2 from "../../../components/buttons/ChipButton2";
 import { STOCK_ENTRY_FORM } from "../../../navigation/ScreenNames";
-import CardHeader from "../../../components/cardComponents/CardHeader";
-import DataColumn from "../../../components/cardComponents/DataColumn";
+import CardHeader from "../../../components/card_components/CardHeader";
+import DataColumn from "../../../components/card_components/DataColumn";
 
 const StockEntryCard = ({ data }) => {
   const [expanded, setExpanded] = useState(false);
@@ -42,8 +42,9 @@ const StockEntryCard = ({ data }) => {
       }}
     >
       <CardHeader
-        value1={` SN: ${data?.serialNumber}`}
-        value2={formatDate(data?.dateCreated)}
+        value1={`SN: ${data?.serialNumber}`}
+        date={data?.dateCreated}
+        shop={data?.shopName}
       />
       <View
         style={{

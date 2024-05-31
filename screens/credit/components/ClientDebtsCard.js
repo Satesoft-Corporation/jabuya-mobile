@@ -1,14 +1,14 @@
 import { View, StyleSheet } from "react-native";
 import React, { memo, useCallback, useEffect, useState } from "react";
-import CardHeader from "../../../components/cardComponents/CardHeader";
+import CardHeader from "../../../components/card_components/CardHeader";
 import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
 import { useNavigation } from "@react-navigation/native";
 import { BaseApiService } from "../../../utils/BaseApiService";
-import CardFooter2 from "../../../components/cardComponents/CardFooter2";
+import CardFooter2 from "../../../components/card_components/CardFooter2";
 import { SHOP_SALES_ENDPOINT } from "../../../utils/EndPointUtils";
 import SalesTable from "../../sales_desk/components/SalesTable";
-import DataRow from "../../../components/cardComponents/DataRow";
-import CardFooter1 from "../../../components/cardComponents/CardFooter1";
+import DataRow from "../../../components/card_components/DataRow";
+import CardFooter1 from "../../../components/card_components/CardFooter1";
 import { CREDIT_PAYMENTS } from "../../../navigation/ScreenNames";
 import Icon from "../../../components/Icon";
 import { Text } from "react-native";
@@ -71,7 +71,8 @@ const ClientDebtsCard = ({
       <View style={styles.container}>
         <CardHeader
           value1={`SN: ${debt?.serialNumber}`}
-          value2={formatDate(debt?.dateCreated)}
+          date={debt?.dateCreated}
+          shop={debt?.sale?.shop?.name}
         />
 
         <SalesTable sales={items} fixHeight={false} />

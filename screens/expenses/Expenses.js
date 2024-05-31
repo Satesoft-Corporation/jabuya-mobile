@@ -22,47 +22,47 @@ const Expenses = ({}) => {
 
   const [loading, setLoading] = useState(true);
 
-  const { getRequestParams, selectedShop } = userData();
+  const { selectedShop, filterParams, userParams } = userData();
 
   const fetchExpenses = async () => {
-    try {
-      setMessage(null);
-      setLoading(true);
+    setMessage(null);
+    setLoading(true);
 
-      const searchParameters = {
-        limit: 0,
-        offset: 0,
-        ...getRequestParams(),
-      };
+    const searchParameters = {
+      limit: 0,
+      offset: 0,
+      ...filterParams(),
+    };
 
-      const response = await new BaseApiService(
-        EXPENSES_ENDPOINT
-      ).getRequestWithJsonResponse(searchParameters);
+    await new BaseApiService(EXPENSES_ENDPOINT)
+      .getRequestWithJsonResponse(searchParameters)
+      .then((response) => {
+        setExpenses(response?.records);
+        setTotalItems(response?.totalItems);
 
-      setExpenses(response?.records);
-      setTotalItems(response?.totalItems);
+        setExpenseValue(response?.records?.reduce((a, b) => a + b?.amount, 0));
 
-      setExpenseValue(response?.records?.reduce((a, b) => a + b?.amount, 0));
+        let cats = [
+          ...new Set(response?.records?.map((exp) => exp?.categoryName)),
+        ]?.length;
 
-      let cats = [
-        ...new Set(response?.records?.map((exp) => exp?.categoryName)),
-      ]?.length;
+        setCategories(cats);
 
-      setCategories(cats);
-
-      setLoading(false);
-      if (response?.totalItems === 0) {
-        setMessage("No expenses found");
-      }
-    } catch (error) {
-      setMessage("Error fetching expense records");
-      setLoading(false);
-    }
+        setLoading(false);
+        if (response?.totalItems === 0) {
+          setMessage("No expenses found");
+        }
+      })
+      .catch((error) => {
+        setMessage("Error fetching expense records");
+        setLoading(false);
+        console.log(error, "the hvihwviwvwivv");
+      });
   };
-
   useEffect(() => {
     fetchExpenses();
   }, [selectedShop]);
+
   return (
     <View style={{ flex: 1 }}>
       <AppStatusBar />
@@ -104,7 +104,11 @@ const Expenses = ({}) => {
         onRefresh={() => fetchExpenses()}
         ListEmptyComponent={() => (
           <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
             {totalItems === 0 && <Text>{message}</Text>}
           </View>

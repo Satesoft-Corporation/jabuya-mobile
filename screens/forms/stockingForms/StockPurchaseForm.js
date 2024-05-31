@@ -12,23 +12,17 @@ import {
   formatNumberWithCommas,
   hasNull,
 } from "../../../utils/Utils";
-import { UserContext } from "../../../context/UserContext";
-import { useContext } from "react";
+import { userData } from "../../../context/UserContext";
 import TopHeader from "../../../components/TopHeader";
 import Snackbar from "../../../components/Snackbar";
 import PrimaryButton from "../../../components/buttons/PrimaryButton";
 import { STOCK_ENTRY_ENDPOINT } from "../../../utils/EndPointUtils";
-import {
-  resolveUnsavedSales,
-  saveShopProductsOnDevice,
-} from "../../../controllers/OfflineControllers";
+import { resolveUnsavedSales } from "../../../controllers/OfflineControllers";
 import { UserSessionUtils } from "../../../utils/UserSessionUtils";
 import MyInput from "../../../components/MyInput";
 
 const StockPurchaseForm = ({ navigation, route }) => {
-  const { selectedShop, userParams } = useContext(UserContext);
-
-  const { shopOwnerId } = userParams;
+  const { selectedShop, shops, setSelectedShop, offlineParams } = userData();
 
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -65,20 +59,11 @@ const StockPurchaseForm = ({ navigation, route }) => {
     setIsPackedProduct(null);
     setSelectedProduct(null);
 
-    let searchParameters = {
-      offset: 0,
-      limit: 10000,
-      shopOwnerId: shopOwnerId,
-    };
     setLoading(true);
 
-    let success = await saveShopProductsOnDevice(searchParameters, true);
-
-    if (success) {
-      const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
-      setProducts(pdtList);
-      setLoading(false);
-    }
+    const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
+    setProducts(pdtList);
+    setLoading(false);
   };
 
   const onProductChange = (pdt) => {
@@ -117,7 +102,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
       manufacturerId: selectedProduct?.manufacturerId,
       productId: edit ? selectedProduct?.productId : selectedProduct?.id,
       productName: selectedProduct?.productName,
-      shopId: selectedShop?.id,
+      shopId: edit ? selectedProduct?.shopId : selectedShop?.id,
       stockedOnDate: convertToServerDate(purchaseDate),
       supplierId: selectedSupplier?.id,
       remarks: remarks || "",
@@ -168,7 +153,6 @@ const StockPurchaseForm = ({ navigation, route }) => {
         });
     }
   };
-  
 
   const populateForm = () => {
     if (route.params) {
@@ -186,6 +170,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
         packageUnitName: selectedRecord?.formattedQuantity.split(" ")[1],
         manufacturerId: selectedRecord?.manufacturerId,
         packageQuantity: selectedRecord?.purchasedQuantity,
+        shopId: selectedRecord?.shopId,
       });
 
       setIsPackedProduct(!selectedRecord?.unpackedPurchase);
@@ -204,9 +189,10 @@ const StockPurchaseForm = ({ navigation, route }) => {
       setBatchNo(selectedRecord?.batchNumber);
       setRemarks(selectedRecord?.remarks);
     } else {
-      //to fetch these only on entry
+      if (suppliers?.length < 0) {
+        fetchSuppliers();
+      }
       fetchProducts();
-      fetchSuppliers();
     }
   };
 
@@ -226,7 +212,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
 
   useEffect(() => {
     populateForm();
-  }, []);
+  }, [selectedShop]);
 
   useEffect(() => {
     getUnitPurchasePrice();
@@ -258,6 +244,26 @@ const StockPurchaseForm = ({ navigation, route }) => {
             {edit ? "Edit" : "Enter"} stock detail
           </Text>
 
+          {!edit && (
+            <View style={{ gap: 5 }}>
+              <Text>Shop</Text>
+              <MyDropDown
+                search={false}
+                style={{
+                  backgroundColor: Colors.light,
+                  borderColor: Colors.dark,
+                }}
+                data={shops?.filter((shop) => !shop?.name?.includes("All"))}
+                value={selectedShop}
+                onChange={(e) => {
+                  setSelectedShop(e);
+                }}
+                placeholder="Select "
+                labelField="name"
+                valueField="id"
+              />
+            </View>
+          )}
           <View>
             <Text style={styles.inputLabel}>Product</Text>
             <MyDropDown

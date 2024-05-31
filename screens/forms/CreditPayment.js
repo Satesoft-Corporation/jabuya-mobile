@@ -8,7 +8,7 @@ import { convertToServerDate, formatNumberWithCommas } from "../../utils/Utils";
 import Loader from "../../components/Loader";
 import { BaseApiService } from "../../utils/BaseApiService";
 import Snackbar from "../../components/Snackbar";
-import DataRow from "../../components/cardComponents/DataRow";
+import DataRow from "../../components/card_components/DataRow";
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 
 const CreditPayment = ({ route }) => {

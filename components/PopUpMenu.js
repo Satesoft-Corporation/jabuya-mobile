@@ -38,11 +38,11 @@ const PopUpmenu = ({ menuItems = [], showShops = false }) => {
             color: Colors.dark,
           }}
         >
-          {item.name}
+          {item?.name}
         </Text>
       </MenuOption>
     ),
-    []
+    [menuItems]
   );
 
   return (
@@ -50,10 +50,9 @@ const PopUpmenu = ({ menuItems = [], showShops = false }) => {
       <MenuTrigger
         text=""
         style={{
-          width: 40,
+          width: 25,
           alignItems: "center",
           justifyContent: "center",
-          borderRadius: 100,
         }}
       >
         <Icon

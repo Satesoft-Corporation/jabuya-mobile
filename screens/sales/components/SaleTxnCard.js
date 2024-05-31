@@ -5,11 +5,11 @@ import {
   formatDate,
   formatNumberWithCommas,
 } from "../../../utils/Utils";
-import CardHeader from "../../../components/cardComponents/CardHeader";
+import CardHeader from "../../../components/card_components/CardHeader";
 import SalesTable from "../../sales_desk/components/SalesTable";
-import DataRow from "../../../components/cardComponents/DataRow";
-import CardFooter2 from "../../../components/cardComponents/CardFooter2";
-import DataColumn from "../../../components/cardComponents/DataColumn";
+import DataRow from "../../../components/card_components/DataRow";
+import CardFooter2 from "../../../components/card_components/CardFooter2";
+import DataColumn from "../../../components/card_components/DataColumn";
 
 function SaleTxnCard({ data }) {
   // sales report item card
@@ -46,13 +46,9 @@ function SaleTxnCard({ data }) {
       style={[styles.container, { borderWidth: balanceGivenOut < 0 ? 1 : 0 }]}
     >
       <CardHeader
-        value1={shopName}
-        value2={`${formatDate(data?.soldOnDate, true)}`}
-      />
-      <CardHeader
         value1={`SN: ${data?.serialNumber}`}
-        value2={`${extractTime(data.dateCreated)}`}
-        value1Style={{ fontWeight: 400 }}
+        date={data?.dateCreated}
+        shop={data?.shopName}
       />
 
       {!expanded && (

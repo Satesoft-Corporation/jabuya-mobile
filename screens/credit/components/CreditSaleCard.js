@@ -1,11 +1,11 @@
 import { View, StyleSheet } from "react-native";
 import React, { memo, useEffect, useState } from "react";
-import CardHeader from "../../../components/cardComponents/CardHeader";
+import CardHeader from "../../../components/card_components/CardHeader";
 import { formatDate } from "../../../utils/Utils";
 import { useNavigation } from "@react-navigation/native";
-import DataColumn from "../../../components/cardComponents/DataColumn";
+import DataColumn from "../../../components/card_components/DataColumn";
 import { BaseApiService } from "../../../utils/BaseApiService";
-import CardFooter2 from "../../../components/cardComponents/CardFooter2";
+import CardFooter2 from "../../../components/card_components/CardFooter2";
 import { CLIENT_DEBTS } from "../../../navigation/ScreenNames";
 
 const CreditSaleListItem = ({
@@ -63,8 +63,10 @@ const CreditSaleListItem = ({
       <View style={styles.container}>
         <CardHeader
           value1={`CSN: ${client?.serialNumber}`}
-          value2={formatDate(client?.dateCreated)}
+          shop={client?.shop?.name}
+          date={client?.dateCreated}
         />
+
         <View style={styles.content}>
           <DataColumn
             title={"Client"}
@@ -80,6 +82,7 @@ const CreditSaleListItem = ({
         </View>
 
         <CardFooter2
+          renderBtn={bal > 0}
           btnTitle="More"
           onBtnPress={() =>
             navigation.navigate(CLIENT_DEBTS, {
