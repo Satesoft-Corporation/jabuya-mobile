@@ -237,12 +237,12 @@ const ProductEntry = ({ navigation, route }) => {
   }, []);
 
   return (
-    <KeyboardAvoidingView
-      enabled={true}
-      behavior={"height"}
-      style={{ flex: 1 }}
-    >
-      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
+      <KeyboardAvoidingView
+        enabled={true}
+        behavior={"height"}
+        style={{ flex: 1 }}
+      >
         <AppStatusBar />
 
         <TopHeader title="List product" />
@@ -256,24 +256,26 @@ const ProductEntry = ({ navigation, route }) => {
         >
           <Text style={styles.headerText}>Enter product details</Text>
 
-          <View style={{ marginTop: 20, gap: 5 }}>
-            <Text>Shop</Text>
-            <MyDropDown
-              search={false}
-              style={{
-                backgroundColor: Colors.light,
-                borderColor: Colors.dark,
-              }}
-              data={shops?.filter((shop) => !shop?.name?.includes("All"))}
-              value={selectedShop}
-              onChange={(e) => {
-                setSelectedShop(e);
-              }}
-              placeholder="Select "
-              labelField="name"
-              valueField="id"
-            />
-          </View>
+          {!edit && (
+            <View style={{ gap: 5 }}>
+              <Text>Shop</Text>
+              <MyDropDown
+                search={false}
+                style={{
+                  backgroundColor: Colors.light,
+                  borderColor: Colors.dark,
+                }}
+                data={shops?.filter((shop) => !shop?.name?.includes("All"))}
+                value={selectedShop}
+                onChange={(e) => {
+                  setSelectedShop(e);
+                }}
+                placeholder="Select Shop"
+                labelField="name"
+                valueField="id"
+              />
+            </View>
+          )}
 
           <View>
             <Text style={styles.inputLabel}>Manufacturer</Text>
@@ -404,8 +406,8 @@ const ProductEntry = ({ navigation, route }) => {
           />
         </View>
         <Snackbar ref={snackBarRef} />
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

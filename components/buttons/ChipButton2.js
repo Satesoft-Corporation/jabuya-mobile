@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity } from "react-native";
-import React, { memo } from "react";
+import React from "react";
 import Colors from "../../constants/Colors";
 
 const ChipButton2 = ({ onPress, title = "", darkMode = true }) => {
@@ -30,4 +30,4 @@ const ChipButton2 = ({ onPress, title = "", darkMode = true }) => {
   );
 };
 
-export default memo(ChipButton2);
+export default ChipButton2;

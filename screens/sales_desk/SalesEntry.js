@@ -15,17 +15,12 @@ import { BlackScreen } from "../../components/BlackAndWhiteScreen";
 import { IconsComponent } from "../../components/MenuIcon";
 import Snackbar from "../../components/Snackbar";
 import { useRef } from "react";
-import { UserContext, userData } from "../../context/UserContext";
-import SelectShopBar from "../../components/SelectShopBar";
+import { userData } from "../../context/UserContext";
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 import { SaleEntryContext } from "../../context/SaleEntryContext";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import { SafeAreaView } from "react-native";
-import {
-  BARCODE_SCREEN,
-  SALES_REPORTS,
-  SHOP_SELECTION,
-} from "../../navigation/ScreenNames";
+import { BARCODE_SCREEN, SALES_REPORTS } from "../../navigation/ScreenNames";
 import SalesTable from "./components/SalesTable";
 import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
 import ConfirmSaleModal from "./components/ConfirmSaleModal";
@@ -68,7 +63,7 @@ function SalesEntry({ navigation }) {
 
   const fetchProducts = async () => {
     setLoading(true);
-    const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id); //store the payload in local storage
+    const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
 
     setProducts(pdtList);
     fetchClients();

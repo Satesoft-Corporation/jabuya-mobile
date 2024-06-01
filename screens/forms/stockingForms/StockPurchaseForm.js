@@ -189,7 +189,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
       setBatchNo(selectedRecord?.batchNumber);
       setRemarks(selectedRecord?.remarks);
     } else {
-      if (suppliers?.length < 0) {
+      if (suppliers?.length === 0) {
         fetchSuppliers();
       }
       fetchProducts();
@@ -258,7 +258,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                 onChange={(e) => {
                   setSelectedShop(e);
                 }}
-                placeholder="Select "
+                placeholder="Select Shop"
                 labelField="name"
                 valueField="id"
               />

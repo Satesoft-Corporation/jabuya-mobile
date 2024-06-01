@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React, { memo } from "react";
+import React from "react";
 import Colors from "../../../constants/Colors";
 import RenderCurrency from "../../../components/RenderCurrency";
 
@@ -25,4 +25,4 @@ const ItemHeader = ({ title, value, isCurrency = false }) => {
   );
 };
 
-export default memo(ItemHeader);
+export default ItemHeader;
