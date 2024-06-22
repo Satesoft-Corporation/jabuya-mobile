@@ -1,4 +1,4 @@
-let Colors = {
+const Colors = {
   dark: "#000000",
   primary: "#f5e102",
   primary_light: "#968c1e",
@@ -8,6 +8,7 @@ let Colors = {
   lime: "#5ca30e",
   gray: "#a3a4ac",
   error: "red",
+  green: "#00B474",
 };
 
 export default Colors;

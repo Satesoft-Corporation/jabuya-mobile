@@ -8,4 +8,11 @@ export default {
   SHOP_ID: "@shop_id",
   SHOP_COUNT: "@shop_count",
   LOGIN_TIME: "@login_time",
+  SHOPS: "@shops",
+  SHOP_PRODUCTS: "@shop_products",
+  PENDING_SALES: "@pending_sales",
+  PIN_CODE: "@pincode",
+  PIN_LOGIN: "@pin_login",
+  SHOP_CLIENTS: "@shop_clients",
+  LOGIN_DETAILS: "@login_details",
 };

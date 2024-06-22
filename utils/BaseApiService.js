@@ -7,10 +7,6 @@ import Constants from "expo-constants";
 export class BaseApiService {
   apiEndpoint;
   authToken = UserSessionUtils.getBearerToken();
-  requestHeaders = {
-    PLATFORM_TYPE: Platform.OS,
-    VERSION_CODE: Constants.expoConfig.version,
-  };
 
   /**
    * This is constructor is used to initialize the API service endpoint to be used for this call.
@@ -32,6 +28,8 @@ export class BaseApiService {
     const headers = {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
+      Version_code: Constants.expoConfig.version,
+      Platform_type: Platform.OS,
     };
     return await fetch(
       this.apiEndpoint + "?" + new URLSearchParams(queryParameters),
@@ -77,6 +75,8 @@ export class BaseApiService {
       Accept: "application/json",
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
+      Version_code: Constants.expoConfig.version,
+      Platform_type: Platform.OS,
     };
     return await fetch(this.apiEndpoint, {
       method: "POST",
@@ -121,14 +121,14 @@ export class BaseApiService {
    * This method is used to obtain a refresh token from the server
    */
   async refreshTokenRequest() {
-    let requestBody = { token: UserSessionUtils.getRefreshToken() };
+    let token = await UserSessionUtils.getRefreshToken();
+
+    const headers = {
+      Authorization: "Bearer " + token,
+    };
     return await fetch(this.apiEndpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify(requestBody),
+      headers: headers,
     });
   }
 
@@ -139,10 +139,12 @@ export class BaseApiService {
    * @returns
    */
   async putRequest(requestBody) {
-    let token = UserSessionUtils.getBearerToken();
+    let token = await UserSessionUtils.getBearerToken();
     const headers = {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
+      Version_code: Constants.expoConfig.version,
+      Platform_type: Platform.OS,
     };
     return fetch(this.apiEndpoint, {
       method: "PUT",

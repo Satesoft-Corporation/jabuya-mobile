@@ -1,12 +1,10 @@
-import { UserSessionUtils } from "./UserSessionUtils";
-import { dummyLoginResponse } from "../constants/Constants";
-import { CommonActions } from "@react-navigation/native";
-
+// eas build -p android --profile preview
 export function formatNumberWithCommas(number) {
+  number = Number(number);
   return number ? number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0;
 }
 
-export function formatDate(inputDate, removeTime = false) {
+export function formatDate(inputDate, removeTime = false, onlyTime = false) {
   let options;
   if (removeTime === true) {
     options = {
@@ -31,6 +29,22 @@ export function formatDate(inputDate, removeTime = false) {
   const formattedDate = date.toLocaleDateString("en-US", options);
 
   return formattedDate;
+}
+
+export function extractTime(inputDate) {
+  const date = new Date(inputDate);
+
+  // Define options for formatting the time
+  const options = {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true, // Use 12-hour format
+  };
+
+  const formattedTime = date.toLocaleTimeString("en-US", options);
+
+  return formattedTime;
 }
 
 export function formatDateToDDMMYY(dateString) {
@@ -118,57 +132,64 @@ export function getCurrentDay(getTomorrowDate = false) {
 export function convertDateFormat(dateString, getTomorrowDate = false) {
   const date = new Date(dateString); // Create a Date object from the input string
 
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  let hours = "00";
+  let minutes = "00";
+  let seconds = "00";
+  let milliseconds = "00";
+
   if (getTomorrowDate === true) {
     date.setDate(date.getDate() + 1); // Increment the date by 1 to get tomorrow's date
   }
 
-  const isoDateString = date.toISOString(); // Convert Date object to ISO string
-  return isoDateString;
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
 }
 
 export function getTimeDifference(date1, date2) {
-  let parsedDate1 = new Date(date1);
-  let parsedDate2 = new Date(date2);
+  let parsedDate1 = date1.getTime();
+  let parsedDate2 = date2.getTime();
 
-  let timeDiff = Math.abs(parsedDate1 - parsedDate2);
+  let timeDifference = Math.abs(parsedDate1 - parsedDate2);
 
-  let milliseconds = timeDiff % 1000;
-  timeDiff = (timeDiff - milliseconds) / 1000;
+  const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+  timeDifference -= days * (1000 * 60 * 60 * 24);
 
-  let seconds = timeDiff % 60;
-  timeDiff = (timeDiff - seconds) / 60;
+  const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+  timeDifference -= hours * (1000 * 60 * 60);
 
-  let minutes = timeDiff % 60;
-  timeDiff = (timeDiff - minutes) / 60;
+  const minutes = Math.floor(timeDifference / (1000 * 60));
+  timeDifference -= minutes * (1000 * 60);
 
-  let hours = timeDiff % 24;
+  const seconds = Math.floor(timeDifference / 1000);
 
   return {
+    days: days,
     hours: hours,
     minutes: minutes,
     seconds: seconds,
   };
 }
 
-export const onDummyLogin = async (navigation) => {
-  let info = { ...dummyLoginResponse };
-  const date = new Date();
+export const isValidNumber = (num) => {
+  let reg = /^[-+]?[0-9]*\.?[0-9]+$/;
 
-  const { dispatch } = navigation;
-  await UserSessionUtils.setLoggedIn(true);
-  await UserSessionUtils.setUserDetails(info.user);
-  await UserSessionUtils.setUserAuthToken(info.accessToken);
-  await UserSessionUtils.setUserRefreshToken(info.refreshToken);
-  await UserSessionUtils.setFullSessionObject(info);
-  await UserSessionUtils.setShopid(String(info.user.attendantShopId));
-  await UserSessionUtils.setLoginTime(String(date));
-
-  navigation.navigate("welcome");
-
-  dispatch(
-    CommonActions.reset({
-      index: 0,
-      routes: [{ name: "welcome" }],
-    })
-  );
+  return reg.test(num);
 };
+
+export function datesAreEqual(d1, d2) {
+  let date1 = new Date(d1);
+
+  let date2 = new Date(d2);
+  const year1 = date1.getFullYear();
+  const month1 = date1.getMonth();
+  const day1 = date1.getDate();
+
+  const year2 = date2.getFullYear();
+  const month2 = date2.getMonth();
+  const day2 = date2.getDate();
+
+  // Compare the year, month, and day components
+  return year1 === year2 && month1 === month2 && day1 === day2;
+}

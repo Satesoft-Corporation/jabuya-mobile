@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StorageParams from "../constants/StorageParams";
 import { CommonActions } from "@react-navigation/native";
+import { LOGIN } from "../navigation/ScreenNames";
 export class UserSessionUtils {
   /**
    * This is used to get the user's bearer token.
@@ -25,11 +26,10 @@ export class UserSessionUtils {
   static async clearLocalStorageAndLogout(navigation) {
     // remove all
     await AsyncStorage.clear();
-    const { dispatch } = navigation;
-    dispatch(
+    navigation?.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: "login" }],
+        routes: [{ name: LOGIN }],
       })
     );
   }
@@ -159,6 +159,23 @@ export class UserSessionUtils {
   }
 
   /**
+   * This method is used to set the number shops for a shop owner
+   * @param {count} count
+   */
+  static async setShops(shops) {
+    await AsyncStorage.setItem(StorageParams.SHOPS, JSON.stringify(shops));
+  }
+
+  /**
+   * This method is used to get the number of shops an owner has
+   * @returns shopcount
+   */
+  static async getShops() {
+    let shops = await AsyncStorage.getItem(StorageParams.SHOPS);
+    return JSON.parse(shops);
+  }
+
+  /**
    * This method is used to set the login timestamp
    * @param {time} time
    */
@@ -172,6 +189,132 @@ export class UserSessionUtils {
    */
   static async getLoginTime() {
     let time = await AsyncStorage.getItem(StorageParams.LOGIN_TIME);
-    return time;
+    return new Date(time);
+  }
+
+  static async setShopProducts(productList) {
+    await AsyncStorage.setItem(
+      StorageParams.SHOP_PRODUCTS,
+      JSON.stringify(productList)
+    );
+  }
+
+  static async getShopProducts(shopId = null) {
+    let productList = await AsyncStorage.getItem(StorageParams.SHOP_PRODUCTS);
+    if (shopId !== null) {
+      let newList = [...JSON.parse(productList)];
+      let filtered = newList.filter((item) => item.shopId === shopId);
+      return filtered;
+    } else {
+      return productList ? JSON.parse(productList) : [];
+    }
+  }
+
+  static async getProductByBarcode(barcode) {
+    let productList = await this.getShopProducts();
+
+    let item = productList.find((item) => item.barcode === barcode);
+
+    return item;
+  }
+
+  /**
+   *
+   * @param {*} salePayLoad
+   * stores a sale record when the user is offline
+   */
+  static async addPendingSale(salePayLoad) {
+    let pendingSales = await this.getPendingSales();
+
+    await AsyncStorage.setItem(
+      StorageParams.PENDING_SALES,
+      JSON.stringify([...pendingSales, salePayLoad])
+    );
+  }
+
+  static async removePendingSale(index) {
+    let pendingSales = await this.getPendingSales();
+    pendingSales.splice(index, 1); // Removes the sale record at the specified index
+
+    await AsyncStorage.setItem(
+      StorageParams.PENDING_SALES,
+      JSON.stringify([...pendingSales])
+    );
+  }
+
+  static async getPendingSales() {
+    let list = await AsyncStorage.getItem(StorageParams.PENDING_SALES);
+    return list ? JSON.parse(list) : [];
+  }
+
+  static async resetPendingSales() {
+    //to clear the list
+    await AsyncStorage.setItem(StorageParams.PENDING_SALES, JSON.stringify([]));
+  }
+
+  static async setUserPinCode(code) {
+    await AsyncStorage.setItem(StorageParams.PIN_CODE, code);
+  }
+
+  static async getUserPinCode() {
+    return await AsyncStorage.getItem(StorageParams.PIN_CODE);
+  }
+
+  static async removeUserPinCode() {
+    await AsyncStorage.removeItem(StorageParams.PIN_CODE);
+    await AsyncStorage.removeItem(StorageParams.PIN_LOGIN);
+  }
+
+  static async setPinLoginTime(time) {
+    await AsyncStorage.setItem(StorageParams.PIN_LOGIN, time);
+  }
+
+  static async getPinLoginTime() {
+    let time = await AsyncStorage.getItem(StorageParams.PIN_LOGIN);
+    return time ? new Date(time) : null;
+  }
+
+  static async setShopClients(clients) {
+    let data = JSON.stringify(clients);
+    await AsyncStorage.setItem(StorageParams.SHOP_CLIENTS, data);
+  }
+
+  static async getShopClients(shopId = null, withNumber = false) {
+    let list = await AsyncStorage.getItem(StorageParams.SHOP_CLIENTS);
+
+    if (shopId !== null) {
+      let newList = [...JSON.parse(list)];
+      let filtered = newList.filter((item) => item?.shop?.id === shopId);
+      if (withNumber === true) {
+        filtered = filtered.map((item) => {
+          return {
+            ...item,
+            fullName: `${item?.fullName}  ${item?.phoneNumber}`,
+          };
+        });
+      }
+      return filtered;
+    } else {
+      return list ? JSON.parse(list) : [];
+    }
+  }
+
+  static async setLoginDetails(data) {
+    await AsyncStorage.setItem(
+      StorageParams.LOGIN_DETAILS,
+      JSON.stringify(data)
+    );
+  }
+
+  static async getLoginDetails() {
+    let data = await AsyncStorage.getItem(StorageParams.LOGIN_DETAILS);
+
+    return JSON.parse(data);
   }
 }
+
+/**
+ * git commands and origin,clon, add,comit,push,fetch,pull,PR
+ *
+ *
+ */
