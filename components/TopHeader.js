@@ -1,10 +1,10 @@
 import React, { memo, useContext, useState } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import Colors from "../constants/Colors";
-import SearchBar from "./SearchBar";
-import { UserContext } from "../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
+import { UserContext } from "context/UserContext";
+import Colors from "@constants/Colors";
 import PopUpmenu from "./PopUpMenu";
+import SearchBar from "./SearchBar";
 
 const TopHeader = ({
   title = "Details",

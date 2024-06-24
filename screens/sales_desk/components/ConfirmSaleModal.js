@@ -1,21 +1,20 @@
 import { View, Text } from "react-native";
 import React, { useContext, useState } from "react";
-import ModalContent from "../../../components/ModalContent";
+import { UserContext } from "context/UserContext";
+import { SaleEntryContext } from "context/SaleEntryContext";
+import { useNetInfo } from "@react-native-community/netinfo";
 import {
   convertToServerDate,
   formatDate,
   formatNumberWithCommas,
-} from "../../../utils/Utils";
-import Colors from "../../../constants/Colors";
+} from "@utils/Utils";
+import { BaseApiService } from "@utils/BaseApiService";
+import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 import SalesTable from "./SalesTable";
-import PrimaryButton from "../../../components/buttons/PrimaryButton";
 import PaymentMethodComponent from "./PaymentMethodComponent";
-import { SaleEntryContext } from "../../../context/SaleEntryContext";
-import { BaseApiService } from "../../../utils/BaseApiService";
-import { UserSessionUtils } from "../../../utils/UserSessionUtils";
-import NetInfo, { useNetInfo } from "@react-native-community/netinfo";
-import { UserContext } from "../../../context/UserContext";
-import { saveShopProductsOnDevice } from "../../../controllers/OfflineControllers";
+import PrimaryButton from "@components/buttons/PrimaryButton";
+import ModalContent from "@components/ModalContent";
+import Colors from "@constants/Colors";
 
 const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
   const [submitted, setSubmitted] = useState(false);
@@ -75,7 +74,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
     setLoading(true);
 
     if (netinfo?.isConnected === true) {
-      new BaseApiService("/shop-sales")
+      await new BaseApiService("/shop-sales")
         .postRequest(payLoad)
         .then(async (response) => {
           let d = { info: await response.json(), status: response.status };

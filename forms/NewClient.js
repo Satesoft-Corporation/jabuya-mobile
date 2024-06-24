@@ -1,17 +1,16 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView } from "react-native";
 import React, { useState, useContext, useRef } from "react";
-import TopHeader from "../../components/TopHeader";
-import AppStatusBar from "../../components/AppStatusBar";
-import Colors from "../../constants/Colors";
-import MyInput from "../../components/MyInput";
-import { MyDropDown } from "../../components/DropdownComponents";
-import { UserContext } from "../../context/UserContext";
-import { convertToServerDate } from "../../utils/Utils";
-import Loader from "../../components/Loader";
-import { BaseApiService } from "../../utils/BaseApiService";
-import Snackbar from "../../components/Snackbar";
-import { BaseStyle } from "../../utils/BaseStyle";
-import PrimaryButton from "../../components/buttons/PrimaryButton";
+import { UserContext } from "context/UserContext";
+import { convertToServerDate } from "@utils/Utils";
+import { BaseApiService } from "@utils/BaseApiService";
+import AppStatusBar from "@components/AppStatusBar";
+import TopHeader from "@components/TopHeader";
+import Loader from "@components/Loader";
+import Colors from "@constants/Colors";
+import MyInput from "@components/MyInput";
+import { MyDropDown } from "@components/DropdownComponents";
+import PrimaryButton from "@components/buttons/PrimaryButton";
+import Snackbar from "@components/Snackbar";
 
 const NewClient = () => {
   const [firstName, setFirstName] = useState("");

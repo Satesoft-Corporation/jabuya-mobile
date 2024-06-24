@@ -1,15 +1,15 @@
 import { View, Text, SafeAreaView } from "react-native";
 import React, { useState, useRef } from "react";
-import TopHeader from "../../components/TopHeader";
-import AppStatusBar from "../../components/AppStatusBar";
-import Colors from "../../constants/Colors";
-import MyInput from "../../components/MyInput";
-import { convertToServerDate, formatNumberWithCommas } from "../../utils/Utils";
-import Loader from "../../components/Loader";
-import { BaseApiService } from "../../utils/BaseApiService";
-import Snackbar from "../../components/Snackbar";
-import DataRow from "../../components/card_components/DataRow";
-import PrimaryButton from "../../components/buttons/PrimaryButton";
+import { convertToServerDate } from "@utils/Utils";
+import { BaseApiService } from "@utils/BaseApiService";
+import AppStatusBar from "@components/AppStatusBar";
+import Colors from "@constants/Colors";
+import TopHeader from "@components/TopHeader";
+import Loader from "@components/Loader";
+import DataRow from "@components/card_components/DataRow";
+import MyInput from "@components/MyInput";
+import PrimaryButton from "@components/buttons/PrimaryButton";
+import Snackbar from "@components/Snackbar";
 
 const CreditPayment = ({ route }) => {
   const sale = { ...route.params };
@@ -43,7 +43,7 @@ const CreditPayment = ({ route }) => {
     if (isValidSubmision) {
       setLoading(true);
 
-      new BaseApiService(`/credit-sales/${sale?.id}/payments`)
+      await new BaseApiService(`/credit-sales/${sale?.id}/payments`)
         .saveRequestWithJsonResponse(payLoad, false)
         .then(async (response) => {
           setLoading(false);

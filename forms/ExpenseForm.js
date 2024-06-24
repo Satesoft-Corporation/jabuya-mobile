@@ -1,17 +1,17 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView } from "react-native";
 import React, { useContext, useEffect, useState, useRef } from "react";
-import AppStatusBar from "../../components/AppStatusBar";
-import TopHeader from "../../components/TopHeader";
-import { BaseStyle } from "../../utils/BaseStyle";
-import MyInput from "../../components/MyInput";
-import { MyDropDown } from "../../components/DropdownComponents";
-import Colors from "../../constants/Colors";
-import { UserContext } from "../../context/UserContext";
-import Loader from "../../components/Loader";
+import { UserContext } from "context/UserContext";
 import { useNavigation } from "@react-navigation/native";
-import { BaseApiService } from "../../utils/BaseApiService";
-import Snackbar from "../../components/Snackbar";
-import PrimaryButton from "../../components/buttons/PrimaryButton";
+import { BaseApiService } from "@utils/BaseApiService";
+import AppStatusBar from "@components/AppStatusBar";
+import TopHeader from "@components/TopHeader";
+import Loader from "@components/Loader";
+import Colors from "@constants/Colors";
+import { MyDropDown } from "@components/DropdownComponents";
+import MyInput from "@components/MyInput";
+import PrimaryButton from "@components/buttons/PrimaryButton";
+import { BaseStyle } from "@utils/BaseStyle";
+import Snackbar from "@components/Snackbar";
 
 const ExpenseForm = () => {
   const [categories, setCategories] = useState([]);
@@ -25,6 +25,7 @@ const ExpenseForm = () => {
 
   const snackRef = useRef(null);
   const navigation = useNavigation();
+
   const fetchCategories = async () => {
     let searchParameters = {
       offset: 0,
@@ -32,7 +33,7 @@ const ExpenseForm = () => {
       commaSeparatedTypeIds: [5],
     };
 
-    new BaseApiService("/lookups/lookup-values")
+    await new BaseApiService("/lookups/lookup-values")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setCategories(response.records);

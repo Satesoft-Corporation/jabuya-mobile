@@ -1,16 +1,16 @@
 import { View, Text, FlatList } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
-import TopHeader from "../../components/TopHeader";
-import AppStatusBar from "../../components/AppStatusBar";
-import Colors from "../../constants/Colors";
-import { userData } from "../../context/UserContext";
-import { BaseApiService } from "../../utils/BaseApiService";
-import { MAXIMUM_RECORDS_PER_FETCH } from "../../constants/Constants";
-import Snackbar from "../../components/Snackbar";
+import { userData } from "context/UserContext";
+import { MAXIMUM_RECORDS_PER_FETCH } from "@constants/Constants";
+import { BaseApiService } from "@utils/BaseApiService";
+import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
+import AppStatusBar from "@components/AppStatusBar";
+import Colors from "@constants/Colors";
+import TopHeader from "@components/TopHeader";
 import StockEntryCard from "./components/StockEntryCard";
-import { STOCK_ENTRY_FORM } from "../../navigation/ScreenNames";
-import { STOCK_ENTRY_ENDPOINT } from "../../utils/EndPointUtils";
-import { saveShopProductsOnDevice } from "../../controllers/OfflineControllers";
+import Snackbar from "@components/Snackbar";
+import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
+import { STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
 
 const StockEntries = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);

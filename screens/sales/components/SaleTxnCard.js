@@ -1,15 +1,11 @@
+import CardFooter2 from "@components/card_components/CardFooter2";
+import CardHeader from "@components/card_components/CardHeader";
+import DataColumn from "@components/card_components/DataColumn";
+import DataRow from "@components/card_components/DataRow";
+import SalesTable from "@screens/sales_desk/components/SalesTable";
+import { formatNumberWithCommas } from "@utils/Utils";
 import { memo, useCallback, useEffect, useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
-import {
-  extractTime,
-  formatDate,
-  formatNumberWithCommas,
-} from "../../../utils/Utils";
-import CardHeader from "../../../components/card_components/CardHeader";
-import SalesTable from "../../sales_desk/components/SalesTable";
-import DataRow from "../../../components/card_components/DataRow";
-import CardFooter2 from "../../../components/card_components/CardFooter2";
-import DataColumn from "../../../components/card_components/DataColumn";
 
 function SaleTxnCard({ data }) {
   // sales report item card

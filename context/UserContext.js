@@ -1,12 +1,12 @@
-import { createContext, useState, useEffect, useContext } from "react";
-import { UserSessionUtils } from "../utils/UserSessionUtils";
-import { BaseApiService } from "../utils/BaseApiService";
-import { LOGIN_END_POINT } from "../utils/EndPointUtils";
 import {
   saveShopClients,
   saveShopDetails,
   saveShopProductsOnDevice,
-} from "../controllers/OfflineControllers";
+} from "@controllers/OfflineControllers";
+import { BaseApiService } from "@utils/BaseApiService";
+import { LOGIN_END_POINT } from "@utils/EndPointUtils";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
+import { createContext, useState, useEffect, useContext } from "react";
 
 export const UserContext = createContext();
 
@@ -43,7 +43,7 @@ export const UserProvider = ({ children }) => {
     });
   };
 
-  const configureUserData = async () => {
+  const configureUserData = async (refresh = false) => {
     let isConfigured = false;
     await UserSessionUtils.getUserDetails()
       .then(async (data) => {
@@ -91,26 +91,28 @@ export const UserProvider = ({ children }) => {
 
           setOfflineParams(searchParameters);
           const savedproducts = await saveShopProductsOnDevice(
-            searchParameters
+            searchParameters,
+            refresh
           );
-          const savedClients = await saveShopClients(searchParameters);
+          const savedClients = await saveShopClients(searchParameters, refresh);
 
           if (savedproducts === true && savedClients === true) {
             isConfigured = true;
           }
+          getShopsFromStorage();
 
-          let shopCount = await UserSessionUtils.getShopCount();
-
-          if (!isShopAttendant && shopCount === null) {
-            const savedShops = await saveShopDetails(isShopOwner, shopOwnerId);
+          if (!isShopAttendant) {
+            const savedShops = await saveShopDetails(
+              isShopOwner,
+              shopOwnerId,
+              refresh
+            );
             isConfigured = savedShops;
           }
-
-          isConfigured = true;
         }
       })
       .catch((error) => {
-        console.log("No user data available");
+        console.log("No user data available", error);
         setUserParams({});
         setSessionObj(null);
         isConfigured = false;

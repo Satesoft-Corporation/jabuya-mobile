@@ -53,7 +53,7 @@ const MyInput = ({
           borderWidth: 0.6,
           borderColor: darkMode ? Colors.primary : Colors.dark,
           paddingHorizontal: 10,
-          justifyContent:'space-between'
+          justifyContent: "space-between",
         }}
       >
         <TextInput
@@ -92,4 +92,4 @@ const MyInput = ({
   );
 };
 
-export default memo(MyInput);
+export default MyInput;

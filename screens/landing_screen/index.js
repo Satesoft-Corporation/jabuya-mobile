@@ -1,20 +1,20 @@
 import { View, SafeAreaView } from "react-native";
 import React, { useEffect, useState } from "react";
-import Colors from "../../constants/Colors";
 import { FlatList } from "react-native";
-import UserProfile from "../../components/UserProfile";
-import { BlackScreen } from "../../components/BlackAndWhiteScreen";
-import AppStatusBar from "../../components/AppStatusBar";
-import { MenuIcon } from "../../components/MenuIcon";
-import { UserSessionUtils } from "../../utils/UserSessionUtils";
-import { getTimeDifference } from "../../utils/Utils";
-import DisplayMessage from "../../components/Dialogs/DisplayMessage";
-import Loader from "../../components/Loader";
 import { StackActions } from "@react-navigation/native";
-import { navList } from "./navList";
-import { LOCK_SCREEN, STOCK_ENTRY } from "../../navigation/ScreenNames";
-import { resolveUnsavedSales } from "../../controllers/OfflineControllers";
 import { userData } from "../../context/UserContext";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
+import { getTimeDifference } from "@utils/Utils";
+import { BlackScreen } from "@components/BlackAndWhiteScreen";
+import AppStatusBar from "@components/AppStatusBar";
+import Loader from "@components/Loader";
+
+import UserProfile from "@components/UserProfile";
+import { MenuIcon } from "@components/MenuIcon";
+import DisplayMessage from "@components/Dialogs/DisplayMessage";
+import Colors from "@constants/Colors";
+import { resolveUnsavedSales } from "@controllers/OfflineControllers";
+import { navList } from "./navList";
 
 const LandingScreen = ({ navigation }) => {
   const {
@@ -77,12 +77,22 @@ const LandingScreen = ({ navigation }) => {
   };
 
   const handleLoginSession = async () => {
+    await configureUserData(false); //configuring up the usercontext
+
     let prevLoginTime = await UserSessionUtils.getLoginTime();
 
     const logintimeDifferance = getTimeDifference(prevLoginTime, new Date());
-    const { days, hours } = logintimeDifferance;
+    const { days, hours, minutes } = logintimeDifferance;
 
     setTimeDiff(logintimeDifferance);
+
+    await handlePinLockStatus();
+    await getShopsFromStorage();
+
+    if (hours > 0 && hours % 3 === 0 && minutes > 59) {
+      console.log("i a mul", hours);
+      await configureUserData(true); //configuring up the user and refreshing
+    }
 
     if (hours < 24) {
       //to save if access token is still valid
@@ -92,25 +102,23 @@ const LandingScreen = ({ navigation }) => {
     if (hours >= 6 || days >= 1) {
       await getRefreshToken();
     }
+
+    setLoading(false);
   };
 
-  const start = async () => {
-    const isUserConfigured = await configureUserData(); //configuring up the user
-
-    if (isUserConfigured === true) {
-      await configureUserData();
-      handlePinLockStatus();
-      handleLoginSession();
-      await getShopsFromStorage();
-      setLoading(false);
-    } else {
-      logOut();
-      return true;
-    }
+  const startTheApp = async () => {
+    await UserSessionUtils.getUserDetails().then(async (data) => {
+      if (data) {
+        await handleLoginSession();
+      } else {
+        logOut();
+        return true;
+      }
+    });
   };
 
   useEffect(() => {
-    start();
+    startTheApp();
   }, []);
 
   return (

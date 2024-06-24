@@ -1,25 +1,20 @@
 import { View, Text, ScrollView, SafeAreaView, StyleSheet } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import Colors from "../../../constants/Colors";
-import AppStatusBar from "../../../components/AppStatusBar";
-import { MyDropDown } from "../../../components/DropdownComponents";
-import { BaseApiService } from "../../../utils/BaseApiService";
-import { packageOptions } from "../../../constants/Constants";
-import Loader from "../../../components/Loader";
+import { userData } from "context/UserContext";
+import { BaseApiService } from "@utils/BaseApiService";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
+import { convertToServerDate, formatNumberWithCommas } from "@utils/Utils";
+import { resolveUnsavedSales } from "@controllers/OfflineControllers";
+import AppStatusBar from "@components/AppStatusBar";
+import TopHeader from "@components/TopHeader";
+import { MyDropDown } from "@components/DropdownComponents";
+import MyInput from "@components/MyInput";
+import PrimaryButton from "@components/buttons/PrimaryButton";
+import Snackbar from "@components/Snackbar";
+import Colors from "@constants/Colors";
 import { KeyboardAvoidingView } from "react-native";
-import {
-  convertToServerDate,
-  formatNumberWithCommas,
-  hasNull,
-} from "../../../utils/Utils";
-import { userData } from "../../../context/UserContext";
-import TopHeader from "../../../components/TopHeader";
-import Snackbar from "../../../components/Snackbar";
-import PrimaryButton from "../../../components/buttons/PrimaryButton";
-import { STOCK_ENTRY_ENDPOINT } from "../../../utils/EndPointUtils";
-import { resolveUnsavedSales } from "../../../controllers/OfflineControllers";
-import { UserSessionUtils } from "../../../utils/UserSessionUtils";
-import MyInput from "../../../components/MyInput";
+import Loader from "@components/Loader";
+import { packageOptions } from "@constants/Constants";
 
 const StockPurchaseForm = ({ navigation, route }) => {
   const { selectedShop, shops, setSelectedShop, offlineParams } = userData();
@@ -44,7 +39,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
 
   const fetchSuppliers = async () => {
     let searchParameters = { offset: 0, limit: 0 };
-    new BaseApiService("/suppliers")
+    await new BaseApiService("/suppliers")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setSuppliers(response.records);
@@ -230,7 +225,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <AppStatusBar />
+        <AppStatusBar/>
 
         <TopHeader title="Stock purchase" />
         <Loader loading={loading} />

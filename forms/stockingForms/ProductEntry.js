@@ -1,22 +1,22 @@
 import { View, Text, KeyboardAvoidingView } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import Colors from "../../../constants/Colors";
-import AppStatusBar from "../../../components/AppStatusBar";
-import { MyDropDown } from "../../../components/DropdownComponents";
-import { BaseApiService } from "../../../utils/BaseApiService";
-import Loader from "../../../components/Loader";
-import { hasNull } from "../../..//utils/Utils";
-import { userData } from "../../../context/UserContext";
-import TopHeader from "../../../components/TopHeader";
-import Snackbar from "../../../components/Snackbar";
-import PrimaryButton from "../../../components/buttons/PrimaryButton";
-import { SafeAreaView } from "react-native";
-import { StyleSheet } from "react-native";
-import MyInput from "../../../components/MyInput";
-import ChipButton from "../../../components/buttons/ChipButton";
+import { userData } from "context/UserContext";
+import { BaseApiService } from "@utils/BaseApiService";
+import { SHOP_PRODUCTS_ENDPOINT } from "@utils/EndPointUtils";
+import { hasNull } from "@utils/Utils";
+import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
+import AppStatusBar from "@components/AppStatusBar";
+import TopHeader from "@components/TopHeader";
+import Loader from "@components/Loader";
+import { MyDropDown } from "@components/DropdownComponents";
 import { FlatList } from "react-native";
-import { SHOP_PRODUCTS_ENDPOINT } from "../../../utils/EndPointUtils";
-import { saveShopProductsOnDevice } from "../../../controllers/OfflineControllers";
+import ChipButton from "@components/buttons/ChipButton";
+import PrimaryButton from "@components/buttons/PrimaryButton";
+import Colors from "@constants/Colors";
+import { StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native";
+import MyInput from "@components/MyInput";
+import Snackbar from "@components/Snackbar";
 
 const ProductEntry = ({ navigation, route }) => {
   const { selectedShop, offlineParams, shops, setSelectedShop } = userData();
@@ -40,7 +40,7 @@ const ProductEntry = ({ navigation, route }) => {
 
   const fetchManufacturers = async () => {
     let searchParameters = { searchTerm: "", offset: 0, limit: 0 };
-    new BaseApiService("/manufacturers")
+    await new BaseApiService("/manufacturers")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setManufacturers(response.records);
@@ -61,7 +61,7 @@ const ProductEntry = ({ navigation, route }) => {
     if (manufacturerId) {
       searchParameters.manufacturerId = manufacturerId;
     }
-    new BaseApiService("/products")
+    await new BaseApiService("/products")
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         setProducts(response.records);

@@ -25,7 +25,7 @@ import SalesTable from "./components/SalesTable";
 import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
 import ConfirmSaleModal from "./components/ConfirmSaleModal";
 
-function SalesEntry({ navigation }) {
+function SalesDesk({ navigation }) {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState(null);
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
@@ -352,4 +352,4 @@ function SalesEntry({ navigation }) {
   );
 }
 
-export default SalesEntry;
+export default SalesDesk;

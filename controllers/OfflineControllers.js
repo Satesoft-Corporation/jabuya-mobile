@@ -1,10 +1,10 @@
-import { BaseApiService } from "../utils/BaseApiService";
+import { BaseApiService } from "@utils/BaseApiService";
 import {
   CLIENTS_ENDPOINT,
   SHOP_PRODUCTS_ENDPOINT,
   SHOP_SALES_ENDPOINT,
-} from "../utils/EndPointUtils";
-import { UserSessionUtils } from "../utils/UserSessionUtils";
+} from "@utils/EndPointUtils";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
 export const resolveUnsavedSales = async () => {
   let pendingSales = await UserSessionUtils.getPendingSales();
@@ -94,7 +94,11 @@ export const saveShopClients = async (params, refresh = false) => {
   return saved;
 };
 
-export const saveShopDetails = async (isShopOwner, shopOwnerId) => {
+export const saveShopDetails = async (
+  isShopOwner,
+  shopOwnerId,
+  refresh = false
+) => {
   let saved = false;
 
   const searchParameters = {
@@ -102,17 +106,20 @@ export const saveShopDetails = async (isShopOwner, shopOwnerId) => {
     offset: 0,
     ...(isShopOwner === true && { shopOwnerId: shopOwnerId }),
   };
+  const shops = await UserSessionUtils.getShopCount();
 
-  await new BaseApiService("/shops")
-    .getRequestWithJsonResponse(searchParameters)
-    .then(async (response) => {
-      await UserSessionUtils.setShopCount(String(response.totalItems));
-      await UserSessionUtils.setShops(response.records);
-      saved = true;
-    })
-    .catch((error) => {
-      saved = false;
-    });
+  if (!shops || refresh === true) {
+    await new BaseApiService("/shops")
+      .getRequestWithJsonResponse(searchParameters)
+      .then(async (response) => {
+        await UserSessionUtils.setShopCount(String(response.totalItems));
+        await UserSessionUtils.setShops(response.records);
+        saved = true;
+      })
+      .catch((error) => {
+        saved = false;
+      });
+  }
 
   return saved;
 };

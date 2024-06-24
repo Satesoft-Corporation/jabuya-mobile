@@ -1,12 +1,12 @@
 import {
+  CONTACT_BOOK,
+  CREDIT_SALES,
+  EXPENSES,
   SALES_DESK,
   SALES_REPORTS,
   STOCKNG,
-  CONTACT_BOOK,
-  EXPENSES,
-  INCOME_GRAPHS,
-  CREDIT_SALES,
-} from "../../navigation/ScreenNames";
+} from "@navigation/ScreenNames";
+
 export const navList = [
   // landing screen icons
   {

@@ -7,35 +7,37 @@ import {
   SafeAreaView,
 } from "react-native";
 import Constants from "expo-constants";
-import { StackActions } from "@react-navigation/native";
-import { BaseApiService } from "../../utils/BaseApiService";
-import { UserSessionUtils } from "../../utils/UserSessionUtils";
-import AppStatusBar from "../../components/AppStatusBar";
-import MyInput from "../../components/MyInput";
-import DisplayMessage from "../../components/Dialogs/DisplayMessage";
-import CircularProgress from "../../components/CircularProgress";
-import Colors from "../../constants/Colors";
-import PrimaryButton from "../../components/buttons/PrimaryButton";
-import { LOGIN_END_POINT } from "../../utils/EndPointUtils";
-import { LANDING_SCREEN } from "../../navigation/ScreenNames";
+import { StackActions, useNavigation } from "@react-navigation/native";
+import { BaseApiService } from "@utils/BaseApiService";
+import { LOGIN_END_POINT } from "@utils/EndPointUtils";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
+import AppStatusBar from "@components/AppStatusBar";
+import MyInput from "@components/MyInput";
+import PrimaryButton from "@components/buttons/PrimaryButton";
+import CircularProgress from "@components/CircularProgress";
+import Colors from "@constants/Colors";
+import DisplayMessage from "@components/Dialogs/DisplayMessage";
+import { LANDING_SCREEN } from "@navigation/ScreenNames";
 
-export default function Login({ navigation }) {
+export default function Login() {
   const [username, setUsername] = useState("mosesjespar@gmail.com");
   const [password, setPassword] = useState("0701807062");
   const [disabled, setDisabled] = useState(false);
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState(null);
 
-  let loginInfo = {
-    username,
-    password,
-  };
+  const navigation = useNavigation();
 
   const date = new Date();
 
-  const onLogin = () => {
+  const onLogin = async () => {
+    const loginInfo = {
+      username,
+      password,
+    };
+
     setDisabled(true);
-    new BaseApiService(LOGIN_END_POINT)
+    await new BaseApiService(LOGIN_END_POINT)
       .saveRequestWithJsonResponse(loginInfo, false)
       .then(async (response) => {
         if (response?.accessToken) {

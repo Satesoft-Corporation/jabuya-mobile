@@ -1,10 +1,10 @@
 import { Text, View, FlatList, TextInput } from "react-native";
 import React, { useContext, useState } from "react";
-import { SaleEntryContext } from "../../../context/SaleEntryContext";
-import ModalContent from "../../../components/ModalContent";
-import ChipButton from "../../../components/buttons/ChipButton";
-import PrimaryButton from "../../../components/buttons/PrimaryButton";
-import Colors from "../../../constants/Colors";
+import { SaleEntryContext } from "context/SaleEntryContext";
+import ModalContent from "@components/ModalContent";
+import ChipButton from "@components/buttons/ChipButton";
+import Colors from "@constants/Colors";
+import PrimaryButton from "@components/buttons/PrimaryButton";
 
 export default function EnterSaleQtyModal() {
   const [submitted, setSubmitted] = useState(false);

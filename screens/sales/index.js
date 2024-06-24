@@ -1,30 +1,20 @@
 import { View, Text, SafeAreaView, FlatList } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
-
-import { BaseApiService } from "../../utils/BaseApiService";
-
-import Colors from "../../constants/Colors";
-
-import AppStatusBar from "../../components/AppStatusBar";
-import {
-  convertDateFormat,
-  formatDate,
-  getCurrentDay,
-} from "../../utils/Utils";
-import UserProfile from "../../components/UserProfile";
-import { UserContext, userData } from "../../context/UserContext";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import React, { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { userData } from "context/UserContext";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
+import { convertDateFormat, formatDate, getCurrentDay } from "@utils/Utils";
+import { BaseApiService } from "@utils/BaseApiService";
+import AppStatusBar from "@components/AppStatusBar";
+import UserProfile from "@components/UserProfile";
+import Colors from "@constants/Colors";
 import ItemHeader from "./components/ItemHeader";
-import VerticalSeparator from "../../components/VerticalSeparator";
-import {
-  INCOME_GRAPHS,
-  OFFLINE_SALES,
-  SHOP_SUMMARY,
-} from "../../navigation/ScreenNames";
+import VerticalSeparator from "@components/VerticalSeparator";
 import SaleTxnCard from "./components/SaleTxnCard";
-import { UserSessionUtils } from "../../utils/UserSessionUtils";
+import { OFFLINE_SALES, SHOP_SUMMARY } from "@navigation/ScreenNames";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
-export default function ViewSales({ navigation }) {
+export default function ViewSales() {
   const [sales, setSales] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [totalSalesQty, setTotalSalesQty] = useState(0); //total quantity for all sold items
@@ -38,6 +28,7 @@ export default function ViewSales({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [offlineSales, setOfflineSales] = useState(false);
 
+  const navigation = useNavigation();
   const { userParams, selectedShop, filterParams } = userData();
 
   const { isShopOwner } = userParams;
@@ -114,7 +105,7 @@ export default function ViewSales({ navigation }) {
 
     clearFields();
 
-    new BaseApiService("/shop-sales")
+    await new BaseApiService("/shop-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
         const data = [...response.records].filter(
