@@ -1,4 +1,4 @@
-export default {
+const StorageParams = {
   ACCESS_TOKEN: "@access_token",
   REFRESH_TOKEN: "@refresh_token",
   IS_LOGGED_IN: "@is_logged_in",
@@ -15,4 +15,7 @@ export default {
   PIN_LOGIN: "@pin_login",
   SHOP_CLIENTS: "@shop_clients",
   LOGIN_DETAILS: "@login_details",
+  CURRENCIES: "@currencies",
 };
+
+export default StorageParams;

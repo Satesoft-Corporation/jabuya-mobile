@@ -99,7 +99,6 @@ export const UserProvider = ({ children }) => {
           if (savedproducts === true && savedClients === true) {
             isConfigured = true;
           }
-          getShopsFromStorage();
 
           if (!isShopAttendant) {
             const savedShops = await saveShopDetails(
@@ -109,6 +108,8 @@ export const UserProvider = ({ children }) => {
             );
             isConfigured = savedShops;
           }
+
+          await getShopsFromStorage();
         }
       })
       .catch((error) => {

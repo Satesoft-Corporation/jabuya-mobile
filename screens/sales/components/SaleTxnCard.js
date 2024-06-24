@@ -56,35 +56,25 @@ function SaleTxnCard({ data }) {
               margin: 10,
             }}
           >
-            <DataColumn title={"Items"} value={itemCount} flex={0} />
+            <DataColumn title={"Items"} value={itemCount} left />
 
             <DataColumn
               title={"Recieved"}
               value={amountPaid}
-              isCurrency
-              flex={0}
+              currency={data?.currency}
             />
 
             <DataColumn
               title={"Amount"}
               value={totalCost}
-              isCurrency
-              flex={0}
+              currency={data?.currency}
             />
             <DataColumn
               title={"Balance"}
               value={balanceGivenOut}
-              flex={0}
-              isCurrency
+              currency={data?.currency}
               end
             />
-            {/* <DataColumn
-              title={"Income"}
-              value={profit}
-              isCurrency
-              end
-              flex={0}
-            /> */}
           </View>
           <CardFooter2
             onBtnPress={toggleExpand}
@@ -103,7 +93,7 @@ function SaleTxnCard({ data }) {
             labelTextStyle={styles.label}
             style={{ marginTop: 5, marginBottom: 10 }}
             valueTextStyle={styles.value}
-            showCurrency
+            currency={data?.currency}
           />
 
           <DataRow
@@ -112,7 +102,7 @@ function SaleTxnCard({ data }) {
             value={formatNumberWithCommas(amountPaid)}
             labelTextStyle={styles.label}
             valueTextStyle={styles.value}
-            showCurrency
+            currency={data?.currency}
           />
           <DataRow
             key={3}
@@ -122,7 +112,7 @@ function SaleTxnCard({ data }) {
             value={formatNumberWithCommas(totalCost)}
             labelTextStyle={styles.label}
             valueTextStyle={styles.value}
-            showCurrency
+            currency={data?.currency}
           />
 
           <DataRow
@@ -131,7 +121,7 @@ function SaleTxnCard({ data }) {
             value={balanceGivenOut}
             labelTextStyle={styles.label}
             valueTextStyle={styles.value}
-            showCurrency
+            currency={data?.currency}
           />
           <DataRow
             key={5}
@@ -139,7 +129,7 @@ function SaleTxnCard({ data }) {
             value={formatNumberWithCommas(profit)}
             labelTextStyle={styles.label}
             valueTextStyle={styles.value}
-            showCurrency
+            currency={data?.currency}
           />
 
           {balanceGivenOut < 0 && (

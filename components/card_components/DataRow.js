@@ -6,8 +6,7 @@ const DataRow = ({
   value,
   labelTextStyle,
   valueTextStyle,
-  showCurrency = false,
-  currencySize = 8,
+  currency,
   style,
 }) => {
   return (
@@ -26,13 +25,13 @@ const DataRow = ({
         {label}
       </Text>
       <Text style={[{ fontWeight: 600, fontSize: 14 }, valueTextStyle]}>
-        {showCurrency && (
+        {currency && (
           <Text
             style={{
-              fontSize: currencySize,
+              fontSize: 10,
             }}
           >
-            UGX{" "}
+            {currency}{" "}
           </Text>
         )}
         {value}

@@ -167,7 +167,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
         >
           {formatDate(new Date())}
         </Text>
-        <Text>Currency : UGX</Text>
+        <Text>Currency : {selectedShop?.currency}</Text>
       </View>
 
       <SalesTable sales={selections} fixHeight={false} />

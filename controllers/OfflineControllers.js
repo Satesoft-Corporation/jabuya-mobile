@@ -1,10 +1,26 @@
 import { BaseApiService } from "@utils/BaseApiService";
 import {
   CLIENTS_ENDPOINT,
+  CURRENCIES_ENDPOINT,
+  SHOP_ENDPOINT,
   SHOP_PRODUCTS_ENDPOINT,
   SHOP_SALES_ENDPOINT,
 } from "@utils/EndPointUtils";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
+
+export const saveCurrencies = async () => {
+  const searchParameters = {
+    limit: 0,
+    offset: 0,
+  };
+
+  await new BaseApiService(CURRENCIES_ENDPOINT)
+    .getRequestWithJsonResponse(searchParameters)
+    .then(async (response) => {
+      await UserSessionUtils.setCurrencies(response?.records);
+    })
+    .catch((error) => {});
+};
 
 export const resolveUnsavedSales = async () => {
   let pendingSales = await UserSessionUtils.getPendingSales();
@@ -45,6 +61,7 @@ export const saveShopProductsOnDevice = async (
   const currentPdts = await UserSessionUtils.getShopProducts();
 
   if (currentPdts.length === 0 || refresh === true) {
+    await saveCurrencies();
     //only hit the api if no product is stored
     console.log("saving pdts offline");
     await new BaseApiService(SHOP_PRODUCTS_ENDPOINT)
@@ -109,7 +126,7 @@ export const saveShopDetails = async (
   const shops = await UserSessionUtils.getShopCount();
 
   if (!shops || refresh === true) {
-    await new BaseApiService("/shops")
+    await new BaseApiService(SHOP_ENDPOINT)
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         await UserSessionUtils.setShopCount(String(response.totalItems));

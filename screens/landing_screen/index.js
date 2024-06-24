@@ -76,22 +76,31 @@ const LandingScreen = ({ navigation }) => {
     }
   };
 
+  const handleUsageTime = async () => {
+    const prevUsageIime = await UserSessionUtils.getLastOpenTime();
+    const usageTimeDifferance = getTimeDifference(prevUsageIime, new Date());
+    const { days, hours, minutes } = usageTimeDifferance;
+
+    const interval = days > 0 && hours > 0 && hours % 3 === 0 && minutes > 50; //every after some hours
+    if (interval === true) {
+      await configureUserData(true); //refreshing local data
+    }
+  };
+
   const handleLoginSession = async () => {
     await configureUserData(false); //configuring up the usercontext
 
-    let prevLoginTime = await UserSessionUtils.getLoginTime();
+    const prevLoginTime = await UserSessionUtils.getLoginTime();
 
     const logintimeDifferance = getTimeDifference(prevLoginTime, new Date());
-    const { days, hours, minutes } = logintimeDifferance;
+
+    const { days, hours } = logintimeDifferance;
 
     setTimeDiff(logintimeDifferance);
 
     await handlePinLockStatus();
     await getShopsFromStorage();
-
-    if (hours > 0 && hours % 3 === 0 && minutes > 59) {
-      await configureUserData(true); //refreshing
-    }
+    await handleUsageTime();
 
     if (hours < 24) {
       //to save if access token is still valid
@@ -101,13 +110,14 @@ const LandingScreen = ({ navigation }) => {
     if (hours >= 6 || days >= 1) {
       await getRefreshToken();
     }
-
+    console.log("login time", logintimeDifferance);
     setLoading(false);
   };
 
   const startTheApp = async () => {
     await UserSessionUtils.getUserDetails().then(async (data) => {
       if (data) {
+        await UserSessionUtils.setLastOpenTime(String(new Date()));
         await handleLoginSession();
       } else {
         logOut();

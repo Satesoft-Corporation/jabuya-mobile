@@ -6,7 +6,7 @@ import CardHeader from "../../../components/card_components/CardHeader";
 import CardFooter1 from "../../../components/card_components/CardFooter1";
 import CardFooter2 from "../../../components/card_components/CardFooter2";
 import { useNavigation } from "@react-navigation/native";
-import { PDT_ENTRY, UPDATE_PRICE } from "../../../navigation/ScreenNames";
+import { PDT_ENTRY } from "../../../navigation/ScreenNames";
 import DataColumn from "../../../components/card_components/DataColumn";
 
 function StockLevelCard({ data }) {
@@ -49,9 +49,10 @@ function StockLevelCard({ data }) {
         style={{
           flexDirection: "row",
           marginVertical: 10,
+          justifyContent: "space-between",
         }}
       >
-        <DataColumn title={"Product"} value={data?.productName} left flex={2} />
+        <DataColumn title={"Product"} value={data?.productName} left />
 
         <DataColumn
           title={"Sold"}
@@ -62,7 +63,7 @@ function StockLevelCard({ data }) {
           title={"Value"}
           value={Math.round(remainingStock * data?.salesPrice)}
           end
-          isCurrency
+          currency={data?.currency}
         />
       </View>
 
@@ -75,7 +76,7 @@ function StockLevelCard({ data }) {
           <DataRow
             label={"Price"}
             value={formatNumberWithCommas(data?.salesPrice)}
-            showCurrency
+            currency={data?.currency}
           />
           <DataRow
             label={"Status"}

@@ -6,31 +6,34 @@ const DataColumn = ({
   title,
   value,
   value2,
-  flex = 1,
-  isCurrency = false,
+  currency,
   left = false,
   end = false,
 }) => {
   const align = left ? "left" : end ? "flex-end" : "center";
 
   return (
-    <View style={{ alignItems: align, flex: flex }}>
+    <View style={{ maxWidth: 120 }}>
       <Text
         style={{
           fontWeight: 600,
-          marginBottom: 3,
           fontSize: 13,
+          textAlign: align,
         }}
       >
         {title}
       </Text>
-      {isCurrency ? (
-        <RenderCurrency value={value} />
+      {currency ? (
+        <RenderCurrency value={value} currencySymbol={currency} />
       ) : (
-        <Text style={{ fontSize: 13, fontWeight: 400 }}>{value}</Text>
+        <Text style={{ fontSize: 13, textAlign: align }} numberOfLines={2}>
+          {value}
+        </Text>
       )}
 
-      {value2 && <Text style={{ fontSize: 13, fontWeight: 400 }}>{value2}</Text>}
+      {value2 && (
+        <Text style={{ fontSize: 13, textAlign: align }}>{value2}</Text>
+      )}
     </View>
   );
 };

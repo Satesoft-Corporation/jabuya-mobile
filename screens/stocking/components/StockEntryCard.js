@@ -51,15 +51,10 @@ const StockEntryCard = ({ data }) => {
           flexDirection: "row",
           justifyContent: "space-between",
           marginVertical: 10,
+          // alignItems: "center",
         }}
       >
-        <DataColumn
-          title={"Product"}
-          left
-          value={productName}
-          flex={2}
-          key={1}
-        />
+        <DataColumn title={"Product"} left value={productName} key={1} />
 
         <DataColumn title={"Qty"} value={purchasedQuantity} key={2} />
 
@@ -67,14 +62,14 @@ const StockEntryCard = ({ data }) => {
           title={"Cost"}
           value={Math.round(purchasePrice / purchasedQuantity)}
           key={3}
-          isCurrency
+          currency={data?.currency}
         />
 
         <DataColumn
           title={"Amount"}
           value={purchasePrice}
           key={4}
-          isCurrency
+          currency={data?.currency}
           end
         />
       </View>

@@ -1,29 +1,26 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Text, View, TextInput, ScrollView } from "react-native";
+import { Text, View, TextInput, ScrollView, SafeAreaView } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
-
-import Colors from "../../constants/Colors";
-
-import AppStatusBar from "../../components/AppStatusBar";
-import UserProfile from "../../components/UserProfile";
+import { useRef } from "react";
+import { SALES_REPORTS } from "@navigation/ScreenNames";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
+import Colors from "@constants/Colors";
+import AppStatusBar from "@components/AppStatusBar";
+import ConfirmSaleModal from "./components/ConfirmSaleModal";
+import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
+import { BlackScreen } from "@components/BlackAndWhiteScreen";
+import UserProfile from "@components/UserProfile";
 import {
   MyDropDown,
   SalesDropdownComponent,
-} from "../../components/DropdownComponents";
-import { formatNumberWithCommas, isValidNumber } from "../../utils/Utils";
-import { BlackScreen } from "../../components/BlackAndWhiteScreen";
-import { IconsComponent } from "../../components/MenuIcon";
-import Snackbar from "../../components/Snackbar";
-import { useRef } from "react";
-import { userData } from "../../context/UserContext";
-import PrimaryButton from "../../components/buttons/PrimaryButton";
-import { SaleEntryContext } from "../../context/SaleEntryContext";
-import { UserSessionUtils } from "../../utils/UserSessionUtils";
-import { SafeAreaView } from "react-native";
-import { BARCODE_SCREEN, SALES_REPORTS } from "../../navigation/ScreenNames";
+} from "@components/DropdownComponents";
+import { formatNumberWithCommas } from "@utils/Utils";
+import PrimaryButton from "@components/buttons/PrimaryButton";
 import SalesTable from "./components/SalesTable";
-import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
-import ConfirmSaleModal from "./components/ConfirmSaleModal";
+import { userData } from "context/UserContext";
+import { SaleEntryContext } from "context/SaleEntryContext";
+import { IconsComponent } from "@components/MenuIcon";
+import Snackbar from "@components/Snackbar";
 
 function SalesDesk({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -64,7 +61,6 @@ function SalesDesk({ navigation }) {
   const fetchProducts = async () => {
     setLoading(true);
     const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
-
     setProducts(pdtList);
     fetchClients();
   };
@@ -76,6 +72,7 @@ function SalesDesk({ navigation }) {
   };
 
   useEffect(() => {
+    console.log(selectedShop);
     clearEverything();
     fetchProducts();
   }, [selectedShop]);
@@ -86,7 +83,6 @@ function SalesDesk({ navigation }) {
 
   const makeSelection = (item) => {
     const { multipleSaleUnits, saleUnitName, salesPrice } = item;
-
     let defUnit = { productSaleUnitName: saleUnitName, unitPrice: salesPrice };
 
     setSelection(item);
@@ -99,6 +95,32 @@ function SalesDesk({ navigation }) {
       setSelectedSaleUnit(defUnit);
       setInitialUnitCost(salesPrice);
       setUnitCost(String(salesPrice));
+    }
+  };
+
+  const handleSubmit = () => {
+    const isValidAmount = Number(recievedAmount) >= totalCost;
+
+    if (selections.length > 0) {
+      if (isValidAmount === true) {
+        setShowConfirmed(true);
+        return true;
+      }
+
+      if (!isValidNumber(recievedAmount)) {
+        snackbarRef.current.show("Invalid input for recieved amount.");
+        return true;
+      } else {
+        snackbarRef.current.show(
+          `Recieved amount should be greater that ${
+            selectedShop?.currency
+          } ${formatNumberWithCommas(totalCost)}`,
+          4000
+        );
+        return true;
+      }
+    } else {
+      snackbarRef.current.show("Product selection is required.");
     }
   };
   return (
@@ -192,7 +214,7 @@ function SalesDesk({ navigation }) {
                     marginEnd: 5,
                   }}
                 >
-                  UGX
+                  {selectedShop?.currency}
                 </Text>
                 <TextInput
                   textAlign="right"
@@ -253,7 +275,9 @@ function SalesDesk({ navigation }) {
                     fontWeight: 700,
                   }}
                 >
-                  <Text style={{ fontSize: 10, fontWeight: 400 }}>UGX</Text>{" "}
+                  <Text style={{ fontSize: 10, fontWeight: 400 }}>
+                    {selectedShop?.currency}
+                  </Text>{" "}
                   {formatNumberWithCommas(totalCost)}
                 </Text>
               </View>
@@ -298,7 +322,9 @@ function SalesDesk({ navigation }) {
                   fontWeight: 700,
                 }}
               >
-                <Text style={{ fontSize: 10, fontWeight: 400 }}>UGX </Text>
+                <Text style={{ fontSize: 10, fontWeight: 400 }}>
+                  {selectedShop?.currency}{" "}
+                </Text>
                 <Text style={{ fontSize: 17 }}>
                   {recievedAmount &&
                     formatNumberWithCommas(recievedAmount - totalCost)}
@@ -316,33 +342,7 @@ function SalesDesk({ navigation }) {
                 fontSize: 18,
                 fontWeight: 500,
               }}
-              onPress={() => {
-                const isValidAmount = Number(recievedAmount) >= totalCost;
-
-                if (selections.length > 0) {
-                  if (isValidAmount === true) {
-                    setShowConfirmed(true);
-                    return true;
-                  }
-
-                  if (!isValidNumber(recievedAmount)) {
-                    snackbarRef.current.show(
-                      "Invalid input for recieved amount."
-                    );
-                    return true;
-                  } else {
-                    snackbarRef.current.show(
-                      `Recieved amount should be greater that UGX ${formatNumberWithCommas(
-                        totalCost
-                      )}`,
-                      4000
-                    );
-                    return true;
-                  }
-                } else {
-                  snackbarRef.current.show("Product selection is required.");
-                }
-              }}
+              onPress={handleSubmit}
             />
           </View>
         </ScrollView>

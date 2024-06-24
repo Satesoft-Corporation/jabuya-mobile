@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { userData } from "context/UserContext";
 import { BaseApiService } from "@utils/BaseApiService";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
-import { convertToServerDate, formatNumberWithCommas } from "@utils/Utils";
+import { convertToServerDate, formatNumberWithCommas, hasNull } from "@utils/Utils";
 import { resolveUnsavedSales } from "@controllers/OfflineControllers";
 import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
@@ -15,6 +15,7 @@ import Colors from "@constants/Colors";
 import { KeyboardAvoidingView } from "react-native";
 import Loader from "@components/Loader";
 import { packageOptions } from "@constants/Constants";
+import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
 
 const StockPurchaseForm = ({ navigation, route }) => {
   const { selectedShop, shops, setSelectedShop, offlineParams } = userData();
@@ -225,7 +226,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <AppStatusBar/>
+        <AppStatusBar />
 
         <TopHeader title="Stock purchase" />
         <Loader loading={loading} />
@@ -317,9 +318,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                 <MyInput
                   label={
                     isPackedProduct === true
-                      ? `Packed quantity (${
-                          selectedProduct?.packageUnitName || ""
-                        })`
+                      ? `Quantity (${selectedProduct?.packageUnitName || ""})`
                       : "Unpacked quantity"
                   }
                   value={
@@ -347,7 +346,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
                   label={
                     isPackedProduct === true
                       ? "Purchase price"
-                      : "Purchase amount (UGX)"
+                      : `Purchase amount (${selectedProduct?.currency})`
                   }
                   value={purchasePrice}
                   cursorColor={Colors.dark}
