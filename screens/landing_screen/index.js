@@ -90,8 +90,7 @@ const LandingScreen = ({ navigation }) => {
     await getShopsFromStorage();
 
     if (hours > 0 && hours % 3 === 0 && minutes > 59) {
-      console.log("i a mul", hours);
-      await configureUserData(true); //configuring up the user and refreshing
+      await configureUserData(true); //refreshing
     }
 
     if (hours < 24) {
