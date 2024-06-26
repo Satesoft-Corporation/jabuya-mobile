@@ -1,17 +1,17 @@
 import { View, FlatList } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import { Text } from "react-native";
-import Colors from "../../constants/Colors";
-import Snackbar from "../../components/Snackbar";
-import { userData } from "../../context/UserContext";
-import AppStatusBar from "../../components/AppStatusBar";
-import TopHeader from "../../components/TopHeader";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
+import { PDT_ENTRY } from "@navigation/ScreenNames";
+import Colors from "@constants/Colors";
+import AppStatusBar from "@components/AppStatusBar";
+import ItemHeader from "@screens/sales/components/ItemHeader";
+import VerticalSeparator from "@components/VerticalSeparator";
 import StockLevelCard from "./components/StockLevelCard";
-import { PDT_ENTRY } from "../../navigation/ScreenNames";
-import VerticalSeparator from "../../components/VerticalSeparator";
-import ItemHeader from "../sales/components/ItemHeader";
-import { formatNumberWithCommas } from "../../utils/Utils";
-import { UserSessionUtils } from "../../utils/UserSessionUtils";
+import Snackbar from "@components/Snackbar";
+import { userData } from "context/UserContext";
+import TopHeader from "@components/TopHeader";
+import { formatNumberWithCommas } from "@utils/Utils";
 
 const StockLevel = ({ navigation }) => {
   const [message, setMessage] = useState(null);

@@ -1,16 +1,15 @@
 import { View, Text, SafeAreaView, FlatList, StyleSheet } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { userData } from "../../context/UserContext";
-import AppStatusBar from "../../components/AppStatusBar";
-import TopHeader from "../../components/TopHeader";
-import ItemHeader from "../sales/components/ItemHeader";
-import VerticalSeparator from "../../components/VerticalSeparator";
-import Snackbar from "../../components/Snackbar";
-import Colors from "../../constants/Colors";
+import { userData } from "context/UserContext";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
+import AppStatusBar from "@components/AppStatusBar";
+import TopHeader from "@components/TopHeader";
+import ItemHeader from "@screens/sales/components/ItemHeader";
+import VerticalSeparator from "@components/VerticalSeparator";
+import Colors from "@constants/Colors";
+import Snackbar from "@components/Snackbar";
 import CreditSaleCard from "./components/CreditSaleCard";
-import { CLIENT_FORM } from "../../navigation/ScreenNames";
-import { UserSessionUtils } from "../../utils/UserSessionUtils";
 
 const CreditSales = () => {
   const navigation = useNavigation();

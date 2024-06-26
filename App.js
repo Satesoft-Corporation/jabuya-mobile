@@ -7,7 +7,7 @@ import LandingScreen from "@screens/landing_screen";
 import ViewSales from "@screens/sales";
 import BarCodeScreen from "@screens/sales_desk/BarCodeScreen";
 import ShopSummary from "@screens/shop_summary/ShopSummary";
-import StockingMenu from "@screens/stocking/StockingMenu";
+import StockingMenu from "@screens/stocking";
 import StockEntries from "@screens/stocking/StockEntries";
 import StockLevel from "@screens/stocking/StockLevels";
 import StockPurchaseForm from "@forms/stockingForms/StockPurchaseForm";

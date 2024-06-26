@@ -5,6 +5,7 @@ import { UserContext } from "context/UserContext";
 import Colors from "@constants/Colors";
 import PopUpmenu from "./PopUpMenu";
 import SearchBar from "./SearchBar";
+import { scale } from "react-native-size-matters";
 
 const TopHeader = ({
   title = "Details",
@@ -58,7 +59,7 @@ const TopHeader = ({
             <Text
               style={{
                 color: Colors.primary,
-                fontSize: 18,
+                fontSize: scale(17),
                 marginStart: 10,
               }}
             >
@@ -99,7 +100,7 @@ const TopHeader = ({
           <Text
             style={{
               color: Colors.primary,
-              fontSize: 13,
+              fontSize: scale(13),
               paddingBottom: 8,
               marginStart: 30,
               marginTop: -10,
@@ -126,4 +127,4 @@ const TopHeader = ({
   );
 };
 
-export default memo(TopHeader);
+export default TopHeader;

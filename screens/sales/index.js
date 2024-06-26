@@ -3,7 +3,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { userData } from "context/UserContext";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
-import { convertDateFormat, formatDate, getCurrentDay } from "@utils/Utils";
+import {
+  convertDateFormat,
+  formatDate,
+  formatNumberWithCommas,
+  getCurrentDay,
+} from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
 import AppStatusBar from "@components/AppStatusBar";
 import UserProfile from "@components/UserProfile";
@@ -114,7 +119,6 @@ export default function ViewSales() {
 
         let sV = data.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
 
-        console.log(response.records)
         if (response.totalItems === 0) {
           setMessage(`No sales made on this day for ${selectedShop?.name}`);
         }
@@ -209,7 +213,10 @@ export default function ViewSales() {
               paddingHorizontal: 12,
             }}
           >
-            <ItemHeader value={totalSalesQty || 0} title="Qty" />
+            <ItemHeader
+              value={formatNumberWithCommas(totalSalesQty) || 0}
+              title="Qty"
+            />
 
             <VerticalSeparator />
 

@@ -1,7 +1,8 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
-import Colors from "../constants/Colors";
 import { Image } from "react-native";
+import Colors from "@constants/Colors";
+import { scale } from "react-native-size-matters";
 
 const StockingIcon = ({ title, onPress, disabled = false }) => {
   return (
@@ -16,7 +17,7 @@ const StockingIcon = ({ title, onPress, disabled = false }) => {
         elevation: 2,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
-        flex:1
+        flex: 1,
       }}
     >
       <View
@@ -27,7 +28,7 @@ const StockingIcon = ({ title, onPress, disabled = false }) => {
       >
         <Text
           style={{
-            fontSize: 17,
+            fontSize: scale(17),
             fontWeight: 600,
             marginTop: 10,
           }}

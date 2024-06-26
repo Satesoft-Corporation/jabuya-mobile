@@ -1,13 +1,11 @@
 import { TouchableOpacity, Image, View, Text } from "react-native";
 import React, { useContext } from "react";
-
-import Colors from "../constants/Colors";
-
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { CREDIT_SALES } from "../navigation/ScreenNames";
-import { SaleEntryContext } from "../context/SaleEntryContext";
+import { scale } from "react-native-size-matters";
+import Colors from "@constants/Colors";
+import { SaleEntryContext } from "context/SaleEntryContext";
 
 export function MenuIcon({
   icon,
@@ -26,12 +24,12 @@ export function MenuIcon({
         margin: 5,
         borderRadius: 5,
         backgroundColor: Colors.light,
-        // maxWidth: screenWidth / 2 - 30,
         elevation: 2,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
-        padding: 10,
+        padding: 5,
         width: 200,
+        justifyContent: "center",
       }}
       onPress={onPress}
     >
@@ -64,7 +62,7 @@ export function MenuIcon({
         style={[
           {
             color: Colors.dark,
-            fontSize: 15,
+            fontSize: scale(15),
             margin: 10,
             fontWeight: "500",
             textAlign: "center",
@@ -104,7 +102,9 @@ export const IconsComponent = () => {
         }}
       >
         <FontAwesome name="credit-card" size={25} color={color} />
-        <Text style={{ alignSelf: "center", color }}>Card</Text>
+        <Text style={{ alignSelf: "center", color, fontSize: scale(13) }}>
+          Card
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -119,7 +119,9 @@ export const IconsComponent = () => {
         }}
       >
         <FontAwesome name="mobile" size={25} color={color} />
-        <Text style={{ alignSelf: "center", color }}>Mobile</Text>
+        <Text style={{ alignSelf: "center", color, fontSize: scale(13) }}>
+          Mobile
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={{
@@ -133,7 +135,9 @@ export const IconsComponent = () => {
         }}
       >
         <FontAwesome name="wechat" size={25} color={color} />
-        <Text style={{ alignSelf: "center", color }}>Fap</Text>
+        <Text style={{ alignSelf: "center", color, fontSize: scale(13) }}>
+          Fap
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => navigation.navigate(CREDIT_SALES)}
@@ -151,7 +155,15 @@ export const IconsComponent = () => {
           size={24}
           color={Colors.dark}
         />
-        <Text style={{ alignSelf: "center", color: Colors.dark }}>Debt</Text>
+        <Text
+          style={{
+            alignSelf: "center",
+            color: Colors.dark,
+            fontSize: scale(13),
+          }}
+        >
+          Debt
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={clearEverything}
@@ -166,7 +178,7 @@ export const IconsComponent = () => {
         }}
       >
         <MaterialCommunityIcons name="broom" size={25} color="black" />
-        <Text style={{ alignSelf: "center" }}>Clear</Text>
+        <Text style={{ alignSelf: "center", fontSize: scale(13) }}>Clear</Text>
       </TouchableOpacity>
     </View>
   );

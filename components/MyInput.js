@@ -5,6 +5,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from "./Icon";
 import { TouchableOpacity } from "react-native";
 import { toReadableDate } from "../utils/Utils";
+import { scale } from "react-native-size-matters";
 
 const MyInput = ({
   onValueChange,
@@ -69,6 +70,7 @@ const MyInput = ({
             color: darkMode ? Colors.primary : Colors.dark,
             textAlign: inputMode === "numeric" ? "right" : "left",
             flex: 1,
+            fontSize: scale(12.5),
           }}
         />
 
@@ -83,6 +85,7 @@ const MyInput = ({
                 value={dateValue}
                 mode={"date"}
                 onChange={onChange}
+                style={{ fontSize: 10 }}
               />
             )}
           </>

@@ -1,6 +1,7 @@
 import { Text, TouchableOpacity } from "react-native";
 import React from "react";
 import Colors from "@constants/Colors";
+import { scale } from "react-native-size-matters";
 
 const PrimaryButton = ({
   onPress,
@@ -35,8 +36,9 @@ const PrimaryButton = ({
       <Text
         style={[
           {
-            fontWeight: "bold",
+            fontWeight: "500",
             color: darkMode ? Colors.primary : Colors.dark,
+            fontSize: scale(15),
           },
           titleStyle,
         ]}

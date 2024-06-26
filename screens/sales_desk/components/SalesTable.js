@@ -2,10 +2,10 @@ import { View, Text, ScrollView } from "react-native";
 import React from "react";
 import Colors from "@constants/Colors";
 import { screenHeight } from "@constants/Constants";
-import { formatNumberWithCommas } from "@utils/Utils";
 import { userData } from "context/UserContext";
+import RenderCurrency from "@components/RenderCurrency";
 
-const SalesTable = ({ sales = [], fixHeight = true }) => {
+const SalesTable = ({ sales = [], fixHeight = true, currency }) => {
   return (
     <View>
       <View
@@ -23,11 +23,11 @@ const SalesTable = ({ sales = [], fixHeight = true }) => {
           Qty
         </Text>
 
-        <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
+        <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
           Cost
         </Text>
 
-        <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
+        <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
           Amount
         </Text>
       </View>
@@ -43,14 +43,14 @@ const SalesTable = ({ sales = [], fixHeight = true }) => {
         }
       >
         {[...sales]?.map((item, i) => (
-          <SaleListItem data={item} key={i} />
+          <SaleListItem data={item} key={i} currency={currency} />
         ))}
       </ScrollView>
     </View>
   );
 };
 
-export const SaleListItem = ({ data }) => {
+const SaleListItem = ({ data, currency }) => {
   // table item on sales entry
   const { productName, shopProductName, saleUnitName } = data;
 
@@ -71,21 +71,22 @@ export const SaleListItem = ({ data }) => {
         paddingVertical: 8,
       }}
     >
-      <Text style={{ flex: 2.5, justifyContent: "center" }}>
+      <Text style={{ flex: 2.5, justifyContent: "center" }} numberOfLines={2}>
         {productName || shopProductName + unitName}
       </Text>
       <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>
+
       <Text style={{ flex: 1, textAlign: "right" }}>
-        <Text style={{ fontSize: 8, fontWeight: 400 }}>
-          {selectedShop?.currency}{" "}
-        </Text>
-        {formatNumberWithCommas(data?.unitCost)}
+        <RenderCurrency
+          value={data?.unitCost}
+          currencySymbol={currency || selectedShop?.currency}
+        />
       </Text>
       <Text style={{ flex: 1, textAlign: "right", paddingEnd: 10 }}>
-        <Text style={{ fontSize: 8, fontWeight: 400 }}>
-          {selectedShop?.currency}{" "}
-        </Text>
-        {formatNumberWithCommas(data?.totalCost)}
+        <RenderCurrency
+          value={data?.totalCost}
+          currencySymbol={currency || selectedShop?.currency}
+        />
       </Text>
     </View>
   );

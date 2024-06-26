@@ -14,7 +14,7 @@ import {
   MyDropDown,
   SalesDropdownComponent,
 } from "@components/DropdownComponents";
-import { formatNumberWithCommas } from "@utils/Utils";
+import { formatNumberWithCommas, isValidNumber } from "@utils/Utils";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import SalesTable from "./components/SalesTable";
 import { userData } from "context/UserContext";
@@ -72,7 +72,6 @@ function SalesDesk({ navigation }) {
   };
 
   useEffect(() => {
-    console.log(selectedShop);
     clearEverything();
     fetchProducts();
   }, [selectedShop]);
@@ -149,6 +148,7 @@ function SalesDesk({ navigation }) {
                 onChange={(e) => setSelectedShop(e)}
                 value={selectedShop}
                 search={false}
+                placeholder="Select a shop"
               />
             </View>
           )}
@@ -336,14 +336,7 @@ function SalesDesk({ navigation }) {
           <IconsComponent />
 
           <View style={{ marginTop: 8, height: 40, marginBottom: 20 }}>
-            <PrimaryButton
-              title={"Confirm purchase"}
-              titleStyle={{
-                fontSize: 18,
-                fontWeight: 500,
-              }}
-              onPress={handleSubmit}
-            />
+            <PrimaryButton title={"Confirm purchase"} onPress={handleSubmit} />
           </View>
         </ScrollView>
         <Snackbar ref={snackbarRef} />

@@ -1,5 +1,6 @@
 import { View, Text } from "react-native";
 import React from "react";
+import { scale } from "react-native-size-matters";
 
 const DataRow = ({
   label,
@@ -16,19 +17,25 @@ const DataRow = ({
         {
           flexDirection: "row",
           justifyContent: "space-between",
-          marginVertical: 2,
+          marginVertical: 3,
         },
         style,
       ]}
     >
-      <Text style={[{ fontWeight: 400, fontSize: 14 }, labelTextStyle]}>
+      <Text style={[{ fontWeight: 400, fontSize: scale(13) }, labelTextStyle]}>
         {label}
       </Text>
-      <Text style={[{ fontWeight: 600, fontSize: 14 }, valueTextStyle]}>
+      <Text
+        style={[
+          { fontWeight: 600, fontSize: scale(13), flex: 1, textAlign: "right" },
+          valueTextStyle,
+        ]}
+        numberOfLines={2}
+      >
         {currency && (
           <Text
             style={{
-              fontSize: 10,
+              fontSize: scale(10),
             }}
           >
             {currency}{" "}

@@ -216,11 +216,13 @@ const ProductEntry = ({ navigation, route }) => {
       new BaseApiService(apiUrl)
         .saveRequestWithJsonResponse(payload, edit)
         .then(async (response) => {
-          await saveShopProductsOnDevice(offlineParams, true);
-          clearForm();
+          if (!edit) {
+            clearForm();
+          }
           setLoading(false);
           setSubmitted(false);
-          snackBarRef.current.show("Product saved successfully", 5000);
+          snackBarRef.current.show("Product saved successfully", 6000);
+          await saveShopProductsOnDevice(offlineParams, true);
           setDisable(false);
         })
         .catch((error) => {

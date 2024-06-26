@@ -73,7 +73,6 @@ function SaleTxnCard({ data }) {
               title={"Balance"}
               value={balanceGivenOut}
               currency={data?.currency}
-              end
             />
           </View>
           <CardFooter2

@@ -3,7 +3,11 @@ import React, { useEffect, useState, useRef } from "react";
 import { userData } from "context/UserContext";
 import { BaseApiService } from "@utils/BaseApiService";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
-import { convertToServerDate, formatNumberWithCommas, hasNull } from "@utils/Utils";
+import {
+  convertToServerDate,
+  formatNumberWithCommas,
+  hasNull,
+} from "@utils/Utils";
 import { resolveUnsavedSales } from "@controllers/OfflineControllers";
 import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
@@ -135,12 +139,13 @@ const StockPurchaseForm = ({ navigation, route }) => {
       new BaseApiService(apiUrl)
         .saveRequestWithJsonResponse(payload, edit)
         .then(async (response) => {
-          fetchProducts();
+          if (!edit) {
+            clearForm();
+          }
           await resolveUnsavedSales(); //to auto saved a pending sale if the purchase was for that specific item
           setSubmitted(false);
           setLoading(false);
-          snackBarRef.current.show("Stock entry saved successfully", 4000);
-          clearForm();
+          snackBarRef.current.show("Stock entry saved successfully", 6000);
         })
         .catch((error) => {
           snackBarRef.current.show(error?.message, 5000);

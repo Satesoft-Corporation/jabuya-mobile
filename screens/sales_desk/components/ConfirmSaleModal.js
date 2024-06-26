@@ -15,6 +15,7 @@ import PaymentMethodComponent from "./PaymentMethodComponent";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import ModalContent from "@components/ModalContent";
 import Colors from "@constants/Colors";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
 const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
   const [submitted, setSubmitted] = useState(false);

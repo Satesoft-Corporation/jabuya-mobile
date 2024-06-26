@@ -1,16 +1,10 @@
-import { View, Text } from "react-native";
+import { View, FlatList } from "react-native";
 import React from "react";
-import StockingIcon from "../../components/StockingIcon";
-import Colors from "../../constants/Colors";
-import { FlatList } from "react-native";
-import TopHeader from "../../components/TopHeader";
-import AppStatusBar from "../../components/AppStatusBar";
-import {
-  STOCK_ENTRY,
-  STOCK_ENTRY_FORM,
-  STOCK_LEVELS,
-  STOCK_LISTING,
-} from "../../navigation/ScreenNames";
+import { STOCK_ENTRY, STOCK_LEVELS } from "@navigation/ScreenNames";
+import Colors from "@constants/Colors";
+import AppStatusBar from "@components/AppStatusBar";
+import TopHeader from "@components/TopHeader";
+import StockingIcon from "@components/StockingIcon";
 
 const StockingMenu = ({ navigation }) => {
   let list = [

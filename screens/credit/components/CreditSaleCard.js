@@ -1,14 +1,13 @@
 import { View, StyleSheet } from "react-native";
-import React, { memo, useEffect, useState } from "react";
-import CardHeader from "../../../components/card_components/CardHeader";
-import { formatDate } from "../../../utils/Utils";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import DataColumn from "../../../components/card_components/DataColumn";
-import { BaseApiService } from "../../../utils/BaseApiService";
-import CardFooter2 from "../../../components/card_components/CardFooter2";
-import { CLIENT_DEBTS } from "../../../navigation/ScreenNames";
+import { BaseApiService } from "@utils/BaseApiService";
+import CardHeader from "@components/card_components/CardHeader";
+import DataColumn from "@components/card_components/DataColumn";
+import CardFooter2 from "@components/card_components/CardFooter2";
+import { CLIENT_DEBTS } from "@navigation/ScreenNames";
 
-const CreditSaleListItem = ({
+const CreditSaleCard = ({
   client,
   appendDebtValue,
   appendBalValue,
@@ -25,6 +24,7 @@ const CreditSaleListItem = ({
 
   const name = client?.fullName;
   const mob = client?.phoneNumber;
+  const currency = client?.shop?.currency?.symbol;
 
   const fetchCreditSales = async () => {
     let searchParameters = {
@@ -33,7 +33,7 @@ const CreditSaleListItem = ({
       clientId: client?.id,
     };
 
-    new BaseApiService("/credit-sales")
+    await new BaseApiService("/credit-sales")
       .getRequestWithJsonResponse(searchParameters)
       .then((response) => {
         setSales(response?.records);
@@ -76,9 +76,9 @@ const CreditSaleListItem = ({
             value2={`${mob}`}
           />
 
-          <DataColumn title={"Debt"} value={debt} isCurrency />
-          <DataColumn title={"Paid"} value={paid} isCurrency />
-          <DataColumn title={"Balance"} value={bal} isCurrency end />
+          <DataColumn title={"Debt"} value={debt} currency={currency} />
+          <DataColumn title={"Paid"} value={paid} currency={currency} />
+          <DataColumn title={"Balance"} value={bal} currency={currency} />
         </View>
 
         <CardFooter2
@@ -99,7 +99,7 @@ const CreditSaleListItem = ({
   }
 };
 
-export default memo(CreditSaleListItem);
+export default CreditSaleCard;
 
 const styles = StyleSheet.create({
   container: {

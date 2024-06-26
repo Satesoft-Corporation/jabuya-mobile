@@ -1,11 +1,10 @@
-import { View,Text } from "react-native";
+import { View, Text } from "react-native";
 import React from "react";
-import { BaseStyle } from "../../utils/BaseStyle";
-import CardHeader from "../../components/card_components/CardHeader";
-import { formatDate } from "../../utils/Utils";
-import CardFooter2 from "../../components/card_components/CardFooter2";
-import DataColumn from "../../components/card_components/DataColumn";
-import Colors from "../../constants/Colors";
+import { BaseStyle } from "@utils/BaseStyle";
+import { formatDate } from "@utils/Utils";
+import DataColumn from "@components/card_components/DataColumn";
+import CardFooter2 from "@components/card_components/CardFooter2";
+import Colors from "@constants/Colors";
 
 const ExpenseCard = ({ exp }) => {
   return (
@@ -38,13 +37,18 @@ const ExpenseCard = ({ exp }) => {
         style={{
           flexDirection: "row",
           marginVertical: 10,
+          justifyContent: "space-between",
         }}
       >
         <DataColumn value={exp?.categoryName} title={"Category"} left />
 
         <DataColumn value={exp?.description} title={"Description"} />
 
-        <DataColumn value={exp?.amount} title={"Amount"} end isCurrency />
+        <DataColumn
+          value={exp?.amount}
+          title={"Amount"}
+          currency={exp?.currency}
+        />
       </View>
 
       <CardFooter2

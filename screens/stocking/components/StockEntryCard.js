@@ -1,12 +1,12 @@
+import ChipButton2 from "@components/buttons/ChipButton2";
+import CardHeader from "@components/card_components/CardHeader";
+import DataColumn from "@components/card_components/DataColumn";
+import DataRow from "@components/card_components/DataRow";
+import { STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
+import { useNavigation } from "@react-navigation/native";
+import { formatDate } from "@utils/Utils";
 import React, { useState } from "react";
 import { View, Text } from "react-native";
-import { formatDate } from "../../../utils/Utils";
-import { useNavigation } from "@react-navigation/native";
-import DataRow from "../../../components/card_components/DataRow";
-import ChipButton2 from "../../../components/buttons/ChipButton2";
-import { STOCK_ENTRY_FORM } from "../../../navigation/ScreenNames";
-import CardHeader from "../../../components/card_components/CardHeader";
-import DataColumn from "../../../components/card_components/DataColumn";
 
 const StockEntryCard = ({ data }) => {
   const [expanded, setExpanded] = useState(false);
@@ -51,7 +51,6 @@ const StockEntryCard = ({ data }) => {
           flexDirection: "row",
           justifyContent: "space-between",
           marginVertical: 10,
-          // alignItems: "center",
         }}
       >
         <DataColumn title={"Product"} left value={productName} key={1} />
@@ -76,6 +75,8 @@ const StockEntryCard = ({ data }) => {
 
       {expanded && (
         <View>
+          <DataRow label={"Product"} value={productName} />
+
           <DataRow label="Barcode" value={barcode} />
           <DataRow label="Batch no" value={batchNumber} />
           <DataRow label="Expiry date" value={formatDate(expiryDate, true)} />

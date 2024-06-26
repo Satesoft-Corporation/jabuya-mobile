@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../context/UserContext";
 import PopUpmenu from "./PopUpMenu";
 import { SETTINGS } from "../navigation/ScreenNames";
+import { scale } from "react-native-size-matters";
 
 const UserProfile = ({
   renderNtnIcon = true,
@@ -69,7 +70,7 @@ const UserProfile = ({
             style={{
               color: Colors.primary,
               fontWeight: 400,
-              fontSize: 12,
+              fontSize: scale(13),
             }}
           >
             {fullName}
@@ -78,7 +79,7 @@ const UserProfile = ({
             style={{
               color: Colors.primary,
               fontWeight: 300,
-              fontSize: 11,
+              fontSize: scale(11),
             }}
           >
             {role}
@@ -87,7 +88,7 @@ const UserProfile = ({
             style={{
               color: Colors.primary,
               fontWeight: 300,
-              fontSize: 11,
+              fontSize: scale(11),
             }}
           >
             {selectedShop?.name || (shops?.length > 1 && `Shops: ${shops}`)}

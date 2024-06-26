@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import React from "react";
 import RenderCurrency from "../RenderCurrency";
+import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 
 const DataColumn = ({
   title,
@@ -17,7 +18,7 @@ const DataColumn = ({
       <Text
         style={{
           fontWeight: 600,
-          fontSize: 13,
+          fontSize: scale(14),
           textAlign: align,
         }}
       >
@@ -26,7 +27,10 @@ const DataColumn = ({
       {currency ? (
         <RenderCurrency value={value} currencySymbol={currency} />
       ) : (
-        <Text style={{ fontSize: 13, textAlign: align }} numberOfLines={2}>
+        <Text
+          style={{ fontSize: scale(13), textAlign: align }}
+          numberOfLines={2}
+        >
           {value}
         </Text>
       )}
