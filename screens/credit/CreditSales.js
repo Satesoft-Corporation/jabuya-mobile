@@ -10,6 +10,7 @@ import VerticalSeparator from "@components/VerticalSeparator";
 import Colors from "@constants/Colors";
 import Snackbar from "@components/Snackbar";
 import CreditSaleCard from "./components/CreditSaleCard";
+import { CLIENT_FORM } from "@navigation/ScreenNames";
 
 const CreditSales = () => {
   const navigation = useNavigation();
