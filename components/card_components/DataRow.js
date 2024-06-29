@@ -22,12 +22,12 @@ const DataRow = ({
         style,
       ]}
     >
-      <Text style={[{ fontWeight: 400, fontSize: scale(13) }, labelTextStyle]}>
+      <Text style={[{ fontWeight: 400, fontSize: scale(14) }, labelTextStyle]}>
         {label}
       </Text>
       <Text
         style={[
-          { fontWeight: 600, fontSize: scale(13), flex: 1, textAlign: "right" },
+          { fontWeight: 600, fontSize: scale(14), flex: 1, textAlign: "right" },
           valueTextStyle,
         ]}
         numberOfLines={2}

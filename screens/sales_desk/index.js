@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Text, View, TextInput, ScrollView, SafeAreaView } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useRef } from "react";
-import { SALES_REPORTS } from "@navigation/ScreenNames";
+import { BARCODE_SCREEN, SALES_REPORTS } from "@navigation/ScreenNames";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import Colors from "@constants/Colors";
 import AppStatusBar from "@components/AppStatusBar";
@@ -61,7 +61,16 @@ function SalesDesk({ navigation }) {
   const fetchProducts = async () => {
     setLoading(true);
     const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
-    setProducts(pdtList);
+    const inStock = pdtList
+      ?.filter((pdt) => pdt?.performanceSummary)
+      .filter((pdt) => {
+        const { totalQuantityStocked, totalQuantitySold } =
+          pdt?.performanceSummary;
+
+        const qtyInStock = totalQuantityStocked - totalQuantitySold;
+        return qtyInStock > 0;
+      });
+    setProducts(inStock);
     fetchClients();
   };
 

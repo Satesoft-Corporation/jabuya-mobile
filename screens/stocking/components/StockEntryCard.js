@@ -69,7 +69,6 @@ const StockEntryCard = ({ data }) => {
           value={purchasePrice}
           key={4}
           currency={data?.currency}
-          end
         />
       </View>
 

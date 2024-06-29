@@ -21,7 +21,7 @@ import Loader from "@components/Loader";
 import { packageOptions } from "@constants/Constants";
 import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
 
-const StockPurchaseForm = ({ navigation, route }) => {
+const StockPurchaseForm = ({ route }) => {
   const { selectedShop, shops, setSelectedShop, offlineParams } = userData();
 
   const [products, setProducts] = useState([]);
@@ -172,6 +172,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
         manufacturerId: selectedRecord?.manufacturerId,
         packageQuantity: selectedRecord?.purchasedQuantity,
         shopId: selectedRecord?.shopId,
+        currency: selectedRecord?.currency,
       });
 
       setIsPackedProduct(!selectedRecord?.unpackedPurchase);
@@ -203,11 +204,11 @@ const StockPurchaseForm = ({ navigation, route }) => {
     let price = Number(purchasePrice);
 
     if (isPackedProduct) {
-      return Math.round(
-        price / (selectedProduct?.packageQuantity * Number(qty))
+      return String(
+        Math.round(price / (selectedProduct?.packageQuantity * Number(qty)))
       );
     } else {
-      return Math.round(price / qty);
+      return String(Math.round(price / qty));
     }
   };
 
@@ -348,11 +349,7 @@ const StockPurchaseForm = ({ navigation, route }) => {
 
               <View style={{ flex: 1 }}>
                 <MyInput
-                  label={
-                    isPackedProduct === true
-                      ? "Purchase price"
-                      : `Purchase amount (${selectedProduct?.currency})`
-                  }
+                  label={`Purchase amount (${selectedProduct?.currency})`}
                   value={purchasePrice}
                   cursorColor={Colors.dark}
                   onValueChange={(text) => setPurchasePrice(text)}

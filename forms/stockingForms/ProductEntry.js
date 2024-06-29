@@ -18,7 +18,7 @@ import { SafeAreaView } from "react-native";
 import MyInput from "@components/MyInput";
 import Snackbar from "@components/Snackbar";
 
-const ProductEntry = ({ navigation, route }) => {
+const ProductEntry = ({ route }) => {
   const { selectedShop, offlineParams, shops, setSelectedShop } = userData();
 
   const [edit, setEdit] = useState(false);
@@ -239,12 +239,8 @@ const ProductEntry = ({ navigation, route }) => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-      <KeyboardAvoidingView
-        enabled={true}
-        behavior={"height"}
-        style={{ flex: 1 }}
-      >
+    <KeyboardAvoidingView enabled={true} style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
         <AppStatusBar />
 
         <TopHeader title="List product" />
@@ -254,162 +250,171 @@ const ProductEntry = ({ navigation, route }) => {
             paddingHorizontal: 8,
             gap: 8,
             paddingBottom: 30,
+            justifyContent: "space-between",
+            flex: 1,
           }}
         >
-          <Text style={styles.headerText}>Enter product details</Text>
+          <View>
+            <Text style={styles.headerText}>Enter product details</Text>
 
-          {!edit && (
-            <View style={{ gap: 5 }}>
-              <Text>Shop</Text>
+            {!edit && (
+              <View style={{ gap: 5 }}>
+                <Text>Shop</Text>
+                <MyDropDown
+                  search={false}
+                  style={{
+                    backgroundColor: Colors.light,
+                    borderColor: Colors.dark,
+                  }}
+                  data={shops?.filter((shop) => !shop?.name?.includes("All"))}
+                  value={selectedShop}
+                  onChange={(e) => {
+                    setSelectedShop(e);
+                  }}
+                  placeholder="Select Shop"
+                  labelField="name"
+                  valueField="id"
+                />
+              </View>
+            )}
+
+            <View>
+              <Text style={styles.inputLabel}>Manufacturer</Text>
               <MyDropDown
-                search={false}
-                style={{
-                  backgroundColor: Colors.light,
-                  borderColor: Colors.dark,
-                }}
-                data={shops?.filter((shop) => !shop?.name?.includes("All"))}
-                value={selectedShop}
-                onChange={(e) => {
-                  setSelectedShop(e);
-                }}
-                placeholder="Select Shop"
+                style={styles.dropDown}
+                data={edit ? [{ ...selectedManufacturer }] : manufacturers}
+                onChange={onManufacturerChange}
+                value={selectedManufacturer}
+                placeholder="Select manufacuturer"
                 labelField="name"
                 valueField="id"
               />
+              {submitted && !selectedManufacturer && (
+                <Text style={styles.errorText}>Manufacturer is required</Text>
+              )}
             </View>
-          )}
 
-          <View>
-            <Text style={styles.inputLabel}>Manufacturer</Text>
-            <MyDropDown
-              style={styles.dropDown}
-              data={edit ? [{ ...selectedManufacturer }] : manufacturers}
-              onChange={onManufacturerChange}
-              value={selectedManufacturer}
-              placeholder="Select manufacuturer"
-              labelField="name"
-              valueField="id"
-            />
-            {submitted && !selectedManufacturer && (
-              <Text style={styles.errorText}>Manufacturer is required</Text>
-            )}
-          </View>
-
-          <View>
-            <Text style={styles.inputLabel}>Product</Text>
-            <MyDropDown
-              style={styles.dropDown}
-              disable={disable}
-              data={edit ? [{ ...selectedProduct }] : products}
-              onChange={onProductChange}
-              value={selectedProduct}
-              placeholder="Select product"
-              labelField="displayName"
-              valueField="id"
-            />
-            {submitted && !selectedProduct && (
-              <Text style={styles.errorText}>Product is required</Text>
-            )}
-          </View>
-
-          <FlatList
-            data={saleUnits?.filter(
-              (item) =>
-                item?.productSaleUnitName !==
-                  selectedSaleUnit?.productSaleUnitName ||
-                item?.saleUnitName !== selectedSaleUnit?.saleUnitName
-            )}
-            ListHeaderComponent={() =>
-              saleUnits?.length > 1 && (
-                <Text style={styles.inputLabel}>Container portions</Text>
-              )
-            }
-            renderItem={({ item }) => (
-              <ChipButton
-                isSelected={selectedSaleUnits?.find(
-                  (unit) =>
-                    item?.saleUnitName === unit?.productSaleUnitName ||
-                    item?.saleUnitName === unit?.saleUnitName
-                )}
-                key={item.saleUnitName}
-                onPress={() => onSaleUnitSelect(item)}
-                title={item?.saleUnitName}
-                style={{ width: "fit-content" }}
-              />
-            )}
-            keyExtractor={(item) => item.saleUnitName.toString()}
-            numColumns={3}
-          />
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.inputLabel}>Sale unit</Text>
+            <View>
+              <Text style={styles.inputLabel}>Product</Text>
               <MyDropDown
                 style={styles.dropDown}
-                data={saleUnits}
-                onChange={handleSaleUnitChange}
-                value={selectedSaleUnit}
-                placeholder="Select sale unit"
-                labelField="saleUnitName"
+                disable={disable}
+                data={edit ? [{ ...selectedProduct }] : products}
+                onChange={onProductChange}
+                value={selectedProduct}
+                placeholder="Select product"
+                labelField="displayName"
                 valueField="id"
-                search={false}
               />
-              {submitted && !selectedSaleUnit && (
-                <Text style={styles.errorText}>Sale unit is required</Text>
+              {submitted && !selectedProduct && (
+                <Text style={styles.errorText}>Product is required</Text>
               )}
             </View>
 
-            <View style={{ flex: 1 }}>
-              <MyInput
-                label={<Text style={styles.inputLabel}>Selling price</Text>}
-                value={salesPrice}
-                onValueChange={(text) => setSalesPrice(text)}
-                inputMode="numeric"
-              />
-
-              {submitted && salesPrice.trim() === "" && (
-                <Text style={styles.errorText}>Sales price is required</Text>
+            <FlatList
+              data={saleUnits?.filter(
+                (item) =>
+                  item?.productSaleUnitName !==
+                    selectedSaleUnit?.productSaleUnitName ||
+                  item?.saleUnitName !== selectedSaleUnit?.saleUnitName
               )}
+              ListHeaderComponent={() =>
+                saleUnits?.length > 1 && (
+                  <Text style={styles.inputLabel}>Container portions</Text>
+                )
+              }
+              renderItem={({ item }) => (
+                <ChipButton
+                  isSelected={selectedSaleUnits?.find(
+                    (unit) =>
+                      item?.saleUnitName === unit?.productSaleUnitName ||
+                      item?.saleUnitName === unit?.saleUnitName
+                  )}
+                  key={item.saleUnitName}
+                  onPress={() => onSaleUnitSelect(item)}
+                  title={item?.saleUnitName}
+                  style={{ width: "fit-content" }}
+                />
+              )}
+              keyExtractor={(item) => item.saleUnitName.toString()}
+              numColumns={3}
+            />
+            <View style={styles.row}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.inputLabel}>Sale unit</Text>
+                <MyDropDown
+                  style={styles.dropDown}
+                  data={saleUnits}
+                  onChange={handleSaleUnitChange}
+                  value={selectedSaleUnit}
+                  placeholder="Select sale unit"
+                  labelField="saleUnitName"
+                  valueField="id"
+                  search={false}
+                />
+                {submitted && !selectedSaleUnit && (
+                  <Text style={styles.errorText}>Sale unit is required</Text>
+                )}
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <MyInput
+                  label={<Text style={styles.inputLabel}>Selling price</Text>}
+                  value={salesPrice}
+                  onValueChange={(text) => setSalesPrice(text)}
+                  inputMode="numeric"
+                />
+
+                {submitted && salesPrice.trim() === "" && (
+                  <Text style={styles.errorText}>Sales price is required</Text>
+                )}
+              </View>
+            </View>
+
+            {selectedSaleUnits?.map((item, index) => (
+              <View style={styles.row} key={index}>
+                <View style={{ flex: 1 }}>
+                  <MyInput
+                    label=""
+                    value={item.saleUnitName || item?.productSaleUnitName}
+                    editable={false}
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <MyInput
+                    label=""
+                    value={item.unitPrice}
+                    onValueChange={(e) => handleUnitPriceChange(index, e)}
+                  />
+                </View>
+              </View>
+            ))}
+            <View>
+              <MyInput
+                label="Remarks"
+                value={remarks}
+                onValueChange={(text) => setRemarks(text)}
+                multiline
+              />
             </View>
           </View>
-
-          {selectedSaleUnits?.map((item, index) => (
-            <View style={styles.row} key={index}>
-              <View style={{ flex: 1 }}>
-                <MyInput
-                  label=""
-                  value={item.saleUnitName || item?.productSaleUnitName}
-                  editable={false}
-                />
-              </View>
-              <View style={{ flex: 1 }}>
-                <MyInput
-                  label=""
-                  value={item.unitPrice}
-                  onValueChange={(e) => handleUnitPriceChange(index, e)}
-                />
-              </View>
-            </View>
-          ))}
-          <View>
-            <MyInput
-              label="Remarks"
-              value={remarks}
-              onValueChange={(text) => setRemarks(text)}
-              multiline
+          <View style={styles.bottomContent}>
+            <PrimaryButton
+              darkMode={false}
+              title={"Clear"}
+              onPress={clearForm}
+            />
+            <PrimaryButton
+              title={"Save"}
+              onPress={saveProduct}
+              disabled={disable}
             />
           </View>
         </View>
-        <View style={styles.bottomContent}>
-          <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} />
-          <PrimaryButton
-            title={"Save"}
-            onPress={saveProduct}
-            disabled={disable}
-          />
-        </View>
+
         <Snackbar ref={snackBarRef} />
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -445,12 +450,6 @@ const styles = StyleSheet.create({
   bottomContent: {
     flexDirection: "row",
     justifyContent: "space-between",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 8,
     gap: 10,
-    marginBottom: 10,
   },
 });

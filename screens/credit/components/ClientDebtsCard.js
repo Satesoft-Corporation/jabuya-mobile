@@ -8,6 +8,7 @@ import SalesTable from "@screens/sales_desk/components/SalesTable";
 import DataRow from "@components/card_components/DataRow";
 import CardFooter2 from "@components/card_components/CardFooter2";
 import CardFooter1 from "@components/card_components/CardFooter1";
+import { CREDIT_PAYMENTS } from "@navigation/ScreenNames";
 
 const ClientDebtsCard = ({ debt, snackbarRef }) => {
   const navigation = useNavigation();

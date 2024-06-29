@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import { scale } from "react-native-size-matters";
 import Colors from "@constants/Colors";
 import { SaleEntryContext } from "context/SaleEntryContext";
+import { CREDIT_SALES } from "@navigation/ScreenNames";
 
 export function MenuIcon({
   icon,

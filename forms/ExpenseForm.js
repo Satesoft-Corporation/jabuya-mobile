@@ -26,6 +26,10 @@ const ExpenseForm = () => {
   const snackRef = useRef(null);
   const navigation = useNavigation();
 
+  const clearForm = () => {
+    setAmount("");
+    setRemarks("");
+  };
   const fetchCategories = async () => {
     let searchParameters = {
       offset: 0,
@@ -58,7 +62,7 @@ const ExpenseForm = () => {
       .saveRequestWithJsonResponse(payload, false)
       .then((response) => {
         setLoading(false);
-        // clearForm();
+        clearForm();
         snackRef.current.show("Details saved", 4000);
       })
       .catch((e) => {

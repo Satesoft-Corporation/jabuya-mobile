@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView } from "react-native";
 import React, { useState, useRef } from "react";
-import { convertToServerDate } from "@utils/Utils";
+import { convertToServerDate, formatNumberWithCommas } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
 import AppStatusBar from "@components/AppStatusBar";
 import Colors from "@constants/Colors";
@@ -38,7 +38,7 @@ const CreditPayment = ({ route }) => {
       paymentDate: convertToServerDate(paymentDate),
     };
 
-    const isValidSubmision = Number(amount) <= balance;
+    const isValidSubmision = Number(amount) <= balance && Number(amount) > 0;
 
     if (isValidSubmision) {
       setLoading(true);
@@ -56,7 +56,9 @@ const CreditPayment = ({ route }) => {
         });
     } else {
       snackRef.current.show(
-        `Amount should not exceed UGX ${formatNumberWithCommas(balance)}`,
+        `Enter valid amount, amount should not exceed ${
+          sale?.currency
+        }${formatNumberWithCommas(balance)}`,
         5000
       );
     }
@@ -95,16 +97,8 @@ const CreditPayment = ({ route }) => {
 
           <DataRow
             label={"Balance "}
-            labelTextStyle={{ fontSize: 15, paddingHorizontal: 4 }}
-            valueTextStyle={{ fontSize: 15 }}
-            value={
-              <>
-                <Text style={{ fontSize: 10 }}>UGX</Text>
-                <Text style={{ fontWeight: 600 }}>
-                  {formatNumberWithCommas(balance)}
-                </Text>
-              </>
-            }
+            currency={sale?.currency}
+            value={balance}
           />
           <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
             <MyInput

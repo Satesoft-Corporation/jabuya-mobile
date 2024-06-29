@@ -65,11 +65,7 @@ const NewClient = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      enabled={true}
-      behavior={"height"}
-      style={{ flex: 1 }}
-    >
+    <KeyboardAvoidingView enabled={true} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
         <AppStatusBar />
         <TopHeader title="Add Debtor" />
