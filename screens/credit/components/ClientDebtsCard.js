@@ -10,7 +10,7 @@ import CardFooter2 from "@components/card_components/CardFooter2";
 import CardFooter1 from "@components/card_components/CardFooter1";
 import { CREDIT_PAYMENTS } from "@navigation/ScreenNames";
 
-const ClientDebtsCard = ({ debt, snackbarRef }) => {
+const ClientDebtsCard = ({ debt, snackbarRef, currency }) => {
   const navigation = useNavigation();
 
   const [expanded, setExpanded] = useState(false);
@@ -19,7 +19,6 @@ const ClientDebtsCard = ({ debt, snackbarRef }) => {
   }, [expanded]);
 
   const isFullyPaid = Math.abs(debt?.amountLoaned - debt?.amountRepaid) <= 0;
-  const currency = debt?.sale?.shop?.currency?.symbol;
 
   const renderLeft = useCallback(() => {
     if (isFullyPaid) {

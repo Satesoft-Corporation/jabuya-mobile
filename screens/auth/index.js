@@ -20,8 +20,8 @@ import DisplayMessage from "@components/Dialogs/DisplayMessage";
 import { LANDING_SCREEN } from "@navigation/ScreenNames";
 
 export default function Login() {
-  const [username, setUsername] = useState("mosesjespar@gmail.com");
-  const [password, setPassword] = useState("0701807062");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [disabled, setDisabled] = useState(false);
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState(null);
@@ -46,9 +46,6 @@ export default function Login() {
           await UserSessionUtils.setUserAuthToken(response.accessToken);
           await UserSessionUtils.setUserRefreshToken(response.refreshToken);
           await UserSessionUtils.setFullSessionObject(response);
-          await UserSessionUtils.setShopid(
-            String(response?.user?.attendantShopId)
-          );
           await UserSessionUtils.setLoginTime(String(date));
           await UserSessionUtils.resetPendingSales();
           await UserSessionUtils.setLoginDetails(loginInfo);

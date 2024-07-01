@@ -13,3 +13,5 @@ export const STOCK_ENTRY_ENDPOINT = "/stock-entries";
 export const EXPENSES_ENDPOINT = "/shop/expenses";
 
 export const CURRENCIES_ENDPOINT = "/currencies";
+
+export const CLIENT_SALES_ENDPOINT = "/credit-sales";

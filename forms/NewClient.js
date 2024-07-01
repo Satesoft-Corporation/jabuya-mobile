@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView } from "react-native";
-import React, { useState, useContext, useRef } from "react";
-import { UserContext } from "context/UserContext";
+import React, { useState, useRef } from "react";
+import { userData } from "context/UserContext";
 import { convertToServerDate } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
 import AppStatusBar from "@components/AppStatusBar";
@@ -11,6 +11,7 @@ import MyInput from "@components/MyInput";
 import { MyDropDown } from "@components/DropdownComponents";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import Snackbar from "@components/Snackbar";
+import { saveShopClients } from "@controllers/OfflineControllers";
 
 const NewClient = () => {
   const [firstName, setFirstName] = useState("");
@@ -23,7 +24,7 @@ const NewClient = () => {
   const [phone2, setPhone2] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { selectedShop } = useContext(UserContext);
+  const { selectedShop, offlineParams } = userData();
 
   const snackRef = useRef(null);
 
@@ -52,14 +53,16 @@ const NewClient = () => {
 
     new BaseApiService("/clients-controller")
       .saveRequestWithJsonResponse(payload, false)
-      .then((response) => {
+      .then(async (response) => {
         setLoading(false);
         clearForm();
         snackRef.current.show("Client details saved", 4000);
+        await saveShopClients(offlineParams, true);
+
       })
       .catch((e) => {
         setLoading(false);
-
+        console.log(e);
         snackRef.current.show(e?.message, 4000);
       });
   };

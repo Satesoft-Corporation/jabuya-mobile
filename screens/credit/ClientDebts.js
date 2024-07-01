@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, FlatList, StyleSheet } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import Colors from "../../constants/Colors";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
@@ -9,9 +9,7 @@ import ItemHeader from "../sales/components/ItemHeader";
 import VerticalSeparator from "../../components/VerticalSeparator";
 
 const ClientDebts = ({ route }) => {
-  const { client, sales, debt, paid, bal } = route?.params ?? {};
-
-  const [loading, setLoading] = useState(true);
+  const { client, sales, debt, paid, bal, currency } = route?.params ?? {};
 
   const snackbarRef = useRef(null);
 
@@ -58,14 +56,11 @@ const ClientDebts = ({ route }) => {
               <ClientDebtsCard
                 debt={item}
                 snackbarRef={snackbarRef}
-                lastItem={index === sales?.length - 1}
-                removeLoader={() => setLoading(false)}
+                currency={currency}
               />
             );
           }}
           keyExtractor={(item) => item.id.toString()}
-          refreshing={loading}
-          onRefresh={() => {}}
         />
         <Snackbar ref={snackbarRef} />
       </View>

@@ -9,7 +9,10 @@ import {
   formatNumberWithCommas,
 } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
-import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
+import {
+  saveClientSalesOnDevice,
+  saveShopProductsOnDevice,
+} from "@controllers/OfflineControllers";
 import SalesTable from "./SalesTable";
 import PaymentMethodComponent from "./PaymentMethodComponent";
 import PrimaryButton from "@components/buttons/PrimaryButton";
@@ -86,7 +89,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
           let id = info?.id;
 
           if (status === 200) {
-            new BaseApiService(`/shop-sales/${id}/confirm`)
+            await new BaseApiService(`/shop-sales/${id}/confirm`)
               .postRequest()
               .then((d) => d.json())
               .then(async (response) => {
@@ -96,12 +99,14 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
                   clearEverything();
                   clearForm();
                   snackbarRef.current.show("Sale confirmed successfully", 4000);
-                  await saveShopProductsOnDevice(searchParameters); // updating offline products
+                  await saveShopProductsOnDevice(searchParameters, true); // updating offline products
+                  if (onCredit) {
+                    await saveClientSalesOnDevice(searchParameters);
+                  }
                 }
               })
               .catch((error) => {
                 setLoading(false);
-
                 setError(`Failed to confirm sale!, ${error?.message}`);
               });
           } else {

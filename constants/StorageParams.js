@@ -16,6 +16,9 @@ const StorageParams = {
   SHOP_CLIENTS: "@shop_clients",
   LOGIN_DETAILS: "@login_details",
   CURRENCIES: "@currencies",
+  LAST_SESSION_TIME: "@last_usage_time",
+  CLIENT_SALES: "@client_sales",
+  
 };
 
 export default StorageParams;

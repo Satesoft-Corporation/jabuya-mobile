@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, FlatList, StyleSheet } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { StackActions, useNavigation } from "@react-navigation/native";
 import { userData } from "context/UserContext";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import AppStatusBar from "@components/AppStatusBar";
@@ -11,6 +11,7 @@ import Colors from "@constants/Colors";
 import Snackbar from "@components/Snackbar";
 import CreditSaleCard from "./components/CreditSaleCard";
 import { CLIENT_FORM } from "@navigation/ScreenNames";
+import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
 
 const CreditSales = () => {
   const navigation = useNavigation();
@@ -26,7 +27,7 @@ const CreditSales = () => {
   const [adds, setAdds] = useState(0);
 
   const snackbarRef = useRef(null);
-  const { selectedShop, userParams } = userData();
+  const { selectedShop, userParams, offlineParams } = userData();
 
   const fetchClients = async () => {
     const { name, id } = selectedShop;
@@ -38,13 +39,22 @@ const CreditSales = () => {
     setClients([]);
     setAdds(0);
 
+    const creditSales = await UserSessionUtils.getClientSales();
+
     await UserSessionUtils.getShopClients(name?.includes("All") ? null : id)
       .then((response) => {
-        setClients(response);
         if (response.length === 0) {
           setMessage("No records found");
           setLoading(false);
+          return true;
         }
+        setClients(response);
+        const debt = creditSales.reduce((a, b) => a + b?.amountLoaned, 0);
+        const paid = creditSales.reduce((a, b) => a + b?.amountRepaid, 0);
+        setDebt(debt);
+        setPaid(paid);
+        setBal(debt - paid);
+        setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
@@ -53,19 +63,9 @@ const CreditSales = () => {
       });
   };
 
-  const appendDebtValue = (value = 0) => {
-    setDebt((prev) => prev + value);
-    setAdds((prev) => prev + 1);
-  };
-
-  const appendPaidValue = (value = 0) => {
-    setPaid((prev) => prev + value);
-  };
-  const appendBalValue = (value = 0) => {
-    setBal((prev) => prev + value);
-  };
-
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
+    setLoading(true);
+    await saveClientSalesOnDevice(offlineParams, true);
     fetchClients();
   };
   useEffect(() => {
@@ -83,7 +83,8 @@ const CreditSales = () => {
       ? [
           {
             name: "Add debtor",
-            onClick: () => navigation.navigate(CLIENT_FORM),
+            onClick: () =>
+              navigation.dispatch(StackActions.replace(CLIENT_FORM)),
           },
         ]
       : []),
@@ -132,14 +133,7 @@ const CreditSales = () => {
           style={{ marginTop: 10 }}
           data={clients}
           renderItem={({ item }) => {
-            return (
-              <CreditSaleCard
-                client={item}
-                appendDebtValue={appendDebtValue}
-                appendBalValue={appendBalValue}
-                appendPaidValue={appendPaidValue}
-              />
-            );
+            return <CreditSaleCard client={item} />;
           }}
           keyExtractor={(item) => item.id.toString()}
           refreshing={loading}

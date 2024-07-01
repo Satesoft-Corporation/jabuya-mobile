@@ -125,23 +125,6 @@ export class UserSessionUtils {
   }
 
   /**
-   * This method is used to get the attendant shopId
-   * @returns shopId
-   */
-  static async getShopId() {
-    let id = await AsyncStorage.getItem(StorageParams.SHOP_ID);
-    return Number(id);
-  }
-
-  /**
-   * This method is used to set the attendant shopId
-   * @param {id} id
-   */
-  static async setShopid(id) {
-    await AsyncStorage.setItem(StorageParams.SHOP_ID, id);
-  }
-
-  /**
    * This method is used to set the number shops for a shop owner
    * @param {count} count
    */
@@ -175,7 +158,7 @@ export class UserSessionUtils {
     let shops = await AsyncStorage.getItem(StorageParams.SHOPS);
     let parsed = JSON.parse(shops);
 
-    let finalList = parsed.map((item) => {
+    let finalList = parsed?.map((item) => {
       const currency = currencyList?.find(
         (cur) => cur?.id === item?.currencyId
       );
@@ -366,6 +349,24 @@ export class UserSessionUtils {
       return filtered;
     } else {
       return list ? JSON.parse(list) : [];
+    }
+  }
+
+  static async setClientSales(list) {
+    await AsyncStorage.setItem(
+      StorageParams.CLIENT_SALES,
+      JSON.stringify(list)
+    );
+  }
+
+  static async getClientSales(client_id = null) {
+    let creditList = await AsyncStorage.getItem(StorageParams.CLIENT_SALES);
+    if (client_id !== null) {
+      const list = [...JSON.parse(creditList)];
+      let filtered = list.filter((sale) => sale?.client_id === client_id);
+      return filtered;
+    } else {
+      return creditList ? [...JSON.parse(creditList)] : [];
     }
   }
 }

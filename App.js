@@ -17,7 +17,6 @@ import LockSetUp from "@screens/applock/LockSetUp";
 import CreditSales from "@screens/credit/CreditSales";
 import CreditPayment from "@forms/CreditPayment";
 import NewClient from "@forms/NewClient";
-import ClientRegister from "@screens/credit/ClientRegister";
 import ContactBook from "@screens/ContactBook";
 import Expenses from "@screens/expenses";
 import ExpenseForm from "@forms/ExpenseForm";
@@ -74,10 +73,7 @@ export default function App() {
               />
 
               <Stack.Screen name={s.CLIENT_FORM} component={NewClient} />
-              <Stack.Screen
-                name={s.CLIENT_REGISTER}
-                component={ClientRegister}
-              />
+
               <Stack.Screen name={s.CONTACT_BOOK} component={ContactBook} />
 
               <Stack.Screen name={s.EXPENSES} component={Expenses} />

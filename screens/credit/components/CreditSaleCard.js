@@ -1,18 +1,13 @@
 import { View, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { BaseApiService } from "@utils/BaseApiService";
+import { StackActions, useNavigation } from "@react-navigation/native";
 import CardHeader from "@components/card_components/CardHeader";
 import DataColumn from "@components/card_components/DataColumn";
 import CardFooter2 from "@components/card_components/CardFooter2";
 import { CLIENT_DEBTS } from "@navigation/ScreenNames";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
-const CreditSaleCard = ({
-  client,
-  appendDebtValue,
-  appendBalValue,
-  appendPaidValue,
-}) => {
+const CreditSaleCard = ({ client }) => {
   const navigation = useNavigation();
 
   const [sales, setSales] = useState([]);
@@ -27,31 +22,16 @@ const CreditSaleCard = ({
   const currency = client?.shop?.currency?.symbol;
 
   const fetchCreditSales = async () => {
-    let searchParameters = {
-      limit: 0,
-      offset: 0,
-      clientId: client?.id,
-    };
+    const list = await UserSessionUtils.getClientSales(client?.id);
+    const debt = list.reduce((a, b) => a + b?.amountLoaned, 0);
+    const paid = list.reduce((a, b) => a + b?.amountRepaid, 0);
+    const bal = debt - paid;
 
-    await new BaseApiService("/credit-sales")
-      .getRequestWithJsonResponse(searchParameters)
-      .then((response) => {
-        setSales(response?.records);
-        const debt = response.records.reduce((a, b) => a + b?.amountLoaned, 0);
-        const paid = response.records.reduce((a, b) => a + b?.amountRepaid, 0);
-        const bal = debt - paid;
-
-        setDebt(debt);
-        setPaid(paid);
-        setBal(bal);
-        appendDebtValue(debt);
-        appendBalValue(bal);
-        appendPaidValue(paid);
-        setShow(true);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    setSales(list);
+    setDebt(debt);
+    setPaid(paid);
+    setBal(bal);
+    setShow(true);
   };
 
   useEffect(() => {
@@ -85,13 +65,16 @@ const CreditSaleCard = ({
           renderBtn={bal > 0}
           btnTitle="More"
           onBtnPress={() =>
-            navigation.navigate(CLIENT_DEBTS, {
-              client,
-              sales,
-              debt,
-              paid,
-              bal,
-            })
+            navigation.dispatch(
+              StackActions.replace(CLIENT_DEBTS, {
+                client,
+                sales,
+                debt,
+                paid,
+                bal,
+                currency,
+              })
+            )
           }
         />
       </View>

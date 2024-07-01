@@ -10,22 +10,23 @@ import DataRow from "@components/card_components/DataRow";
 import MyInput from "@components/MyInput";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import Snackbar from "@components/Snackbar";
+import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
+import { userData } from "context/UserContext";
 
 const CreditPayment = ({ route }) => {
   const sale = { ...route.params };
-
+  const { offlineParams } = userData();
   let balance = sale?.amountLoaned - sale?.amountRepaid;
 
   const [paymentDate, setPaymentDate] = useState(new Date());
-  const [amount, setAmount] = useState("0");
+  const [amount, setAmount] = useState("");
   const [remarks, setRemarks] = useState("");
 
   const [loading, setLoading] = useState(false);
 
   const snackRef = useRef(null);
-
   const clearForm = () => {
-    setAmount("0");
+    setAmount("");
     setRemarks("");
   };
 
@@ -33,7 +34,7 @@ const CreditPayment = ({ route }) => {
     // setSubmitted(true);
     let payLoad = {
       id: 0,
-      creditSaleId: sale?.sale?.id,
+      creditSaleId: sale?.creditSaleId,
       amount: Number(amount),
       paymentDate: convertToServerDate(paymentDate),
     };
@@ -49,6 +50,7 @@ const CreditPayment = ({ route }) => {
           setLoading(false);
           clearForm();
           snackRef.current.show(`Payment saved successfully`, 5000);
+          await saveClientSalesOnDevice(offlineParams);
         })
         .catch((error) => {
           setLoading(false);
@@ -72,7 +74,7 @@ const CreditPayment = ({ route }) => {
       }}
     >
       <AppStatusBar />
-      <TopHeader title={`Credit payment for ${sale?.shopClient?.fullName}`} />
+      <TopHeader title={`Credit payment for ${sale?.client_name}`} />
       <Loader loading={loading} />
       <View
         style={{
@@ -103,7 +105,7 @@ const CreditPayment = ({ route }) => {
           <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
             <MyInput
               label="Client name"
-              value={sale?.shopClient?.fullName}
+              value={sale?.client_name}
               style={{ flex: 1 }}
               editable={false}
             />

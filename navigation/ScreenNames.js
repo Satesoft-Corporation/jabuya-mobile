@@ -15,7 +15,6 @@ export const PDT_ENTRY = "product_entry";
 export const UPDATE_PRICE = "update_price";
 
 export const CREDIT_SALES = "credit_sales";
-export const CLIENT_REGISTER = "client_register";
 export const CLIENT_FORM = "client_form";
 export const SUPPLIERS = "suppliers";
 export const CREDIT_PAYMENTS = "credit_payments";
