@@ -15,6 +15,7 @@ import DisplayMessage from "@components/Dialogs/DisplayMessage";
 import Colors from "@constants/Colors";
 import { resolveUnsavedSales } from "@controllers/OfflineControllers";
 import { navList } from "./navList";
+import { LOCK_SCREEN } from "@navigation/ScreenNames";
 
 const LandingScreen = ({ navigation }) => {
   const {
