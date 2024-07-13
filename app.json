@@ -23,6 +23,14 @@
         {
           "cameraPermission": "Allow Duqact to access camera."
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Duqact to access your camera",
+          "microphonePermission": "Allow Duqact to access your microphone",
+          "recordAudioAndroid": true
+        }
       ]
     ],
     "assetBundlePatterns": ["**/*"],

@@ -168,7 +168,11 @@ function SalesDesk({ navigation }) {
             products={products}
             handleChange={(t) => handleChange(t)}
             makeSelection={makeSelection}
-            setScanned={() => navigation.navigate(BARCODE_SCREEN)}
+            setScanned={() =>
+              navigation.navigate(BARCODE_SCREEN, {
+                products,
+              })
+            }
           />
         </View>
       </BlackScreen>

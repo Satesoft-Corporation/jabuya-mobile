@@ -12,6 +12,7 @@ import Snackbar from "@components/Snackbar";
 import { userData } from "context/UserContext";
 import TopHeader from "@components/TopHeader";
 import { formatNumberWithCommas } from "@utils/Utils";
+import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 
 const StockLevel = ({ navigation }) => {
   const [message, setMessage] = useState(null);
@@ -26,7 +27,7 @@ const StockLevel = ({ navigation }) => {
 
   const snackbarRef = useRef(null);
 
-  const { selectedShop } = userData();
+  const { selectedShop, offlineParams } = userData();
 
   const fetchShopProducts = async () => {
     try {
@@ -149,8 +150,9 @@ const StockLevel = ({ navigation }) => {
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
         renderItem={({ item }) => <StockLevelCard data={item} />}
-        onRefresh={() => {
+        onRefresh={async () => {
           setSearchTerm("");
+          await saveShopProductsOnDevice(offlineParams, 2 === 2);
           fetchShopProducts();
         }}
         refreshing={loading}

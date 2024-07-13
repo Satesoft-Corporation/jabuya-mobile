@@ -20,7 +20,9 @@ export const saveCurrencies = async () => {
     .then(async (response) => {
       await UserSessionUtils.setCurrencies(response?.records);
     })
-    .catch((error) => {});
+    .catch((error) => {
+      console.error(error, "currencies");
+    });
 };
 
 export const resolveUnsavedSales = async () => {
@@ -144,7 +146,7 @@ export const saveShopDetails = async (
 };
 
 export const saveClientSalesOnDevice = async (searchParameters) => {
-  console.log('Saving credit sales')
+  console.log("Saving credit sales");
   await new BaseApiService(CLIENT_SALES_ENDPOINT)
     .getRequestWithJsonResponse(searchParameters)
     .then(async (response) => {
