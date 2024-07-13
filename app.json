@@ -15,7 +15,13 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Allow Duqact to use device biometrics."
+          "faceIDPermission": "Allow Duqact to access device biometrics."
+        }
+      ],
+      [
+        "expo-barcode-scanner",
+        {
+          "cameraPermission": "Allow Duqact to access camera."
         }
       ]
     ],
