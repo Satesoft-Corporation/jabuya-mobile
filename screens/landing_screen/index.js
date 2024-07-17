@@ -18,13 +18,8 @@ import { navList } from "./navList";
 import { LOCK_SCREEN } from "@navigation/ScreenNames";
 
 const LandingScreen = ({ navigation }) => {
-  const {
-    getShopsFromStorage,
-    userParams,
-    configureUserData,
-    getRefreshToken,
-    shops,
-  } = userData();
+  const { getShopsFromStorage, configureUserData, getRefreshToken, shops } =
+    userData();
 
   const [loading, setLoading] = useState(true);
   const [showMoodal, setShowModal] = useState(false);
@@ -54,13 +49,7 @@ const LandingScreen = ({ navigation }) => {
     }
 
     if (item.target) {
-      if (item.target === "stocking" && userParams?.isShopAttendant === true) {
-        navigation.navigate(STOCK_ENTRY);
-        return null;
-      } else {
-        navigation.navigate(item.target);
-        return null;
-      }
+      navigation.navigate(item.target);
     }
   };
 
