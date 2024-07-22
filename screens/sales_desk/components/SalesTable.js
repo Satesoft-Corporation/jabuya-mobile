@@ -35,7 +35,7 @@ const SalesTable = ({ sales = [], fixHeight = true, currency }) => {
         style={
           fixHeight
             ? {
-                height: screenHeight / 4,
+                height: screenHeight / 3.5,
               }
             : {
                 maxHeight: screenHeight / 4,

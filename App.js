@@ -28,6 +28,8 @@ import { SaleEntryProvider } from "context/SaleEntryContext";
 import SalesDesk from "@screens/sales_desk";
 import * as s from "@navigation/ScreenNames";
 import Login from "@screens/auth";
+import ReportsMenu from "@screens/reports";
+import ComingSoon from "@screens/coming_soon";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -84,6 +86,10 @@ export default function App() {
               <Stack.Screen name={s.OFFLINE_SALES} component={OfflineSales} />
 
               <Stack.Screen name={s.CLIENT_DEBTS} component={ClientDebts} />
+
+              <Stack.Screen name={s.REPORTS_MENU} component={ReportsMenu} />
+
+              <Stack.Screen name={s.COMING_SOON} component={ComingSoon} />
             </Stack.Navigator>
           </NavigationContainer>
         </SaleEntryProvider>

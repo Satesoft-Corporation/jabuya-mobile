@@ -163,6 +163,21 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
           </Text>
         </View>
       )}
+
+      {!recievedAmount && (
+        <View style={{ marginVertical: 5 }}>
+          <Text
+            numberOfLines={4}
+            style={{
+              color: Colors.error,
+              fontWeight: 500,
+            }}
+          >
+            Confirm if its a debt
+          </Text>
+        </View>
+      )}
+
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Text
           style={{

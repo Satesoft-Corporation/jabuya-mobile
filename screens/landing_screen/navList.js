@@ -1,10 +1,7 @@
 import {
   CONTACT_BOOK,
-  CREDIT_SALES,
-  EXPENSES,
+  REPORTS_MENU,
   SALES_DESK,
-  SALES_REPORTS,
-  STOCKNG,
 } from "@navigation/ScreenNames";
 
 export const navList = [
@@ -19,19 +16,7 @@ export const navList = [
     id: 2,
     icon: require("../../assets/icons/icons8-report-50.png"),
     title: "Reports",
-    target: SALES_REPORTS,
-  },
-  {
-    id: 3,
-    icon: require("../../assets/icons/icons8-box-50.png"),
-    title: "Stocking",
-    target: STOCKNG,
-  },
-  {
-    id: 4,
-    icon: require("../../assets/icons/open-hand.png"),
-    title: "Debtors",
-    target: CREDIT_SALES,
+    target: REPORTS_MENU,
   },
   {
     id: 5,
@@ -39,16 +24,21 @@ export const navList = [
     title: "Contacts",
     target: CONTACT_BOOK,
   },
+
+  {
+    id: 3,
+    icon: require("../../assets/icons/cctv.png"),
+    title: "Camera",
+  },
+
   {
     id: 6,
     icon: require("../../assets/icons/icons8-chat-50.png"),
     title: "Chat",
-    // target:INCOME_GRAPHS
   },
   {
-    id: 7,
-    icon: require("../../assets/icons/spending.png"),
-    title: "Expenses",
-    target: EXPENSES,
+    id: 3,
+    icon: require("../../assets/icons/settings.png"),
+    title: "Settings",
   },
 ];

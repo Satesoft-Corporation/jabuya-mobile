@@ -1,7 +1,7 @@
 import { View, SafeAreaView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { FlatList } from "react-native";
-import { StackActions } from "@react-navigation/native";
+import { StackActions, useNavigation } from "@react-navigation/native";
 import { userData } from "../../context/UserContext";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import { getTimeDifference } from "@utils/Utils";
@@ -15,9 +15,9 @@ import DisplayMessage from "@components/Dialogs/DisplayMessage";
 import Colors from "@constants/Colors";
 import { resolveUnsavedSales } from "@controllers/OfflineControllers";
 import { navList } from "./navList";
-import { LOCK_SCREEN } from "@navigation/ScreenNames";
+import { COMING_SOON, LOCK_SCREEN } from "@navigation/ScreenNames";
 
-const LandingScreen = ({ navigation }) => {
+const LandingScreen = () => {
   const { getShopsFromStorage, configureUserData, getRefreshToken, shops } =
     userData();
 
@@ -28,6 +28,7 @@ const LandingScreen = ({ navigation }) => {
   const [canCancel, setCanCancel] = useState(false);
   const [timeDiff, setTimeDiff] = useState(null);
 
+  const navigation = useNavigation();
   const logOut = () => {
     setLoading(false);
     UserSessionUtils.clearLocalStorageAndLogout(navigation);
@@ -42,7 +43,7 @@ const LandingScreen = ({ navigation }) => {
 
   const handleTabPress = (item) => {
     const { days } = timeDiff;
-    if (days >= 7) {
+    if (days >= 14) {
       //trigger the logout dialog every after some time
       logInPrompt();
       return null;
@@ -50,6 +51,11 @@ const LandingScreen = ({ navigation }) => {
 
     if (item.target) {
       navigation.navigate(item.target);
+      return;
+    }
+    if (!item.target) {
+      navigation.navigate(COMING_SOON, item?.title);
+      return;
     }
   };
 

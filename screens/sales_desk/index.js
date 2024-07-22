@@ -19,7 +19,6 @@ import PrimaryButton from "@components/buttons/PrimaryButton";
 import SalesTable from "./components/SalesTable";
 import { userData } from "context/UserContext";
 import { SaleEntryContext } from "context/SaleEntryContext";
-import { IconsComponent } from "@components/MenuIcon";
 import Snackbar from "@components/Snackbar";
 
 function SalesDesk({ navigation }) {
@@ -110,7 +109,7 @@ function SalesDesk({ navigation }) {
     const isValidAmount = Number(recievedAmount) >= totalCost;
 
     if (selections.length > 0) {
-      if (isValidAmount === true) {
+      if (!recievedAmount) {
         setShowConfirmed(true);
         return true;
       }
@@ -177,82 +176,16 @@ function SalesDesk({ navigation }) {
         </View>
       </BlackScreen>
 
-      <View style={{ backgroundColor: Colors.light_2, flex: 1 }}>
-        <ScrollView style={{ paddingHorizontal: 10, marginTop: 7 }}>
+      <ScrollView
+        style={{ backgroundColor: Colors.light_2, flex: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={{ paddingHorizontal: 10, marginTop: 7, gap: 10 }}>
           <View
             style={{
               backgroundColor: Colors.light,
               borderRadius: 5,
               padding: 10,
-              paddingVertical: 4,
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                elevation: 10,
-                shadowOffset: { width: 0, height: 25 },
-                shadowOpacity: 0.8,
-              }}
-            >
-              <FontAwesome5 name="money-bill" size={24} color="black" />
-              <View
-                style={{
-                  marginLeft: 10,
-                }}
-              >
-                <Text style={{ fontWeight: "bold" }}>Recieved amt</Text>
-              </View>
-            </View>
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "flex-end",
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    alignSelf: "center",
-                    color: Colors.gray,
-                    fontSize: 10,
-                    marginEnd: 5,
-                  }}
-                >
-                  {selectedShop?.currency}
-                </Text>
-                <TextInput
-                  textAlign="right"
-                  value={recievedAmount}
-                  inputMode="numeric"
-                  onChangeText={(text) => setRecievedAmount(text)}
-                  style={{
-                    backgroundColor: Colors.light,
-                    borderRadius: 5,
-                    padding: 5,
-                    width: 120,
-                    fontSize: 17,
-                  }}
-                  placeholder="Enter amount"
-                />
-              </View>
-            </View>
-          </View>
-
-          <View
-            style={{
-              backgroundColor: Colors.light,
-              borderRadius: 5,
-              padding: 10,
-              marginTop: 8,
             }}
           >
             <SalesTable sales={selections} />
@@ -301,29 +234,79 @@ function SalesDesk({ navigation }) {
             style={{
               backgroundColor: Colors.light,
               borderRadius: 5,
-              padding: 10,
+              paddingHorizontal: 10,
+              paddingVertical: 5,
               flexDirection: "row",
               justifyContent: "space-between",
-              marginTop: 8,
+              borderWidth: 1,
+              borderColor: "#000",
             }}
           >
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
+                elevation: 10,
+                shadowOffset: { width: 0, height: 25 },
+                shadowOpacity: 0.8,
+                gap: 10,
               }}
             >
-              <FontAwesome5 name="money-bill" size={24} color="black" />
+              <FontAwesome5 name="money-bill" size={20} color="black" />
+              <Text style={{ fontWeight: "bold", fontSize: 17 }}>
+                Recieved amount
+              </Text>
+            </View>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "flex-end",
+              }}
+            >
               <View
                 style={{
-                  marginLeft: 10,
+                  flexDirection: "row",
+                  justifyContent: "center",
                 }}
               >
-                <Text style={{ fontWeight: "bold", fontSize: 17 }}>
-                  Balance
+                <Text
+                  style={{
+                    alignSelf: "center",
+                    color: Colors.gray,
+                    fontSize: 10,
+                    marginEnd: 5,
+                  }}
+                >
+                  {selectedShop?.currency}
                 </Text>
+                <TextInput
+                  textAlign="right"
+                  value={recievedAmount}
+                  inputMode="numeric"
+                  onChangeText={(text) => setRecievedAmount(text)}
+                  style={{
+                    backgroundColor: Colors.light,
+                    borderRadius: 5,
+                    width: 120,
+                    fontSize: 17,
+                    marginEnd: 5,
+                  }}
+                  placeholder="Enter amount"
+                />
               </View>
             </View>
+          </View>
+
+          <View
+            style={{
+              backgroundColor: Colors.light,
+              borderRadius: 5,
+              padding: 10,
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={{ fontWeight: "bold", fontSize: 17 }}>Balance</Text>
             <View
               style={{
                 justifyContent: "center",
@@ -346,14 +329,32 @@ function SalesDesk({ navigation }) {
             </View>
           </View>
 
-          <IconsComponent />
-
-          <View style={{ marginTop: 8, height: 40, marginBottom: 20 }}>
-            <PrimaryButton title={"Confirm purchase"} onPress={handleSubmit} />
+          <View
+            style={{
+              marginTop: 8,
+              height: 40,
+              marginBottom: 20,
+              flexDirection: "row",
+              gap: 5,
+            }}
+          >
+            <View style={{ flex: 0.3 }}>
+              <PrimaryButton
+                title={"Clear"}
+                onPress={clearEverything}
+                darkMode={false}
+              />
+            </View>
+            <View style={{ flex: 0.7 }}>
+              <PrimaryButton
+                title={"Confirm purchase"}
+                onPress={handleSubmit}
+              />
+            </View>
           </View>
-        </ScrollView>
-        <Snackbar ref={snackbarRef} />
-      </View>
+        </View>
+      </ScrollView>
+      <Snackbar ref={snackbarRef} />
     </SafeAreaView>
   );
 }
