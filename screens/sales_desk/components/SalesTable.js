@@ -23,11 +23,11 @@ const SalesTable = ({ sales = [], fixHeight = true, currency }) => {
           Qty
         </Text>
 
-        <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
+        <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
           Cost
         </Text>
 
-        <Text style={{ flex: 1, textAlign: "center", fontWeight: 600 }}>
+        <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
           Amount
         </Text>
       </View>

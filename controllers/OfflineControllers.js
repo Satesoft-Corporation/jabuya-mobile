@@ -29,6 +29,7 @@ export const resolveUnsavedSales = async () => {
   let pendingSales = await UserSessionUtils.getPendingSales();
 
   if (pendingSales.length > 0) {
+    console.log("Saving sales");
     pendingSales.forEach(async (cart, index) => {
       await new BaseApiService(SHOP_SALES_ENDPOINT)
         .postRequest(cart)

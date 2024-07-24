@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "context/UserContext";
 import { SaleEntryContext } from "context/SaleEntryContext";
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -7,6 +7,7 @@ import {
   convertToServerDate,
   formatDate,
   formatNumberWithCommas,
+  isValidNumber,
 } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
 import {
@@ -19,6 +20,7 @@ import PrimaryButton from "@components/buttons/PrimaryButton";
 import ModalContent from "@components/ModalContent";
 import Colors from "@constants/Colors";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
+import DataRow from "@components/card_components/DataRow";
 
 const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
   const [submitted, setSubmitted] = useState(false);
@@ -129,6 +131,39 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
     }
   };
 
+  const validate = () => {
+    setError(null);
+    const isValidAmount = Number(recievedAmount) >= totalCost;
+    let isValid = true;
+    if (selectedPaymentMethod?.id === 0) {
+      if (!isValidNumber(recievedAmount)) {
+        setError("Invalid input for recieved amount.");
+        console.log(recievedAmount);
+        isValid = false;
+        return;
+      }
+      if (!isValidAmount) {
+        setError(
+          `Recieved amount should not be less than ${
+            selectedShop?.currency
+          }${formatNumberWithCommas(totalCost)}`
+        );
+        isValid = false;
+        return;
+      }
+    }
+
+    if (selectedPaymentMethod?.id === 1 && !selectedClient) {
+      setError("Client selection is required for debt sales.");
+      isValid = false;
+      return;
+    }
+
+    if (isValid === true) {
+      postSales();
+    }
+  };
+
   return (
     <ModalContent visible={visible} style={{ padding: 10 }}>
       <View
@@ -164,20 +199,6 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
         </View>
       )}
 
-      {!recievedAmount && (
-        <View style={{ marginVertical: 5 }}>
-          <Text
-            numberOfLines={4}
-            style={{
-              color: Colors.error,
-              fontWeight: 500,
-            }}
-          >
-            Confirm if its a debt
-          </Text>
-        </View>
-      )}
-
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Text
           style={{
@@ -193,73 +214,25 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
 
       <SalesTable sales={selections} fixHeight={false} />
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 10,
-        }}
-      >
-        <Text style={{ fontWeight: "bold" }}>Recieved </Text>
-        <Text
-          style={{
-            alignSelf: "flex-end",
-            fontWeight: "bold",
-            marginEnd: 4,
-          }}
-        >
-          {formatNumberWithCommas(recievedAmount)}
-        </Text>
-      </View>
+      <DataRow
+        label={"Recieved"}
+        value={formatNumberWithCommas(recievedAmount)}
+        currency={selectedShop?.currency}
+      />
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginVertical: 3,
-        }}
-      >
-        <Text style={{ fontWeight: "bold" }}>
-          Sold{" "}
-          <Text style={{ fontWeight: "400" }}>
-            {totalQty >= 1 && (
-              <Text>
-                {totalQty}
-                {totalQty > 1 ? <Text> items</Text> : <Text> item</Text>}
-              </Text>
-            )}
-          </Text>
-        </Text>
+      <DataRow
+        label={`Sold ${
+          totalQty > 1 ? `${totalQty} items` : `${totalQty} item`
+        }`}
+        value={formatNumberWithCommas(totalCost)}
+        currency={selectedShop?.currency}
+      />
 
-        <Text
-          style={{
-            alignSelf: "flex-end",
-            fontWeight: "bold",
-            marginEnd: 4,
-          }}
-        >
-          {formatNumberWithCommas(totalCost)}
-        </Text>
-      </View>
-
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text style={{ fontWeight: "bold" }}>Balance</Text>
-        <Text
-          style={{
-            alignSelf: "flex-end",
-            fontWeight: "bold",
-            marginEnd: 4,
-            fontSize: 15,
-          }}
-        >
-          {formatNumberWithCommas(recievedAmount - totalCost)}
-        </Text>
-      </View>
+      <DataRow
+        label={"Balance"}
+        value={formatNumberWithCommas(recievedAmount - totalCost)}
+        currency={selectedShop?.currency}
+      />
 
       <PaymentMethodComponent
         submitted={submitted}
@@ -270,6 +243,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
         clients={clients}
         selectedClient={selectedClient}
         setSelectedClient={setSelectedClient}
+        visible={visible}
       />
 
       <View
@@ -292,7 +266,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
             setAmountPaid(null);
           }}
         />
-        <PrimaryButton title={"Save"} onPress={postSales} />
+        <PrimaryButton title={"Save"} onPress={validate} />
       </View>
     </ModalContent>
   );

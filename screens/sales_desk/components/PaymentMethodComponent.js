@@ -1,11 +1,11 @@
 import { View, Text, FlatList } from "react-native";
-import React, { useContext } from "react";
-import Colors from "../../../constants/Colors";
-import { paymentMethods } from "../../../constants/Constants";
-import { SaleEntryContext } from "../../../context/SaleEntryContext";
-import ChipButton from "../../../components/buttons/ChipButton";
-import { MyDropDown } from "../../../components/DropdownComponents";
-import MyInput from "../../../components/MyInput";
+import React, { useContext, useEffect } from "react";
+import { SaleEntryContext } from "context/SaleEntryContext";
+import MyInput from "@components/MyInput";
+import { paymentMethods } from "@constants/Constants";
+import { MyDropDown } from "@components/DropdownComponents";
+import Colors from "@constants/Colors";
+import ChipButton from "@components/buttons/ChipButton";
 
 const PaymentMethodComponent = ({
   soldOnDate,
@@ -15,9 +15,14 @@ const PaymentMethodComponent = ({
   clients = [],
   selectedClient,
   setSelectedClient,
+  visible,
 }) => {
-  const { selectedPaymentMethod, setSelectedPaymentMethod } =
-    useContext(SaleEntryContext);
+  const {
+    selectedPaymentMethod,
+    setSelectedPaymentMethod,
+    recievedAmount,
+    setRecievedAmount,
+  } = useContext(SaleEntryContext);
 
   const SoldOnDateComponent = () => {
     return (
@@ -29,6 +34,21 @@ const PaymentMethodComponent = ({
       />
     );
   };
+
+  const handleInput = (text) => {
+    if (selectedPaymentMethod?.id === 0) {
+      setRecievedAmount(text);
+    } else {
+      setAmountPaid(text);
+    }
+  };
+
+  useEffect(() => {
+    if (recievedAmount === "") {
+      setSelectedPaymentMethod(paymentMethods[1]);
+    }
+  }, [visible]);
+
   return (
     <View style={{ marginTop: 10 }}>
       <Text
@@ -59,57 +79,48 @@ const PaymentMethodComponent = ({
         numColumns={3}
       />
 
-      {selectedPaymentMethod?.id === 0 && <SoldOnDateComponent />}
-
-      {selectedPaymentMethod?.id === 1 && (
-        <View>
-          <View
+      <View>
+        {selectedPaymentMethod?.id === 1 && (
+          <MyDropDown
             style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: 10,
-            }}
-          >
-            <View style={{ flex: 1, marginTop: 5 }}>
-              <MyDropDown
-                style={{
-                  backgroundColor: Colors.light,
-                  borderColor: Colors.dark,
-                }}
-                data={clients}
-                onChange={(e) => setSelectedClient(e)}
-                value={selectedClient}
-                placeholder="Select client"
-                labelField="fullName"
-                valueField="id"
-              />
-            </View>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: 10,
+              backgroundColor: Colors.light,
+              borderColor: Colors.dark,
               marginTop: 5,
             }}
-          >
-            <View style={{ flex: 1 }}>
-              <MyInput
-                label="Amount paid"
-                value={amountPaid}
-                onValueChange={(text) => setAmountPaid(text)}
-                cursorColor={Colors.dark}
-                inputMode="numeric"
-              />
-            </View>
+            data={clients}
+            onChange={(e) => setSelectedClient(e)}
+            value={selectedClient}
+            placeholder="Select client"
+            labelField="fullName"
+            valueField="id"
+          />
+        )}
 
-            <View style={{ flex: 1 }}>
-              <SoldOnDateComponent />
-            </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            gap: 10,
+            marginTop: 5,
+          }}
+        >
+          <View style={{ flex: 1 }}>
+            <MyInput
+              label="Amount paid"
+              value={
+                selectedPaymentMethod?.id === 0 ? recievedAmount : amountPaid
+              }
+              onValueChange={(text) => handleInput(text)}
+              cursorColor={Colors.dark}
+              inputMode="numeric"
+            />
+          </View>
+
+          <View style={{ flex: 1 }}>
+            <SoldOnDateComponent />
           </View>
         </View>
-      )}
+      </View>
     </View>
   );
 };

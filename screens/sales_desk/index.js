@@ -106,26 +106,8 @@ function SalesDesk({ navigation }) {
   };
 
   const handleSubmit = () => {
-    const isValidAmount = Number(recievedAmount) >= totalCost;
-
     if (selections.length > 0) {
-      if (!recievedAmount) {
-        setShowConfirmed(true);
-        return true;
-      }
-
-      if (!isValidNumber(recievedAmount)) {
-        snackbarRef.current.show("Invalid input for recieved amount.");
-        return true;
-      } else {
-        snackbarRef.current.show(
-          `Recieved amount should be greater that ${
-            selectedShop?.currency
-          } ${formatNumberWithCommas(totalCost)}`,
-          4000
-        );
-        return true;
-      }
+      setShowConfirmed(true);
     } else {
       snackbarRef.current.show("Product selection is required.");
     }
