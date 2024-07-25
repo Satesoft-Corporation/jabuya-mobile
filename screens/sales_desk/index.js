@@ -2,7 +2,11 @@ import React, { useState, useEffect, useContext } from "react";
 import { Text, View, TextInput, ScrollView, SafeAreaView } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useRef } from "react";
-import { BARCODE_SCREEN, SALES_REPORTS } from "@navigation/ScreenNames";
+import {
+  BARCODE_SCREEN,
+  CREDIT_SALES,
+  SALES_REPORTS,
+} from "@navigation/ScreenNames";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import Colors from "@constants/Colors";
 import AppStatusBar from "@components/AppStatusBar";
@@ -20,6 +24,7 @@ import SalesTable from "./components/SalesTable";
 import { userData } from "context/UserContext";
 import { SaleEntryContext } from "context/SaleEntryContext";
 import Snackbar from "@components/Snackbar";
+import DataRow from "@components/card_components/DataRow";
 
 function SalesDesk({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -52,8 +57,12 @@ function SalesDesk({ navigation }) {
 
   const menuItems = [
     {
-      name: "Report",
+      name: "Daily sales",
       onClick: () => navigation.navigate(SALES_REPORTS),
+    },
+    {
+      name: "Debts",
+      onClick: () => navigation.navigate(CREDIT_SALES),
     },
   ];
 
@@ -171,45 +180,6 @@ function SalesDesk({ navigation }) {
             }}
           >
             <SalesTable sales={selections} />
-
-            <View
-              style={{
-                backgroundColor: Colors.light,
-                borderRadius: 5,
-                padding: 10,
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
-            >
-              <View>
-                <Text style={{ fontWeight: "bold", marginTop: 5 }}>
-                  Sold{" "}
-                  {totalQty >= 1 && (
-                    <Text>
-                      {totalQty}
-                      {totalQty > 1 ? <Text> items</Text> : <Text> item</Text>}
-                    </Text>
-                  )}
-                </Text>
-              </View>
-              <View
-                style={{
-                  justifyContent: "center",
-                  alignItems: "flex-end",
-                }}
-              >
-                <Text
-                  style={{
-                    fontWeight: 700,
-                  }}
-                >
-                  <Text style={{ fontSize: 10, fontWeight: 400 }}>
-                    {selectedShop?.currency}
-                  </Text>{" "}
-                  {formatNumberWithCommas(totalCost)}
-                </Text>
-              </View>
-            </View>
           </View>
 
           <View
@@ -255,7 +225,7 @@ function SalesDesk({ navigation }) {
                   style={{
                     alignSelf: "center",
                     color: Colors.gray,
-                    fontSize: 10,
+                    fontSize: 14,
                     marginEnd: 5,
                   }}
                 >
@@ -284,31 +254,34 @@ function SalesDesk({ navigation }) {
               backgroundColor: Colors.light,
               borderRadius: 5,
               padding: 10,
-              flexDirection: "row",
-              justifyContent: "space-between",
             }}
           >
-            <Text style={{ fontWeight: "bold", fontSize: 17 }}>Balance</Text>
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "flex-end",
-              }}
-            >
-              <Text
-                style={{
-                  fontWeight: 700,
-                }}
-              >
-                <Text style={{ fontSize: 10, fontWeight: 400 }}>
-                  {selectedShop?.currency}{" "}
-                </Text>
-                <Text style={{ fontSize: 17 }}>
-                  {recievedAmount &&
-                    formatNumberWithCommas(recievedAmount - totalCost)}
-                </Text>
-              </Text>
-            </View>
+            <DataRow
+              label={`Sold ${
+                totalQty > 1
+                  ? `${totalQty} items`
+                  : totalQty === 1
+                  ? `${totalQty} item`
+                  : ""
+              }`}
+              value={formatNumberWithCommas(totalCost)}
+              currency={selectedShop?.currency}
+              labelTextStyle={{ fontWeight: 600 }}
+            />
+          </View>
+
+          <View
+            style={{
+              backgroundColor: Colors.light,
+              borderRadius: 5,
+              padding: 10,
+            }}
+          >
+            <DataRow
+              label={"Balance"}
+              value={formatNumberWithCommas(recievedAmount - totalCost)}
+              currency={selectedShop?.currency}
+            />
           </View>
 
           <View

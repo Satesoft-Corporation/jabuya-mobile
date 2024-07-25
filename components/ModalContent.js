@@ -17,7 +17,7 @@ export default function ({ children, onBackDropPress, visible = true, style }) {
         </TouchableWithoutFeedback>
         <View style={[{ padding: 20 }, style]}>
           <Surface
-            style={{ borderRadius: 9, paddingHorizontal: 10, paddingBottom: 5 }}
+            style={{ borderRadius: 9, paddingHorizontal: 15, paddingBottom: 5 }}
           >
             {children}
           </Surface>

@@ -39,7 +39,10 @@ function SaleTxnCard({ data }) {
 
   return (
     <View
-      style={[styles.container, { borderWidth: balanceGivenOut < 0 ? 1 : 0 }]}
+      style={[
+        styles.container,
+        { borderWidth: balanceGivenOut < 0 ? 1 : 0, gap: 8 },
+      ]}
     >
       <CardHeader
         value1={`SN: ${data?.serialNumber}`}
@@ -52,8 +55,16 @@ function SaleTxnCard({ data }) {
           <View
             style={{
               flexDirection: "row",
+              gap: 5,
+            }}
+          >
+            <Text style={{ fontWeight: "600" }}>List:</Text>
+            <Text numberOfLines={1}>{data?.name}</Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
               justifyContent: "space-between",
-              margin: 10,
             }}
           >
             <DataColumn title={"Items"} value={itemCount} left />
@@ -75,6 +86,7 @@ function SaleTxnCard({ data }) {
               currency={data?.currency}
             />
           </View>
+
           <CardFooter2
             onBtnPress={toggleExpand}
             btnTitle="More"

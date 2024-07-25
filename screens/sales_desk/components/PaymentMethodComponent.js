@@ -22,7 +22,10 @@ const PaymentMethodComponent = ({
     setSelectedPaymentMethod,
     recievedAmount,
     setRecievedAmount,
+    totalCost,
   } = useContext(SaleEntryContext);
+
+  const isValidAmount = Number(recievedAmount) >= totalCost;
 
   const SoldOnDateComponent = () => {
     return (
@@ -44,8 +47,9 @@ const PaymentMethodComponent = ({
   };
 
   useEffect(() => {
-    if (recievedAmount === "") {
+    if (!isValidAmount) {
       setSelectedPaymentMethod(paymentMethods[1]);
+      setAmountPaid(recievedAmount);
     }
   }, [visible]);
 
@@ -106,7 +110,11 @@ const PaymentMethodComponent = ({
         >
           <View style={{ flex: 1 }}>
             <MyInput
-              label="Amount paid"
+              label={
+                selectedPaymentMethod?.id === 0
+                  ? "Recieved amount"
+                  : "Amount paid"
+              }
               value={
                 selectedPaymentMethod?.id === 0 ? recievedAmount : amountPaid
               }

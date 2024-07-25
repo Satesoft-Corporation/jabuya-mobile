@@ -14,6 +14,7 @@ const ClientDebtsCard = ({ debt, snackbarRef, currency }) => {
   const navigation = useNavigation();
 
   const [expanded, setExpanded] = useState(false);
+
   const toggleExpand = useCallback(() => {
     setExpanded(!expanded);
   }, [expanded]);
@@ -80,8 +81,9 @@ const ClientDebtsCard = ({ debt, snackbarRef, currency }) => {
             />
 
             <CardFooter1
+              label={renderLeft()}
               btnTitle2="Hide"
-              btnTitle1="Pay"
+              btnTitle1={isFullyPaid ? null : "Pay"}
               onClick1={() => {
                 if (!isFullyPaid) {
                   navigation?.navigate(CREDIT_PAYMENTS, debt);

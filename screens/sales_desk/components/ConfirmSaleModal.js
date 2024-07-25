@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { UserContext } from "context/UserContext";
 import { SaleEntryContext } from "context/SaleEntryContext";
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -41,6 +41,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
     totalQty,
     selectedPaymentMethod,
     setLoading,
+    setSelectedPaymentMethod,
   } = useContext(SaleEntryContext);
 
   const { isShopAttendant, attendantShopId, isShopOwner, shopOwnerId } =
@@ -250,9 +251,9 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          marginTop: 20,
+          marginTop: 30,
           gap: 10,
-          marginBottom: 5,
+          marginBottom: 10,
         }}
       >
         <PrimaryButton
@@ -264,6 +265,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
             setError(null);
             setSelectedClient(null);
             setAmountPaid(null);
+            setSelectedPaymentMethod(null);
           }}
         />
         <PrimaryButton title={"Save"} onPress={validate} />

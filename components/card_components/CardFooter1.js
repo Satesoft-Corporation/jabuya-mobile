@@ -31,8 +31,11 @@ const CardFooter1 = ({
           justifyContent: "center",
         }}
       >
-        <ChipButton2 darkMode={false} title={btnTitle1} onPress={onClick1} />
-        <ChipButton2 title={btnTitle2} onPress={onClick2} />
+        {btnTitle1 && (
+          <ChipButton2 darkMode={false} title={btnTitle1} onPress={onClick1} />
+        )}
+
+        {btnTitle2 && <ChipButton2 title={btnTitle2} onPress={onClick2} />}
       </View>
     </View>
   );

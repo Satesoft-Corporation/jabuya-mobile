@@ -65,16 +65,14 @@ const CreditSaleCard = ({ client }) => {
           renderBtn={bal > 0}
           btnTitle="More"
           onBtnPress={() =>
-            navigation.dispatch(
-              StackActions.replace(CLIENT_DEBTS, {
-                client,
-                sales,
-                debt,
-                paid,
-                bal,
-                currency,
-              })
-            )
+            navigation.navigate(CLIENT_DEBTS, {
+              client,
+              sales,
+              debt,
+              paid,
+              bal,
+              currency,
+            })
           }
         />
       </View>
