@@ -115,7 +115,8 @@ function StockLevelCard({ data }) {
         <CardFooter2
           btnTitle={"More"}
           onBtnPress={toggleExpand}
-          label={<Text>Listed by: {data?.createdByFullName}</Text>}
+          label={data?.createdByFullName}
+          listed
         />
       )}
     </View>

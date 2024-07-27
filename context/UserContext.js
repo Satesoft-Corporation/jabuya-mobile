@@ -58,11 +58,13 @@ export const UserProvider = ({ children }) => {
             attendantShopId,
             shopOwnerId,
             attendantShopName,
+            isSuperAdmin,
           } = data;
 
           setUserParams({
             isShopOwner,
             isShopAttendant,
+            isSuperAdmin,
             attendantShopId,
             shopOwnerId,
           });
@@ -76,41 +78,47 @@ export const UserProvider = ({ children }) => {
             attendantShopName: data?.attendantShopName,
           });
 
-          if (isShopAttendant == true) {
-            setSelectedShop({
-              name: attendantShopName,
-              id: attendantShopId,
-            });
-          }
+          if (isSuperAdmin === false) {
+            if (isShopAttendant == true) {
+              setSelectedShop({
+                name: attendantShopName,
+                id: attendantShopId,
+              });
+            }
 
-          const searchParameters = {
-            offset: 0,
-            limit: 10000,
-            ...(isShopAttendant && { shopId: attendantShopId }),
-            ...(isShopOwner && { shopOwnerId }),
-          };
+            const searchParameters = {
+              offset: 0,
+              limit: 10000,
+              ...(isShopAttendant && { shopId: attendantShopId }),
+              ...(isShopOwner && { shopOwnerId }),
+            };
 
-          setOfflineParams(searchParameters);
-          const savedproducts = await saveShopProductsOnDevice(
-            searchParameters,
-            refresh
-          );
-          const savedClients = await saveShopClients(searchParameters, refresh);
-
-          if (savedproducts === true && savedClients === true) {
-            isConfigured = true;
-          }
-
-          if (!isShopAttendant) {
-            const savedShops = await saveShopDetails(
-              isShopOwner,
-              shopOwnerId,
+            setOfflineParams(searchParameters);
+            const savedproducts = await saveShopProductsOnDevice(
+              searchParameters,
               refresh
             );
-            isConfigured = savedShops;
-          }
+            const savedClients = await saveShopClients(
+              searchParameters,
+              refresh
+            );
 
-          await getShopsFromStorage();
+            if (savedproducts === true && savedClients === true) {
+              isConfigured = true;
+            }
+
+            if (!isShopAttendant) {
+              const savedShops = await saveShopDetails(
+                isShopOwner,
+                shopOwnerId,
+                refresh
+              );
+              isConfigured = savedShops;
+            }
+            await getShopsFromStorage();
+          } else {
+            console.log("An Admin has accessed the app");
+          }
         }
       })
       .catch((error) => {
@@ -159,12 +167,14 @@ export const UserProvider = ({ children }) => {
     let obj = {};
     const allShops = selectedShop?.name === "All shops";
 
-    if (userParams?.isShopOwner === true && allShops) {
-      obj.shopOwnerId = userParams?.shopOwnerId;
-    }
+    if (userParams?.isSuperAdmin === false) {
+      if (userParams?.isShopOwner === true && allShops) {
+        obj.shopOwnerId = userParams?.shopOwnerId;
+      }
 
-    if (!allShops) {
-      obj.shopId = selectedShop?.id;
+      if (!allShops) {
+        obj.shopId = selectedShop?.id;
+      }
     }
 
     return obj;

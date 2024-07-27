@@ -25,6 +25,8 @@ import { userData } from "context/UserContext";
 import { SaleEntryContext } from "context/SaleEntryContext";
 import Snackbar from "@components/Snackbar";
 import DataRow from "@components/card_components/DataRow";
+import { scale } from "react-native-size-matters";
+import { screenWidth } from "@constants/Constants";
 
 function SalesDesk({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -192,60 +194,43 @@ function SalesDesk({ navigation }) {
               justifyContent: "space-between",
               borderWidth: 1,
               borderColor: "#000",
+              alignItems: "baseline",
             }}
           >
+            <Text style={{ fontWeight: "bold", fontSize: scale(14) }}>
+              Recieved amount
+            </Text>
             <View
               style={{
                 flexDirection: "row",
-                alignItems: "center",
-                elevation: 10,
-                shadowOffset: { width: 0, height: 25 },
-                shadowOpacity: 0.8,
+                justifyContent: "center",
+                maxWidth: screenWidth / 2.5,
                 gap: 10,
               }}
             >
-              <FontAwesome5 name="money-bill" size={20} color="black" />
-              <Text style={{ fontWeight: "bold", fontSize: 17 }}>
-                Recieved amount
-              </Text>
-            </View>
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "flex-end",
-              }}
-            >
-              <View
+              <Text
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
+                  alignSelf: "center",
+                  color: Colors.gray,
+                  fontSize: scale(14),
+                  marginEnd: 5,
                 }}
               >
-                <Text
-                  style={{
-                    alignSelf: "center",
-                    color: Colors.gray,
-                    fontSize: 14,
-                    marginEnd: 5,
-                  }}
-                >
-                  {selectedShop?.currency}
-                </Text>
-                <TextInput
-                  textAlign="right"
-                  value={recievedAmount}
-                  inputMode="numeric"
-                  onChangeText={(text) => setRecievedAmount(text)}
-                  style={{
-                    backgroundColor: Colors.light,
-                    borderRadius: 5,
-                    width: 120,
-                    fontSize: 17,
-                    marginEnd: 5,
-                  }}
-                  placeholder="Enter amount"
-                />
-              </View>
+                {selectedShop?.currency}
+              </Text>
+              <TextInput
+                textAlign="right"
+                value={recievedAmount}
+                inputMode="numeric"
+                onChangeText={(text) => setRecievedAmount(text)}
+                style={{
+                  backgroundColor: Colors.light,
+                  borderRadius: 5,
+                  fontSize: scale(15),
+                  marginEnd: 5,
+                }}
+                placeholder="Enter amount"
+              />
             </View>
           </View>
 

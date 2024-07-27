@@ -58,7 +58,7 @@ export function MenuIcon({
         style={[
           {
             color: Colors.dark,
-            fontSize: scale(15),
+            fontSize: scale(14),
             margin: 10,
             fontWeight: "500",
             textAlign: "center",

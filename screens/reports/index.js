@@ -2,6 +2,7 @@ import { View, FlatList } from "react-native";
 import React from "react";
 import {
   CREDIT_SALES,
+  EXPENSES,
   SALES_REPORTS,
   STOCK_ENTRY,
   STOCK_LEVELS,
@@ -29,6 +30,10 @@ const ReportsMenu = ({ navigation }) => {
     {
       title: "Stock levels",
       target: STOCK_LEVELS,
+    },
+    {
+      title: "Expenses",
+      target: EXPENSES,
     },
   ];
 

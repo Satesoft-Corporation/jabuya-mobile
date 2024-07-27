@@ -33,6 +33,11 @@ const ExpenseCard = ({ exp }) => {
           {formatDate(exp?.dateCreated)}
         </Text>
       </View>
+
+      <View style={{ marginTop: 5 }}>
+        <Text style={{ fontWeight: 600 }}>Description</Text>
+        <Text numberOfLines={3}>{exp?.description}</Text>
+      </View>
       <View
         style={{
           flexDirection: "row",
@@ -41,8 +46,6 @@ const ExpenseCard = ({ exp }) => {
         }}
       >
         <DataColumn value={exp?.categoryName} title={"Category"} left />
-
-        <DataColumn value={exp?.description} title={"Description"} />
 
         <DataColumn
           value={exp?.amount}
@@ -53,7 +56,8 @@ const ExpenseCard = ({ exp }) => {
 
       <CardFooter2
         btnTitle="More"
-        label={`Entered by ${exp?.createdByFullName}`}
+        label={exp?.createdByFullName}
+        entered
         renderBtn={false}
       />
     </View>

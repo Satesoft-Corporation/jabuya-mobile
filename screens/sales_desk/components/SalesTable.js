@@ -3,7 +3,7 @@ import React from "react";
 import Colors from "@constants/Colors";
 import { screenHeight } from "@constants/Constants";
 import { userData } from "context/UserContext";
-import RenderCurrency from "@components/RenderCurrency";
+import { formatNumberWithCommas } from "@utils/Utils";
 
 const SalesTable = ({ sales = [], fixHeight = true, currency }) => {
   return (
@@ -77,16 +77,10 @@ const SaleListItem = ({ data, currency }) => {
       <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>
 
       <Text style={{ flex: 1, textAlign: "right" }}>
-        <RenderCurrency
-          value={data?.unitCost}
-          currencySymbol={currency || selectedShop?.currency}
-        />
+        {formatNumberWithCommas(data?.unitCost)}
       </Text>
       <Text style={{ flex: 1, textAlign: "right", paddingEnd: 10 }}>
-        <RenderCurrency
-          value={data?.totalCost}
-          currencySymbol={currency || selectedShop?.currency}
-        />
+        {formatNumberWithCommas(data?.totalCost)}
       </Text>
     </View>
   );

@@ -12,7 +12,7 @@ const CardHeader = ({ value1, date = new Date(), value1Style, shop }) => {
         justifyContent: "space-between",
       }}
     >
-      <View style={{ gap: 5 }}>
+      <View>
         <Text
           style={{
             fontSize: scale(12),
@@ -34,7 +34,7 @@ const CardHeader = ({ value1, date = new Date(), value1Style, shop }) => {
         </Text>
       </View>
 
-      <View style={{ gap: 5 }}>
+      <View>
         <Text
           style={{
             fontSize: scale(12),

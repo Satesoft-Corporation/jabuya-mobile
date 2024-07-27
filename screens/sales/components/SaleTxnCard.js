@@ -10,7 +10,7 @@ import { Text, View, StyleSheet } from "react-native";
 function SaleTxnCard({ data }) {
   // sales report item card
 
-  const { lineItems, totalCost, amountPaid, balanceGivenOut, shopName } = data;
+  const { lineItems, totalCost, amountPaid, balanceGivenOut } = data;
 
   const [expanded, setExpanded] = useState(false);
   const [itemCount, setItemCount] = useState(0);
@@ -30,13 +30,6 @@ function SaleTxnCard({ data }) {
     }
   }, [data]);
 
-  const servedBy = () => (
-    <Text style={styles.footerText1}>
-      Served by:{" "}
-      <Text style={styles.footerText2}>{data?.createdByFullName}</Text>
-    </Text>
-  );
-
   return (
     <View
       style={[
@@ -52,22 +45,21 @@ function SaleTxnCard({ data }) {
 
       {!expanded && (
         <>
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 5,
-            }}
-          >
-            <Text style={{ fontWeight: "600" }}>List:</Text>
-            <Text numberOfLines={1}>{data?.name}</Text>
+          <View>
+            <Text style={{ fontWeight: "600" }}>List</Text>
+            <Text numberOfLines={2} style={{ fontWeight: "500" }}>
+              {data?.name}
+            </Text>
           </View>
+
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
+              marginTop: 5,
             }}
           >
-            <DataColumn title={"Items"} value={itemCount} left />
+            <DataColumn title={"Items"} value={itemCount} />
 
             <DataColumn
               title={"Recieved"}
@@ -86,12 +78,6 @@ function SaleTxnCard({ data }) {
               currency={data?.currency}
             />
           </View>
-
-          <CardFooter2
-            onBtnPress={toggleExpand}
-            btnTitle="More"
-            label={servedBy()}
-          />
         </>
       )}
       {expanded && (
@@ -152,15 +138,16 @@ function SaleTxnCard({ data }) {
               valueTextStyle={styles.value}
             />
           )}
-
-          <CardFooter2
-            onBtnPress={toggleExpand}
-            btnTitle="Hide"
-            label={servedBy(false)}
-            style={{ marginTop: 15 }}
-          />
         </View>
       )}
+
+      <CardFooter2
+        onBtnPress={toggleExpand}
+        btnTitle={expanded ? "Hide" : "More"}
+        label={data?.createdByFullName}
+        served
+        darkMode={!expanded}
+      />
     </View>
   );
 }

@@ -77,9 +77,10 @@ const LandingScreen = () => {
     const usageTimeDifferance = getTimeDifference(prevUsageIime, new Date());
     const { days, hours, minutes } = usageTimeDifferance;
 
-    const interval = days > 0 && hours > 0 && hours % 3 === 0 && minutes > 50; //every after some hours
+    const interval = days > 0 && hours > 0 && hours % 3 === 0 && minutes > 50; //every after some 3 hours
     if (interval === true) {
-      await configureUserData(true); //refreshing local data
+      console.log("refreshing local data");
+      await configureUserData(true);
     }
   };
 
@@ -103,7 +104,7 @@ const LandingScreen = () => {
       await resolveUnsavedSales();
     }
 
-    if (hours >= 6 || days >= 1) {
+    if (hours >= 20 || days >= 1) {
       await getRefreshToken();
     }
     console.log("login time", logintimeDifferance);
@@ -150,7 +151,7 @@ const LandingScreen = () => {
           renderItem={({ item }) => (
             <MenuIcon icon={item} onPress={() => handleTabPress(item)} />
           )}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.title.toString()}
           numColumns={3}
         />
       </View>
