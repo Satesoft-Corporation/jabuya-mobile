@@ -30,6 +30,8 @@ import * as s from "@navigation/ScreenNames";
 import Login from "@screens/auth";
 import ReportsMenu from "@screens/reports";
 import ComingSoon from "@screens/coming_soon";
+import Entries from "@screens/entries";
+import AppStatusBar from "@components/AppStatusBar";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -39,6 +41,7 @@ export default function App() {
       <UserProvider>
         <SaleEntryProvider>
           <NavigationContainer>
+            <AppStatusBar />
             <Stack.Navigator
               screenOptions={{
                 headerShown: false,
@@ -90,6 +93,8 @@ export default function App() {
               <Stack.Screen name={s.REPORTS_MENU} component={ReportsMenu} />
 
               <Stack.Screen name={s.COMING_SOON} component={ComingSoon} />
+
+              <Stack.Screen name={s.ENTRIES} component={Entries} />
             </Stack.Navigator>
           </NavigationContainer>
         </SaleEntryProvider>

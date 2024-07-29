@@ -35,3 +35,6 @@ export const LOCK_SETuP = "lock_setup";
 export const INCOME_GRAPHS = "income_graphs";
 export const REPORTS_MENU = "reports_menu";
 export const COMING_SOON = "coming_soon";
+
+export const ENTRIES = "entries";
+

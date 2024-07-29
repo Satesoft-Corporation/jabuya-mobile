@@ -59,10 +59,6 @@ export default function ViewSales() {
       : []),
     ...(isShopOwner === true
       ? [
-          // {
-          //   name: "Income graphs",
-          //   onClick: () => navigation.navigate(INCOME_GRAPHS),
-          // },
           {
             name: "Investment",
             onClick: () => navigation.navigate(SHOP_SUMMARY),
@@ -117,6 +113,7 @@ export default function ViewSales() {
           (sale) => sale?.balanceGivenOut >= 0
         ); //to filter out credit sales
 
+        console.log(data)
         let sV = data.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
 
         if (response.totalItems === 0) {

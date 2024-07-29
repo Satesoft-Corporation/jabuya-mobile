@@ -3,6 +3,7 @@ import React from "react";
 import { Image } from "react-native";
 import Colors from "@constants/Colors";
 import { scale } from "react-native-size-matters";
+import { screenWidth } from "@constants/Constants";
 
 const StockingIcon = ({ title, onPress, disabled = false }) => {
   return (
@@ -12,7 +13,7 @@ const StockingIcon = ({ title, onPress, disabled = false }) => {
       style={{
         backgroundColor: Colors.light,
         borderRadius: 6,
-        width: 200,
+        maxWidth: screenWidth / 2 - 30,
         margin: 10,
         elevation: 2,
         shadowOffset: { width: 0, height: 1 },

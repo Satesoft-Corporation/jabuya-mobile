@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Text, View, TextInput, ScrollView, SafeAreaView } from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
 import { useRef } from "react";
 import {
   BARCODE_SCREEN,
@@ -18,7 +17,7 @@ import {
   MyDropDown,
   SalesDropdownComponent,
 } from "@components/DropdownComponents";
-import { formatNumberWithCommas, isValidNumber } from "@utils/Utils";
+import { formatNumberWithCommas } from "@utils/Utils";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import SalesTable from "./components/SalesTable";
 import { userData } from "context/UserContext";
@@ -27,16 +26,26 @@ import Snackbar from "@components/Snackbar";
 import DataRow from "@components/card_components/DataRow";
 import { scale } from "react-native-size-matters";
 import { screenWidth } from "@constants/Constants";
+import { SHOP_PRODUCTS_ENDPOINT } from "@utils/EndPointUtils";
+import { BaseApiService } from "@utils/BaseApiService";
+import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 
 function SalesDesk({ navigation }) {
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
   const [clients, setClients] = useState([]);
 
   const snackbarRef = useRef(null);
 
-  const { userParams, selectedShop, shops, setSelectedShop } = userData();
+  const {
+    userParams,
+    selectedShop,
+    shops,
+    setSelectedShop,
+    filterParams,
+    offlineParams,
+  } = userData();
 
   const {
     selections,
@@ -55,7 +64,7 @@ function SalesDesk({ navigation }) {
     setUnitCost,
   } = useContext(SaleEntryContext);
 
-  const { isShopAttendant } = userParams;
+  const { isShopAttendant, isSuperAdmin } = userParams;
 
   const menuItems = [
     {
@@ -69,19 +78,45 @@ function SalesDesk({ navigation }) {
   ];
 
   const fetchProducts = async () => {
-    setLoading(true);
-    const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
-    const inStock = pdtList
-      ?.filter((pdt) => pdt?.performanceSummary)
-      .filter((pdt) => {
-        const { totalQuantityStocked, totalQuantitySold } =
-          pdt?.performanceSummary;
+    if (isSuperAdmin) {
+      await fetchProductsFromServer();
+      setLoading(false);
+      return;
+    } else {
+      setLoading(true);
+      const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
+      const inStock = pdtList
+        ?.filter((pdt) => pdt?.performanceSummary)
+        .filter((pdt) => {
+          const { totalQuantityStocked, totalQuantitySold } =
+            pdt?.performanceSummary;
 
-        const qtyInStock = totalQuantityStocked - totalQuantitySold;
-        return qtyInStock > 0;
-      });
-    setProducts(inStock);
-    fetchClients();
+          const qtyInStock = totalQuantityStocked - totalQuantitySold;
+          return qtyInStock > 0;
+        });
+      setProducts(inStock);
+      fetchClients();
+    }
+  };
+
+  const fetchProductsFromServer = async () => {
+    if (!selectedShop?.name.includes("All")) {
+      const searchParameters = {
+        ...filterParams(),
+        ...(searchTerm && { searchTerm: searchTerm }),
+        offset: 0,
+        limit: 20,
+      };
+      await new BaseApiService(SHOP_PRODUCTS_ENDPOINT)
+        .getRequestWithJsonResponse(searchParameters)
+        .then(async (response) => {
+          setProducts(response.records);
+          setLoading(false);
+        })
+        .catch((error) => {
+          setLoading(false);
+        });
+    }
   };
 
   const fetchClients = async () => {
@@ -90,9 +125,19 @@ function SalesDesk({ navigation }) {
     setLoading(false);
   };
 
+  const onComplete = async () => {
+    if (!isSuperAdmin) {
+      await saveShopProductsOnDevice(offlineParams, true); // updating offline products
+    }
+  };
+
   useEffect(() => {
-    clearEverything();
     fetchProducts();
+  }, [searchTerm, selectedShop]);
+
+  useEffect(() => {
+    setLoading(true);
+    clearEverything();
   }, [selectedShop]);
 
   const handleChange = (value) => {
@@ -132,6 +177,7 @@ function SalesDesk({ navigation }) {
         setVisible={() => setShowConfirmed(false)}
         snackbarRef={snackbarRef}
         clients={clients}
+        onComplete={onComplete}
       />
 
       <EnterSaleQtyModal />
@@ -148,7 +194,7 @@ function SalesDesk({ navigation }) {
                 valueField="id"
                 onChange={(e) => setSelectedShop(e)}
                 value={selectedShop}
-                search={false}
+                search={shops?.length > 4}
                 placeholder="Select a shop"
               />
             </View>

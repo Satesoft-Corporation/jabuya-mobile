@@ -22,12 +22,20 @@ import Colors from "@constants/Colors";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import DataRow from "@components/card_components/DataRow";
 
-const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
+const ConfirmSaleModal = ({
+  setVisible,
+  snackbarRef,
+  visible,
+  clients,
+  onComplete,
+}) => {
   const [submitted, setSubmitted] = useState(false);
   const [soldOnDate, setSoldOnDate] = useState(new Date());
   const [amountPaid, setAmountPaid] = useState("");
   const [serverError, setError] = useState(null);
   const [selectedClient, setSelectedClient] = useState(null);
+  const [clientName, setClientName] = useState("");
+  const [clientNumber, setClientNumber] = useState("");
 
   const { userParams, selectedShop } = useContext(UserContext);
 
@@ -51,6 +59,8 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
     setAmountPaid("");
     setSelectedClient(null);
     setError(null);
+    setClientName("");
+    setClientNumber("");
   };
 
   const postSales = async () => {
@@ -66,7 +76,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
 
     const onCredit = selectedPaymentMethod?.id === 1;
 
-    let payLoad = {
+    const payLoad = {
       id: null,
       shopId: isShopAttendant ? attendantShopId : selectedShop?.id,
       amountPaid: onCredit ? Number(amountPaid) : Number(recievedAmount),
@@ -76,6 +86,8 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
       soldOnDate: convertToServerDate(soldOnDate),
       ...(onCredit && { clientPhoneNumber: selectedClient?.phoneNumber }),
       ...(onCredit && { clientId: selectedClient?.id }),
+      ...(!onCredit && clientNumber && { clientPhoneNumber: clientNumber }),
+      ...(!onCredit && clientName && { clientName: clientName }),
     };
 
     setLoading(true);
@@ -102,8 +114,8 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
                   clearEverything();
                   clearForm();
                   snackbarRef.current.show("Sale confirmed successfully", 4000);
-                  await saveShopProductsOnDevice(searchParameters, true); // updating offline products
-                  if (onCredit) {
+                  onComplete();
+                  if (onCredit && !userParams?.isSuperAdmin) {
                     await saveClientSalesOnDevice(searchParameters);
                   }
                 }
@@ -245,6 +257,10 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
         selectedClient={selectedClient}
         setSelectedClient={setSelectedClient}
         visible={visible}
+        clientName={clientName}
+        clientNumber={clientNumber}
+        setClientName={setClientName}
+        setClientNumber={setClientNumber}
       />
 
       <View

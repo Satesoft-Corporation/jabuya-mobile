@@ -35,9 +35,8 @@ const UserProfile = ({
       style={{
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: 10,
         alignItems: "center",
-        paddingHorizontal: 10,
+        padding: 10,
         backgroundColor: Colors.dark,
       }}
     >

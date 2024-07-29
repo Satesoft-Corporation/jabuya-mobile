@@ -16,6 +16,10 @@ const PaymentMethodComponent = ({
   selectedClient,
   setSelectedClient,
   visible,
+  clientName,
+  setClientName,
+  clientNumber,
+  setClientNumber,
 }) => {
   const {
     selectedPaymentMethod,
@@ -84,6 +88,30 @@ const PaymentMethodComponent = ({
       />
 
       <View>
+        {selectedPaymentMethod?.id === 0 && (
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 10,
+              marginTop: 5,
+            }}
+          >
+            <MyInput
+              label={"Client Name"}
+              value={clientName}
+              onValueChange={(text) => setClientName(text)}
+            />
+
+            <MyInput
+              label={"Client Phone Number"}
+              value={clientNumber}
+              onValueChange={(text) => setClientNumber(text)}
+              inputMode="numeric"
+
+            />
+          </View>
+        )}
         {selectedPaymentMethod?.id === 1 && (
           <MyDropDown
             style={{
@@ -108,25 +136,21 @@ const PaymentMethodComponent = ({
             marginTop: 5,
           }}
         >
-          <View style={{ flex: 1 }}>
-            <MyInput
-              label={
-                selectedPaymentMethod?.id === 0
-                  ? "Recieved amount"
-                  : "Amount paid"
-              }
-              value={
-                selectedPaymentMethod?.id === 0 ? recievedAmount : amountPaid
-              }
-              onValueChange={(text) => handleInput(text)}
-              cursorColor={Colors.dark}
-              inputMode="numeric"
-            />
-          </View>
+          <MyInput
+            label={
+              selectedPaymentMethod?.id === 0
+                ? "Recieved amount"
+                : "Amount paid"
+            }
+            value={
+              selectedPaymentMethod?.id === 0 ? recievedAmount : amountPaid
+            }
+            onValueChange={(text) => handleInput(text)}
+            cursorColor={Colors.dark}
+            inputMode="numeric"
+          />
 
-          <View style={{ flex: 1 }}>
-            <SoldOnDateComponent />
-          </View>
+          <SoldOnDateComponent />
         </View>
       </View>
     </View>

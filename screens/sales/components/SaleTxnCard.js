@@ -37,6 +37,11 @@ function SaleTxnCard({ data }) {
         { borderWidth: balanceGivenOut < 0 ? 1 : 0, gap: 8 },
       ]}
     >
+      {!expanded && (
+        <Text numberOfLines={1} style={{ fontWeight: "500" }}>
+          {data?.name}
+        </Text>
+      )}
       <CardHeader
         value1={`SN: ${data?.serialNumber}`}
         date={data?.dateCreated}
@@ -45,13 +50,6 @@ function SaleTxnCard({ data }) {
 
       {!expanded && (
         <>
-          <View>
-            <Text style={{ fontWeight: "600" }}>List</Text>
-            <Text numberOfLines={2} style={{ fontWeight: "500" }}>
-              {data?.name}
-            </Text>
-          </View>
-
           <View
             style={{
               flexDirection: "row",
@@ -115,7 +113,7 @@ function SaleTxnCard({ data }) {
           <DataRow
             key={4}
             label={"Balance"}
-            value={balanceGivenOut}
+            value={formatNumberWithCommas(balanceGivenOut)}
             labelTextStyle={styles.label}
             valueTextStyle={styles.value}
             currency={data?.currency}
@@ -129,9 +127,19 @@ function SaleTxnCard({ data }) {
             currency={data?.currency}
           />
 
-          {balanceGivenOut < 0 && (
+          {data?.clientName && (
             <DataRow
               key={6}
+              label={"Client's name"}
+              value={data?.clientName}
+              labelTextStyle={styles.label}
+              valueTextStyle={styles.value}
+            />
+          )}
+
+          {data?.clientPhoneNumber && (
+            <DataRow
+              key={7}
               label={"Client's mobile"}
               value={data?.clientPhoneNumber}
               labelTextStyle={styles.label}

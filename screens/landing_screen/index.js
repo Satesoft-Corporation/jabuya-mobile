@@ -129,15 +129,12 @@ const LandingScreen = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <AppStatusBar />
       <Loader loading={loading} />
-      <BlackScreen>
-        <UserProfile
-          renderMenu={shops?.length > 1}
-          renderNtnIcon={false}
-          showShops
-        />
-      </BlackScreen>
+      <UserProfile
+        renderMenu={shops?.length > 1}
+        renderNtnIcon={false}
+        showShops
+      />
 
       <View
         style={{

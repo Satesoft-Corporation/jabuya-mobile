@@ -131,6 +131,7 @@ export const saveShopDetails = async (
   const shops = await UserSessionUtils.getShopCount();
 
   if (!shops || refresh === true) {
+    console.log("Saving shops");
     await new BaseApiService(SHOP_ENDPOINT)
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {

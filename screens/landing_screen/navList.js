@@ -1,6 +1,6 @@
 import {
   CONTACT_BOOK,
-  EXPENSES,
+  ENTRIES,
   REPORTS_MENU,
   SALES_DESK,
 } from "@navigation/ScreenNames";
@@ -18,6 +18,11 @@ export const navList = [
     target: REPORTS_MENU,
   },
   {
+    icon: require("../../assets/icons/entries.png"),
+    title: "Entries",
+    target: ENTRIES,
+  },
+  {
     icon: require("../../assets/icons/icons8-contact-book-64.png"),
     title: "Contacts",
     target: CONTACT_BOOK,
@@ -32,9 +37,4 @@ export const navList = [
     icon: require("../../assets/icons/icons8-chat-50.png"),
     title: "Chat",
   },
-  // {
-  //   icon: require("../../assets/icons/spending.png"),
-  //   title: "Expenses",
-  //   target: EXPENSES,
-  // },
 ];

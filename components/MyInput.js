@@ -31,7 +31,7 @@ const MyInput = ({
   };
 
   return (
-    <View style={[{ gap: 5 }, style]}>
+    <View style={[{ gap: 5, flex: 1, maxHeight: 70 }, style]}>
       {label !== "" && (
         <Text
           style={{

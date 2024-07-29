@@ -1,5 +1,4 @@
 import {
-  saveClientSalesOnDevice,
   saveShopClients,
   saveShopDetails,
   saveShopProductsOnDevice,
@@ -78,6 +77,15 @@ export const UserProvider = ({ children }) => {
             attendantShopName: data?.attendantShopName,
           });
 
+          if (!isShopAttendant) {
+            const savedShops = await saveShopDetails(
+              isShopOwner,
+              shopOwnerId,
+              refresh
+            );
+            isConfigured = savedShops;
+          }
+
           if (isSuperAdmin === false) {
             if (isShopAttendant == true) {
               setSelectedShop({
@@ -107,17 +115,7 @@ export const UserProvider = ({ children }) => {
               isConfigured = true;
             }
 
-            if (!isShopAttendant) {
-              const savedShops = await saveShopDetails(
-                isShopOwner,
-                shopOwnerId,
-                refresh
-              );
-              isConfigured = savedShops;
-            }
             await getShopsFromStorage();
-          } else {
-            console.log("An Admin has accessed the app");
           }
         }
       })
@@ -167,14 +165,12 @@ export const UserProvider = ({ children }) => {
     let obj = {};
     const allShops = selectedShop?.name === "All shops";
 
-    if (userParams?.isSuperAdmin === false) {
-      if (userParams?.isShopOwner === true && allShops) {
-        obj.shopOwnerId = userParams?.shopOwnerId;
-      }
+    if (userParams?.isShopOwner === true && allShops) {
+      obj.shopOwnerId = userParams?.shopOwnerId;
+    }
 
-      if (!allShops) {
-        obj.shopId = selectedShop?.id;
-      }
+    if (!allShops) {
+      obj.shopId = selectedShop?.id;
     }
 
     return obj;

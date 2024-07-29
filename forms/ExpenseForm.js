@@ -81,7 +81,6 @@ const ExpenseForm = () => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <AppStatusBar />
         <TopHeader title="Enter Expense" />
 
         <Loader loading={loading} />
@@ -89,12 +88,12 @@ const ExpenseForm = () => {
           style={{
             marginHorizontal: 5,
             marginVertical: 10,
-            paddingHorizontal: 12,
+            paddingHorizontal: 10,
             justifyContent: "space-between",
             flex: 1,
           }}
         >
-          <View>
+          <View style={{ gap: 8 }}>
             <Text
               style={{
                 marginTop: 10,
@@ -103,7 +102,7 @@ const ExpenseForm = () => {
             >
               Expense Details
             </Text>
-            <View style={{ marginTop: 20, gap: 5 }}>
+            <View style={{ gap: 5 }}>
               <Text>Shop</Text>
               <MyDropDown
                 search={false}
@@ -121,7 +120,7 @@ const ExpenseForm = () => {
                 valueField="id"
               />
             </View>
-            <View style={{ marginTop: 10, gap: 5 }}>
+            <View style={{ gap: 5 }}>
               <Text>Category</Text>
               <MyDropDown
                 search={false}
@@ -139,16 +138,14 @@ const ExpenseForm = () => {
                 valueField="id"
               />
             </View>
-            <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
-              <View style={{ flex: 1, gap: 5 }}>
-                <MyInput
-                  label="Amount"
-                  inputMode="numeric"
-                  value={amount}
-                  onValueChange={(text) => setAmount(text)}
-                  style={{ flex: 1 }}
-                />
-              </View>
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <MyInput
+                label="Amount"
+                inputMode="numeric"
+                value={amount}
+                onValueChange={(text) => setAmount(text)}
+                style={{ flex: 1 }}
+              />
               <MyInput
                 label="Date "
                 dateValue={dob}
@@ -157,12 +154,14 @@ const ExpenseForm = () => {
                 style={{ flex: 1 }}
               />
             </View>
-            <MyInput
-              label="Desciprition"
-              multiline
-              value={remarks}
-              onValueChange={(text) => setRemarks(text)}
-            />
+            <View style={{ flexDirection: "row" }}>
+              <MyInput
+                label="Desciprition"
+                multiline
+                value={remarks}
+                onValueChange={(text) => setRemarks(text)}
+              />
+            </View>
           </View>
 
           <View style={BaseStyle.bottomContent}>

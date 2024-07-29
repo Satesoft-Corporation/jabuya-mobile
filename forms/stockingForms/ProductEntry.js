@@ -254,7 +254,7 @@ const ProductEntry = ({ route }) => {
             flex: 1,
           }}
         >
-          <View>
+          <View style={{ gap: 8 }}>
             <Text style={styles.headerText}>Enter product details</Text>
 
             {!edit && (
@@ -389,7 +389,7 @@ const ProductEntry = ({ route }) => {
                 </View>
               </View>
             ))}
-            <View>
+            <View style={{ flexDirection: "row" }}>
               <MyInput
                 label="Remarks"
                 value={remarks}
@@ -430,7 +430,6 @@ const styles = StyleSheet.create({
   inputLabel: {
     marginVertical: 3,
     marginStart: 6,
-    marginTop: 5,
   },
   dropDown: {
     backgroundColor: Colors.light,

@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { userData } from "context/UserContext";
 import { MAXIMUM_RECORDS_PER_FETCH } from "@constants/Constants";
 import { BaseApiService } from "@utils/BaseApiService";
-import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 import AppStatusBar from "@components/AppStatusBar";
 import Colors from "@constants/Colors";
 import TopHeader from "@components/TopHeader";
@@ -89,10 +88,6 @@ const StockEntries = ({ navigation }) => {
   useEffect(() => {
     fetchStockEntries();
   }, [selectedShop]);
-
-  useEffect(() => {
-    saveShopProductsOnDevice(offlineParams, true);
-  }, []);
 
   const menuItems = [
     {

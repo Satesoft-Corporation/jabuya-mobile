@@ -3,7 +3,6 @@ import React, { useState, useRef } from "react";
 import { userData } from "context/UserContext";
 import { convertToServerDate } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
-import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
 import Loader from "@components/Loader";
 import Colors from "@constants/Colors";
@@ -58,7 +57,6 @@ const NewClient = () => {
         clearForm();
         snackRef.current.show("Client details saved", 4000);
         await saveShopClients(offlineParams, true);
-
       })
       .catch((e) => {
         setLoading(false);
@@ -70,7 +68,6 @@ const NewClient = () => {
   return (
     <KeyboardAvoidingView enabled={true} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <AppStatusBar />
         <TopHeader title="Add Debtor" />
         <Loader loading={loading} />
         <View
@@ -81,7 +78,7 @@ const NewClient = () => {
             flex: 1,
           }}
         >
-          <View>
+          <View style={{ gap: 10, flex: 1 }}>
             <Text
               style={{
                 marginTop: 10,
@@ -91,7 +88,7 @@ const NewClient = () => {
               Client Details
             </Text>
 
-            <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+            <View style={{ flexDirection: "row", gap: 10 }}>
               <MyInput
                 label="First name"
                 value={firstName}
@@ -128,17 +125,15 @@ const NewClient = () => {
                   valueField="id"
                 />
               </View>
-              <View style={{ flex: 1 }}>
-                <MyInput
-                  label="Date of birth"
-                  dateValue={dob}
-                  isDateInput
-                  onDateChange={(date) => setDOB(date)}
-                />
-              </View>
+              <MyInput
+                label="Date of birth"
+                dateValue={dob}
+                isDateInput
+                onDateChange={(date) => setDOB(date)}
+              />
             </View>
 
-            <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+            <View style={{ flexDirection: "row", gap: 10 }}>
               <MyInput
                 inputMode="numeric"
                 label="Phone number"
