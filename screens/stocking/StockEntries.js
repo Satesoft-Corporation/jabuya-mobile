@@ -22,7 +22,7 @@ const StockEntries = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const snackbarRef = useRef(null);
 
-  const { selectedShop, filterParams, offlineParams } = userData();
+  const { selectedShop, filterParams, userParams } = userData();
 
   const fetchStockEntries = async (offsetToUse = 0) => {
     try {
@@ -107,7 +107,7 @@ const StockEntries = ({ navigation }) => {
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}
         disabled={disable}
-        showMenuDots
+        showMenuDots={userParams?.isShopAttendant === false}
         menuItems={menuItems}
         showShops
       />

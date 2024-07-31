@@ -28,7 +28,7 @@ const StockLevel = ({ navigation }) => {
 
   const snackbarRef = useRef(null);
 
-  const { selectedShop, offlineParams } = userData();
+  const { selectedShop, offlineParams, userParams } = userData();
 
   const fetchShopProducts = async () => {
     try {
@@ -141,10 +141,14 @@ const StockLevel = ({ navigation }) => {
   };
 
   const menuItems = [
-    {
-      name: "List product",
-      onClick: () => toProductEntry(),
-    },
+    ...(userParams?.isShopAttendant === false
+      ? [
+          {
+            name: "List product",
+            onClick: () => toProductEntry(),
+          },
+        ]
+      : []),
     {
       name: "Download excel sheet",
       onClick: () => downloadExcelSheet(),

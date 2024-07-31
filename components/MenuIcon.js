@@ -2,6 +2,8 @@ import { TouchableOpacity, Image, View, Text } from "react-native";
 import React from "react";
 import { scale } from "react-native-size-matters";
 import Colors from "@constants/Colors";
+import { userData } from "context/UserContext";
+import { ENTRIES } from "@navigation/ScreenNames";
 
 export function MenuIcon({
   icon,
@@ -10,6 +12,11 @@ export function MenuIcon({
   iconStyle,
   titleStyle,
 }) {
+  const { userParams } = userData();
+
+  if (icon.target === ENTRIES && userParams?.isShopAttendant === true) {
+    return;
+  }
   return (
     <TouchableOpacity
       key={icon.id}
