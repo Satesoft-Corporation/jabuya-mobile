@@ -11,8 +11,9 @@ import StockLevelCard from "./components/StockLevelCard";
 import Snackbar from "@components/Snackbar";
 import { userData } from "context/UserContext";
 import TopHeader from "@components/TopHeader";
-import { formatNumberWithCommas } from "@utils/Utils";
+import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
+import { saveExcelSheet } from "@utils/FileSystem";
 
 const StockLevel = ({ navigation }) => {
   const [message, setMessage] = useState(null);
@@ -36,12 +37,15 @@ const StockLevel = ({ navigation }) => {
 
       let list = await UserSessionUtils.getShopProducts(id);
 
-      list = list?.filter(filterCallback);
+      list = list?.filter((item) =>
+        item?.productName?.toLowerCase()?.includes(searchTerm.toLowerCase())
+      );
 
       setStockLevels(list);
 
       setStockLevelRecords(list?.length);
 
+      //for calculations
       const newList = list?.map((data) => {
         const summary = data?.performanceSummary;
         const productSoldQty = summary?.totalQuantitySold || 0;
@@ -85,8 +89,44 @@ const StockLevel = ({ navigation }) => {
     }
   };
 
-  const filterCallback = (item) =>
-    item?.productName?.toLowerCase()?.includes(searchTerm.toLowerCase());
+  const downloadExcelSheet = async () => {
+    setLoading(true);
+    const titles = [
+      "Product",
+      "Sold",
+      "Stock",
+      "Value",
+      "Price",
+      "Category",
+      "Listed by",
+      "Listed on",
+    ];
+
+    const summarisedata = stockLevels.map((pdt) => {
+      const smry = pdt?.performanceSummary;
+      const remaining =
+        smry?.totalQuantityStocked || 0 - smry?.totalQuantitySold || 0;
+
+      const name = pdt?.productName;
+      const sold = Math.round(smry?.totalQuantitySold || 0);
+      const value = Math.round(remaining * pdt?.salesPrice);
+
+      return [
+        name,
+        formatNumberWithCommas(sold),
+        formatNumberWithCommas(remaining),
+        formatNumberWithCommas(value),
+        formatNumberWithCommas(pdt?.salesPrice),
+        pdt?.categoryName,
+        pdt?.createdByFullName,
+        formatDate(pdt?.dateCreated, true),
+      ];
+    });
+    const excelData = [titles, ...summarisedata];
+
+    await saveExcelSheet(`${selectedShop?.name}'s product list`, excelData);
+    setLoading(false);
+  };
 
   useEffect(() => {
     fetchShopProducts();
@@ -104,6 +144,10 @@ const StockLevel = ({ navigation }) => {
     {
       name: "List product",
       onClick: () => toProductEntry(),
+    },
+    {
+      name: "Download excel sheet",
+      onClick: () => downloadExcelSheet(),
     },
   ];
 
