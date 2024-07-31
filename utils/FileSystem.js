@@ -56,7 +56,7 @@ export const saveExcelSheet = async (sheetName = "ProductList", data) => {
     const asset = await MediaLibrary.createAssetAsync(filePath);
     await MediaLibrary.createAlbumAsync("Documents", asset, false);
 
-    Alert.alert("Success", "Excel file has been created and saved.", [
+    Alert.alert("Success", "Excel file has been saved in your documents.", [
       { text: "OK" },
       {
         text: "Share file",

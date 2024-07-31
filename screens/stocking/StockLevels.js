@@ -91,35 +91,51 @@ const StockLevel = ({ navigation }) => {
 
   const downloadExcelSheet = async () => {
     setLoading(true);
+    const clabel = selectedShop?.currency ? `(${selectedShop?.currency})` : "";
     const titles = [
-      "Product",
-      "Sold",
-      "Stock",
-      "Value",
-      "Price",
+      "Product ",
+      `Price ${clabel}`,
+      "Items sold",
+      "Items in stock",
+      "Stock value",
       "Category",
+      "Manufacturer",
+      "Barcode",
+      "Package Unit",
+      "SerialNumber",
       "Listed by",
       "Listed on",
     ];
 
-    const summarisedata = stockLevels.map((pdt) => {
-      const smry = pdt?.performanceSummary;
-      const remaining =
-        smry?.totalQuantityStocked || 0 - smry?.totalQuantitySold || 0;
+    const summarisedata = stockLevels.map((data) => {
+      const summary = data?.performanceSummary;
+      const productSoldQty = summary?.totalQuantitySold || 0;
+      const productStockedQty = summary?.totalQuantityStocked || 0;
+      const price = data?.salesPrice;
 
-      const name = pdt?.productName;
-      const sold = Math.round(smry?.totalQuantitySold || 0);
-      const value = Math.round(remaining * pdt?.salesPrice);
+      let remainingStock = Math.round(productStockedQty - productSoldQty);
+
+      if (
+        remainingStock === undefined ||
+        isNaN(remainingStock) ||
+        remainingStock < 1
+      ) {
+        remainingStock = 0;
+      }
 
       return [
-        name,
-        formatNumberWithCommas(sold),
-        formatNumberWithCommas(remaining),
-        formatNumberWithCommas(value),
-        formatNumberWithCommas(pdt?.salesPrice),
-        pdt?.categoryName,
-        pdt?.createdByFullName,
-        formatDate(pdt?.dateCreated, true),
+        data?.productName,
+        price,
+        productSoldQty,
+        remainingStock,
+        Math.round(remainingStock * price),
+        data?.categoryName,
+        data?.manufacturerName,
+        data?.barcode,
+        data?.packageUnitName,
+        data?.serialNumber,
+        data?.createdByFullName,
+        formatDate(data?.dateCreated, true),
       ];
     });
     const excelData = [titles, ...summarisedata];
