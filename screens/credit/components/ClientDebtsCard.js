@@ -6,11 +6,11 @@ import Colors from "@constants/Colors";
 import CardHeader from "@components/card_components/CardHeader";
 import SalesTable from "@screens/sales_desk/components/SalesTable";
 import DataRow from "@components/card_components/DataRow";
-import CardFooter2 from "@components/card_components/CardFooter2";
-import CardFooter1 from "@components/card_components/CardFooter1";
 import { CREDIT_PAYMENTS } from "@navigation/ScreenNames";
+import CardFooter from "@components/card_components/CardFooter";
+import { formatNumberWithCommas } from "@utils/Utils";
 
-const ClientDebtsCard = ({ debt, snackbarRef, currency }) => {
+const ClientDebtsCard = ({ debt, currency }) => {
   const navigation = useNavigation();
 
   const [expanded, setExpanded] = useState(false);
@@ -20,6 +20,7 @@ const ClientDebtsCard = ({ debt, snackbarRef, currency }) => {
   }, [expanded]);
 
   const isFullyPaid = Math.abs(debt?.amountLoaned - debt?.amountRepaid) <= 0;
+  const showPay = expanded && isFullyPaid === false;
 
   const renderLeft = useCallback(() => {
     if (isFullyPaid) {
@@ -52,58 +53,47 @@ const ClientDebtsCard = ({ debt, snackbarRef, currency }) => {
           currency={currency}
         />
         {expanded && (
-          <View style={{ flex: 1, marginTop: 10 }}>
+          <View style={{ flex: 1, marginTop: 5 }}>
             <DataRow
               key={1}
               label={"Total Debt"}
-              value={debt?.amountLoaned}
+              value={formatNumberWithCommas(debt?.amountLoaned)}
               currency={currency}
             />
 
             <DataRow
               key={2}
               label={"Paid"}
-              value={debt?.amountRepaid}
+              value={formatNumberWithCommas(debt?.amountRepaid)}
               currency={currency}
             />
 
             <DataRow
               key={4}
               label={"Balance"}
-              value={debt?.amountLoaned - debt?.amountRepaid}
+              value={formatNumberWithCommas(
+                debt?.amountLoaned - debt?.amountRepaid
+              )}
               currency={currency}
             />
-
             <DataRow
               key={5}
               label={"Served by"}
               value={debt?.createdByFullName}
             />
-
-            <CardFooter1
-              label={renderLeft()}
-              btnTitle2="Hide"
-              btnTitle1={isFullyPaid ? null : "Pay"}
-              onClick1={() => {
-                if (!isFullyPaid) {
-                  navigation?.navigate(CREDIT_PAYMENTS, debt);
-                } else {
-                  snackbarRef?.current?.show("Sale is fully paid");
-                }
-              }}
-              onClick2={toggleExpand}
-              style={{ marginTop: 15 }}
-            />
           </View>
         )}
 
-        {!expanded && (
-          <CardFooter2
-            btnTitle="More"
-            onBtnPress={toggleExpand}
-            renderLeft={renderLeft}
-          />
-        )}
+        <CardFooter
+          renderLeft={renderLeft}
+          btnTitle2={expanded ? "Hide" : "More"}
+          btnTitle1={showPay ? "Pay" : null}
+          onClick1={() => {
+            navigation?.navigate(CREDIT_PAYMENTS, debt);
+          }}
+          onClick2={toggleExpand}
+          darkMode={!expanded}
+        />
       </View>
     );
   }

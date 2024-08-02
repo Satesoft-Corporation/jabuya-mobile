@@ -1,12 +1,10 @@
+import CardFooter from "@components/card_components/CardFooter";
+import DataRow from "@components/card_components/DataRow";
+import SalesTable from "@screens/sales_desk/components/SalesTable";
+import { formatDate, formatNumberWithCommas } from "@utils/Utils";
+import { UserContext } from "context/UserContext";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
-import CardHeader from "../../../components/card_components/CardHeader";
-import SalesTable from "../../sales_desk/components/SalesTable";
-import DataRow from "../../../components/card_components/DataRow";
-import CardFooter2 from "../../../components/card_components/CardFooter2";
-import { UserContext } from "../../../context/UserContext";
-import CardFooter1 from "../../../components/card_components/CardFooter1";
 
 function OfflineSaleTxnCard({ data, onRemove }) {
   const { lineItems, soldOnDate, onCredit, shopId } = data;
@@ -31,16 +29,12 @@ function OfflineSaleTxnCard({ data, onRemove }) {
 
       {expanded && <TxnCashSummary data={data} />}
 
-      {!expanded && <CardFooter2 onBtnPress={toggleExpand} btnTitle="More" />}
-
-      {expanded && (
-        <CardFooter1
-          btnTitle1="Remove"
-          btnTitle2="Hide"
-          onClick2={toggleExpand}
-          onClick1={onRemove}
-        />
-      )}
+      <CardFooter
+        onClick2={toggleExpand}
+        btnTitle2={!expanded ? "More" : "Hide"}
+        btnTitle1={expanded ? "Remove" : null}
+        onClick1={onRemove}
+      />
     </View>
   );
 }

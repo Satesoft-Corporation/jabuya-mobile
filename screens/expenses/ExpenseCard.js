@@ -3,8 +3,8 @@ import React from "react";
 import { BaseStyle } from "@utils/BaseStyle";
 import { formatDate } from "@utils/Utils";
 import DataColumn from "@components/card_components/DataColumn";
-import CardFooter2 from "@components/card_components/CardFooter2";
 import Colors from "@constants/Colors";
+import CardFooter from "@components/card_components/CardFooter";
 
 const ExpenseCard = ({ exp }) => {
   return (
@@ -54,12 +54,7 @@ const ExpenseCard = ({ exp }) => {
         />
       </View>
 
-      <CardFooter2
-        btnTitle="More"
-        label={exp?.createdByFullName}
-        entered
-        renderBtn={false}
-      />
+      <CardFooter label={exp?.createdByFullName} entered />
     </View>
   );
 };

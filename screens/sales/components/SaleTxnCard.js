@@ -1,4 +1,4 @@
-import CardFooter2 from "@components/card_components/CardFooter2";
+import CardFooter from "@components/card_components/CardFooter";
 import CardHeader from "@components/card_components/CardHeader";
 import DataColumn from "@components/card_components/DataColumn";
 import DataRow from "@components/card_components/DataRow";
@@ -7,7 +7,7 @@ import { formatNumberWithCommas } from "@utils/Utils";
 import { memo, useCallback, useEffect, useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
 
-function SaleTxnCard({ data }) {
+function SaleTxnCard({ data, print }) {
   // sales report item card
 
   const { lineItems, totalCost, amountPaid, balanceGivenOut } = data;
@@ -149,12 +149,14 @@ function SaleTxnCard({ data }) {
         </View>
       )}
 
-      <CardFooter2
-        onBtnPress={toggleExpand}
-        btnTitle={expanded ? "Hide" : "More"}
+      <CardFooter
+        onClick1={toggleExpand}
+        btnTitle1={expanded ? "Hide" : "More"}
         label={data?.createdByFullName}
         served
         darkMode={!expanded}
+        btnTitle2={expanded ? "Print" : null}
+        onClick2={() => print(data)}
       />
     </View>
   );

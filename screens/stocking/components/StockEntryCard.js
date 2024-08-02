@@ -1,4 +1,4 @@
-import ChipButton2 from "@components/buttons/ChipButton2";
+import CardFooter from "@components/card_components/CardFooter";
 import CardHeader from "@components/card_components/CardHeader";
 import DataColumn from "@components/card_components/DataColumn";
 import DataRow from "@components/card_components/DataRow";
@@ -73,7 +73,7 @@ const StockEntryCard = ({ data }) => {
       </View>
 
       {expanded && (
-        <View>
+        <View style={{ marginBottom: 10 }}>
           <DataRow label={"Product"} value={productName} />
 
           <DataRow label="Barcode" value={barcode} />
@@ -90,37 +90,15 @@ const StockEntryCard = ({ data }) => {
         </View>
       )}
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: 10,
-        }}
-      >
-        <View>
-          <Text style={{ fontWeight: 600, fontSize: 12 }}>
-            Restock by:{" "}
-            <Text style={{ fontWeight: 300, fontSize: 12 }}>
-              {createdByFullName}
-            </Text>
-          </Text>
-        </View>
-
-        <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
-          {expanded && (
-            <ChipButton2
-              onPress={() => navigation?.navigate(STOCK_ENTRY_FORM, data)}
-              title={"Edit"}
-              darkMode={false}
-            />
-          )}
-          <ChipButton2
-            onPress={toggleExpand}
-            title={expanded ? "Hide" : "More"}
-          />
-        </View>
-      </View>
+      <CardFooter
+        restocked
+        label={createdByFullName}
+        btnTitle1={expanded ? "Edit" : null}
+        btnTitle2={expanded ? "Hide" : "More"}
+        onClick1={() => navigation?.navigate(STOCK_ENTRY_FORM, data)}
+        darkMode={false}
+        onClick2={toggleExpand}
+      />
     </View>
   );
 };

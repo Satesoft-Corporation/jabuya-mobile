@@ -18,6 +18,7 @@ import VerticalSeparator from "@components/VerticalSeparator";
 import SaleTxnCard from "./components/SaleTxnCard";
 import { OFFLINE_SALES, SHOP_SUMMARY } from "@navigation/ScreenNames";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { printSale } from "@utils/PrintService";
 
 export default function ViewSales() {
   const [sales, setSales] = useState([]);
@@ -37,6 +38,12 @@ export default function ViewSales() {
   const { userParams, selectedShop, filterParams } = userData();
 
   const { isShopOwner } = userParams;
+
+  const print = async (data) => {
+    setLoading(true);
+    await printSale(data);
+    setLoading(false);
+  };
 
   const unsavedSales = async () => {
     let list = await UserSessionUtils.getPendingSales();
@@ -113,7 +120,6 @@ export default function ViewSales() {
           (sale) => sale?.balanceGivenOut >= 0
         ); //to filter out credit sales
 
-        console.log(data)
         let sV = data.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
 
         if (response.totalItems === 0) {
@@ -236,7 +242,12 @@ export default function ViewSales() {
         data={sales}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item, i }) => (
-          <SaleTxnCard key={i} data={item} isShopOwner={isShopOwner} />
+          <SaleTxnCard
+            key={i}
+            data={item}
+            isShopOwner={isShopOwner}
+            print={(data) => print(data)}
+          />
         )}
         ListEmptyComponent={() => (
           <Text style={{ flex: 1, textAlign: "center", alignSelf: "center" }}>

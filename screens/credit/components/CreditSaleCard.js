@@ -1,11 +1,11 @@
 import { View, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
-import { StackActions, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import CardHeader from "@components/card_components/CardHeader";
 import DataColumn from "@components/card_components/DataColumn";
-import CardFooter2 from "@components/card_components/CardFooter2";
 import { CLIENT_DEBTS } from "@navigation/ScreenNames";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
+import CardFooter from "@components/card_components/CardFooter";
 
 const CreditSaleCard = ({ client }) => {
   const navigation = useNavigation();
@@ -61,10 +61,9 @@ const CreditSaleCard = ({ client }) => {
           <DataColumn title={"Balance"} value={bal} currency={currency} />
         </View>
 
-        <CardFooter2
-          renderBtn={bal > 0}
-          btnTitle="More"
-          onBtnPress={() =>
+        <CardFooter
+          btnTitle1={bal > 0 ? "More" : null}
+          onClick1={() =>
             navigation.navigate(CLIENT_DEBTS, {
               client,
               sales,

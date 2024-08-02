@@ -2,15 +2,12 @@ import { View, Text } from "react-native";
 import React from "react";
 import ChipButton2 from "../buttons/ChipButton2";
 
-const CardFooter2 = ({
+const CardFooter = ({
   label,
-  btnTitle = "",
-  btnTitle1 = "label1",
-  btnTitle2 = "label2",
+  btnTitle1,
+  btnTitle2,
   onClick1,
   onClick2,
-  onBtnPress,
-  renderBtn = true,
   style,
   renderLeft = () => {},
   restocked = false,
@@ -41,15 +38,18 @@ const CardFooter2 = ({
         <Text style={{ fontWeight: 400 }}>{label}</Text>
       </Text>
 
-      {renderBtn && (
-        <ChipButton2
-          title={btnTitle}
-          onPress={onBtnPress}
-          darkMode={darkMode}
-        />
-      )}
+      <View style={{ flexDirection: "row", gap: 10 }}>
+        {btnTitle1 && (
+          <ChipButton2
+            title={btnTitle1}
+            onPress={onClick1}
+            darkMode={darkMode}
+          />
+        )}
+        {btnTitle2 && <ChipButton2 title={btnTitle2} onPress={onClick2} />}
+      </View>
     </View>
   );
 };
 
-export default CardFooter2;
+export default CardFooter;
