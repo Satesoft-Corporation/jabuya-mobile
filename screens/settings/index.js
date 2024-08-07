@@ -1,17 +1,16 @@
 import { View, Text, Image } from "react-native";
-import React, { useContext, useState } from "react";
-import AppStatusBar from "../../components/AppStatusBar";
-import TopHeader from "../../components/TopHeader";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native";
-import Colors from "../../constants/Colors";
-import SettingsBar from "./SettingsBar";
 import Constants from "expo-constants";
-import { UserContext, userData } from "../../context/UserContext";
-import DisplayMessage from "../../components/Dialogs/DisplayMessage";
-import { UserSessionUtils } from "../../utils/UserSessionUtils";
-import { LOCK_SETuP } from "../../navigation/ScreenNames";
-import { BaseStyle } from "../../utils/BaseStyle";
 import { Switch } from "react-native-paper";
+import { userData } from "context/UserContext";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
+import AppStatusBar from "@components/AppStatusBar";
+import TopHeader from "@components/TopHeader";
+import Colors from "@constants/Colors";
+import SettingsBar from "./SettingsBar";
+import { BaseStyle } from "@utils/BaseStyle";
+import DisplayMessage from "@components/Dialogs/DisplayMessage";
 
 const Settings = ({ navigation }) => {
   const {
@@ -20,7 +19,7 @@ const Settings = ({ navigation }) => {
     logInWithPin,
     setLoginWithPin,
     getAppLockStatus,
-    setUserParams,
+    resetAll,
   } = userData();
 
   const [showMoodal, setShowModal] = useState(false);
@@ -38,9 +37,9 @@ const Settings = ({ navigation }) => {
       await getAppLockStatus();
     }
   };
-  const { role, fullName } = sessionObj;
 
   const logOut = () => {
+    resetAll();
     UserSessionUtils.clearLocalStorageAndLogout(navigation);
   };
 
@@ -90,7 +89,7 @@ const Settings = ({ navigation }) => {
               color: Colors.primary,
             }}
           >
-            {fullName}
+            {sessionObj?.fullName}
           </Text>
           <Text
             style={{
@@ -98,7 +97,7 @@ const Settings = ({ navigation }) => {
               color: Colors.primary,
             }}
           >
-            {role}
+            {sessionObj?.role}
           </Text>
         </View>
       </View>

@@ -24,6 +24,15 @@ export const UserProvider = ({ children }) => {
   const [logInWithPin, setLoginWithPin] = useState(false);
   const [offlineParams, setOfflineParams] = useState(null);
 
+  const resetAll = () => {
+    setUserParams({});
+    setShops([]);
+    setOfflineParams(null);
+    setLoginWithPin(false);
+    setSessionObj(null);
+    setSelectedShop(null);
+  };
+
   const getShopsFromStorage = async () => {
     await UserSessionUtils.getShops().then(async (ownerShops) => {
       if (ownerShops) {
@@ -206,6 +215,7 @@ export const UserProvider = ({ children }) => {
     configureUserData,
     offlineParams,
     filterParams,
+    resetAll,
   };
   return <UserContext.Provider value={data}>{children}</UserContext.Provider>;
 };
