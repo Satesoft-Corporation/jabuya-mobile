@@ -23,6 +23,8 @@
     "expo-file-system": "~17.0.1",
     "expo-linear-gradient": "~13.0.2",
     "expo-local-authentication": "~14.0.1",
+    "expo-media-library": "~16.0.4",
+    "expo-print": "~13.0.1",
     "expo-sharing": "~12.0.1",
     "expo-splash-screen": "~0.27.5",
     "expo-status-bar": "~1.12.1",
@@ -41,9 +43,7 @@
     "react-native-svg": "15.2.0",
     "react-native-vector-icons": "^10.0.3",
     "react-native-web": "^0.19.8",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
-    "expo-media-library": "~16.0.4",
-    "expo-print": "~13.0.1"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",

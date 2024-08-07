@@ -5,8 +5,6 @@ import { StackActions, useNavigation } from "@react-navigation/native";
 import { userData } from "../../context/UserContext";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import { getTimeDifference } from "@utils/Utils";
-import { BlackScreen } from "@components/BlackAndWhiteScreen";
-import AppStatusBar from "@components/AppStatusBar";
 import Loader from "@components/Loader";
 
 import UserProfile from "@components/UserProfile";
