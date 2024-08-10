@@ -16,7 +16,9 @@ const ComingSoon = ({ route }) => {
 
       <TopHeader title={route?.params} />
       <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
-        <Text style={{ fontSize: 20 }}>Feature is coming soon.</Text>
+        <Text style={{ fontSize: 20, textAlign: "center" }} numberOfLines={2}>
+          This feature is not available for your shop.
+        </Text>
       </View>
     </View>
   );

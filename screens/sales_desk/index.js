@@ -83,7 +83,6 @@ function SalesDesk({ navigation }) {
       setLoading(false);
       return;
     } else {
-      setLoading(true);
       const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
       const inStock = pdtList
         ?.filter((pdt) => pdt?.performanceSummary)

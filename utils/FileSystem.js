@@ -1,7 +1,7 @@
 import * as XLSX from "xlsx";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
-import { Alert, Linking } from "react-native";
+import { Alert } from "react-native";
 import * as Sharing from "expo-sharing";
 import * as Print from "expo-print";
 
@@ -24,17 +24,6 @@ const shareFile = async (fileUri) => {
 
 export const saveExcelSheet = async (sheetName = "ProductList", data) => {
   try {
-    // Request permission to access media library
-    const { status } = await MediaLibrary.requestPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission Denied",
-        "Permission to access media library is required."
-      );
-      console.log("Not permission granted");
-
-      return;
-    }
     console.log("Creating sheet");
     // Create a workbook and a worksheet
     const ws = XLSX.utils.aoa_to_sheet(data);
@@ -52,17 +41,8 @@ export const saveExcelSheet = async (sheetName = "ProductList", data) => {
       encoding: FileSystem.EncodingType.Base64,
     });
 
-    // Save the file to the media library
-    const asset = await MediaLibrary.createAssetAsync(filePath);
-    await MediaLibrary.createAlbumAsync("Documents", asset, false);
+    await shareFile(filePath);
 
-    Alert.alert("Success", "Excel file has been saved in your documents.", [
-      { text: "OK" },
-      {
-        text: "Share file",
-        onPress: () => shareFile(filePath),
-      },
-    ]);
     console.log("sheet created", filePath);
   } catch (error) {
     Alert.alert(
