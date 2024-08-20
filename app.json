@@ -40,7 +40,8 @@
           "recordAudioAndroid": true
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      "expo-font"
     ],
     "assetBundlePatterns": [
       "**/*"
