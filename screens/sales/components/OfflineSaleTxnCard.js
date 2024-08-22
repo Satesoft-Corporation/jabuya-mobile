@@ -1,4 +1,5 @@
 import CardFooter from "@components/card_components/CardFooter";
+import CardHeader from "@components/card_components/CardHeader";
 import DataRow from "@components/card_components/DataRow";
 import SalesTable from "@screens/sales_desk/components/SalesTable";
 import { formatDate, formatNumberWithCommas } from "@utils/Utils";

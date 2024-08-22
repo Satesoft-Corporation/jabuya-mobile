@@ -12,7 +12,6 @@ import StockEntries from "@screens/stocking/StockEntries";
 import StockLevel from "@screens/stocking/StockLevels";
 import StockPurchaseForm from "@forms/stockingForms/StockPurchaseForm";
 import Settings from "@screens/settings";
-import LockScreen from "@screens/applock/LockScreen";
 import LockSetUp from "@screens/applock/LockSetUp";
 import CreditSales from "@screens/credit/CreditSales";
 import CreditPayment from "@forms/CreditPayment";
@@ -68,7 +67,6 @@ export default function App() {
               />
 
               <Stack.Screen name={s.SETTINGS} component={Settings} />
-              <Stack.Screen name={s.LOCK_SCREEN} component={LockScreen} />
               <Stack.Screen name={s.LOCK_SETuP} component={LockSetUp} />
 
               <Stack.Screen name={s.CREDIT_SALES} component={CreditSales} />

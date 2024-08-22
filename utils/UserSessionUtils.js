@@ -238,6 +238,10 @@ export class UserSessionUtils {
     );
   }
 
+  /**
+   *
+   * @returns returns a list of sales made offline
+   */
   static async getPendingSales() {
     let list = await AsyncStorage.getItem(StorageParams.PENDING_SALES);
     return list ? JSON.parse(list) : [];

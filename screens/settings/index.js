@@ -1,5 +1,5 @@
 import { View, Text, Image } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native";
 import Constants from "expo-constants";
 import { Switch } from "react-native-paper";
@@ -11,8 +11,10 @@ import Colors from "@constants/Colors";
 import SettingsBar from "./SettingsBar";
 import { BaseStyle } from "@utils/BaseStyle";
 import DisplayMessage from "@components/Dialogs/DisplayMessage";
+import { LOCK_SETuP, OFFLINE_SALES } from "@navigation/ScreenNames";
+import { useNavigation } from "@react-navigation/native";
 
-const Settings = ({ navigation }) => {
+const Settings = () => {
   const {
     hasUserSetPinCode,
     sessionObj,
@@ -24,8 +26,11 @@ const Settings = ({ navigation }) => {
 
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
-  const [agreeText, setAgreeText] = useState("");
+  const [agreeText, setAgreeText] = useState(null);
   const [canCancel, setCanCancel] = useState(false);
+  const [pendingSales, setPendingSales] = useState(0);
+
+  const navigation = useNavigation();
 
   const onToggleSwitch = async () => {
     setLoginWithPin(!logInWithPin);
@@ -34,23 +39,45 @@ const Settings = ({ navigation }) => {
       navigation.navigate(LOCK_SETuP);
     } else {
       await UserSessionUtils.removeUserPinCode();
+      await UserSessionUtils.setPinLoginTime(null);
       await getAppLockStatus();
     }
   };
 
-  const logOut = () => {
-    resetAll();
-    UserSessionUtils.clearLocalStorageAndLogout(navigation);
+  const logOut = async () => {
+    if (pendingSales > 0) {
+      navigation.navigate(OFFLINE_SALES);
+    } else {
+      resetAll();
+      await UserSessionUtils.clearLocalStorageAndLogout(navigation);
+    }
   };
 
-  const handleLogout = () => {
-    setMessage(
-      "Are you sure you want to log out?, all unsaved data will be lost."
-    );
-    setAgreeText("Yes");
-    setCanCancel(true);
-    setShowModal(true);
+  const checkForUnsavedSales = async () => {
+    const data = await UserSessionUtils.getPendingSales();
+    setPendingSales(data?.length);
   };
+
+  const handleLogout = async () => {
+    if (pendingSales === 0) {
+      setMessage("Are you sure you want to log out?");
+      setAgreeText("Log out");
+      setCanCancel(true);
+      setShowModal(true);
+    } else {
+      setAgreeText("View sales");
+      setMessage(
+        `Cannot logout, you have ${pendingSales} unsaved sale (s) on your device, please connect to the internet to save them.`
+      );
+      setCanCancel(false);
+      setShowModal(true);
+      return;
+    }
+  };
+
+  useEffect(() => {
+    checkForUnsavedSales();
+  }, [showMoodal]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -105,6 +132,7 @@ const Settings = ({ navigation }) => {
       <View style={{ paddingHorizontal: 10 }}>
         <View style={{ marginTop: 20 }}>
           <Text style={{ fontSize: 16 }}>Personal</Text>
+
           <View style={BaseStyle.container}>
             <SettingsBar
               icon={require("../../assets/icons/icons8-font-size-60.png")}
@@ -126,11 +154,6 @@ const Settings = ({ navigation }) => {
         <View style={{ marginTop: 20 }}>
           <Text style={{ fontSize: 16 }}>Security and Mangement</Text>
           <View style={BaseStyle.container}>
-            {/* <SettingsBar
-              icon={require("../../assets/icons/icons8-shield-50.png")}
-              text="Password"
-            /> */}
-
             <SettingsBar
               icon={require("../../assets/icons/icons8-shield-50.png")}
               text="Pin Lock"

@@ -1,7 +1,7 @@
 import { View, SafeAreaView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { FlatList } from "react-native";
-import { StackActions, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { userData } from "../../context/UserContext";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import { getTimeDifference } from "@utils/Utils";
@@ -14,6 +14,7 @@ import Colors from "@constants/Colors";
 import { resolveUnsavedSales } from "@controllers/OfflineControllers";
 import { navList } from "./navList";
 import { COMING_SOON, LOCK_SCREEN } from "@navigation/ScreenNames";
+import LockScreenModal from "@screens/applock/LockScreenModal";
 
 const LandingScreen = () => {
   const { getShopsFromStorage, configureUserData, getRefreshToken, shops } =
@@ -25,6 +26,7 @@ const LandingScreen = () => {
   const [agreeText, setAgreeText] = useState("");
   const [canCancel, setCanCancel] = useState(false);
   const [timeDiff, setTimeDiff] = useState(null);
+  const [showLock, setShowLock] = useState(false);
 
   const navigation = useNavigation();
   const logOut = () => {
@@ -41,7 +43,7 @@ const LandingScreen = () => {
 
   const handleTabPress = (item) => {
     const { days } = timeDiff;
-    if (days >= 14) {
+    if (days >= 30) {
       //trigger the logout dialog every after some time
       logInPrompt();
       return null;
@@ -62,10 +64,9 @@ const LandingScreen = () => {
 
     if (prevPinTime !== null) {
       let pintimeDiff = getTimeDifference(prevPinTime, new Date());
-
+      console.log("pin time diff", pintimeDiff);
       if (pintimeDiff.minutes >= 10) {
-        navigation.dispatch(StackActions.replace(LOCK_SCREEN));
-        return;
+        setShowLock(true);
       }
     }
   };
@@ -73,10 +74,9 @@ const LandingScreen = () => {
   const handleUsageTime = async () => {
     const prevUsageIime = await UserSessionUtils.getLastOpenTime();
     const usageTimeDifferance = getTimeDifference(prevUsageIime, new Date());
-    const { days, hours, minutes } = usageTimeDifferance;
+    const { hours } = usageTimeDifferance;
 
-    const interval = days > 0 && hours > 0 && hours % 3 === 0 && minutes > 50; //every after some 3 hours
-    if (interval === true) {
+    if (hours > 3) {
       console.log("refreshing local data");
       await configureUserData(true);
     }
@@ -134,6 +134,10 @@ const LandingScreen = () => {
         showShops
       />
 
+      <LockScreenModal
+        showLock={showLock}
+        hideLock={() => setShowLock(false)}
+      />
       <View
         style={{
           paddingHorizontal: 10,
