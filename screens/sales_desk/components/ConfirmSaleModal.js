@@ -10,10 +10,7 @@ import {
   isValidNumber,
 } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
-import {
-  saveClientSalesOnDevice,
-  saveShopProductsOnDevice,
-} from "@controllers/OfflineControllers";
+import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
 import SalesTable from "./SalesTable";
 import PaymentMethodComponent from "./PaymentMethodComponent";
 import PrimaryButton from "@components/buttons/PrimaryButton";
@@ -92,7 +89,7 @@ const ConfirmSaleModal = ({
 
     setLoading(true);
 
-    if (netinfo?.isConnected === true) {
+    if (netinfo?.isInternetReachable === true) {
       await new BaseApiService("/shop-sales")
         .postRequest(payLoad)
         .then(async (response) => {

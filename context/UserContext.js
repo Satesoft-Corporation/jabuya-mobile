@@ -141,14 +141,12 @@ export const UserProvider = ({ children }) => {
   const getAppLockStatus = async () => {
     await UserSessionUtils.getUserPinCode().then(async (data) => {
       if (data) {
-        console.log("user has a pin");
         setHasUserSetPinCode(true);
         setUserPinCode(data);
         setLoginWithPin(true);
       } else {
         setHasUserSetPinCode(false);
         setLoginWithPin(false);
-        console.log("user has no pin");
       }
     });
   };

@@ -26,34 +26,43 @@ export const saveCurrencies = async () => {
 };
 
 export const resolveUnsavedSales = async () => {
-  let pendingSales = await UserSessionUtils.getPendingSales();
+  const pendingSales = await UserSessionUtils.getPendingSales();
 
   if (pendingSales.length > 0) {
-    console.log("Saving sales");
-    pendingSales.forEach(async (cart, index) => {
-      await new BaseApiService(SHOP_SALES_ENDPOINT)
-        .postRequest(cart)
-        .then(async (response) => {
-          let d = { info: await response.json(), status: response.status };
-          return d;
-        })
-        .then(async (d) => {
-          let { info, status } = d;
-          let id = info?.id;
+    let errors = [];
+
+    // Use map to create an array of promises
+    await Promise.all(
+      pendingSales.map(async (cart, index) => {
+        console.log("Saving sale", index + 1);
+        try {
+          const response = await new BaseApiService(
+            SHOP_SALES_ENDPOINT
+          ).postRequest(cart);
+          const info = await response.json();
+          const status = response.status;
 
           if (status === 200) {
-            new BaseApiService(`/shop-sales/${id}/confirm`)
-              .postRequest()
-              .then((d) => d.json())
-              .then(async (d) => {
-                await UserSessionUtils.removePendingSale(index);
-              })
-              .catch((error) => {});
+            try {
+              const confirmResponse = await new BaseApiService(
+                `/shop-sales/${info?.id}/confirm`
+              ).postRequest();
+              await confirmResponse.json();
+
+              await UserSessionUtils.removePendingSale(index);
+            } catch (error) {
+              errors.push(error?.message);
+            }
           } else {
+            errors.push(info?.message);
           }
-        })
-        .catch((error) => {});
-    });
+        } catch (error) {
+          errors.push(error?.message);
+        }
+      })
+    );
+
+    return errors;
   }
 };
 
@@ -65,7 +74,6 @@ export const saveShopProductsOnDevice = async (
   const currentPdts = await UserSessionUtils.getShopProducts();
 
   if (currentPdts.length === 0 || refresh === true) {
-    await saveCurrencies();
     //only hit the api if no product is stored
     console.log("saving pdts offline");
     await new BaseApiService(SHOP_PRODUCTS_ENDPOINT)
@@ -73,6 +81,7 @@ export const saveShopProductsOnDevice = async (
       .then(async (response) => {
         await UserSessionUtils.setShopProducts(response.records); //to keep updating the list locally
         saved = true;
+        console.log("products saved");
       })
       .catch((error) => {
         console.log("Unknown Error", error?.message);

@@ -4,10 +4,9 @@ import { Image } from "react-native";
 import Colors from "../../constants/Colors";
 
 const SettingsBar = ({
-  icon = "",
+  icon,
   text = "",
   onPress = () => {},
-  tintColor = Colors.dark,
   renderRight = () => {},
   style,
   textColor = Colors.dark,
@@ -21,8 +20,7 @@ const SettingsBar = ({
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          marginTop: 10,
-          paddingBottom: 10,
+          height: 40,
         },
         style,
       ]}
@@ -32,18 +30,10 @@ const SettingsBar = ({
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
+          gap: 10,
         }}
       >
-        <Image
-          source={icon}
-          style={{
-            width: 25,
-            height: 25,
-            resizeMode: "cover",
-            tintColor: tintColor,
-            marginHorizontal: 5,
-          }}
-        />
+        {icon}
 
         <Text
           style={[

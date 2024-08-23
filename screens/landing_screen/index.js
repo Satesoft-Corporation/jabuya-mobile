@@ -11,9 +11,9 @@ import UserProfile from "@components/UserProfile";
 import { MenuIcon } from "@components/MenuIcon";
 import DisplayMessage from "@components/Dialogs/DisplayMessage";
 import Colors from "@constants/Colors";
-import { resolveUnsavedSales } from "@controllers/OfflineControllers";
+import { saveCurrencies } from "@controllers/OfflineControllers";
 import { navList } from "./navList";
-import { COMING_SOON, LOCK_SCREEN } from "@navigation/ScreenNames";
+import { COMING_SOON } from "@navigation/ScreenNames";
 import LockScreenModal from "@screens/applock/LockScreenModal";
 
 const LandingScreen = () => {
@@ -29,9 +29,10 @@ const LandingScreen = () => {
   const [showLock, setShowLock] = useState(false);
 
   const navigation = useNavigation();
-  const logOut = () => {
+
+  const logOut = async () => {
     setLoading(false);
-    UserSessionUtils.clearLocalStorageAndLogout(navigation);
+    await UserSessionUtils.clearLocalStorageAndLogout(navigation);
   };
 
   const logInPrompt = () => {
@@ -64,7 +65,6 @@ const LandingScreen = () => {
 
     if (prevPinTime !== null) {
       let pintimeDiff = getTimeDifference(prevPinTime, new Date());
-      console.log("pin time diff", pintimeDiff);
       if (pintimeDiff.minutes >= 10) {
         setShowLock(true);
       }
@@ -85,6 +85,7 @@ const LandingScreen = () => {
   const handleLoginSession = async () => {
     await configureUserData(false); //configuring up the usercontext
 
+    await saveCurrencies();
     const prevLoginTime = await UserSessionUtils.getLoginTime();
 
     const logintimeDifferance = getTimeDifference(prevLoginTime, new Date());
@@ -97,11 +98,6 @@ const LandingScreen = () => {
     await getShopsFromStorage();
     await handleUsageTime();
 
-    if (hours < 24) {
-      //to save if access token is still valid
-      await resolveUnsavedSales();
-    }
-
     if (hours >= 20 || days >= 1) {
       await getRefreshToken();
     }
@@ -110,15 +106,19 @@ const LandingScreen = () => {
   };
 
   const startTheApp = async () => {
-    await UserSessionUtils.getUserDetails().then(async (data) => {
-      if (data) {
-        await UserSessionUtils.setLastOpenTime(String(new Date()));
-        await handleLoginSession();
-      } else {
-        logOut();
-        return true;
-      }
-    });
+    await UserSessionUtils.getUserDetails()
+      .then(async (data) => {
+        if (data) {
+          await UserSessionUtils.setLastOpenTime(String(new Date()));
+          await handleLoginSession();
+        } else {
+          logOut();
+          return true;
+        }
+      })
+      .catch((e) => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {

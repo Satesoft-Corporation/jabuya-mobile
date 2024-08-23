@@ -266,7 +266,11 @@ export class UserSessionUtils {
   }
 
   static async setPinLoginTime(time) {
-    await AsyncStorage.setItem(StorageParams.PIN_LOGIN, time);
+    if (time === null) {
+      await AsyncStorage.removeItem(StorageParams.PIN_LOGIN);
+    } else {
+      await AsyncStorage.setItem(StorageParams.PIN_LOGIN, time);
+    }
   }
 
   static async getPinLoginTime() {

@@ -13,6 +13,7 @@ import { BaseStyle } from "@utils/BaseStyle";
 import DisplayMessage from "@components/Dialogs/DisplayMessage";
 import { LOCK_SETuP, OFFLINE_SALES } from "@navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
+import Icon from "@components/Icon";
 
 const Settings = () => {
   const {
@@ -39,7 +40,6 @@ const Settings = () => {
       navigation.navigate(LOCK_SETuP);
     } else {
       await UserSessionUtils.removeUserPinCode();
-      await UserSessionUtils.setPinLoginTime(null);
       await getAppLockStatus();
     }
   };
@@ -135,17 +135,20 @@ const Settings = () => {
 
           <View style={BaseStyle.container}>
             <SettingsBar
-              icon={require("../../assets/icons/icons8-font-size-60.png")}
-              text="Text font size"
+              icon={<Icon name="wifi-off" groupName="Feather" size={19} />}
+              text="Offline sales"
+              onPress={() => navigation.navigate(OFFLINE_SALES)}
             />
 
             <SettingsBar
-              icon={require("../../assets/icons/ic_notification.png")}
+              icon={<Icon name={"bell"} groupName="FontAwesome" size={20} />}
               text="Notfications"
             />
 
             <SettingsBar
-              icon={require("../../assets/icons/icons8-magnetic-card-50.png")}
+              icon={
+                <Icon name={"credit-card"} groupName="FontAwesome" size={20} />
+              }
               text="Subscriptions"
             />
           </View>
@@ -155,7 +158,7 @@ const Settings = () => {
           <Text style={{ fontSize: 16 }}>Security and Mangement</Text>
           <View style={BaseStyle.container}>
             <SettingsBar
-              icon={require("../../assets/icons/icons8-shield-50.png")}
+              icon={<Icon name={"user-lock"} size={20} />}
               text="Pin Lock"
               renderRight={() => (
                 <Switch
@@ -168,11 +171,17 @@ const Settings = () => {
             />
 
             <SettingsBar
-              icon={require("../../assets/icons/icons8-shield-50.png")}
+              icon={<Icon name={"help-circle"} groupName="Feather" size={20} />}
               text="Help center"
             />
             <SettingsBar
-              icon={require("../../assets/icons/icons8-shield-50.png")}
+              icon={
+                <Icon
+                  name={"privacy-tip"}
+                  groupName="MaterialIcons"
+                  size={20}
+                />
+              }
               text="Terms and privacy"
             />
           </View>
@@ -180,7 +189,14 @@ const Settings = () => {
 
         <SettingsBar
           onPress={handleLogout}
-          icon={require("../../assets/icons/icons8-logout-48.png")}
+          icon={
+            <Icon
+              name={"logout"}
+              groupName="AntDesign"
+              size={20}
+              color={Colors.primary}
+            />
+          }
           text="Logout"
           tintColor={Colors.primary}
           textColor={Colors.primary}

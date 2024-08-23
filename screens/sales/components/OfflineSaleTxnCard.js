@@ -3,26 +3,27 @@ import CardHeader from "@components/card_components/CardHeader";
 import DataRow from "@components/card_components/DataRow";
 import SalesTable from "@screens/sales_desk/components/SalesTable";
 import { formatDate, formatNumberWithCommas } from "@utils/Utils";
-import { UserContext } from "context/UserContext";
+import { UserContext, userData } from "context/UserContext";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 
 function OfflineSaleTxnCard({ data, onRemove }) {
   const { lineItems, soldOnDate, onCredit, shopId } = data;
 
   const [expanded, setExpanded] = useState(false);
 
-  const { shops } = useContext(UserContext);
+  const { shops } = userData();
 
   const toggleExpand = useCallback(() => {
     setExpanded(!expanded);
   }, [expanded]);
 
-  const shopName = shops?.find((shop) => shop?.id === shopId)?.name;
+  const shop = shops?.find((shop) => shop?.id === shopId);
+
   return (
     <View style={[styles.container, { borderWidth: onCredit ? 1 : 0 }]}>
       <CardHeader
-        value1={shopName}
+        value1={shop?.name}
         value2={`${formatDate(soldOnDate, true)}`}
       />
 
@@ -43,11 +44,16 @@ function OfflineSaleTxnCard({ data, onRemove }) {
 export default OfflineSaleTxnCard;
 
 export const TxnCashSummary = ({ data }) => {
-  const { lineItems, amountPaid } = data;
+  const { lineItems, amountPaid, shopId } = data;
 
   const [itemCount, setItemCount] = useState(0);
   const [totalCost, setTotalCost] = useState(0);
 
+  const { shops } = userData();
+
+  const shop = shops?.find((shop) => shop?.id === shopId);
+
+  const currency = shop?.currency;
   useEffect(() => {
     if (lineItems !== undefined) {
       let cartQty = lineItems.reduce((a, item) => a + item.quantity, 0);
@@ -64,17 +70,14 @@ export const TxnCashSummary = ({ data }) => {
         key={1}
         label={"Total"}
         value={formatNumberWithCommas(totalCost)}
-        labelTextStyle={styles.label}
-        style={{ marginTop: 5, marginBottom: 10 }}
-        showCurrency
+        currency={currency}
       />
 
       <DataRow
         key={2}
         label={"Recieved"}
         value={formatNumberWithCommas(amountPaid)}
-        labelTextStyle={styles.label}
-        showCurrency
+        currency={currency}
       />
       <DataRow
         key={3}
@@ -82,34 +85,19 @@ export const TxnCashSummary = ({ data }) => {
           itemCount > 1 ? `${itemCount} items` : `${itemCount} item`
         }`}
         value={formatNumberWithCommas(totalCost)}
-        labelTextStyle={styles.label}
-        showCurrency
+        currency={currency}
       />
 
       <DataRow
         key={4}
         label={"Balance"}
         value={amountPaid - totalCost}
-        labelTextStyle={styles.label}
-        showCurrency
+        currency={currency}
       />
     </View>
   );
 };
 const styles = StyleSheet.create({
-  label: {
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  value: { fontWeight: "600", fontSize: 14 },
-  footerText1: {
-    fontWeight: "600",
-    fontSize: 12,
-  },
-  footerText2: {
-    fontWeight: "300",
-    fontSize: 12,
-  },
   container: {
     flex: 1,
     marginTop: 10,

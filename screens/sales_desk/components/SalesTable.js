@@ -2,10 +2,9 @@ import { View, Text, ScrollView } from "react-native";
 import React from "react";
 import Colors from "@constants/Colors";
 import { screenHeight } from "@constants/Constants";
-import { userData } from "context/UserContext";
 import { formatNumberWithCommas } from "@utils/Utils";
 
-const SalesTable = ({ sales = [], fixHeight = true, currency }) => {
+const SalesTable = ({ sales = [], fixHeight = true }) => {
   return (
     <View>
       <View
@@ -43,20 +42,18 @@ const SalesTable = ({ sales = [], fixHeight = true, currency }) => {
         }
       >
         {[...sales]?.map((item, i) => (
-          <SaleListItem data={item} key={i} currency={currency} />
+          <SaleListItem data={item} key={i} />
         ))}
       </ScrollView>
     </View>
   );
 };
 
-const SaleListItem = ({ data, currency }) => {
+const SaleListItem = ({ data }) => {
   // table item on sales entry
   const { productName, shopProductName, saleUnitName } = data;
 
   let unitName = saleUnitName ? " - " + saleUnitName : "";
-
-  const { selectedShop } = userData();
 
   return (
     <View
