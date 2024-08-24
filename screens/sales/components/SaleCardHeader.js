@@ -43,7 +43,7 @@ const SaleCardHeader = ({ data, expanded }) => {
           >
             Items
           </Text>
-          <Text numberOfLines={1} style={{ fontWeight: "500" }}>
+          <Text numberOfLines={2} style={{ fontWeight: "500" }}>
             {data?.name}
           </Text>
         </View>

@@ -165,11 +165,6 @@ const StockLevel = ({ navigation }) => {
           },
         ]
       : []),
-    {
-      name: "Share excel sheet",
-      onClick: () => downloadExcelSheet(),
-      share: true,
-    },
   ];
 
   return (

@@ -38,6 +38,7 @@ const PaymentMethodComponent = ({
         dateValue={soldOnDate}
         label="Sold on"
         onDateChange={(date) => setSoldOnDate(date)}
+        maximumDate
       />
     );
   };
@@ -108,7 +109,6 @@ const PaymentMethodComponent = ({
               value={clientNumber}
               onValueChange={(text) => setClientNumber(text)}
               inputMode="numeric"
-
             />
           </View>
         )}
