@@ -151,6 +151,7 @@ const ExpenseForm = () => {
                 dateValue={dob}
                 isDateInput
                 onDateChange={(date) => setDOB(date)}
+                maximumDate
                 style={{ flex: 1 }}
               />
             </View>

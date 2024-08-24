@@ -8,7 +8,10 @@ import {
   formatNumberWithCommas,
   hasNull,
 } from "@utils/Utils";
-import { resolveUnsavedSales } from "@controllers/OfflineControllers";
+import {
+  resolveUnsavedSales,
+  saveShopProductsOnDevice,
+} from "@controllers/OfflineControllers";
 import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
 import { MyDropDown } from "@components/DropdownComponents";
@@ -76,7 +79,7 @@ const StockPurchaseForm = ({ route }) => {
 
   const clearForm = () => {
     setBatchNo("");
-    setExpiryDate(null);
+    setExpiryDate(new Date());
     setPackedPurchasedQuantity(null);
     setPurchasePrice(null);
     setSelectedProduct(null);
@@ -143,6 +146,7 @@ const StockPurchaseForm = ({ route }) => {
             clearForm();
           }
           await resolveUnsavedSales(); //to auto saved a pending sale if the purchase was for that specific item
+          await saveShopProductsOnDevice(offlineParams, 2 === 2);
           setSubmitted(false);
           setLoading(false);
           snackBarRef.current.show("Stock entry saved successfully", 6000);
@@ -380,6 +384,7 @@ const StockPurchaseForm = ({ route }) => {
                 dateValue={expiryDate}
                 label="Expiry Date"
                 onDateChange={(date) => setExpiryDate(date)}
+                minimumDate
               />
               {submitted && !expiryDate && (
                 <Text style={styles.errorText}>Expiry date is required</Text>
@@ -402,6 +407,7 @@ const StockPurchaseForm = ({ route }) => {
                 dateValue={purchaseDate}
                 isDateInput
                 onDateChange={(date) => setPurchaseDate(date)}
+                maximumDate
               />
               {submitted && !purchaseDate && (
                 <Text style={styles.errorText}>Purchase date is required</Text>

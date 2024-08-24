@@ -3,6 +3,7 @@ import {
   CLIENTS_ENDPOINT,
   CLIENT_SALES_ENDPOINT,
   CURRENCIES_ENDPOINT,
+  LOGIN_END_POINT,
   SHOP_ENDPOINT,
   SHOP_PRODUCTS_ENDPOINT,
   SHOP_SALES_ENDPOINT,
@@ -200,4 +201,22 @@ export const saveClientSalesOnDevice = async (searchParameters) => {
     .catch((error) => {
       console.log("Unknown Error", error?.message);
     });
+};
+
+/**
+ * Getting new access token for the user
+ */
+export const getRefreshToken = async () => {
+  const loginInfo = await UserSessionUtils.getLoginDetails();
+  console.log("Getting refresh token");
+  if (loginInfo) {
+    await new BaseApiService(LOGIN_END_POINT)
+      .saveRequestWithJsonResponse(loginInfo, false)
+      .then(async (response) => {
+        await UserSessionUtils.setUserAuthToken(response.accessToken);
+        await UserSessionUtils.setUserRefreshToken(response.refreshToken);
+        await UserSessionUtils.setLoginTime(String(new Date()));
+        console.log("token refreshed");
+      });
+  }
 };

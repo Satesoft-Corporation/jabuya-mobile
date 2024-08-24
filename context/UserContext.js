@@ -1,10 +1,10 @@
 import {
+  saveCurrencies,
   saveShopClients,
   saveShopDetails,
   saveShopProductsOnDevice,
 } from "@controllers/OfflineControllers";
-import { BaseApiService } from "@utils/BaseApiService";
-import { LOGIN_END_POINT } from "@utils/EndPointUtils";
+
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import { createContext, useState, useEffect, useContext } from "react";
 
@@ -57,6 +57,7 @@ export const UserProvider = ({ children }) => {
     await UserSessionUtils.getUserDetails()
       .then(async (data) => {
         if (data) {
+          console.log("configuring user");
           const {
             roles,
             firstName,
@@ -76,6 +77,8 @@ export const UserProvider = ({ children }) => {
             attendantShopId,
             shopOwnerId,
           });
+
+          await saveCurrencies();
 
           setSessionObj({
             fullName: firstName + " " + lastName,
@@ -151,21 +154,6 @@ export const UserProvider = ({ children }) => {
     });
   };
 
-  const getRefreshToken = async () => {
-    const loginInfo = await UserSessionUtils.getLoginDetails();
-    console.log("Getting refresh token");
-    if (loginInfo) {
-      new BaseApiService(LOGIN_END_POINT)
-        .saveRequestWithJsonResponse(loginInfo, false)
-        .then(async (response) => {
-          await UserSessionUtils.setUserAuthToken(response.accessToken);
-          await UserSessionUtils.setUserRefreshToken(response.refreshToken);
-          await UserSessionUtils.setLoginTime(String(new Date()));
-          console.log("token refreshed");
-        });
-    }
-  };
-
   /**
    *
    * returns and object of search params basing on the selected shop and the current user type
@@ -210,7 +198,6 @@ export const UserProvider = ({ children }) => {
     getShopsFromStorage,
     logInWithPin,
     setLoginWithPin,
-    getRefreshToken,
     getAppLockStatus,
     configureUserData,
     offlineParams,

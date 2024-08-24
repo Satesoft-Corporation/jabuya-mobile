@@ -6,26 +6,18 @@ import { userData } from "../../context/UserContext";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import { getTimeDifference } from "@utils/Utils";
 import Loader from "@components/Loader";
-
 import UserProfile from "@components/UserProfile";
 import { MenuIcon } from "@components/MenuIcon";
-import DisplayMessage from "@components/Dialogs/DisplayMessage";
 import Colors from "@constants/Colors";
-import { saveCurrencies } from "@controllers/OfflineControllers";
 import { navList } from "./navList";
 import { COMING_SOON } from "@navigation/ScreenNames";
 import LockScreenModal from "@screens/applock/LockScreenModal";
+import { getRefreshToken } from "@controllers/OfflineControllers";
 
 const LandingScreen = () => {
-  const { getShopsFromStorage, configureUserData, getRefreshToken, shops } =
-    userData();
+  const { getShopsFromStorage, configureUserData, shops } = userData();
 
   const [loading, setLoading] = useState(true);
-  const [showMoodal, setShowModal] = useState(false);
-  const [message, setMessage] = useState("");
-  const [agreeText, setAgreeText] = useState("");
-  const [canCancel, setCanCancel] = useState(false);
-  const [timeDiff, setTimeDiff] = useState(null);
   const [showLock, setShowLock] = useState(false);
 
   const navigation = useNavigation();
@@ -35,21 +27,7 @@ const LandingScreen = () => {
     await UserSessionUtils.clearLocalStorageAndLogout(navigation);
   };
 
-  const logInPrompt = () => {
-    setMessage("Your session has expired, please login to continue.");
-    setAgreeText("Login");
-    setCanCancel(false);
-    setShowModal(true);
-  };
-
   const handleTabPress = (item) => {
-    const { days } = timeDiff;
-    if (days >= 30) {
-      //trigger the logout dialog every after some time
-      logInPrompt();
-      return null;
-    }
-
     if (item.target) {
       navigation.navigate(item.target);
       return;
@@ -71,34 +49,19 @@ const LandingScreen = () => {
     }
   };
 
-  const handleUsageTime = async () => {
-    const prevUsageIime = await UserSessionUtils.getLastOpenTime();
-    const usageTimeDifferance = getTimeDifference(prevUsageIime, new Date());
-    const { hours } = usageTimeDifferance;
-
-    if (hours > 3) {
-      console.log("refreshing local data");
-      await configureUserData(true);
-    }
-  };
-
   const handleLoginSession = async () => {
     await configureUserData(false); //configuring up the usercontext
 
-    await saveCurrencies();
     const prevLoginTime = await UserSessionUtils.getLoginTime();
 
     const logintimeDifferance = getTimeDifference(prevLoginTime, new Date());
 
     const { days, hours } = logintimeDifferance;
 
-    setTimeDiff(logintimeDifferance);
-
     await handlePinLockStatus();
     await getShopsFromStorage();
-    await handleUsageTime();
 
-    if (hours >= 20 || days >= 1) {
+    if (hours >= 10 || days >= 1) {
       await getRefreshToken();
     }
     console.log("login time", logintimeDifferance);
@@ -154,15 +117,6 @@ const LandingScreen = () => {
           numColumns={3}
         />
       </View>
-
-      <DisplayMessage
-        showModal={showMoodal}
-        message={message}
-        onAgree={logOut}
-        agreeText={agreeText}
-        setShowModal={setShowModal}
-        canCancel={canCancel}
-      />
     </SafeAreaView>
   );
 };

@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView } from "react-native";
+import { View, SafeAreaView } from "react-native";
 import React from "react";
 import TopHeader from "@components/TopHeader";
 import EntryBar from "@components/EntryBar";
@@ -8,7 +8,6 @@ import {
   PDT_ENTRY,
   STOCK_ENTRY_FORM,
 } from "@navigation/ScreenNames";
-import Colors from "@constants/Colors";
 
 const Entries = () => {
   return (
@@ -20,7 +19,6 @@ const Entries = () => {
           paddingHorizontal: 10,
           flex: 1,
           marginTop: 10,
-          backgroundColor: Colors.light, //121111
         }}
       >
         <View
@@ -30,10 +28,11 @@ const Entries = () => {
           }}
         >
           <EntryBar
-            title={"Add Stock"}
+            title={"Add Purchase"}
             target={STOCK_ENTRY_FORM}
             icon="store"
           />
+
           <EntryBar
             title={"List new product"}
             target={PDT_ENTRY}

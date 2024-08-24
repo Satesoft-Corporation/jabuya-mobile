@@ -18,7 +18,7 @@ const DataColumn = ({
       <Text
         style={{
           fontWeight: 600,
-          fontSize: scale(14),
+          fontSize: scale(13),
           textAlign: align,
         }}
       >

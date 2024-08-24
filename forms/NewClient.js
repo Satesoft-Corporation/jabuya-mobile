@@ -130,6 +130,7 @@ const NewClient = () => {
                 dateValue={dob}
                 isDateInput
                 onDateChange={(date) => setDOB(date)}
+                maximumDate
               />
             </View>
 

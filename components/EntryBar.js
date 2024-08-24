@@ -10,19 +10,35 @@ const EntryBar = ({ title, target, isLast = false, icon = "" }) => {
       activeOpacity={0.9}
       onPress={() => navigation.navigate(target)}
       style={{
-        backgroundColor: Colors.light_2, //121111
+        backgroundColor: Colors.light_2,
+        borderBottomColor: "#000",
+        borderRadius: 5,
+        gap: 15,
         flexDirection: "row",
         alignItems: "center",
-        gap: 20,
-        minHeight: 40,
-        borderBottomColor: "#000",
-        borderBottomWidth: isLast ? 0 : 0.5,
-        padding: 15,
-        borderRadius: 5,
+        paddingLeft: 10,
+        paddingTop: 10,
+        // paddingBottom: 2,
+        minHeight: 45,
       }}
     >
-      <Icon name={icon} size={18} />
-      <Text style={{}}>{title}</Text>
+      <View
+        style={{
+          paddingBottom: 15,
+        }}
+      >
+        <Icon name={icon} size={20} />
+      </View>
+      <View
+        style={{
+          borderBottomColor: "#000",
+          borderBottomWidth: !isLast ? 0.5 : 0,
+          flex: 1,
+          paddingBottom: 15,
+        }}
+      >
+        <Text>{title}</Text>
+      </View>
     </TouchableOpacity>
   );
 };

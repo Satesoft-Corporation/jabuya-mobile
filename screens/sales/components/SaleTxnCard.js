@@ -1,13 +1,13 @@
 import CardFooter from "@components/card_components/CardFooter";
-import CardHeader from "@components/card_components/CardHeader";
 import DataColumn from "@components/card_components/DataColumn";
 import DataRow from "@components/card_components/DataRow";
 import SalesTable from "@screens/sales_desk/components/SalesTable";
 import { formatNumberWithCommas } from "@utils/Utils";
 import { memo, useCallback, useEffect, useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+import SaleCardHeader from "./SaleCardHeader";
 
-function SaleTxnCard({ data, print }) {
+function SaleTxnCard({ data, print, shops = [] }) {
   // sales report item card
 
   const { lineItems, totalCost, amountPaid, balanceGivenOut } = data;
@@ -37,16 +37,7 @@ function SaleTxnCard({ data, print }) {
         { borderWidth: balanceGivenOut < 0 ? 1 : 0, gap: 8 },
       ]}
     >
-      {!expanded && (
-        <Text numberOfLines={1} style={{ fontWeight: "500" }}>
-          {data?.name}
-        </Text>
-      )}
-      <CardHeader
-        value1={`SN: ${data?.serialNumber}`}
-        date={data?.dateCreated}
-        shop={data?.shopName}
-      />
+      <SaleCardHeader data={data} expanded={expanded} />
 
       {!expanded && (
         <>
@@ -57,7 +48,7 @@ function SaleTxnCard({ data, print }) {
               marginTop: 5,
             }}
           >
-            <DataColumn title={"Items"} value={itemCount} />
+            <DataColumn title={"Qty"} value={itemCount} />
 
             <DataColumn
               title={"Recieved"}
@@ -150,14 +141,16 @@ function SaleTxnCard({ data, print }) {
       )}
 
       <CardFooter
-        onClick1={toggleExpand}
-        btnTitle1={expanded ? "Hide" : "More"}
+        onClick2={toggleExpand}
+        btnTitle1={expanded ? "Print" : null}
         label={data?.createdByFullName}
         served
         darkMode={!expanded}
-        btnTitle2={expanded ? "Print" : null}
-        onClick2={() => print(data)}
+        btnTitle2={expanded ? "Hide" : "More"}
+        onClick1={() => print(data)}
       />
+
+      {shops?.length > 1 && <CardFooter label={data?.shopName} />}
     </View>
   );
 }

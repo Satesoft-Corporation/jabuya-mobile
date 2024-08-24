@@ -19,6 +19,8 @@ const MyInput = ({
   multiline = false,
   value,
   dateValue = new Date(),
+  maximumDate = false,
+  minimumDate = false,
   onDateChange,
   darkMode = false,
   boldLabel = false,
@@ -86,6 +88,8 @@ const MyInput = ({
                 mode={"date"}
                 onChange={onChange}
                 style={{ fontSize: 10 }}
+                maximumDate={maximumDate ? new Date() : null}
+                minimumDate={minimumDate ? new Date() : null}
               />
             )}
           </>

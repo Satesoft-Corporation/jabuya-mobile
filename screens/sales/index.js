@@ -35,7 +35,7 @@ export default function ViewSales() {
   const [offlineSales, setOfflineSales] = useState(false);
 
   const navigation = useNavigation();
-  const { userParams, selectedShop, filterParams } = userData();
+  const { userParams, selectedShop, filterParams, shops } = userData();
 
   const { isShopOwner } = userParams;
 
@@ -247,6 +247,7 @@ export default function ViewSales() {
             data={item}
             isShopOwner={isShopOwner}
             print={(data) => print(data)}
+            shops={shops}
           />
         )}
         ListEmptyComponent={() => (
