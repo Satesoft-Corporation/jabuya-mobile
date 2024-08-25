@@ -1,16 +1,15 @@
 import { View, Text, FlatList } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
-import TopHeader from "../../components/TopHeader";
-import AppStatusBar from "../../components/AppStatusBar";
-import Colors from "../../constants/Colors";
-import { userData } from "../../context/UserContext";
-import { BaseApiService } from "../../utils/BaseApiService";
-import { MAXIMUM_RECORDS_PER_FETCH } from "../../constants/Constants";
-import Snackbar from "../../components/Snackbar";
+import { userData } from "context/UserContext";
+import { MAXIMUM_RECORDS_PER_FETCH } from "@constants/Constants";
+import { BaseApiService } from "@utils/BaseApiService";
+import AppStatusBar from "@components/AppStatusBar";
+import Colors from "@constants/Colors";
+import TopHeader from "@components/TopHeader";
 import StockEntryCard from "./components/StockEntryCard";
-import { STOCK_ENTRY_FORM } from "../../navigation/ScreenNames";
-import { STOCK_ENTRY_ENDPOINT } from "../../utils/EndPointUtils";
-import { saveShopProductsOnDevice } from "../../controllers/OfflineControllers";
+import Snackbar from "@components/Snackbar";
+import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
+import { STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
 
 const StockEntries = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
@@ -23,7 +22,7 @@ const StockEntries = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const snackbarRef = useRef(null);
 
-  const { selectedShop, filterParams, offlineParams } = userData();
+  const { selectedShop, filterParams, userParams } = userData();
 
   const fetchStockEntries = async (offsetToUse = 0) => {
     try {
@@ -90,10 +89,6 @@ const StockEntries = ({ navigation }) => {
     fetchStockEntries();
   }, [selectedShop]);
 
-  useEffect(() => {
-    saveShopProductsOnDevice(offlineParams, true);
-  }, []);
-
   const menuItems = [
     {
       name: "Add purchase",
@@ -112,7 +107,7 @@ const StockEntries = ({ navigation }) => {
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}
         disabled={disable}
-        showMenuDots
+        showMenuDots={userParams?.isShopAttendant === false}
         menuItems={menuItems}
         showShops
       />

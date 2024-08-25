@@ -29,7 +29,11 @@ const PopUpmenu = ({ menuItems = [], showShops = false }) => {
 
   const renderItem = useCallback(
     ({ item, i }) => (
-      <MenuOption key={i} onSelect={() => item?.onClick()}>
+      <MenuOption
+        key={i}
+        onSelect={() => item?.onClick()}
+        style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
+      >
         <Text
           style={{
             paddingVertical: 5,
@@ -40,6 +44,7 @@ const PopUpmenu = ({ menuItems = [], showShops = false }) => {
         >
           {item?.name}
         </Text>
+        {item?.share && <Icon name="share-alt" size={14} />}
       </MenuOption>
     ),
     [menuItems]

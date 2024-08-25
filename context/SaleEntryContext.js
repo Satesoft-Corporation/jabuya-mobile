@@ -1,8 +1,7 @@
+import Loader from "@components/Loader";
+import { paymentMethods } from "@constants/Constants";
+import { isValidNumber } from "@utils/Utils";
 import { createContext, useState, useEffect } from "react";
-import { isValidNumber } from "../utils/Utils";
-
-import { paymentMethods } from "../constants/Constants";
-import Loader from "../components/Loader";
 
 export const SaleEntryContext = createContext();
 

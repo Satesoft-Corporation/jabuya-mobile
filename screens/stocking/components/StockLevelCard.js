@@ -1,13 +1,12 @@
+import CardHeader from "@components/card_components/CardHeader";
+import DataColumn from "@components/card_components/DataColumn";
+import DataRow from "@components/card_components/DataRow";
+import { PDT_ENTRY } from "@navigation/ScreenNames";
+import { useNavigation } from "@react-navigation/native";
+import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import React, { useState } from "react";
 import { View, Text } from "react-native";
-import { formatDate, formatNumberWithCommas } from "../../../utils/Utils";
-import DataRow from "../../../components/card_components/DataRow";
-import CardHeader from "../../../components/card_components/CardHeader";
-import CardFooter1 from "../../../components/card_components/CardFooter1";
-import CardFooter2 from "../../../components/card_components/CardFooter2";
-import { useNavigation } from "@react-navigation/native";
-import { PDT_ENTRY, UPDATE_PRICE } from "../../../navigation/ScreenNames";
-import DataColumn from "../../../components/card_components/DataColumn";
+import CardFooter from "@components/card_components/CardFooter";
 
 function StockLevelCard({ data }) {
   const [expanded, setExpanded] = useState(false);
@@ -49,9 +48,10 @@ function StockLevelCard({ data }) {
         style={{
           flexDirection: "row",
           marginVertical: 10,
+          justifyContent: "space-between",
         }}
       >
-        <DataColumn title={"Product"} value={data?.productName} left flex={2} />
+        <DataColumn title={"Product"} value={data?.productName} left />
 
         <DataColumn
           title={"Sold"}
@@ -61,8 +61,7 @@ function StockLevelCard({ data }) {
         <DataColumn
           title={"Value"}
           value={Math.round(remainingStock * data?.salesPrice)}
-          end
-          isCurrency
+          currency={data?.currency}
         />
       </View>
 
@@ -70,12 +69,14 @@ function StockLevelCard({ data }) {
         <View
           style={{
             justifyContent: "space-between",
+            marginBottom: 10,
           }}
         >
+          <DataRow label={"Product"} value={data?.productName} />
           <DataRow
             label={"Price"}
             value={formatNumberWithCommas(data?.salesPrice)}
-            showCurrency
+            currency={data?.currency}
           />
           <DataRow
             label={"Status"}
@@ -100,23 +101,18 @@ function StockLevelCard({ data }) {
               <Text>{data?.remarks}</Text>
             </>
           )}
-
-          <CardFooter1
-            btnTitle1="Edit"
-            btnTitle2="Hide"
-            onClick2={toggleExpand}
-            onClick1={() => navigation.navigate(PDT_ENTRY, data)}
-          />
         </View>
       )}
 
-      {!expanded && (
-        <CardFooter2
-          btnTitle={"More"}
-          onBtnPress={toggleExpand}
-          label={<Text>Listed by: {data?.createdByFullName}</Text>}
-        />
-      )}
+      <CardFooter
+        btnTitle1={expanded ? "Edit" : null}
+        btnTitle2={expanded ? "Hide" : "More"}
+        onClick2={toggleExpand}
+        onClick1={() => navigation.navigate(PDT_ENTRY, data)}
+        label={expanded ? null : data?.createdByFullName}
+        listed={!expanded}
+        darkMode={!expanded}
+      />
     </View>
   );
 }

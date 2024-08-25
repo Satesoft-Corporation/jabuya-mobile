@@ -1,20 +1,16 @@
+import CardFooter from "@components/card_components/CardFooter";
+import DataColumn from "@components/card_components/DataColumn";
+import DataRow from "@components/card_components/DataRow";
+import SalesTable from "@screens/sales_desk/components/SalesTable";
+import { formatNumberWithCommas } from "@utils/Utils";
 import { memo, useCallback, useEffect, useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
-import {
-  extractTime,
-  formatDate,
-  formatNumberWithCommas,
-} from "../../../utils/Utils";
-import CardHeader from "../../../components/card_components/CardHeader";
-import SalesTable from "../../sales_desk/components/SalesTable";
-import DataRow from "../../../components/card_components/DataRow";
-import CardFooter2 from "../../../components/card_components/CardFooter2";
-import DataColumn from "../../../components/card_components/DataColumn";
+import { View, StyleSheet } from "react-native";
+import SaleCardHeader from "./SaleCardHeader";
 
-function SaleTxnCard({ data }) {
+function SaleTxnCard({ data, print, shops = [] }) {
   // sales report item card
 
-  const { lineItems, totalCost, amountPaid, balanceGivenOut, shopName } = data;
+  const { lineItems, totalCost, amountPaid, balanceGivenOut } = data;
 
   const [expanded, setExpanded] = useState(false);
   const [itemCount, setItemCount] = useState(0);
@@ -34,22 +30,14 @@ function SaleTxnCard({ data }) {
     }
   }, [data]);
 
-  const servedBy = () => (
-    <Text style={styles.footerText1}>
-      Served by:{" "}
-      <Text style={styles.footerText2}>{data?.createdByFullName}</Text>
-    </Text>
-  );
-
   return (
     <View
-      style={[styles.container, { borderWidth: balanceGivenOut < 0 ? 1 : 0 }]}
+      style={[
+        styles.container,
+        { borderWidth: balanceGivenOut < 0 ? 1 : 0, gap: 8 },
+      ]}
     >
-      <CardHeader
-        value1={`SN: ${data?.serialNumber}`}
-        date={data?.dateCreated}
-        shop={data?.shopName}
-      />
+      <SaleCardHeader data={data} expanded={expanded} />
 
       {!expanded && (
         <>
@@ -57,44 +45,28 @@ function SaleTxnCard({ data }) {
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              margin: 10,
+              marginTop: 5,
             }}
           >
-            <DataColumn title={"Items"} value={itemCount} flex={0} />
+            <DataColumn title={"Qty"} value={itemCount} />
 
             <DataColumn
               title={"Recieved"}
               value={amountPaid}
-              isCurrency
-              flex={0}
+              currency={data?.currency}
             />
 
             <DataColumn
               title={"Amount"}
               value={totalCost}
-              isCurrency
-              flex={0}
+              currency={data?.currency}
             />
             <DataColumn
               title={"Balance"}
               value={balanceGivenOut}
-              flex={0}
-              isCurrency
-              end
+              currency={data?.currency}
             />
-            {/* <DataColumn
-              title={"Income"}
-              value={profit}
-              isCurrency
-              end
-              flex={0}
-            /> */}
           </View>
-          <CardFooter2
-            onBtnPress={toggleExpand}
-            btnTitle="More"
-            label={servedBy()}
-          />
         </>
       )}
       {expanded && (
@@ -107,7 +79,7 @@ function SaleTxnCard({ data }) {
             labelTextStyle={styles.label}
             style={{ marginTop: 5, marginBottom: 10 }}
             valueTextStyle={styles.value}
-            showCurrency
+            currency={data?.currency}
           />
 
           <DataRow
@@ -116,7 +88,7 @@ function SaleTxnCard({ data }) {
             value={formatNumberWithCommas(amountPaid)}
             labelTextStyle={styles.label}
             valueTextStyle={styles.value}
-            showCurrency
+            currency={data?.currency}
           />
           <DataRow
             key={3}
@@ -126,16 +98,16 @@ function SaleTxnCard({ data }) {
             value={formatNumberWithCommas(totalCost)}
             labelTextStyle={styles.label}
             valueTextStyle={styles.value}
-            showCurrency
+            currency={data?.currency}
           />
 
           <DataRow
             key={4}
             label={"Balance"}
-            value={balanceGivenOut}
+            value={formatNumberWithCommas(balanceGivenOut)}
             labelTextStyle={styles.label}
             valueTextStyle={styles.value}
-            showCurrency
+            currency={data?.currency}
           />
           <DataRow
             key={5}
@@ -143,27 +115,42 @@ function SaleTxnCard({ data }) {
             value={formatNumberWithCommas(profit)}
             labelTextStyle={styles.label}
             valueTextStyle={styles.value}
-            showCurrency
+            currency={data?.currency}
           />
 
-          {balanceGivenOut < 0 && (
+          {data?.clientName && (
             <DataRow
               key={6}
+              label={"Client's name"}
+              value={data?.clientName}
+              labelTextStyle={styles.label}
+              valueTextStyle={styles.value}
+            />
+          )}
+
+          {data?.clientPhoneNumber && (
+            <DataRow
+              key={7}
               label={"Client's mobile"}
               value={data?.clientPhoneNumber}
               labelTextStyle={styles.label}
               valueTextStyle={styles.value}
             />
           )}
-
-          <CardFooter2
-            onBtnPress={toggleExpand}
-            btnTitle="Hide"
-            label={servedBy(false)}
-            style={{ marginTop: 15 }}
-          />
         </View>
       )}
+
+      <CardFooter
+        onClick2={toggleExpand}
+        btnTitle1={expanded ? "Print" : null}
+        label={data?.createdByFullName}
+        served
+        darkMode={!expanded}
+        btnTitle2={expanded ? "Hide" : "More"}
+        onClick1={() => print(data)}
+      />
+
+      {shops?.length > 1 && <CardFooter label={data?.shopName} />}
     </View>
   );
 }

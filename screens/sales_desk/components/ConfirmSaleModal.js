@@ -1,28 +1,38 @@
 import { View, Text } from "react-native";
 import React, { useContext, useState } from "react";
-import ModalContent from "../../../components/ModalContent";
+import { UserContext } from "context/UserContext";
+import { SaleEntryContext } from "context/SaleEntryContext";
+import { useNetInfo } from "@react-native-community/netinfo";
 import {
   convertToServerDate,
   formatDate,
   formatNumberWithCommas,
-} from "../../../utils/Utils";
-import Colors from "../../../constants/Colors";
+  isValidNumber,
+} from "@utils/Utils";
+import { BaseApiService } from "@utils/BaseApiService";
+import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
 import SalesTable from "./SalesTable";
-import PrimaryButton from "../../../components/buttons/PrimaryButton";
 import PaymentMethodComponent from "./PaymentMethodComponent";
-import { SaleEntryContext } from "../../../context/SaleEntryContext";
-import { BaseApiService } from "../../../utils/BaseApiService";
-import { UserSessionUtils } from "../../../utils/UserSessionUtils";
-import NetInfo, { useNetInfo } from "@react-native-community/netinfo";
-import { UserContext } from "../../../context/UserContext";
-import { saveShopProductsOnDevice } from "../../../controllers/OfflineControllers";
+import PrimaryButton from "@components/buttons/PrimaryButton";
+import ModalContent from "@components/ModalContent";
+import Colors from "@constants/Colors";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
+import DataRow from "@components/card_components/DataRow";
 
-const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
+const ConfirmSaleModal = ({
+  setVisible,
+  snackbarRef,
+  visible,
+  clients,
+  onComplete,
+}) => {
   const [submitted, setSubmitted] = useState(false);
   const [soldOnDate, setSoldOnDate] = useState(new Date());
   const [amountPaid, setAmountPaid] = useState("");
   const [serverError, setError] = useState(null);
   const [selectedClient, setSelectedClient] = useState(null);
+  const [clientName, setClientName] = useState("");
+  const [clientNumber, setClientNumber] = useState("");
 
   const { userParams, selectedShop } = useContext(UserContext);
 
@@ -36,6 +46,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
     totalQty,
     selectedPaymentMethod,
     setLoading,
+    setSelectedPaymentMethod,
   } = useContext(SaleEntryContext);
 
   const { isShopAttendant, attendantShopId, isShopOwner, shopOwnerId } =
@@ -45,6 +56,8 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
     setAmountPaid("");
     setSelectedClient(null);
     setError(null);
+    setClientName("");
+    setClientNumber("");
   };
 
   const postSales = async () => {
@@ -60,7 +73,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
 
     const onCredit = selectedPaymentMethod?.id === 1;
 
-    let payLoad = {
+    const payLoad = {
       id: null,
       shopId: isShopAttendant ? attendantShopId : selectedShop?.id,
       amountPaid: onCredit ? Number(amountPaid) : Number(recievedAmount),
@@ -70,12 +83,14 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
       soldOnDate: convertToServerDate(soldOnDate),
       ...(onCredit && { clientPhoneNumber: selectedClient?.phoneNumber }),
       ...(onCredit && { clientId: selectedClient?.id }),
+      ...(!onCredit && clientNumber && { clientPhoneNumber: clientNumber }),
+      ...(!onCredit && clientName && { clientName: clientName }),
     };
 
     setLoading(true);
 
-    if (netinfo?.isConnected === true) {
-      new BaseApiService("/shop-sales")
+    if (netinfo?.isInternetReachable === true) {
+      await new BaseApiService("/shop-sales")
         .postRequest(payLoad)
         .then(async (response) => {
           let d = { info: await response.json(), status: response.status };
@@ -86,7 +101,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
           let id = info?.id;
 
           if (status === 200) {
-            new BaseApiService(`/shop-sales/${id}/confirm`)
+            await new BaseApiService(`/shop-sales/${id}/confirm`)
               .postRequest()
               .then((d) => d.json())
               .then(async (response) => {
@@ -96,12 +111,14 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
                   clearEverything();
                   clearForm();
                   snackbarRef.current.show("Sale confirmed successfully", 4000);
-                  await saveShopProductsOnDevice(searchParameters); // updating offline products
+                  onComplete();
+                  if (onCredit && !userParams?.isSuperAdmin) {
+                    await saveClientSalesOnDevice(searchParameters);
+                  }
                 }
               })
               .catch((error) => {
                 setLoading(false);
-
                 setError(`Failed to confirm sale!, ${error?.message}`);
               });
           } else {
@@ -121,6 +138,39 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
       clearEverything();
       clearForm();
       snackbarRef.current.show("Sale record will be saved when online.", 4000);
+    }
+  };
+
+  const validate = () => {
+    setError(null);
+    const isValidAmount = Number(recievedAmount) >= totalCost;
+    let isValid = true;
+    if (selectedPaymentMethod?.id === 0) {
+      if (!isValidNumber(recievedAmount)) {
+        setError("Invalid input for recieved amount.");
+        console.log(recievedAmount);
+        isValid = false;
+        return;
+      }
+      if (!isValidAmount) {
+        setError(
+          `Recieved amount should not be less than ${
+            selectedShop?.currency
+          }${formatNumberWithCommas(totalCost)}`
+        );
+        isValid = false;
+        return;
+      }
+    }
+
+    if (selectedPaymentMethod?.id === 1 && !selectedClient) {
+      setError("Client selection is required for debt sales.");
+      isValid = false;
+      return;
+    }
+
+    if (isValid === true) {
+      postSales();
     }
   };
 
@@ -158,6 +208,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
           </Text>
         </View>
       )}
+
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Text
           style={{
@@ -168,78 +219,30 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
         >
           {formatDate(new Date())}
         </Text>
-        <Text>Currency : UGX</Text>
+        <Text>Currency : {selectedShop?.currency}</Text>
       </View>
 
       <SalesTable sales={selections} fixHeight={false} />
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 10,
-        }}
-      >
-        <Text style={{ fontWeight: "bold" }}>Recieved </Text>
-        <Text
-          style={{
-            alignSelf: "flex-end",
-            fontWeight: "bold",
-            marginEnd: 4,
-          }}
-        >
-          {formatNumberWithCommas(recievedAmount)}
-        </Text>
-      </View>
+      <DataRow
+        label={"Recieved"}
+        value={formatNumberWithCommas(recievedAmount)}
+        currency={selectedShop?.currency}
+      />
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginVertical: 3,
-        }}
-      >
-        <Text style={{ fontWeight: "bold" }}>
-          Sold{" "}
-          <Text style={{ fontWeight: "400" }}>
-            {totalQty >= 1 && (
-              <Text>
-                {totalQty}
-                {totalQty > 1 ? <Text> items</Text> : <Text> item</Text>}
-              </Text>
-            )}
-          </Text>
-        </Text>
+      <DataRow
+        label={`Sold ${
+          totalQty > 1 ? `${totalQty} items` : `${totalQty} item`
+        }`}
+        value={formatNumberWithCommas(totalCost)}
+        currency={selectedShop?.currency}
+      />
 
-        <Text
-          style={{
-            alignSelf: "flex-end",
-            fontWeight: "bold",
-            marginEnd: 4,
-          }}
-        >
-          {formatNumberWithCommas(totalCost)}
-        </Text>
-      </View>
-
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text style={{ fontWeight: "bold" }}>Balance</Text>
-        <Text
-          style={{
-            alignSelf: "flex-end",
-            fontWeight: "bold",
-            marginEnd: 4,
-            fontSize: 15,
-          }}
-        >
-          {formatNumberWithCommas(recievedAmount - totalCost)}
-        </Text>
-      </View>
+      <DataRow
+        label={"Balance"}
+        value={formatNumberWithCommas(recievedAmount - totalCost)}
+        currency={selectedShop?.currency}
+      />
 
       <PaymentMethodComponent
         submitted={submitted}
@@ -250,15 +253,20 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
         clients={clients}
         selectedClient={selectedClient}
         setSelectedClient={setSelectedClient}
+        visible={visible}
+        clientName={clientName}
+        clientNumber={clientNumber}
+        setClientName={setClientName}
+        setClientNumber={setClientNumber}
       />
 
       <View
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          marginTop: 20,
+          marginTop: 30,
           gap: 10,
-          marginBottom: 5,
+          marginBottom: 10,
         }}
       >
         <PrimaryButton
@@ -270,9 +278,10 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, clients }) => {
             setError(null);
             setSelectedClient(null);
             setAmountPaid(null);
+            setSelectedPaymentMethod(null);
           }}
         />
-        <PrimaryButton title={"Save"} onPress={postSales} />
+        <PrimaryButton title={"Save"} onPress={validate} />
       </View>
     </ModalContent>
   );

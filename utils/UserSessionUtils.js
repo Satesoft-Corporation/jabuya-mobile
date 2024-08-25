@@ -125,23 +125,6 @@ export class UserSessionUtils {
   }
 
   /**
-   * This method is used to get the attendant shopId
-   * @returns shopId
-   */
-  static async getShopId() {
-    let id = await AsyncStorage.getItem(StorageParams.SHOP_ID);
-    return Number(id);
-  }
-
-  /**
-   * This method is used to set the attendant shopId
-   * @param {id} id
-   */
-  static async setShopid(id) {
-    await AsyncStorage.setItem(StorageParams.SHOP_ID, id);
-  }
-
-  /**
    * This method is used to set the number shops for a shop owner
    * @param {count} count
    */
@@ -171,8 +154,21 @@ export class UserSessionUtils {
    * @returns shopcount
    */
   static async getShops() {
+    let currencyList = await this.getCurrencies();
     let shops = await AsyncStorage.getItem(StorageParams.SHOPS);
-    return JSON.parse(shops);
+    let parsed = JSON.parse(shops);
+
+    let finalList = parsed?.map((item) => {
+      const currency = currencyList?.find(
+        (cur) => cur?.id === item?.currencyId
+      );
+
+      return {
+        ...item,
+        currency: currency?.symbol || "",
+      };
+    });
+    return finalList;
   }
 
   /**
@@ -242,6 +238,10 @@ export class UserSessionUtils {
     );
   }
 
+  /**
+   *
+   * @returns returns a list of sales made offline
+   */
   static async getPendingSales() {
     let list = await AsyncStorage.getItem(StorageParams.PENDING_SALES);
     return list ? JSON.parse(list) : [];
@@ -266,7 +266,11 @@ export class UserSessionUtils {
   }
 
   static async setPinLoginTime(time) {
-    await AsyncStorage.setItem(StorageParams.PIN_LOGIN, time);
+    if (time === null) {
+      await AsyncStorage.removeItem(StorageParams.PIN_LOGIN);
+    } else {
+      await AsyncStorage.setItem(StorageParams.PIN_LOGIN, time);
+    }
   }
 
   static async getPinLoginTime() {
@@ -311,10 +315,66 @@ export class UserSessionUtils {
 
     return JSON.parse(data);
   }
-}
 
-/**
- * git commands and origin,clon, add,comit,push,fetch,pull,PR
- *
- *
- */
+  //
+
+  /**
+   * sets time when The app was last opened
+   * @param {*} time
+   */
+  static async setLastOpenTime(time) {
+    await AsyncStorage.setItem("@last_usage_time", time);
+  }
+
+  /**
+   * returns the time when the app was last used
+   * @returns
+   */
+  static async getLastOpenTime() {
+    const time = await AsyncStorage.getItem("@last_usage_time");
+    return time ? new Date(time) : null;
+  }
+
+  /**
+   * saves currencies locally
+   * @param {*} currencies
+   */
+  static async setCurrencies(currencies) {
+    const data = JSON.stringify(currencies);
+    await AsyncStorage.setItem(StorageParams.CURRENCIES, data);
+  }
+
+  /**
+   * returns the list of currencies saved locally
+   * @returns
+   */
+  static async getCurrencies(currencyId = null) {
+    const list = await AsyncStorage.getItem(StorageParams.CURRENCIES);
+
+    if (currencyId !== null) {
+      let newList = [...JSON.parse(list)];
+      let filtered = newList.filter((item) => item?.id === currencyId);
+      return filtered;
+    } else {
+      return list ? JSON.parse(list) : [];
+    }
+  }
+
+  static async setClientSales(list) {
+    await AsyncStorage.setItem(
+      StorageParams.CLIENT_SALES,
+      JSON.stringify(list)
+    );
+  }
+
+  static async getClientSales(client_id = null) {
+    let creditList = await AsyncStorage.getItem(StorageParams.CLIENT_SALES);
+    if (client_id !== null) {
+      const list = [...JSON.parse(creditList)];
+      let filtered = list.filter((sale) => sale?.client_id === client_id);
+      return filtered;
+    } else {
+      return creditList ? [...JSON.parse(creditList)] : [];
+    }
+  }
+}

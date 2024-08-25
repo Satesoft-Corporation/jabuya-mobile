@@ -1,19 +1,13 @@
 import { View, StyleSheet } from "react-native";
-import React, { memo, useEffect, useState } from "react";
-import CardHeader from "../../../components/card_components/CardHeader";
-import { formatDate } from "../../../utils/Utils";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import DataColumn from "../../../components/card_components/DataColumn";
-import { BaseApiService } from "../../../utils/BaseApiService";
-import CardFooter2 from "../../../components/card_components/CardFooter2";
-import { CLIENT_DEBTS } from "../../../navigation/ScreenNames";
+import CardHeader from "@components/card_components/CardHeader";
+import DataColumn from "@components/card_components/DataColumn";
+import { CLIENT_DEBTS } from "@navigation/ScreenNames";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
+import CardFooter from "@components/card_components/CardFooter";
 
-const CreditSaleListItem = ({
-  client,
-  appendDebtValue,
-  appendBalValue,
-  appendPaidValue,
-}) => {
+const CreditSaleCard = ({ client }) => {
   const navigation = useNavigation();
 
   const [sales, setSales] = useState([]);
@@ -25,33 +19,19 @@ const CreditSaleListItem = ({
 
   const name = client?.fullName;
   const mob = client?.phoneNumber;
+  const currency = client?.shop?.currency?.symbol;
 
   const fetchCreditSales = async () => {
-    let searchParameters = {
-      limit: 0,
-      offset: 0,
-      clientId: client?.id,
-    };
+    const list = await UserSessionUtils.getClientSales(client?.id);
+    const debt = list.reduce((a, b) => a + b?.amountLoaned, 0);
+    const paid = list.reduce((a, b) => a + b?.amountRepaid, 0);
+    const bal = debt - paid;
 
-    new BaseApiService("/credit-sales")
-      .getRequestWithJsonResponse(searchParameters)
-      .then((response) => {
-        setSales(response?.records);
-        const debt = response.records.reduce((a, b) => a + b?.amountLoaned, 0);
-        const paid = response.records.reduce((a, b) => a + b?.amountRepaid, 0);
-        const bal = debt - paid;
-
-        setDebt(debt);
-        setPaid(paid);
-        setBal(bal);
-        appendDebtValue(debt);
-        appendBalValue(bal);
-        appendPaidValue(paid);
-        setShow(true);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    setSales(list);
+    setDebt(debt);
+    setPaid(paid);
+    setBal(bal);
+    setShow(true);
   };
 
   useEffect(() => {
@@ -76,21 +56,21 @@ const CreditSaleListItem = ({
             value2={`${mob}`}
           />
 
-          <DataColumn title={"Debt"} value={debt} isCurrency />
-          <DataColumn title={"Paid"} value={paid} isCurrency />
-          <DataColumn title={"Balance"} value={bal} isCurrency end />
+          <DataColumn title={"Debt"} value={debt} currency={currency} />
+          <DataColumn title={"Paid"} value={paid} currency={currency} />
+          <DataColumn title={"Balance"} value={bal} currency={currency} />
         </View>
 
-        <CardFooter2
-          renderBtn={bal > 0}
-          btnTitle="More"
-          onBtnPress={() =>
+        <CardFooter
+          btnTitle1={bal > 0 ? "More" : null}
+          onClick1={() =>
             navigation.navigate(CLIENT_DEBTS, {
               client,
               sales,
               debt,
               paid,
               bal,
+              currency,
             })
           }
         />
@@ -99,7 +79,7 @@ const CreditSaleListItem = ({
   }
 };
 
-export default memo(CreditSaleListItem);
+export default CreditSaleCard;
 
 const styles = StyleSheet.create({
   container: {

@@ -1,15 +1,17 @@
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
-import Colors from "../../constants/Colors";
-import { screenHeight, screenWidth } from "../../constants/Constants";
 import { BarCodeScanner } from "expo-barcode-scanner";
-import AppStatusBar from "../../components/AppStatusBar";
-import { SaleEntryContext } from "../../context/SaleEntryContext";
-import { UserSessionUtils } from "../../utils/UserSessionUtils";
+import AppStatusBar from "@components/AppStatusBar";
 import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
+import Colors from "@constants/Colors";
+import { screenHeight, screenWidth } from "@constants/Constants";
+import { SaleEntryContext } from "context/SaleEntryContext";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
-const BarCodeScreen = ({ navigation }) => {
+const BarCodeScreen = ({ navigation, route }) => {
   const [hasPermission, setHasPermission] = useState(null);
+
+  const { products } = route?.params;
 
   const {
     setQuantity,
@@ -25,13 +27,27 @@ const BarCodeScreen = ({ navigation }) => {
   } = useContext(SaleEntryContext);
 
   const handleBarCodeScanned = ({ data }) => {
-    setScanned(true);
-    fetchProductByBarCode(data);
+    try {
+      console.log(data);
+      setScanned(true);
+      fetchProductByBarCode(data);
+    } catch (e) {
+      console.error(e);
+      setScanned(false);
+      setLoading(false);
+    }
   };
 
   const fetchProductByBarCode = async (barcode) => {
     setLoading(true);
-    const item = await UserSessionUtils.getProductByBarcode(barcode);
+    console.log("scanning");
+    let item;
+    if (products) {
+      item = products.find((item) => item.barcode === barcode);
+      console.log("looking through instock pdts");
+    } else {
+      item = await UserSessionUtils.getProductByBarcode(barcode);
+    }
 
     if (!item) {
       setLoading(false);

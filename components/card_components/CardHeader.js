@@ -1,7 +1,8 @@
 import { View, Text } from "react-native";
 import React from "react";
-import Colors from "../../constants/Colors";
-import { extractTime, formatDate } from "../../utils/Utils";
+import { extractTime, formatDate } from "@utils/Utils";
+import Colors from "@constants/Colors";
+import { scale } from "react-native-size-matters";
 
 const CardHeader = ({ value1, date = new Date(), value1Style, shop }) => {
   return (
@@ -11,10 +12,10 @@ const CardHeader = ({ value1, date = new Date(), value1Style, shop }) => {
         justifyContent: "space-between",
       }}
     >
-      <View style={{ gap: 5 }}>
+      <View>
         <Text
           style={{
-            fontSize: 12,
+            fontSize: scale(12),
             fontWeight: "bold",
           }}
         >
@@ -24,7 +25,7 @@ const CardHeader = ({ value1, date = new Date(), value1Style, shop }) => {
         <Text
           style={[
             {
-              fontSize: 12,
+              fontSize: scale(12),
             },
             value1Style,
           ]}
@@ -33,10 +34,10 @@ const CardHeader = ({ value1, date = new Date(), value1Style, shop }) => {
         </Text>
       </View>
 
-      <View style={{ gap: 5 }}>
+      <View>
         <Text
           style={{
-            fontSize: 12,
+            fontSize: scale(12),
             color: Colors.gray,
             alignSelf: "flex-end",
           }}
@@ -46,7 +47,7 @@ const CardHeader = ({ value1, date = new Date(), value1Style, shop }) => {
 
         <Text
           style={{
-            fontSize: 12,
+            fontSize: scale(12),
             color: Colors.gray,
             alignSelf: "flex-end",
           }}

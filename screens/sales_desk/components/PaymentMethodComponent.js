@@ -1,11 +1,11 @@
 import { View, Text, FlatList } from "react-native";
-import React, { useContext } from "react";
-import Colors from "../../../constants/Colors";
-import { paymentMethods } from "../../../constants/Constants";
-import { SaleEntryContext } from "../../../context/SaleEntryContext";
-import ChipButton from "../../../components/buttons/ChipButton";
-import { MyDropDown } from "../../../components/DropdownComponents";
-import MyInput from "../../../components/MyInput";
+import React, { useContext, useEffect } from "react";
+import { SaleEntryContext } from "context/SaleEntryContext";
+import MyInput from "@components/MyInput";
+import { paymentMethods } from "@constants/Constants";
+import { MyDropDown } from "@components/DropdownComponents";
+import Colors from "@constants/Colors";
+import ChipButton from "@components/buttons/ChipButton";
 
 const PaymentMethodComponent = ({
   soldOnDate,
@@ -15,9 +15,21 @@ const PaymentMethodComponent = ({
   clients = [],
   selectedClient,
   setSelectedClient,
+  visible,
+  clientName,
+  setClientName,
+  clientNumber,
+  setClientNumber,
 }) => {
-  const { selectedPaymentMethod, setSelectedPaymentMethod } =
-    useContext(SaleEntryContext);
+  const {
+    selectedPaymentMethod,
+    setSelectedPaymentMethod,
+    recievedAmount,
+    setRecievedAmount,
+    totalCost,
+  } = useContext(SaleEntryContext);
+
+  const isValidAmount = Number(recievedAmount) >= totalCost;
 
   const SoldOnDateComponent = () => {
     return (
@@ -26,9 +38,26 @@ const PaymentMethodComponent = ({
         dateValue={soldOnDate}
         label="Sold on"
         onDateChange={(date) => setSoldOnDate(date)}
+        maximumDate
       />
     );
   };
+
+  const handleInput = (text) => {
+    if (selectedPaymentMethod?.id === 0) {
+      setRecievedAmount(text);
+    } else {
+      setAmountPaid(text);
+    }
+  };
+
+  useEffect(() => {
+    if (!isValidAmount) {
+      setSelectedPaymentMethod(paymentMethods[1]);
+      setAmountPaid(recievedAmount);
+    }
+  }, [visible]);
+
   return (
     <View style={{ marginTop: 10 }}>
       <Text
@@ -59,33 +88,8 @@ const PaymentMethodComponent = ({
         numColumns={3}
       />
 
-      {selectedPaymentMethod?.id === 0 && <SoldOnDateComponent />}
-
-      {selectedPaymentMethod?.id === 1 && (
-        <View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: 10,
-            }}
-          >
-            <View style={{ flex: 1, marginTop: 5 }}>
-              <MyDropDown
-                style={{
-                  backgroundColor: Colors.light,
-                  borderColor: Colors.dark,
-                }}
-                data={clients}
-                onChange={(e) => setSelectedClient(e)}
-                value={selectedClient}
-                placeholder="Select client"
-                labelField="fullName"
-                valueField="id"
-              />
-            </View>
-          </View>
-
+      <View>
+        {selectedPaymentMethod?.id === 0 && (
           <View
             style={{
               flexDirection: "row",
@@ -94,22 +98,61 @@ const PaymentMethodComponent = ({
               marginTop: 5,
             }}
           >
-            <View style={{ flex: 1 }}>
-              <MyInput
-                label="Amount paid"
-                value={amountPaid}
-                onValueChange={(text) => setAmountPaid(text)}
-                cursorColor={Colors.dark}
-                inputMode="numeric"
-              />
-            </View>
+            <MyInput
+              label={"Client Name"}
+              value={clientName}
+              onValueChange={(text) => setClientName(text)}
+            />
 
-            <View style={{ flex: 1 }}>
-              <SoldOnDateComponent />
-            </View>
+            <MyInput
+              label={"Client Phone Number"}
+              value={clientNumber}
+              onValueChange={(text) => setClientNumber(text)}
+              inputMode="numeric"
+            />
           </View>
+        )}
+        {selectedPaymentMethod?.id === 1 && (
+          <MyDropDown
+            style={{
+              backgroundColor: Colors.light,
+              borderColor: Colors.dark,
+              marginTop: 5,
+            }}
+            data={clients}
+            onChange={(e) => setSelectedClient(e)}
+            value={selectedClient}
+            placeholder="Select client"
+            labelField="fullName"
+            valueField="id"
+          />
+        )}
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            gap: 10,
+            marginTop: 5,
+          }}
+        >
+          <MyInput
+            label={
+              selectedPaymentMethod?.id === 0
+                ? "Recieved amount"
+                : "Amount paid"
+            }
+            value={
+              selectedPaymentMethod?.id === 0 ? recievedAmount : amountPaid
+            }
+            onValueChange={(text) => handleInput(text)}
+            cursorColor={Colors.dark}
+            inputMode="numeric"
+          />
+
+          <SoldOnDateComponent />
         </View>
-      )}
+      </View>
     </View>
   );
 };

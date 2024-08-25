@@ -1,12 +1,12 @@
+import CardFooter from "@components/card_components/CardFooter";
+import CardHeader from "@components/card_components/CardHeader";
+import DataColumn from "@components/card_components/DataColumn";
+import DataRow from "@components/card_components/DataRow";
+import { STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
+import { useNavigation } from "@react-navigation/native";
+import { formatDate } from "@utils/Utils";
 import React, { useState } from "react";
 import { View, Text } from "react-native";
-import { formatDate } from "../../../utils/Utils";
-import { useNavigation } from "@react-navigation/native";
-import DataRow from "../../../components/card_components/DataRow";
-import ChipButton2 from "../../../components/buttons/ChipButton2";
-import { STOCK_ENTRY_FORM } from "../../../navigation/ScreenNames";
-import CardHeader from "../../../components/card_components/CardHeader";
-import DataColumn from "../../../components/card_components/DataColumn";
 
 const StockEntryCard = ({ data }) => {
   const [expanded, setExpanded] = useState(false);
@@ -53,13 +53,7 @@ const StockEntryCard = ({ data }) => {
           marginVertical: 10,
         }}
       >
-        <DataColumn
-          title={"Product"}
-          left
-          value={productName}
-          flex={2}
-          key={1}
-        />
+        <DataColumn title={"Product"} left value={productName} key={1} />
 
         <DataColumn title={"Qty"} value={purchasedQuantity} key={2} />
 
@@ -67,20 +61,21 @@ const StockEntryCard = ({ data }) => {
           title={"Cost"}
           value={Math.round(purchasePrice / purchasedQuantity)}
           key={3}
-          isCurrency
+          currency={data?.currency}
         />
 
         <DataColumn
           title={"Amount"}
           value={purchasePrice}
           key={4}
-          isCurrency
-          end
+          currency={data?.currency}
         />
       </View>
 
       {expanded && (
-        <View>
+        <View style={{ marginBottom: 10 }}>
+          <DataRow label={"Product"} value={productName} />
+
           <DataRow label="Barcode" value={barcode} />
           <DataRow label="Batch no" value={batchNumber} />
           <DataRow label="Expiry date" value={formatDate(expiryDate, true)} />
@@ -95,37 +90,15 @@ const StockEntryCard = ({ data }) => {
         </View>
       )}
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: 10,
-        }}
-      >
-        <View>
-          <Text style={{ fontWeight: 600, fontSize: 12 }}>
-            Restock by:{" "}
-            <Text style={{ fontWeight: 300, fontSize: 12 }}>
-              {createdByFullName}
-            </Text>
-          </Text>
-        </View>
-
-        <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
-          {expanded && (
-            <ChipButton2
-              onPress={() => navigation?.navigate(STOCK_ENTRY_FORM, data)}
-              title={"Edit"}
-              darkMode={false}
-            />
-          )}
-          <ChipButton2
-            onPress={toggleExpand}
-            title={expanded ? "Hide" : "More"}
-          />
-        </View>
-      </View>
+      <CardFooter
+        restocked
+        label={createdByFullName}
+        btnTitle1={expanded ? "Edit" : null}
+        btnTitle2={expanded ? "Hide" : "More"}
+        onClick1={() => navigation?.navigate(STOCK_ENTRY_FORM, data)}
+        darkMode={false}
+        onClick2={toggleExpand}
+      />
     </View>
   );
 };

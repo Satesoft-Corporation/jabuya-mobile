@@ -23,7 +23,7 @@ const ShopSummary = ({ navigation, route }) => {
   const [totalSalesValue, setTotalSalesValue] = useState(null); //cash at hand
   const [financialRecords, setFinancialRecords] = useState(null);
 
-  const { userParams } = useContext(UserContext);
+  const { userParams, selectedShop } = useContext(UserContext);
 
   const { shopOwnerId } = userParams;
 
@@ -141,7 +141,7 @@ const ShopSummary = ({ navigation, route }) => {
                   fontSize: 10,
                 }}
               >
-                UGX
+                {selectedShop?.currency}
               </Text>{" "}
               {formatNumberWithCommas(initialCapital)}
             </Text>

@@ -5,6 +5,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from "./Icon";
 import { TouchableOpacity } from "react-native";
 import { toReadableDate } from "../utils/Utils";
+import { scale } from "react-native-size-matters";
 
 const MyInput = ({
   onValueChange,
@@ -18,6 +19,8 @@ const MyInput = ({
   multiline = false,
   value,
   dateValue = new Date(),
+  maximumDate = false,
+  minimumDate = false,
   onDateChange,
   darkMode = false,
   boldLabel = false,
@@ -30,7 +33,7 @@ const MyInput = ({
   };
 
   return (
-    <View style={[{ gap: 5 }, style]}>
+    <View style={[{ gap: 5, flex: 1, maxHeight: 70 }, style]}>
       {label !== "" && (
         <Text
           style={{
@@ -53,7 +56,7 @@ const MyInput = ({
           borderWidth: 0.6,
           borderColor: darkMode ? Colors.primary : Colors.dark,
           paddingHorizontal: 10,
-          justifyContent:'space-between'
+          justifyContent: "space-between",
         }}
       >
         <TextInput
@@ -69,6 +72,7 @@ const MyInput = ({
             color: darkMode ? Colors.primary : Colors.dark,
             textAlign: inputMode === "numeric" ? "right" : "left",
             flex: 1,
+            fontSize: scale(12.5),
           }}
         />
 
@@ -83,6 +87,9 @@ const MyInput = ({
                 value={dateValue}
                 mode={"date"}
                 onChange={onChange}
+                style={{ fontSize: 10 }}
+                maximumDate={maximumDate ? new Date() : null}
+                minimumDate={minimumDate ? new Date() : null}
               />
             )}
           </>
@@ -92,4 +99,4 @@ const MyInput = ({
   );
 };
 
-export default memo(MyInput);
+export default MyInput;

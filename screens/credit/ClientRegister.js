@@ -4,37 +4,29 @@ import TopHeader from "../../components/TopHeader";
 import Colors from "../../constants/Colors";
 import { UserContext } from "../../context/UserContext";
 import AppStatusBar from "../../components/AppStatusBar";
-import { BaseApiService } from "../../utils/BaseApiService";
 import { ActivityIndicator } from "react-native";
 import ShopClient from "./components/ShopClient";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
 const ClientRegister = () => {
   const { selectedShop } = useContext(UserContext);
 
   const [clients, setClients] = useState([]);
   const [message, setMessage] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [offset, setOffset] = useState(0);
   const [showFooter, setShowFooter] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
 
-  const fetchClients = () => {
+  const fetchClients = async () => {
     setShowFooter(true);
     setMessage(null);
+    const { name, id } = selectedShop;
 
-    const serachParams = {
-      shopId: selectedShop?.id,
-      limit: 0,
-      offset: 0,
-    };
-
-    new BaseApiService("/clients-controller")
-      .getRequestWithJsonResponse(serachParams)
+    await UserSessionUtils.getShopClients(name?.includes("All") ? null : id)
       .then((response) => {
-        setClients(response.records);
-        setTotalItems(response.totalItems);
+        setClients(response);
+        setTotalItems(response.length);
 
-        if (response?.totalItems === 0) {
+        if (response?.length === 0) {
           setMessage("No shop clients found");
           setShowFooter(false);
         }

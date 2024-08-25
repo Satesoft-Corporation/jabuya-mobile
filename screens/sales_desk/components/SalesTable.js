@@ -1,8 +1,8 @@
 import { View, Text, ScrollView } from "react-native";
 import React from "react";
-import Colors from "../../../constants/Colors";
-import { screenHeight } from "../../../constants/Constants";
-import { formatNumberWithCommas } from "../../../utils/Utils";
+import Colors from "@constants/Colors";
+import { screenHeight } from "@constants/Constants";
+import { formatNumberWithCommas } from "@utils/Utils";
 
 const SalesTable = ({ sales = [], fixHeight = true }) => {
   return (
@@ -34,7 +34,7 @@ const SalesTable = ({ sales = [], fixHeight = true }) => {
         style={
           fixHeight
             ? {
-                height: screenHeight / 4,
+                height: screenHeight / 3,
               }
             : {
                 maxHeight: screenHeight / 4,
@@ -49,11 +49,12 @@ const SalesTable = ({ sales = [], fixHeight = true }) => {
   );
 };
 
-export const SaleListItem = ({ data }) => {
+const SaleListItem = ({ data }) => {
   // table item on sales entry
   const { productName, shopProductName, saleUnitName } = data;
 
   let unitName = saleUnitName ? " - " + saleUnitName : "";
+
   return (
     <View
       key={productName}
@@ -67,16 +68,15 @@ export const SaleListItem = ({ data }) => {
         paddingVertical: 8,
       }}
     >
-      <Text style={{ flex: 2.5, justifyContent: "center" }}>
+      <Text style={{ flex: 2.5, justifyContent: "center" }} numberOfLines={2}>
         {productName || shopProductName + unitName}
       </Text>
       <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>
+
       <Text style={{ flex: 1, textAlign: "right" }}>
-        <Text style={{ fontSize: 8, fontWeight: 400 }}>UGX </Text>
         {formatNumberWithCommas(data?.unitCost)}
       </Text>
       <Text style={{ flex: 1, textAlign: "right", paddingEnd: 10 }}>
-        <Text style={{ fontSize: 8, fontWeight: 400 }}>UGX </Text>
         {formatNumberWithCommas(data?.totalCost)}
       </Text>
     </View>

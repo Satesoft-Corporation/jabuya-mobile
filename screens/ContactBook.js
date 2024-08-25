@@ -3,46 +3,35 @@ import {
   Text,
   SafeAreaView,
   FlatList,
-  ActivityIndicator,
   Image,
   Linking,
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import TopHeader from "../components/TopHeader";
-import AppStatusBar from "../components/AppStatusBar";
-import Colors from "../constants/Colors";
-import { UserSessionUtils } from "../utils/UserSessionUtils";
-import { BaseApiService } from "../utils/BaseApiService";
-import { userData } from "../context/UserContext";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
+import AppStatusBar from "@components/AppStatusBar";
+import TopHeader from "@components/TopHeader";
+import Colors from "@constants/Colors";
+import { userData } from "context/UserContext";
 
 const ContactBook = () => {
   const [clients, setClients] = useState([]);
   const [message, setMessage] = useState(null);
-  const [showFooter, setShowFooter] = useState(true);
-  const [totalItems, setTotalItems] = useState(0);
-  const { filterParams } = userData();
 
-  const fetchClients = () => {
-    const serachParams = {
-      ...filterParams(),
-      limit: 0,
-      offset: 0,
-    };
-    new BaseApiService("/clients-controller")
-      .getRequestWithJsonResponse(serachParams)
-      .then(async (response) => {
-        setClients(response.records);
-        setTotalItems(response.totalItems);
-        if (response?.totalItems === 0) {
+  const { selectedShop } = userData();
+
+  const fetchClients = async () => {
+    const { name, id } = selectedShop;
+    await UserSessionUtils.getShopClients(name?.includes("All") ? null : id)
+      .then((response) => {
+        setClients(response);
+
+        if (response?.length === 0) {
           setMessage("No shop clients found");
-          setShowFooter(false);
         }
       })
-      .catch(async (error) => {
-        let clients = await UserSessionUtils.getShopClients();
-        setClients(clients);
-        setTotalItems(clients.length);
+      .catch((error) => {
+        setMessage("Error fetching shop clients");
       });
   };
 
@@ -50,19 +39,6 @@ const ContactBook = () => {
     fetchClients();
   }, []);
 
-  const renderFooter = () => {
-    if (showFooter === true) {
-      if (clients.length === totalItems && clients.length > 0) {
-        return null;
-      }
-
-      return (
-        <View style={{ paddingVertical: 20 }}>
-          <ActivityIndicator animating size="large" color={Colors.dark} />
-        </View>
-      );
-    }
-  };
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <AppStatusBar />
@@ -83,8 +59,6 @@ const ContactBook = () => {
               {clients === 0 && <Text>{message}</Text>}
             </View>
           )}
-          ListFooterComponent={renderFooter}
-          onEndReachedThreshold={0}
         />
       </View>
     </SafeAreaView>
