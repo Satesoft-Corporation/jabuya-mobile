@@ -2,7 +2,6 @@ import { View, SafeAreaView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { FlatList } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { userData } from "../../context/UserContext";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import { getTimeDifference } from "@utils/Utils";
 import Loader from "@components/Loader";
@@ -12,7 +11,15 @@ import Colors from "@constants/Colors";
 import { navList } from "./navList";
 import { COMING_SOON } from "@navigation/ScreenNames";
 import LockScreenModal from "@screens/applock/LockScreenModal";
-import { getRefreshToken } from "@controllers/OfflineControllers";
+import {
+  getRefreshToken,
+  saveShopDetails,
+} from "@controllers/OfflineControllers";
+import { userData } from "context/UserContext";
+import { useSelector } from "react-redux";
+import { getOfflineParams } from "reducers/selectors";
+import { useDispatch } from "react-redux";
+import { setShops } from "actions";
 
 const LandingScreen = () => {
   const { getShopsFromStorage, configureUserData, shops } = userData();
@@ -21,6 +28,8 @@ const LandingScreen = () => {
   const [showLock, setShowLock] = useState(false);
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const offlineParams = useSelector(getOfflineParams);
 
   const logOut = async () => {
     setLoading(false);
@@ -39,10 +48,10 @@ const LandingScreen = () => {
   };
 
   const handlePinLockStatus = async () => {
-    let prevPinTime = await UserSessionUtils.getPinLoginTime(); //time when app lock was last used
+    const prevPinTime = await UserSessionUtils.getPinLoginTime(); //time when app lock was last used
 
     if (prevPinTime !== null) {
-      let pintimeDiff = getTimeDifference(prevPinTime, new Date());
+      const pintimeDiff = getTimeDifference(prevPinTime, new Date());
       if (pintimeDiff.minutes >= 10) {
         setShowLock(true);
       }
@@ -50,7 +59,7 @@ const LandingScreen = () => {
   };
 
   const handleLoginSession = async () => {
-    await configureUserData(false); //configuring up the usercontext
+    await handlePinLockStatus();
 
     const prevLoginTime = await UserSessionUtils.getLoginTime();
 
@@ -58,12 +67,14 @@ const LandingScreen = () => {
 
     const { days, hours } = logintimeDifferance;
 
-    await handlePinLockStatus();
-    await getShopsFromStorage();
-
     if (hours >= 10 || days >= 1) {
       await getRefreshToken();
     }
+
+    await configureUserData(false); //configuring up the usercontext
+
+    await getShopsFromStorage();
+
     console.log("login time", logintimeDifferance);
     setLoading(false);
   };
@@ -73,6 +84,10 @@ const LandingScreen = () => {
       .then(async (data) => {
         if (data) {
           await UserSessionUtils.setLastOpenTime(String(new Date()));
+          const shops = await saveShopDetails(offlineParams, true);
+
+          dispatch(setShops(shops));
+          console.log(s);
           await handleLoginSession();
         } else {
           logOut();

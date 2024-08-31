@@ -1,5 +1,4 @@
 import {
-  saveCurrencies,
   saveShopClients,
   saveShopDetails,
   saveShopProductsOnDevice,
@@ -77,8 +76,6 @@ export const UserProvider = ({ children }) => {
             attendantShopId,
             shopOwnerId,
           });
-
-          await saveCurrencies();
 
           setSessionObj({
             fullName: firstName + " " + lastName,

@@ -8,6 +8,8 @@ import { UserContext } from "../context/UserContext";
 import PopUpmenu from "./PopUpMenu";
 import { SETTINGS } from "../navigation/ScreenNames";
 import { scale } from "react-native-size-matters";
+import { useSelector } from "react-redux";
+import { getUserData, getUserType } from "reducers/selectors";
 
 const UserProfile = ({
   renderNtnIcon = true,
@@ -18,9 +20,10 @@ const UserProfile = ({
   const [shops, setShops] = useState(null);
   const navigation = useNavigation();
 
-  const { sessionObj, selectedShop } = useContext(UserContext);
+  const { selectedShop } = useContext(UserContext);
 
-  const { role, fullName } = { ...sessionObj };
+  const sessionObj = useSelector(getUserData);
+  const userType = useSelector(getUserType);
 
   useEffect(() => {
     UserSessionUtils.getShopCount().then((count) => {
@@ -72,7 +75,7 @@ const UserProfile = ({
               fontSize: scale(13),
             }}
           >
-            {fullName}
+            {sessionObj?.fullName}
           </Text>
           <Text
             style={{
@@ -81,7 +84,7 @@ const UserProfile = ({
               fontSize: scale(11),
             }}
           >
-            {role}
+            {userType}
           </Text>
           <Text
             style={{

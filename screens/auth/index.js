@@ -12,6 +12,8 @@ import Colors from "@constants/Colors";
 import DisplayMessage from "@components/Dialogs/DisplayMessage";
 import { LANDING_SCREEN } from "@navigation/ScreenNames";
 import { ScrollView } from "react-native";
+import { useDispatch } from "react-redux";
+import { changeUser, loginAction } from "actions";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -21,6 +23,7 @@ export default function Login() {
   const [message, setMessage] = useState(null);
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const date = new Date();
 
@@ -43,6 +46,9 @@ export default function Login() {
           await UserSessionUtils.setLoginTime(String(date));
           await UserSessionUtils.resetPendingSales();
           await UserSessionUtils.setLoginDetails(loginInfo);
+
+          dispatch(loginAction(true));
+          dispatch(changeUser(response.user));
           navigation.dispatch(StackActions.replace(LANDING_SCREEN));
 
           setDisabled(false);

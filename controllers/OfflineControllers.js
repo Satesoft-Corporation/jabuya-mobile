@@ -126,27 +126,20 @@ export const saveShopClients = async (params, refresh = false) => {
   return saved;
 };
 
-export const saveShopDetails = async (
-  isShopOwner,
-  shopOwnerId,
-  refresh = false
-) => {
+export const saveShopDetails = async (searchParameters, refresh = false) => {
   let saved = false;
-
-  const searchParameters = {
-    limit: 0,
-    offset: 0,
-    ...(isShopOwner === true && { shopOwnerId: shopOwnerId }),
-  };
+  let shopsArray = [];
   const shops = await UserSessionUtils.getShopCount();
 
   if (!shops || refresh === true) {
     console.log("Saving shops");
+    saveCurrencies();
     await new BaseApiService(SHOP_ENDPOINT)
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         await UserSessionUtils.setShopCount(String(response.totalItems));
         await UserSessionUtils.setShops(response.records);
+        shopsArray = [...response.records];
         saved = true;
       })
       .catch((error) => {
@@ -154,7 +147,8 @@ export const saveShopDetails = async (
       });
   }
 
-  return saved;
+  // return saved;
+  return shopsArray;
 };
 
 export const saveClientSalesOnDevice = async (searchParameters) => {
