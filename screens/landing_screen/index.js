@@ -12,28 +12,66 @@ import { navList } from "./navList";
 import { COMING_SOON } from "@navigation/ScreenNames";
 import LockScreenModal from "@screens/applock/LockScreenModal";
 import {
-  getRefreshToken,
   saveShopDetails,
+  saveShopProductsOnDevice,
 } from "@controllers/OfflineControllers";
-import { userData } from "context/UserContext";
 import { useSelector } from "react-redux";
-import { getOfflineParams } from "reducers/selectors";
+import {
+  getConfigureStatus,
+  getLastApplockTime,
+  getLastLoginTime,
+  getOfflineParams,
+} from "reducers/selectors";
 import { useDispatch } from "react-redux";
-import { setShops } from "actions";
+import {
+  changeUser,
+  loginAction,
+  setIsUserConfigured,
+} from "actions/userActions";
+import { useNetInfo } from "@react-native-community/netinfo";
+import { BaseApiService } from "@utils/BaseApiService";
+import { setShopProducts, setShops } from "actions/shopActions";
 
 const LandingScreen = () => {
-  const { getShopsFromStorage, configureUserData, shops } = userData();
-
   const [loading, setLoading] = useState(true);
   const [showLock, setShowLock] = useState(false);
 
   const navigation = useNavigation();
-  const dispatch = useDispatch();
-  const offlineParams = useSelector(getOfflineParams);
 
-  const logOut = async () => {
-    setLoading(false);
-    await UserSessionUtils.clearLocalStorageAndLogout(navigation);
+  const netInfo = useNetInfo();
+  const dispatch = useDispatch();
+
+  const offlineParams = useSelector(getOfflineParams);
+  const prevLoginTime = useSelector(getLastLoginTime);
+  const configStatus = useSelector(getConfigureStatus);
+  const prevPinTime = useSelector(getLastApplockTime);
+
+  const getRefreshToken = async () => {
+    const loginInfo = await UserSessionUtils.getLoginDetails();
+    if (loginInfo) {
+      await new BaseApiService(LOGIN_END_POINT)
+        .saveRequestWithJsonResponse(loginInfo, false)
+        .then(async (response) => {
+          await UserSessionUtils.setUserAuthToken(response.accessToken);
+          await UserSessionUtils.setUserRefreshToken(response.refreshToken);
+          dispatch(loginAction(true));
+          dispatch(changeUser(response.user));
+          console.log("token refreshed");
+        });
+    }
+  };
+
+  const configureUserData = async (refresh = false) => {
+    if (refresh === true) {
+      const shops = await saveShopDetails(offlineParams, refresh);
+      const products = await saveShopProductsOnDevice(offlineParams, refresh);
+
+      dispatch(setShops(shops));
+
+      dispatch(setShopProducts(products));
+
+      dispatch(setIsUserConfigured(true));
+    }
   };
 
   const handleTabPress = (item) => {
@@ -48,8 +86,6 @@ const LandingScreen = () => {
   };
 
   const handlePinLockStatus = async () => {
-    const prevPinTime = await UserSessionUtils.getPinLoginTime(); //time when app lock was last used
-
     if (prevPinTime !== null) {
       const pintimeDiff = getTimeDifference(prevPinTime, new Date());
       if (pintimeDiff.minutes >= 10) {
@@ -60,57 +96,39 @@ const LandingScreen = () => {
 
   const handleLoginSession = async () => {
     await handlePinLockStatus();
+    setLoading(true);
 
-    const prevLoginTime = await UserSessionUtils.getLoginTime();
+    if (prevLoginTime !== null) {
+      const logintimeDifferance = getTimeDifference(
+        new Date(prevLoginTime),
+        new Date()
+      );
 
-    const logintimeDifferance = getTimeDifference(prevLoginTime, new Date());
+      const { days, hours } = logintimeDifferance;
 
-    const { days, hours } = logintimeDifferance;
+      console.log("login time", logintimeDifferance);
 
-    if (hours >= 10 || days >= 1) {
-      await getRefreshToken();
+      // if (netInfo.isInternetReachable === true) {
+
+      await configureUserData(configStatus === false);
+
+      if (hours >= 13 || days >= 1) {
+        await getRefreshToken();
+        await configureUserData(true);
+      }
     }
-
-    await configureUserData(false); //configuring up the usercontext
-
-    await getShopsFromStorage();
-
-    console.log("login time", logintimeDifferance);
+    // }
     setLoading(false);
   };
 
-  const startTheApp = async () => {
-    await UserSessionUtils.getUserDetails()
-      .then(async (data) => {
-        if (data) {
-          await UserSessionUtils.setLastOpenTime(String(new Date()));
-          const shops = await saveShopDetails(offlineParams, true);
-
-          dispatch(setShops(shops));
-          console.log(s);
-          await handleLoginSession();
-        } else {
-          logOut();
-          return true;
-        }
-      })
-      .catch((e) => {
-        setLoading(false);
-      });
-  };
-
   useEffect(() => {
-    startTheApp();
+    handleLoginSession();
   }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <Loader loading={loading} />
-      <UserProfile
-        renderMenu={shops?.length > 1}
-        renderNtnIcon={false}
-        showShops
-      />
+      <UserProfile renderNtnIcon={false} showShops />
 
       <LockScreenModal
         showLock={showLock}

@@ -1,12 +1,23 @@
 export const LOGIN_ACTION = "LOGIN";
-
 export const CHANGE_USER = "CHANGE_USER";
 export const CHANGE_USER_TYPE = "CHANGE_USER_TYPE";
-
+export const SET_APPLOCK_TIME = "SET_APPLOCK_TIME";
+export const SET_IS_USER_CONFIGURED = "SET_IS_USER_CONFIGURED";
 export const CHANGE_SELECTED_SHOP = "CHANGE_SELECTED_SHOP";
 export const SET_SHOPS = "SET_SHOPS";
+export const SET_USER_PIN_CODE = "SET_USER_PIN_CODE";
 
 //cart
+
+export const SET_SHOP_PRODUCTS = "SET_SHOP_PRODUCTS";
+
+export const ADD_OFFLINE_SALE = "ADD_OFFLINE_SALE";
+export const REMOVE_OFFLINE_SALE = "REMOVE_OFFLINE_SALE";
+
+export const ADD_SHOP_CLIENTS = "ADD_SHOP_CLIENTS";
+
+export const ADD_CLIENT_SALES = "ADD_CLIENT_SALES";
+
 export const ADD_TO_CART = "ADD_TO_CART";
 export const REMOVE_FROM_CART = "REMOVE_FROM_CART";
 export const CLEAR_CART = "CLEAR_CART";

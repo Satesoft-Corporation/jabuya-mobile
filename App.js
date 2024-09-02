@@ -33,6 +33,7 @@ import Entries from "@screens/entries";
 import AppStatusBar from "@components/AppStatusBar";
 import { Provider } from "react-redux";
 import { store } from "store";
+import LoadingScreen from "@screens/landing_screen/LoadingScreen";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -49,6 +50,8 @@ export default function App() {
                   headerShown: false,
                 }}
               >
+                <Stack.Screen name={"Loading"} component={LoadingScreen} />
+
                 <Stack.Screen
                   name={s.LANDING_SCREEN}
                   component={LandingScreen}

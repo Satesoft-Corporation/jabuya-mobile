@@ -22,16 +22,23 @@ export const changeUserType = (type) => {
   };
 };
 
-export const setShops = (shops) => {
+export const setUserPinCode = (code) => {
   return {
-    type: actionTypes.SET_SHOPS,
-    payload: shops,
+    type: actionTypes.SET_USER_PIN_CODE,
+    payload: code,
   };
 };
 
-export const changeShop = (shop) => {
+export const setApplockTime = (timeStamp) => {
   return {
-    type: actionTypes.CHANGE_SELECTED_SHOP,
-    payload: shop,
+    type: actionTypes.SET_APPLOCK_TIME,
+    payload: timeStamp,
+  };
+};
+
+export const setIsUserConfigured = (bool) => {
+  return {
+    type: actionTypes.SET_IS_USER_CONFIGURED,
+    payload: bool,
   };
 };

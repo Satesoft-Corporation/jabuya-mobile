@@ -3,13 +3,14 @@ import * as actions from "actions/actionTypes";
 
 const initialState = {
   isLoggedIn: false,
+  dataConfigured: false,
+  lastLoginTime: null,
   user: {},
   userType: null,
   attendantShopId: null,
   shopOwnerId: null,
   userPincode: null,
-  shops: [],
-  selectedShop: null,
+  lastApplockTime: null,
   offlineParams: {},
 };
 
@@ -38,6 +39,7 @@ const userReduer = (state = initialState, action) => {
         user: { ...action.payload, fullName: firstName + " " + lastName },
         attendantShopId: attendantShopId,
         shopOwnerId: shopOwnerId,
+        lastLoginTime: String(new Date()),
         offlineParams: {
           offset: 0,
           limit: 10000,
@@ -55,17 +57,24 @@ const userReduer = (state = initialState, action) => {
       };
     }
 
-    case actions.SET_SHOPS: {
+    case actions.SET_USER_PIN_CODE: {
       return {
         ...state,
-        shops: action.payload,
+        userPincode: action.payload,
       };
     }
 
-    case actions.CHANGE_SELECTED_SHOP: {
+    case actions.SET_APPLOCK_TIME: {
       return {
         ...state,
-        selectedShop: action.payload,
+        lastApplockTime: action.payload,
+      };
+    }
+
+    case actions.SET_IS_USER_CONFIGURED: {
+      return {
+        ...state,
+        dataConfigured: action.payload,
       };
     }
 

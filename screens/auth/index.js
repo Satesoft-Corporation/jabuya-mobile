@@ -13,7 +13,8 @@ import DisplayMessage from "@components/Dialogs/DisplayMessage";
 import { LANDING_SCREEN } from "@navigation/ScreenNames";
 import { ScrollView } from "react-native";
 import { useDispatch } from "react-redux";
-import { changeUser, loginAction } from "actions";
+import { changeUser, loginAction } from "actions/userActions";
+import { screenWidth } from "@constants/Constants";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -77,7 +78,7 @@ export default function Login() {
           width: 100,
           resizeMode: "contain",
           alignSelf: "center",
-          marginTop: 20,
+          marginTop: screenWidth / 4,
         }}
       />
 

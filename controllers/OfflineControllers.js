@@ -3,7 +3,6 @@ import {
   CLIENTS_ENDPOINT,
   CLIENT_SALES_ENDPOINT,
   CURRENCIES_ENDPOINT,
-  LOGIN_END_POINT,
   SHOP_ENDPOINT,
   SHOP_PRODUCTS_ENDPOINT,
   SHOP_SALES_ENDPOINT,
@@ -15,15 +14,18 @@ export const saveCurrencies = async () => {
     limit: 0,
     offset: 0,
   };
-
+  let currencies = [];
   await new BaseApiService(CURRENCIES_ENDPOINT)
     .getRequestWithJsonResponse(searchParameters)
     .then(async (response) => {
       await UserSessionUtils.setCurrencies(response?.records);
+      currencies = [...response?.records];
     })
     .catch((error) => {
       console.error(error, "currencies");
     });
+
+  return currencies;
 };
 
 export const resolveUnsavedSales = async () => {
@@ -71,7 +73,7 @@ export const saveShopProductsOnDevice = async (
   searchParameters,
   refresh = false //to get updated data
 ) => {
-  let saved = false;
+  let pdts = [];
   const currentPdts = await UserSessionUtils.getShopProducts();
 
   if (currentPdts.length === 0 || refresh === true) {
@@ -80,22 +82,16 @@ export const saveShopProductsOnDevice = async (
     await new BaseApiService(SHOP_PRODUCTS_ENDPOINT)
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
+        pdts = [...response.records];
         await UserSessionUtils.setShopProducts(response.records); //to keep updating the list locally
-        saved = true;
         console.log("products saved");
       })
       .catch((error) => {
         console.log("Unknown Error", error?.message);
-        if (currentPdts.length === 0) {
-          saved = false;
-        }
       });
   }
 
-  if (currentPdts.length > 0) {
-    saved = true;
-  }
-  return saved;
+  return pdts;
 };
 
 export const saveShopClients = async (params, refresh = false) => {
@@ -126,21 +122,31 @@ export const saveShopClients = async (params, refresh = false) => {
   return saved;
 };
 
-export const saveShopDetails = async (searchParameters, refresh = false) => {
-  let saved = false;
+export const saveShopDetails = async (searchParameters, callApi = false) => {
   let shopsArray = [];
   const shops = await UserSessionUtils.getShopCount();
 
-  if (!shops || refresh === true) {
+  if (!shops || callApi === true) {
     console.log("Saving shops");
-    saveCurrencies();
+    const currencyList = await saveCurrencies();
     await new BaseApiService(SHOP_ENDPOINT)
       .getRequestWithJsonResponse(searchParameters)
       .then(async (response) => {
         await UserSessionUtils.setShopCount(String(response.totalItems));
         await UserSessionUtils.setShops(response.records);
-        shopsArray = [...response.records];
-        saved = true;
+
+        const finalList = response.records?.map((item) => {
+          const currency = currencyList?.find(
+            (cur) => cur?.id === item?.currencyId
+          );
+
+          return {
+            ...item,
+            currency: currency?.symbol || "",
+          };
+        });
+
+        shopsArray = [...finalList];
       })
       .catch((error) => {
         saved = false;
@@ -195,22 +201,4 @@ export const saveClientSalesOnDevice = async (searchParameters) => {
     .catch((error) => {
       console.log("Unknown Error", error?.message);
     });
-};
-
-/**
- * Getting new access token for the user
- */
-export const getRefreshToken = async () => {
-  const loginInfo = await UserSessionUtils.getLoginDetails();
-  console.log("Getting refresh token");
-  if (loginInfo) {
-    await new BaseApiService(LOGIN_END_POINT)
-      .saveRequestWithJsonResponse(loginInfo, false)
-      .then(async (response) => {
-        await UserSessionUtils.setUserAuthToken(response.accessToken);
-        await UserSessionUtils.setUserRefreshToken(response.refreshToken);
-        await UserSessionUtils.setLoginTime(String(new Date()));
-        console.log("token refreshed");
-      });
-  }
 };
