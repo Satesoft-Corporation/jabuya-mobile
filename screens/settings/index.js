@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native";
 import Constants from "expo-constants";
 import { Switch } from "react-native-paper";
-import { userData } from "context/UserContext";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
@@ -14,17 +13,15 @@ import DisplayMessage from "@components/Dialogs/DisplayMessage";
 import { LOCK_SETuP, OFFLINE_SALES } from "@navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "@components/Icon";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserData, getUserPinCode, getUserType } from "reducers/selectors";
+import {
+  logOutAction,
+  setApplockTime,
+  setUserPinCode,
+} from "actions/userActions";
 
 const Settings = () => {
-  const {
-    hasUserSetPinCode,
-    sessionObj,
-    logInWithPin,
-    setLoginWithPin,
-    getAppLockStatus,
-    resetAll,
-  } = userData();
-
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
   const [agreeText, setAgreeText] = useState(null);
@@ -33,14 +30,17 @@ const Settings = () => {
 
   const navigation = useNavigation();
 
-  const onToggleSwitch = async () => {
-    setLoginWithPin(!logInWithPin);
+  const dispatch = useDispatch();
+  const userPincode = useSelector(getUserPinCode);
+  const sessionObj = useSelector(getUserData);
+  const userType = useSelector(getUserType);
 
-    if (hasUserSetPinCode === false) {
+  const onToggleSwitch = async () => {
+    if (userPincode === null) {
       navigation.navigate(LOCK_SETuP);
     } else {
-      await UserSessionUtils.removeUserPinCode();
-      await getAppLockStatus();
+      dispatch(setUserPinCode(null));
+      dispatch(setApplockTime(null));
     }
   };
 
@@ -48,7 +48,7 @@ const Settings = () => {
     if (pendingSales > 0) {
       navigation.navigate(OFFLINE_SALES);
     } else {
-      resetAll();
+      dispatch(logOutAction());
       await UserSessionUtils.clearLocalStorageAndLogout(navigation);
     }
   };
@@ -124,7 +124,7 @@ const Settings = () => {
               color: Colors.primary,
             }}
           >
-            {sessionObj?.role}
+            {userType}
           </Text>
         </View>
       </View>
@@ -163,7 +163,7 @@ const Settings = () => {
               renderRight={() => (
                 <Switch
                   style={{ height: 20 }}
-                  value={logInWithPin}
+                  value={userPincode !== null}
                   onValueChange={onToggleSwitch}
                   color="#000"
                 />

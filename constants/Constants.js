@@ -20,3 +20,5 @@ export const userTypes = {
   isShopAttendant: "Shop Attendant",
   isSuperAdmin: "Super Admin",
 };
+
+export const ALL_SHOPS_LABEL = "All Shops";

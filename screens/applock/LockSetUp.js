@@ -2,11 +2,11 @@ import { Text, SafeAreaView } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import ReactNativePinView from "react-native-pin-view";
 import { useNavigation } from "@react-navigation/native";
-import { userData } from "context/UserContext";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
 import Colors from "@constants/Colors";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import Icon from "@components/Icon";
+import { useDispatch } from "react-redux";
+import { setApplockTime, setUserPinCode } from "actions/userActions";
 
 const LockSetUp = () => {
   const [lockText, setLockText] = useState("Set pin code");
@@ -15,18 +15,17 @@ const LockSetUp = () => {
   const [enteredPin, setEnteredPin] = useState("");
   const [showCompletedButton, setShowCompletedButton] = useState(false);
 
-  const { getAppLockStatus } = userData();
-
   const pinLength = 5;
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const onConfirmPin = async () => {
     if (showCompletedButton) {
-      await UserSessionUtils.setUserPinCode(enteredPin);
-      await getAppLockStatus();
+      dispatch(setUserPinCode(enteredPin));
 
-      await UserSessionUtils.setPinLoginTime(String(new Date()));
+      dispatch(setApplockTime(String(new Date())));
+
       navigation.goBack();
       return true;
     }

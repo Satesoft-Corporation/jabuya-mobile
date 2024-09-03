@@ -76,9 +76,9 @@ export const SalesDropdownComponent = ({
             style={{
               width: 35,
               height: 30,
-              tintColor: Colors.primary,
               alignSelf: "center",
             }}
+            tintColor={Colors.primary}
           />
         </TouchableOpacity>
       </View>

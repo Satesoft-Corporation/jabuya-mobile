@@ -2,12 +2,13 @@ import { Text, SafeAreaView } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import { Image } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
-import { userData } from "context/UserContext";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
 import Colors from "@constants/Colors";
 import Modal from "react-native-modal";
 import ReactNativePinView from "react-native-pin-view";
 import Icon from "@components/Icon";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserPinCode } from "reducers/selectors";
+import { setApplockTime } from "actions/userActions";
 
 const LockScreenModal = ({ showLock = false, hideLock = () => {} }) => {
   const [errorText, setErrorText] = useState(null);
@@ -17,12 +18,13 @@ const LockScreenModal = ({ showLock = false, hideLock = () => {} }) => {
   const [enteredPin, setEnteredPin] = useState("");
   const [hasFP, setHasFp] = useState(false);
 
-  const { getAppLockStatus, userPincode } = userData();
+  const userPincode = useSelector(getUserPinCode);
+  const dispatch = useDispatch();
 
   const pinLength = 5;
+
   const logTheUserIn = async () => {
-    await UserSessionUtils.setPinLoginTime(String(new Date()));
-    await getAppLockStatus();
+    dispatch(setApplockTime(String(new Date())));
     hideLock();
   };
 

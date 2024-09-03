@@ -42,3 +42,9 @@ export const setIsUserConfigured = (bool) => {
     payload: bool,
   };
 };
+
+export const logOutAction = () => {
+  return {
+    type: actionTypes.LOG_OUT,
+  };
+};

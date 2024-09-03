@@ -221,9 +221,9 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.dark,
                 marginEnd: 10,
               }}
+              tintColor={Colors.dark}
             />
 
             <View>
@@ -264,9 +264,9 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.dark,
                 marginEnd: 10,
               }}
+              tintColor={Colors.dark}
             />
 
             <View>
@@ -318,9 +318,9 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.dark,
                 marginEnd: 10,
               }}
+              tintColor={Colors.dark}
             />
 
             <View>
@@ -361,9 +361,9 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.dark,
                 marginEnd: 10,
               }}
+              tintColor={Colors.dark}
             />
 
             <View>
@@ -406,9 +406,9 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.dark,
                 marginEnd: 10,
               }}
+              tintColor={Colors.dark}
             />
             <View>
               <Text style={{ fontWeight: 400, fontSize: 16 }}>
@@ -444,9 +444,9 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.dark,
                 marginEnd: 10,
               }}
+              tintColor={Colors.dark}
             />
             <View>
               <Text style={{ fontWeight: 400, fontSize: 16 }}>Expenses</Text>
@@ -480,9 +480,9 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.primary,
                 marginEnd: 10,
               }}
+              tintColor={Colors.primary}
             />
             <View>
               <Text

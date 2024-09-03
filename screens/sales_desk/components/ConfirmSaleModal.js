@@ -18,14 +18,19 @@ import ModalContent from "@components/ModalContent";
 import Colors from "@constants/Colors";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import DataRow from "@components/card_components/DataRow";
+import { useSelector } from "react-redux";
+import { getCart, getSelectedShop, getShopClients } from "reducers/selectors";
+import { clearCart } from "actions/shopActions";
 
-const ConfirmSaleModal = ({
-  setVisible,
-  snackbarRef,
-  visible,
-  clients,
-  onComplete,
-}) => {
+const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
+  const clients = useSelector(getShopClients);
+  const selectedShop = useSelector(getSelectedShop);
+  const cart = useSelector(getCart);
+
+  const clearEverything = () => dispatch(clearCart());
+
+  const { cartItems, totalCartCost, recievedAmount, totalQty } = cart;
+
   const [submitted, setSubmitted] = useState(false);
   const [soldOnDate, setSoldOnDate] = useState(new Date());
   const [amountPaid, setAmountPaid] = useState("");
@@ -34,20 +39,12 @@ const ConfirmSaleModal = ({
   const [clientName, setClientName] = useState("");
   const [clientNumber, setClientNumber] = useState("");
 
-  const { userParams, selectedShop } = useContext(UserContext);
+  const { userParams } = useContext(UserContext);
 
   const netinfo = useNetInfo();
 
-  const {
-    selections,
-    recievedAmount,
-    totalCost,
-    clearEverything,
-    totalQty,
-    selectedPaymentMethod,
-    setLoading,
-    setSelectedPaymentMethod,
-  } = useContext(SaleEntryContext);
+  const { selectedPaymentMethod, setLoading, setSelectedPaymentMethod } =
+    useContext(SaleEntryContext);
 
   const { isShopAttendant, attendantShopId, isShopOwner, shopOwnerId } =
     userParams;
@@ -77,7 +74,7 @@ const ConfirmSaleModal = ({
       id: null,
       shopId: isShopAttendant ? attendantShopId : selectedShop?.id,
       amountPaid: onCredit ? Number(amountPaid) : Number(recievedAmount),
-      lineItems: selections,
+      lineItems: cartItems,
       paymentMode: selectedPaymentMethod?.id,
       onCredit: onCredit,
       soldOnDate: convertToServerDate(soldOnDate),
@@ -143,7 +140,7 @@ const ConfirmSaleModal = ({
 
   const validate = () => {
     setError(null);
-    const isValidAmount = Number(recievedAmount) >= totalCost;
+    const isValidAmount = Number(recievedAmount) >= totalCartCost;
     let isValid = true;
     if (selectedPaymentMethod?.id === 0) {
       if (!isValidNumber(recievedAmount)) {
@@ -156,7 +153,7 @@ const ConfirmSaleModal = ({
         setError(
           `Recieved amount should not be less than ${
             selectedShop?.currency
-          }${formatNumberWithCommas(totalCost)}`
+          }${formatNumberWithCommas(totalCartCost)}`
         );
         isValid = false;
         return;
@@ -222,7 +219,7 @@ const ConfirmSaleModal = ({
         <Text>Currency : {selectedShop?.currency}</Text>
       </View>
 
-      <SalesTable sales={selections} fixHeight={false} />
+      <SalesTable sales={cartItems} fixHeight={false} />
 
       <DataRow
         label={"Recieved"}
@@ -234,13 +231,13 @@ const ConfirmSaleModal = ({
         label={`Sold ${
           totalQty > 1 ? `${totalQty} items` : `${totalQty} item`
         }`}
-        value={formatNumberWithCommas(totalCost)}
+        value={formatNumberWithCommas(totalCartCost)}
         currency={selectedShop?.currency}
       />
 
       <DataRow
         label={"Balance"}
-        value={formatNumberWithCommas(recievedAmount - totalCost)}
+        value={formatNumberWithCommas(recievedAmount - totalCartCost)}
         currency={selectedShop?.currency}
       />
 

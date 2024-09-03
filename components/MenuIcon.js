@@ -51,11 +51,11 @@ export function MenuIcon({
       >
         <Image
           source={icon.icon}
+          tintColor={Colors.dark}
           style={[
             {
               width: 35,
               height: 35,
-              tintColor: Colors.dark,
             },
             iconStyle,
           ]}

@@ -12,15 +12,22 @@ import { navList } from "./navList";
 import { COMING_SOON } from "@navigation/ScreenNames";
 import LockScreenModal from "@screens/applock/LockScreenModal";
 import {
+  saveClientSalesOnDevice,
+  saveShopClients,
   saveShopDetails,
   saveShopProductsOnDevice,
 } from "@controllers/OfflineControllers";
 import { useSelector } from "react-redux";
 import {
+  getAttendantShopId,
+  getAttendantShopName,
   getConfigureStatus,
   getLastApplockTime,
   getLastLoginTime,
   getOfflineParams,
+  getShopOwnerId,
+  getUserData,
+  getUserType,
 } from "reducers/selectors";
 import { useDispatch } from "react-redux";
 import {
@@ -30,10 +37,18 @@ import {
 } from "actions/userActions";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { BaseApiService } from "@utils/BaseApiService";
-import { setShopProducts, setShops } from "actions/shopActions";
+import {
+  changeSelectedShop,
+  setClientSales,
+  setShopClients,
+  setShopProducts,
+  setShops,
+} from "actions/shopActions";
+import { LOGIN_END_POINT } from "@utils/EndPointUtils";
+import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 
 const LandingScreen = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showLock, setShowLock] = useState(false);
 
   const navigation = useNavigation();
@@ -45,6 +60,10 @@ const LandingScreen = () => {
   const prevLoginTime = useSelector(getLastLoginTime);
   const configStatus = useSelector(getConfigureStatus);
   const prevPinTime = useSelector(getLastApplockTime);
+  const userType = useSelector(getUserType);
+  const attendantShopName = useSelector(getAttendantShopName);
+  const attendantShopId = useSelector(getAttendantShopId);
+  const shopOwnerId = useSelector(getShopOwnerId);
 
   const getRefreshToken = async () => {
     const loginInfo = await UserSessionUtils.getLoginDetails();
@@ -63,12 +82,36 @@ const LandingScreen = () => {
 
   const configureUserData = async (refresh = false) => {
     if (refresh === true) {
-      const shops = await saveShopDetails(offlineParams, refresh);
-      const products = await saveShopProductsOnDevice(offlineParams, refresh);
+      setLoading(true);
+      let shops = [];
 
+      if (userType === userTypes.isShopAttendant) {
+        shops = [{ name: attendantShopName, id: attendantShopId }];
+      }
+
+      if (userType !== userTypes.isShopAttendant) {
+        const shopData = await saveShopDetails(offlineParams);
+        if (shopData?.length > 1) {
+          shops = [{ name: ALL_SHOPS_LABEL, id: shopOwnerId }, ...shopData];
+        } else {
+          shops = [...shopData];
+        }
+      }
+
+      dispatch(changeSelectedShop(shops[0]));
       dispatch(setShops(shops));
 
-      dispatch(setShopProducts(products));
+      if (userType !== userTypes.isSuperAdmin) {
+        const products = await saveShopProductsOnDevice(offlineParams);
+        const clients = await saveShopClients(offlineParams);
+        const clientSales = await saveClientSalesOnDevice(offlineParams);
+
+        dispatch(setShopProducts(products));
+
+        dispatch(setShopClients(clients));
+
+        dispatch(setClientSales(clientSales));
+      }
 
       dispatch(setIsUserConfigured(true));
     }
@@ -87,7 +130,8 @@ const LandingScreen = () => {
 
   const handlePinLockStatus = async () => {
     if (prevPinTime !== null) {
-      const pintimeDiff = getTimeDifference(prevPinTime, new Date());
+      const pintimeDiff = getTimeDifference(new Date(prevPinTime), new Date());
+      console.log("lock time", pintimeDiff);
       if (pintimeDiff.minutes >= 10) {
         setShowLock(true);
       }
@@ -95,30 +139,34 @@ const LandingScreen = () => {
   };
 
   const handleLoginSession = async () => {
-    await handlePinLockStatus();
-    setLoading(true);
+    try {
+      await handlePinLockStatus();
 
-    if (prevLoginTime !== null) {
-      const logintimeDifferance = getTimeDifference(
-        new Date(prevLoginTime),
-        new Date()
-      );
+      if (prevLoginTime !== null) {
+        const logintimeDifferance = getTimeDifference(
+          new Date(prevLoginTime),
+          new Date()
+        );
 
-      const { days, hours } = logintimeDifferance;
+        const { days, hours } = logintimeDifferance;
 
-      console.log("login time", logintimeDifferance);
+        console.log("login time", logintimeDifferance);
 
-      // if (netInfo.isInternetReachable === true) {
+        // if (netInfo.isInternetReachable === true) {
+        await configureUserData(configStatus === false);
 
-      await configureUserData(configStatus === false);
-
-      if (hours >= 13 || days >= 1) {
-        await getRefreshToken();
-        await configureUserData(true);
+        if (hours >= 13 || days >= 1) {
+          setLoading(true);
+          await getRefreshToken();
+          await configureUserData(true);
+        }
       }
+      // }
+      setLoading(false);
+    } catch (e) {
+      console.error(e);
+      setLoading(false);
     }
-    // }
-    setLoading(false);
   };
 
   useEffect(() => {

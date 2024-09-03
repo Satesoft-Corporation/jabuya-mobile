@@ -11,17 +11,22 @@ import Colors from "../constants/Colors";
 import Icon from "./Icon";
 import { StatusBar } from "react-native";
 import { screenHeight } from "../constants/Constants";
-import { UserContext } from "../context/UserContext";
+import { getSelectedShop, getShops } from "reducers/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import { changeSelectedShop } from "actions/shopActions";
 
 const PopUpmenu = ({ menuItems = [], showShops = false }) => {
-  const { setSelectedShop, shops, selectedShop } = useContext(UserContext);
+  const dispatch = useDispatch();
+
+  const selectedShop = useSelector(getSelectedShop);
+  const shops = useSelector(getShops);
 
   const modifiedShopList =
     showShops && shops?.length > 1
       ? shops?.map((shop) => {
           return {
             ...shop,
-            onClick: () => setSelectedShop(shop),
+            onClick: () => dispatch(changeSelectedShop(shop)),
             bold: shop?.id === selectedShop?.id,
           };
         })

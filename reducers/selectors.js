@@ -6,6 +6,8 @@ export const getUserPinCode = (state) => state.userData.userPincode;
 
 export const getOfflineParams = (state) => state.userData.offlineParams;
 
+export const getFilterParams = (state) => state.userData.filterParams;
+
 export const getLastLoginTime = (state) => state.userData.lastLoginTime;
 
 export const getLastApplockTime = (state) => state.userData.lastApplockTime;
@@ -16,6 +18,22 @@ export const getLoginStatus = (state) => state.userData.isLoggedIn;
 
 export const getAttendantShopId = (state) => state.userData.attendantShopId;
 
+export const getAttendantShopName = (state) => state.userData.attendantShopName;
+
 export const getShopOwnerId = (state) => state.userData.shopOwnerId;
 
 export const getShops = (state) => state.shop.shops;
+
+export const getSelectedShop = (state) => state.shop.selectedShop;
+
+export const getShopProducts = (state) => state.shop.shopProducts;
+
+export const getShopClients = (state) => state.shop.clients;
+
+export const getClientSales = (state) => state.shop.clientSales;
+
+export const getOfflineSales = (state) => state.shop.offlineSales;
+
+export const getCartSelection = (state) => state.shop.cartSelection;
+
+export const getCart = (state) => state.shop.cart;

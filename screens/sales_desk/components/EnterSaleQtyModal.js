@@ -1,45 +1,115 @@
 import { Text, View, FlatList, TextInput } from "react-native";
-import React, { useContext, useState } from "react";
-import { SaleEntryContext } from "context/SaleEntryContext";
+import React, { useEffect, useState } from "react";
 import ModalContent from "@components/ModalContent";
 import ChipButton from "@components/buttons/ChipButton";
 import Colors from "@constants/Colors";
 import PrimaryButton from "@components/buttons/PrimaryButton";
+import { useDispatch, useSelector } from "react-redux";
+import { getCartSelection } from "reducers/selectors";
+import { isValidNumber } from "@utils/Utils";
+import { addItemToCart, makeProductSelection } from "actions/shopActions";
 
-export default function EnterSaleQtyModal() {
+export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
+  const selection = useSelector(getCartSelection);
+
+  const dispatch = useDispatch();
+
+  const { selectedSaleUnit, saleUnits, salesPrice } = selection ?? {};
+
   const [submitted, setSubmitted] = useState(false);
+  const [quantity, setQuantity] = useState("");
+  const [errors, setErrors] = useState(0);
+  const [unitCost, setUnitCost] = useState("");
+  const [unitSalesPrice, setUnitSalesPrice] = useState(""); //price for a sale unit
+  const [saleUnit, setSaleUnit] = useState(null); //selected if multiple
 
-  const {
-    selection,
-    setSelection,
-    setSelectedSaleUnit,
-    selectedSaleUnit,
-    setUnitCost,
-    setScanned,
-    saveSelection,
-    setQuantity,
-    quantity,
-    setErrors,
-    errors,
-    unitCost,
-    showMoodal,
-    setShowModal,
-    onChipPress,
-    saleUnits,
-    setInitialUnitCost,
-  } = useContext(SaleEntryContext);
+  const hide = () => {
+    dispatch(makeProductSelection(null));
+    setUnitCost("");
+    setQuantity("");
+    setShowModal(false);
+  };
+
+  const onChipPress = (item) => {
+    setSaleUnit(item);
+    setUnitCost(String(item?.unitPrice));
+    setUnitSalesPrice(item?.unitPrice);
+  };
 
   const handlePress = () => {
-    if (selectedSaleUnit) {
-      saveSelection();
-      setSubmitted(false);
+    if (saleUnit) {
+      const parsedQuantity = Number(quantity);
+      const itemUnitCost = Number(unitCost);
+
+      const cost = Math.round(itemUnitCost * parsedQuantity);
+
+      const isValidQuantity =
+        isValidNumber(parsedQuantity) && parsedQuantity > 0;
+
+      const isValidCost =
+        isValidNumber(itemUnitCost) && itemUnitCost >= unitSalesPrice;
+
+      if (itemUnitCost < unitSalesPrice) {
+        setErrors((prevErrors) => {
+          return {
+            ...prevErrors,
+            lessPriceError: `Unit cost for ${selection.productName} should be greater than ${unitSalesPrice}`,
+          };
+        });
+      }
+
+      if (!isValidNumber(itemUnitCost)) {
+        setErrors((prevErrors) => {
+          return {
+            ...prevErrors,
+            lessPriceError: "Invalid input for unit cost",
+          };
+        });
+      }
+
+      if (parsedQuantity === 0) {
+        setErrors((prevErrors) => {
+          return {
+            ...prevErrors,
+            qtyZeroError: "Quantity should be greater than 0",
+          };
+        });
+      }
+
+      if (!isValidNumber(parsedQuantity)) {
+        setErrors((prevErrors) => {
+          return {
+            ...prevErrors,
+            qtyZeroError: "Invalid quantity input",
+          };
+        });
+      }
+
+      if (isValidQuantity && isValidCost) {
+        const { productSaleUnitName } = saleUnit;
+        const name =
+          productSaleUnitName !== "Whole" ? " - " + productSaleUnitName : "";
+
+        const readyItem = {
+          id: selection.id,
+          productName: selection?.productName + name,
+          shopProductId: selection.id,
+          quantity: parsedQuantity, // Use the parsed quantity
+          totalCost: cost,
+          unitCost: Number(unitCost),
+          saleUnitId: saleUnit?.id || null,
+        };
+
+        dispatch(addItemToCart(readyItem));
+        hide();
+      }
     } else {
       setSubmitted(true);
     }
   };
 
   const renderFooter = () => {
-    if (submitted && !selectedSaleUnit) {
+    if (submitted && !saleUnit) {
       return (
         <Text
           style={{
@@ -52,6 +122,12 @@ export default function EnterSaleQtyModal() {
       );
     }
   };
+
+  useEffect(() => {
+    setUnitCost(String(salesPrice));
+    setSaleUnit(selectedSaleUnit);
+    setUnitSalesPrice(salesPrice);
+  }, [selection]);
 
   return (
     <ModalContent visible={showMoodal} style={{ padding: 30 }}>
@@ -71,9 +147,9 @@ export default function EnterSaleQtyModal() {
           >
             Successfull
           </Text>
-          <Text>{selection && selection.productName} has been selected.</Text>
+          <Text>{selection?.productName} has been selected.</Text>
 
-          {!selectedSaleUnit && (
+          {!saleUnit && (
             <View style={{ marginTop: 10 }}>
               <Text
                 style={{
@@ -89,7 +165,7 @@ export default function EnterSaleQtyModal() {
                   <ChipButton
                     title={item?.productSaleUnitName}
                     isSelected={
-                      selectedSaleUnit?.productSaleUnitName ===
+                      saleUnit?.productSaleUnitName ===
                       item?.productSaleUnitName
                     }
                     onPress={() => onChipPress(item)}
@@ -103,7 +179,7 @@ export default function EnterSaleQtyModal() {
           )}
         </View>
 
-        {selectedSaleUnit && (
+        {saleUnit && (
           <View>
             <Text
               style={{
@@ -113,7 +189,7 @@ export default function EnterSaleQtyModal() {
                 marginLeft: 4,
               }}
             >
-              Quantity
+              Quantity {unitCost} {salesPrice}
             </Text>
             <TextInput
               onFocus={() => setErrors(null)}
@@ -203,16 +279,10 @@ export default function EnterSaleQtyModal() {
             title={"Cancel"}
             onPress={() => {
               setShowModal(false);
-              setErrors({});
-              setSelection(null);
-              setScanned(false);
-              setSelectedSaleUnit(null);
-              setSubmitted(false);
-              setUnitCost("");
-              setInitialUnitCost(null);
+              dispatch(makeProductSelection(null));
             }}
           />
-          {selectedSaleUnit && (
+          {saleUnit && (
             <PrimaryButton title={"Confirm"} onPress={handlePress} />
           )}
         </View>

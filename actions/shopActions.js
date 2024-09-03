@@ -34,16 +34,50 @@ export const removeOfflineSale = (index) => {
   };
 };
 
-export const addShopClients = (clients) => {
+export const setShopClients = (clients) => {
   return {
     type: actionTypes.ADD_SHOP_CLIENTS,
     payload: clients,
   };
 };
 
-export const addClientSales = (clientSales) => {
+export const setClientSales = (clientSales) => {
   return {
     type: actionTypes.ADD_CLIENT_SALES,
     payload: clientSales,
+  };
+};
+
+export const makeProductSelection = (product) => {
+  return {
+    type: actionTypes.MAKE_PRODUCT_SELECTION,
+    payload: product,
+  };
+};
+
+export const changeSelectionSaleUnit = (product) => {
+  return {
+    type: actionTypes.CHANGE_sELECTION_SALE_UNIT,
+    payload: product,
+  };
+};
+
+export const addItemToCart = (item) => {
+  return {
+    type: actionTypes.ADD_TO_CART,
+    payload: item,
+  };
+};
+
+export const clearCart = () => {
+  return {
+    type: actionTypes.CLEAR_CART,
+  };
+};
+
+export const updateRecievedAmount = (amount) => {
+  return {
+    type: actionTypes.UPDATE_RECIEVED_AMOUNT,
+    payload: amount,
   };
 };

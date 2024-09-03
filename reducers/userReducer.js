@@ -1,4 +1,4 @@
-import { userTypes } from "@constants/Constants";
+import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import * as actions from "actions/actionTypes";
 
 const initialState = {
@@ -7,15 +7,20 @@ const initialState = {
   lastLoginTime: null,
   user: {},
   userType: null,
-  attendantShopId: null,
-  shopOwnerId: null,
+  attendantShopId: 0,
+  attendantShopName: null,
+  shopOwnerId: 0,
   userPincode: null,
   lastApplockTime: null,
   offlineParams: {},
+  filterParams: {},
 };
 
 const userReduer = (state = initialState, action) => {
   switch (action.type) {
+    case actions.LOG_OUT: {
+      return initialState;
+    }
     case actions.LOGIN_ACTION: {
       return {
         ...state,
@@ -75,6 +80,25 @@ const userReduer = (state = initialState, action) => {
       return {
         ...state,
         dataConfigured: action.payload,
+      };
+    }
+
+    case actions.CHANGE_SELECTED_SHOP: {
+      const allShops = action.payload.name === ALL_SHOPS_LABEL;
+
+      let obj = {};
+
+      if (state.userType === userTypes.isShopOwner && allShops) {
+        obj.shopOwnerId = state.shopOwnerId;
+      }
+
+      if (!allShops) {
+        obj.shopId = action.payload?.id;
+      }
+
+      return {
+        ...state,
+        filterParams: obj,
       };
     }
 

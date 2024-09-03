@@ -6,7 +6,6 @@ import {
   CREDIT_SALES,
   SALES_REPORTS,
 } from "@navigation/ScreenNames";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
 import Colors from "@constants/Colors";
 import AppStatusBar from "@components/AppStatusBar";
 import ConfirmSaleModal from "./components/ConfirmSaleModal";
@@ -20,51 +19,64 @@ import {
 import { formatNumberWithCommas } from "@utils/Utils";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import SalesTable from "./components/SalesTable";
-import { userData } from "context/UserContext";
 import { SaleEntryContext } from "context/SaleEntryContext";
 import Snackbar from "@components/Snackbar";
 import DataRow from "@components/card_components/DataRow";
 import { scale } from "react-native-size-matters";
-import { screenWidth } from "@constants/Constants";
+import { ALL_SHOPS_LABEL, screenWidth, userTypes } from "@constants/Constants";
 import { SHOP_PRODUCTS_ENDPOINT } from "@utils/EndPointUtils";
 import { BaseApiService } from "@utils/BaseApiService";
 import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getCart,
+  getCartSelection,
+  getFilterParams,
+  getOfflineParams,
+  getSelectedShop,
+  getShopClients,
+  getShopProducts,
+  getShops,
+  getUserType,
+} from "reducers/selectors";
+import {
+  changeSelectedShop,
+  clearCart,
+  makeProductSelection,
+  setShopProducts,
+  updateRecievedAmount,
+} from "actions/shopActions";
 
 function SalesDesk({ navigation }) {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
   const [clients, setClients] = useState([]);
+  const [showMoodal, setShowModal] = useState(false);
 
   const snackbarRef = useRef(null);
 
-  const {
-    userParams,
-    selectedShop,
-    shops,
-    setSelectedShop,
-    filterParams,
-    offlineParams,
-  } = userData();
+  const dispatch = useDispatch();
 
-  const {
-    selections,
-    selection,
-    setSelection,
-    setLoading,
-    totalQty,
-    recievedAmount,
-    setRecievedAmount,
-    totalCost,
-    clearEverything,
-    setShowModal,
-    setSaleUnits,
-    setSelectedSaleUnit,
-    setInitialUnitCost,
-    setUnitCost,
-  } = useContext(SaleEntryContext);
+  const selectedShop = useSelector(getSelectedShop);
+  const offlineParams = useSelector(getOfflineParams);
+  const shopProducts = useSelector(getShopProducts);
+  const shopClients = useSelector(getShopClients);
+  const userType = useSelector(getUserType);
+  const filterParams = useSelector(getFilterParams);
+  const shops = useSelector(getShops);
+  const selection = useSelector(getCartSelection);
 
-  const { isShopAttendant, isSuperAdmin } = userParams;
+  const cart = useSelector(getCart);
+
+  const clearEverything = () => dispatch(clearCart());
+
+  const { cartItems, totalCartCost, recievedAmount, totalQty } = cart;
+
+  const { setLoading } = useContext(SaleEntryContext);
+
+  const isSuperAdmin = userType === userTypes.isSuperAdmin;
+  const isShopAttendant = userType === userTypes.isShopAttendant;
 
   const menuItems = [
     {
@@ -83,25 +95,28 @@ function SalesDesk({ navigation }) {
       setLoading(false);
       return;
     } else {
-      const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
+      const pdtList = shopProducts.filter((p) => p.shopId === selectedShop?.id);
+
+      const clist = shopClients.filter((i) => i?.shop?.id === selectedShop?.id);
+
       const inStock = pdtList
         ?.filter((pdt) => pdt?.performanceSummary)
         .filter((pdt) => {
           const { totalQuantityStocked, totalQuantitySold } =
             pdt?.performanceSummary;
-
           const qtyInStock = totalQuantityStocked - totalQuantitySold;
           return qtyInStock > 0;
         });
       setProducts(inStock);
-      fetchClients();
+      setClients(clist);
+      setLoading(false);
     }
   };
 
   const fetchProductsFromServer = async () => {
-    if (!selectedShop?.name.includes("All")) {
+    if (selectedShop?.name !== ALL_SHOPS_LABEL) {
       const searchParameters = {
-        ...filterParams(),
+        ...filterParams,
         ...(searchTerm && { searchTerm: searchTerm }),
         offset: 0,
         limit: 20,
@@ -118,15 +133,10 @@ function SalesDesk({ navigation }) {
     }
   };
 
-  const fetchClients = async () => {
-    let clients = await UserSessionUtils.getShopClients(selectedShop?.id, true);
-    setClients(clients);
-    setLoading(false);
-  };
-
   const onComplete = async () => {
     if (!isSuperAdmin) {
-      await saveShopProductsOnDevice(offlineParams, true); // updating offline products
+      const pdts = await saveShopProductsOnDevice(offlineParams); // updating offline products
+      dispatch(setShopProducts(pdts));
     }
   };
 
@@ -135,7 +145,6 @@ function SalesDesk({ navigation }) {
   }, [searchTerm, selectedShop]);
 
   useEffect(() => {
-    setLoading(true);
     clearEverything();
   }, [selectedShop]);
 
@@ -144,24 +153,12 @@ function SalesDesk({ navigation }) {
   };
 
   const makeSelection = (item) => {
-    const { multipleSaleUnits, saleUnitName, salesPrice } = item;
-    let defUnit = { productSaleUnitName: saleUnitName, unitPrice: salesPrice };
-
-    setSelection(item);
+    dispatch(makeProductSelection(item));
     setShowModal(true);
-
-    if (multipleSaleUnits) {
-      setSaleUnits([defUnit, ...multipleSaleUnits]);
-    } else {
-      setSaleUnits([{ ...defUnit }]);
-      setSelectedSaleUnit(defUnit);
-      setInitialUnitCost(salesPrice);
-      setUnitCost(String(salesPrice));
-    }
   };
 
   const handleSubmit = () => {
-    if (selections.length > 0) {
+    if (cartItems.length > 0) {
       setShowConfirmed(true);
     } else {
       snackbarRef.current.show("Product selection is required.");
@@ -179,7 +176,7 @@ function SalesDesk({ navigation }) {
         onComplete={onComplete}
       />
 
-      <EnterSaleQtyModal />
+      <EnterSaleQtyModal showMoodal={showMoodal} setShowModal={setShowModal} />
 
       <BlackScreen flex={isShopAttendant ? 12 : 10}>
         <UserProfile renderMenu renderNtnIcon={false} menuItems={menuItems} />
@@ -188,10 +185,10 @@ function SalesDesk({ navigation }) {
           {!isShopAttendant && shops?.length > 1 && (
             <View style={{ paddingHorizontal: 10 }}>
               <MyDropDown
-                data={shops?.filter((s) => !s?.name?.includes("All"))}
+                data={shops?.filter((s) => s?.name !== ALL_SHOPS_LABEL)}
                 labelField={"name"}
                 valueField="id"
-                onChange={(e) => setSelectedShop(e)}
+                onChange={(e) => dispatch(changeSelectedShop(e))}
                 value={selectedShop}
                 search={shops?.length > 4}
                 placeholder="Select a shop"
@@ -200,7 +197,7 @@ function SalesDesk({ navigation }) {
           )}
 
           <SalesDropdownComponent
-            disable={!isShopAttendant && selectedShop?.name?.includes("All")}
+            disable={!isShopAttendant && selectedShop?.name === ALL_SHOPS_LABEL}
             value={selection}
             products={products}
             handleChange={(t) => handleChange(t)}
@@ -226,7 +223,7 @@ function SalesDesk({ navigation }) {
               padding: 10,
             }}
           >
-            <SalesTable sales={selections} />
+            <SalesTable sales={cartItems} />
           </View>
 
           <View
@@ -267,7 +264,9 @@ function SalesDesk({ navigation }) {
                 textAlign="right"
                 value={recievedAmount}
                 inputMode="numeric"
-                onChangeText={(text) => setRecievedAmount(text)}
+                onChangeText={(text) =>
+                  dispatch(updateRecievedAmount(Number(text)))
+                }
                 style={{
                   backgroundColor: Colors.light,
                   borderRadius: 5,
@@ -294,7 +293,7 @@ function SalesDesk({ navigation }) {
                   ? `${totalQty} item`
                   : ""
               }`}
-              value={formatNumberWithCommas(totalCost)}
+              value={formatNumberWithCommas(totalCartCost)}
               currency={selectedShop?.currency}
               labelTextStyle={{ fontWeight: 600 }}
             />
@@ -309,7 +308,7 @@ function SalesDesk({ navigation }) {
           >
             <DataRow
               label={"Balance"}
-              value={formatNumberWithCommas(recievedAmount - totalCost)}
+              value={formatNumberWithCommas(recievedAmount - totalCartCost)}
               currency={selectedShop?.currency}
             />
           </View>

@@ -51,8 +51,8 @@ const TopHeader = ({
                   height: 30,
                   width: 20,
                   resizeMode: "contain",
-                  tintColor: Colors.primary,
                 }}
+                tintColor={Colors.primary}
               />
             </TouchableOpacity>
 
@@ -84,8 +84,8 @@ const TopHeader = ({
                     height: 30,
                     width: 20,
                     resizeMode: "contain",
-                    tintColor: Colors.primary,
                   }}
+                  tintColor={Colors.primary}
                 />
               </TouchableOpacity>
             )}

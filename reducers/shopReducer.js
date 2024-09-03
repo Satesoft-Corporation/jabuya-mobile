@@ -9,14 +9,102 @@ const initialState = {
   clientSales: [],
   cart: {
     cartItems: [],
-    totalCost: 0,
+    totalCartCost: 0,
     recievedAmount: 0,
-    selection: null,
+    totalQty: 0,
   },
+  cartSelection: null,
 };
 
 const shopReducer = (state = initialState, action) => {
   switch (action.type) {
+    case actions.ADD_TO_CART: {
+      const { productName, quantity, totalCost } = action.payload;
+
+      const { cartItems, totalCartCost, totalQty } = state.cart;
+
+      const exists = cartItems.find((item) => item.productName === productName);
+
+      if (exists) {
+        const newCost = exists?.totalCost + totalCost;
+        const newQty = exists?.quantity + quantity;
+
+        return {
+          ...state,
+          cart: {
+            cartItems: cartItems.map((item) =>
+              item.productName === productName
+                ? { ...item, quantity: newQty, totalCost: newCost }
+                : item
+            ),
+            totalCartCost: totalCartCost + totalCost,
+            totalQty: totalQty + quantity,
+            recievedAmount: state.cart.recievedAmount,
+          },
+        };
+      } else {
+        return {
+          ...state,
+          cart: {
+            cartItems: [...state.cart.cartItems, action.payload],
+            totalCartCost: totalCartCost + totalCost,
+            totalQty: totalQty + quantity,
+          },
+        };
+      }
+    }
+
+    case actions.MAKE_PRODUCT_SELECTION: {
+      if (action.payload !== null) {
+        let newSelection = { ...action.payload };
+
+        const { multipleSaleUnits, saleUnitName, salesPrice } = action.payload;
+        const defUnit = {
+          productSaleUnitName: saleUnitName,
+          unitPrice: salesPrice,
+        };
+
+        if (multipleSaleUnits) {
+          newSelection.saleUnits = [defUnit, ...multipleSaleUnits];
+        } else {
+          newSelection.saleUnits = [{ ...defUnit }];
+          newSelection.selectedSaleUnit = defUnit;
+          newSelection.salesPrice = salesPrice;
+        }
+
+        return {
+          ...state,
+          cartSelection: newSelection,
+        };
+      } else {
+        return {
+          ...state,
+          cartSelection: action.payload,
+        };
+      }
+    }
+
+    case actions.UPDATE_RECIEVED_AMOUNT: {
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          recievedAmount: action.payload,
+        },
+      };
+    }
+
+    case actions.CLEAR_CART: {
+      return {
+        ...state,
+        cart: initialState.cart,
+        cartSelection: initialState.cartSelection,
+      };
+    }
+    case actions.LOG_OUT: {
+      return initialState;
+    }
+
     case actions.SET_SHOPS: {
       return {
         ...state,

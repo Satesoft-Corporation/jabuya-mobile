@@ -9,7 +9,7 @@ import PopUpmenu from "./PopUpMenu";
 import { SETTINGS } from "../navigation/ScreenNames";
 import { scale } from "react-native-size-matters";
 import { useSelector } from "react-redux";
-import { getUserData, getUserType } from "reducers/selectors";
+import { getSelectedShop, getUserData, getUserType } from "reducers/selectors";
 
 const UserProfile = ({
   renderNtnIcon = true,
@@ -17,21 +17,11 @@ const UserProfile = ({
   menuItems,
   showShops,
 }) => {
-  const [shops, setShops] = useState(null);
   const navigation = useNavigation();
 
-  const { selectedShop } = useContext(UserContext);
-
+  const selectedShop = useSelector(getSelectedShop);
   const sessionObj = useSelector(getUserData);
   const userType = useSelector(getUserType);
-
-  useEffect(() => {
-    UserSessionUtils.getShopCount().then((count) => {
-      if (count) {
-        setShops(count);
-      }
-    });
-  }, []);
 
   return (
     <View
@@ -93,7 +83,7 @@ const UserProfile = ({
               fontSize: scale(11),
             }}
           >
-            {selectedShop?.name || (shops?.length > 1 && `Shops: ${shops}`)}
+            {selectedShop?.name}
           </Text>
         </View>
       </View>

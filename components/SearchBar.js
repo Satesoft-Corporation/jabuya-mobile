@@ -39,7 +39,8 @@ function SearchBar({
       >
         <Image
           source={require("../assets/icons/ic_search_gray.png")}
-          style={{ width: 20, height: 20, tintColor: Colors.gray }}
+          style={{ width: 20, height: 20 }}
+          tintColor={Colors.gray}
         />
       </TouchableOpacity>
     </View>
