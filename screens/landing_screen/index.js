@@ -9,7 +9,7 @@ import UserProfile from "@components/UserProfile";
 import { MenuIcon } from "@components/MenuIcon";
 import Colors from "@constants/Colors";
 import { navList } from "./navList";
-import { COMING_SOON } from "@navigation/ScreenNames";
+import { COMING_SOON, CONTACT_BOOK, ENTRIES } from "@navigation/ScreenNames";
 import LockScreenModal from "@screens/applock/LockScreenModal";
 import {
   saveClientSalesOnDevice,
@@ -40,6 +40,8 @@ import { BaseApiService } from "@utils/BaseApiService";
 import {
   changeSelectedShop,
   setClientSales,
+  setCollectClintInfo,
+  setOffersDebt,
   setShopClients,
   setShopProducts,
   setShops,
@@ -51,6 +53,8 @@ const LandingScreen = () => {
   const [loading, setLoading] = useState(false);
   const [showLock, setShowLock] = useState(false);
 
+  const [menu, setMenu] = useState([]);
+
   const navigation = useNavigation();
 
   const netInfo = useNetInfo();
@@ -61,10 +65,9 @@ const LandingScreen = () => {
   const configStatus = useSelector(getConfigureStatus);
   const prevPinTime = useSelector(getLastApplockTime);
   const userType = useSelector(getUserType);
-  const attendantShopName = useSelector(getAttendantShopName);
-  const attendantShopId = useSelector(getAttendantShopId);
   const shopOwnerId = useSelector(getShopOwnerId);
 
+  const isShopAttendant = userType === userTypes.isShopAttendant;
   const getRefreshToken = async () => {
     const loginInfo = await UserSessionUtils.getLoginDetails();
     if (loginInfo) {
@@ -84,35 +87,48 @@ const LandingScreen = () => {
     if (refresh === true) {
       setLoading(true);
       let shops = [];
+      let menuList = [...navList];
+      const shopData = await saveShopDetails(offlineParams, isShopAttendant);
 
-      if (userType === userTypes.isShopAttendant) {
-        shops = [{ name: attendantShopName, id: attendantShopId }];
-      }
+      const offersDebt = shopData?.some((s) => s?.supportsCreditSales === true);
 
-      if (userType !== userTypes.isShopAttendant) {
-        const shopData = await saveShopDetails(offlineParams);
-        if (shopData?.length > 1) {
-          shops = [{ name: ALL_SHOPS_LABEL, id: shopOwnerId }, ...shopData];
-        } else {
-          shops = [...shopData];
-        }
+      const collectClientInfo = shopData?.some(
+        (s) => s?.captureClientDetailsOnAllSales === true
+      );
+
+      if (shopData?.length > 1) {
+        shops = [{ name: ALL_SHOPS_LABEL, id: shopOwnerId }, ...shopData];
+      } else {
+        shops = [...shopData];
       }
 
       dispatch(changeSelectedShop(shops[0]));
       dispatch(setShops(shops));
+      dispatch(setOffersDebt(offersDebt));
+      dispatch(setCollectClintInfo(collectClientInfo));
 
-      if (userType !== userTypes.isSuperAdmin) {
-        const products = await saveShopProductsOnDevice(offlineParams);
+      if (offersDebt === true) {
         const clients = await saveShopClients(offlineParams);
         const clientSales = await saveClientSalesOnDevice(offlineParams);
-
-        dispatch(setShopProducts(products));
-
+        menuList = [...navList];
         dispatch(setShopClients(clients));
-
         dispatch(setClientSales(clientSales));
       }
 
+      if (offersDebt === false) {
+        menuList = menuList.filter((i) => i.target !== CONTACT_BOOK);
+      }
+
+      if (isShopAttendant) {
+        menuList = menuList.filter((i) => i.target !== ENTRIES);
+      }
+
+      if (userType !== userTypes.isSuperAdmin) {
+        const products = await saveShopProductsOnDevice(offlineParams);
+        dispatch(setShopProducts(products));
+      }
+
+      setMenu(menuList);
       dispatch(setIsUserConfigured(true));
     }
   };
@@ -190,7 +206,7 @@ const LandingScreen = () => {
       >
         <FlatList
           style={{ marginTop: 10 }}
-          data={navList}
+          data={menu}
           renderItem={({ item }) => (
             <MenuIcon icon={item} onPress={() => handleTabPress(item)} />
           )}

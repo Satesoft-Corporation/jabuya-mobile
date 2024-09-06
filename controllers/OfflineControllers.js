@@ -103,40 +103,46 @@ export const saveShopClients = async (searchParameters) => {
   return clients;
 };
 
-export const saveShopDetails = async (searchParameters) => {
+export const saveShopDetails = async (
+  searchParameters,
+  isShopAttendant = false
+) => {
   let shopsArray = [];
   console.log("Saving shops");
   const currencyList = await saveCurrencies();
-  await new BaseApiService(SHOP_ENDPOINT)
+
+  const apiUrl =
+    isShopAttendant === false
+      ? SHOP_ENDPOINT
+      : `${SHOP_ENDPOINT}/${searchParameters?.shopId}`;
+
+  console.log(isShopAttendant);
+  await new BaseApiService(apiUrl)
     .getRequestWithJsonResponse(searchParameters)
     .then(async (response) => {
-      await UserSessionUtils.setShopCount(String(response.totalItems));
-      await UserSessionUtils.setShops(response.records);
+      if (isShopAttendant === false) {
+        const finalList = response?.records?.map((item) => {
+          const currency = currencyList?.find(
+            (cur) => cur?.id === item?.currencyId
+          );
+          return {
+            ...item,
+            currency: currency?.symbol || "",
+          };
+        });
+        shopsArray = [...finalList];
+      }
 
-      const finalList = response.records?.map((item) => {
+      if (isShopAttendant === true) {
         const currency = currencyList?.find(
-          (cur) => cur?.id === item?.currencyId
+          (cur) => cur?.id === response?.data?.currencyId
         );
 
-        return {
-          ...item,
-          currency: currency?.symbol || "",
-        };
-      });
-      if (finalList.length > 1) {
-        const allShops = {
-          name: "All shops",
-          id: searchParameters?.shopOwnerId || 0,
-        };
-
-        shopsArray = [allShops, ...finalList];
-      } else {
-        shopsArray = [...finalList];
+        shopsArray = [{ ...response?.data, currency: currency?.symbol || "" }];
       }
     })
     .catch(async (error) => {
       console.log(error);
-      shopsArray = await UserSessionUtils.getShops();
     });
 
   // return saved;

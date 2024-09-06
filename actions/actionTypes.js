@@ -1,5 +1,5 @@
 export const LOGIN_ACTION = "LOGIN";
-export const LOG_OUT = "LOGIN_OUT";
+export const LOG_OUT = "LOG_OUT";
 export const CHANGE_USER = "CHANGE_USER";
 export const CHANGE_USER_TYPE = "CHANGE_USER_TYPE";
 export const SET_APPLOCK_TIME = "SET_APPLOCK_TIME";
@@ -23,6 +23,10 @@ export const ADD_TO_CART = "ADD_TO_CART";
 
 export const MAKE_PRODUCT_SELECTION = "MAKE_PRODUCT_SELECTION";
 export const CHANGE_sELECTION_SALE_UNIT = "CHANGE_sELECTION_SALE_UNIT";
+
+export const OFFERS_DEBT = "OFFERS_DEBT";
+
+export const COLLECT_CLIENTS_INFO = "COLLECT_CLIENTS_INFO";
 
 export const REMOVE_FROM_CART = "REMOVE_FROM_CART";
 export const CLEAR_CART = "CLEAR_CART";

@@ -14,6 +14,8 @@ const initialState = {
     totalQty: 0,
   },
   cartSelection: null,
+  offersDebt: false,
+  collectClientInfo: false,
 };
 
 const shopReducer = (state = initialState, action) => {
@@ -156,6 +158,19 @@ const shopReducer = (state = initialState, action) => {
       };
     }
 
+    case actions.OFFERS_DEBT: {
+      return {
+        ...state,
+        offersDebt: action.payload,
+      };
+    }
+
+    case actions.COLLECT_CLIENTS_INFO: {
+      return {
+        ...state,
+        collectClientInfo: action.payload,
+      };
+    }
     default:
       return state;
   }

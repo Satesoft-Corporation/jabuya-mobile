@@ -37,3 +37,7 @@ export const getOfflineSales = (state) => state.shop.offlineSales;
 export const getCartSelection = (state) => state.shop.cartSelection;
 
 export const getCart = (state) => state.shop.cart;
+
+export const getOffersDebt = (state) => state.shop.offersDebt;
+
+export const getCollectClientInfo = (state) => state.shop.collectClientInfo;

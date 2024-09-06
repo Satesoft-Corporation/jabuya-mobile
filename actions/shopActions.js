@@ -81,3 +81,17 @@ export const updateRecievedAmount = (amount) => {
     payload: amount,
   };
 };
+
+export const setOffersDebt = (bool) => {
+  return {
+    type: actionTypes.OFFERS_DEBT,
+    payload: bool,
+  };
+};
+
+export const setCollectClintInfo = (bool) => {
+  return {
+    type: actionTypes.COLLECT_CLIENTS_INFO,
+    payload: bool,
+  };
+};
