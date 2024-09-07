@@ -16,7 +16,7 @@ import {
   MyDropDown,
   SalesDropdownComponent,
 } from "@components/DropdownComponents";
-import { formatNumberWithCommas } from "@utils/Utils";
+import { formatNumberWithCommas, isValidNumber } from "@utils/Utils";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import SalesTable from "./components/SalesTable";
 import { SaleEntryContext } from "context/SaleEntryContext";
@@ -32,6 +32,7 @@ import {
   getCart,
   getCartSelection,
   getFilterParams,
+  getOffersDebt,
   getOfflineParams,
   getSelectedShop,
   getShopClients,
@@ -66,6 +67,8 @@ function SalesDesk({ navigation }) {
   const filterParams = useSelector(getFilterParams);
   const shops = useSelector(getShops);
   const selection = useSelector(getCartSelection);
+  // const offersDebt = false;
+  const offersDebt = useSelector(getOffersDebt);
 
   const cart = useSelector(getCart);
 
@@ -144,9 +147,9 @@ function SalesDesk({ navigation }) {
     fetchProducts();
   }, [searchTerm, selectedShop]);
 
-  useEffect(() => {
-    clearEverything();
-  }, [selectedShop]);
+  // useEffect(() => {
+  //   clearEverything();
+  // }, [selectedShop]);
 
   const handleChange = (value) => {
     setSearchTerm(value);
@@ -159,7 +162,27 @@ function SalesDesk({ navigation }) {
 
   const handleSubmit = () => {
     if (cartItems.length > 0) {
-      setShowConfirmed(true);
+      if (offersDebt === true) {
+        setShowConfirmed(true);
+        return;
+      } else {
+        if (isNaN(recievedAmount)) {
+          snackbarRef.current.show("Please Enter a valid amount.", 4000);
+          return;
+        }
+
+        if (Number(recievedAmount) < totalCartCost) {
+          snackbarRef.current.show(
+            `Recieved amount should not be less than ${
+              selectedShop?.currency
+            } ${formatNumberWithCommas(totalCartCost)}`,
+            4000
+          );
+          return;
+        }
+
+        setShowConfirmed(true);
+      }
     } else {
       snackbarRef.current.show("Product selection is required.");
     }
@@ -264,9 +287,9 @@ function SalesDesk({ navigation }) {
                 textAlign="right"
                 value={recievedAmount}
                 inputMode="numeric"
-                onChangeText={(text) =>
-                  dispatch(updateRecievedAmount(Number(text)))
-                }
+                onChangeText={(text) => {
+                  dispatch(updateRecievedAmount(text));
+                }}
                 style={{
                   backgroundColor: Colors.light,
                   borderRadius: 5,

@@ -1,7 +1,6 @@
 import { View, FlatList } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import { Text } from "react-native";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
 import { PDT_ENTRY } from "@navigation/ScreenNames";
 import Colors from "@constants/Colors";
 import AppStatusBar from "@components/AppStatusBar";
@@ -14,6 +13,14 @@ import TopHeader from "@components/TopHeader";
 import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 import { saveExcelSheet } from "@utils/FileSystem";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getOfflineParams,
+  getSelectedShop,
+  getShopProducts,
+  getUserType,
+} from "reducers/selectors";
+import { userTypes } from "@constants/Constants";
 
 const StockLevel = ({ navigation }) => {
   const [message, setMessage] = useState(null);
@@ -21,29 +28,34 @@ const StockLevel = ({ navigation }) => {
   const [stockLevels, setStockLevels] = useState([]);
   const [stockLevelRecords, setStockLevelRecords] = useState(0);
   const [loading, setLoading] = useState(false);
-
   const [stock, setStock] = useState(0);
-
   const [pdtValue, setPdtValue] = useState(0);
 
-  const snackbarRef = useRef(null);
+  const dispatch = useDispatch();
+  // const products = await saveShopProductsOnDevice(offlineParams);
+  // dispatch(setShopProducts(products));
 
-  const { selectedShop, offlineParams, userParams } = userData();
+  const offlineParams = useSelector(getOfflineParams);
+  const selectedShop = useSelector(getSelectedShop);
+  const shopProducts = useSelector(getShopProducts);
+  const userType = useSelector(getUserType);
+
+  const isShopAttendant = userType === userTypes.isShopAttendant;
+  const snackbarRef = useRef(null);
 
   const fetchShopProducts = async () => {
     try {
       setLoading(true);
-      const id = selectedShop?.name.includes("All") ? null : selectedShop?.id;
 
-      let list = await UserSessionUtils.getShopProducts(id);
+      let pdtList = shopProducts.filter((p) => p.shopId === selectedShop?.id);
 
-      list = list?.filter((item) =>
+      pdtList = pdtList?.filter((item) =>
         item?.productName?.toLowerCase()?.includes(searchTerm.toLowerCase())
       );
 
-      setStockLevels(list);
+      setStockLevels(pdtList);
 
-      setStockLevelRecords(list?.length);
+      setStockLevelRecords(pdtList?.length);
 
       //for calculations
       const newList = list?.map((data) => {
@@ -157,7 +169,7 @@ const StockLevel = ({ navigation }) => {
   };
 
   const menuItems = [
-    ...(userParams?.isShopAttendant === false
+    ...(!isShopAttendant
       ? [
           {
             name: "List product",

@@ -1,6 +1,5 @@
 import { View, Text, FlatList, SafeAreaView } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
 import Colors from "@constants/Colors";
 import TopHeader from "@components/TopHeader";
 import OfflineSaleTxnCard, {
@@ -12,9 +11,12 @@ import PrimaryButton from "@components/buttons/PrimaryButton";
 import VerticalSeparator from "@components/VerticalSeparator";
 import { formatNumberWithCommas } from "@utils/Utils";
 import ItemHeader from "./components/ItemHeader";
-import { resolveUnsavedSales } from "@controllers/OfflineControllers";
 import Snackbar from "@components/Snackbar";
 import { useNetInfo } from "@react-native-community/netinfo";
+import { useDispatch, useSelector } from "react-redux";
+import { getOffersDebt, getOfflineSales } from "reducers/selectors";
+import { BaseApiService } from "@utils/BaseApiService";
+import { removeOfflineSale } from "actions/shopActions";
 
 const OfflineSales = () => {
   const [sales, setSales] = useState([]);
@@ -28,12 +30,14 @@ const OfflineSales = () => {
 
   const snackbarRef = useRef(null);
   const netinfo = useNetInfo();
+  const salesList = useSelector(getOfflineSales);
+  const offersDebt = useSelector(getOffersDebt);
+  const dispatch = useDispatch();
 
-  const getOfflineSales = async () => {
+  const getOfflineSale = async () => {
     setVisible(false);
     setLoading(true);
 
-    const salesList = await UserSessionUtils.getPendingSales();
     let totalQty = 0;
     let totalAmt = 0;
     let debtTxn = 0;
@@ -58,14 +62,53 @@ const OfflineSales = () => {
     setLoading(false);
   };
 
+  const saveSales = async () => {
+    if (salesList?.length > 0) {
+      let errors = [];
+
+      // Use map to create an array of promises
+      await Promise.all(
+        salesList.map(async (cart, index) => {
+          console.log("Saving sale", index + 1);
+          try {
+            const response = await new BaseApiService(
+              SHOP_SALES_ENDPOINT
+            ).postRequest(cart);
+            const info = await response.json();
+            const status = response.status;
+
+            if (status === 200) {
+              try {
+                const confirmResponse = await new BaseApiService(
+                  `/shop-sales/${info?.id}/confirm`
+                ).postRequest();
+
+                await confirmResponse.json();
+
+                dispatch(removeOfflineSale(index));
+              } catch (error) {
+                errors.push(error?.message);
+              }
+            } else {
+              errors.push(info?.message);
+            }
+          } catch (error) {
+            errors.push(error?.message);
+          }
+        })
+      );
+
+      return errors;
+    }
+  };
   const handleSave = async () => {
     if (netinfo.isInternetReachable === true && !loading) {
       setSavingErrors([]);
       setLoading(true);
-      const errors = await resolveUnsavedSales();
+      const errors = await saveSales();
       setSavingErrors(errors);
 
-      await getOfflineSales();
+      await getOfflineSale();
       return;
     }
 
@@ -76,11 +119,11 @@ const OfflineSales = () => {
   };
 
   const handleRemove = (item, index) => {
-    setSelectedSale(item);
+    setSelectedSale({ ...item, index });
     setVisible(true);
   };
   useEffect(() => {
-    getOfflineSales();
+    getOfflineSale();
   }, []);
 
   return (
@@ -102,15 +145,22 @@ const OfflineSales = () => {
 
             <VerticalSeparator />
 
-            <ItemHeader title="Sales" value={totalValue} isCurrency />
+            <ItemHeader
+              title="Sales"
+              value={formatNumberWithCommas(totalValue)}
+            />
 
             <VerticalSeparator />
 
             <ItemHeader title="Cash " value={sales.length - debts} />
 
-            <VerticalSeparator />
+            {offersDebt && (
+              <>
+                <VerticalSeparator />
 
-            <ItemHeader title="Debts" value={debts} />
+                <ItemHeader title="Debts" value={debts} />
+              </>
+            )}
           </View>
 
           <View
@@ -146,7 +196,7 @@ const OfflineSales = () => {
       <FlatList
         containerStyle={{ padding: 5 }}
         showsHorizontalScrollIndicator={false}
-        data={sales}
+        data={salesList}
         renderItem={({ item, index }) => (
           <OfflineSaleTxnCard
             key={index}
@@ -159,8 +209,6 @@ const OfflineSales = () => {
             {!loading ? "No sales found" : ""}
           </Text>
         )}
-        onRefresh={() => getOfflineSales()}
-        refreshing={loading}
       />
 
       <Snackbar ref={snackbarRef} />
@@ -168,24 +216,23 @@ const OfflineSales = () => {
       <RemoveSaleModal
         visible={visible}
         data={selectedSale}
-        onComplete={getOfflineSales}
-        hide={() => setVisible(false)}
+        hide={() => {
+          setVisible(false);
+          getOfflineSale();
+        }}
       />
     </SafeAreaView>
   );
 };
 
-const RemoveSaleModal = ({
-  visible = false,
-  data,
-  index,
-  onComplete,
-  ...props
-}) => {
-  const removeSale = async () => {
-    await UserSessionUtils.removePendingSale(index);
-    onComplete();
+const RemoveSaleModal = ({ visible = false, data, ...props }) => {
+  const dispatch = useDispatch();
+
+  const removeSale = () => {
+    dispatch(removeOfflineSale(data?.index));
+    props?.hide();
   };
+
   return (
     <ModalContent visible={visible} style={{ padding: 10 }}>
       <View

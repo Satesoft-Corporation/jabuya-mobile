@@ -1,7 +1,16 @@
 // eas build -p android --profile preview
-export function formatNumberWithCommas(number) {
-  number = Number(number);
-  return number ? number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0;
+
+export function formatNumberWithCommas(number, symbol = "") {
+  if (number === null || number === undefined || isNaN(number)) {
+    return `${symbol}0`;
+  }
+
+  const formattedNumber = Number(number).toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 3,
+  });
+
+  return `${symbol} ${formattedNumber}`;
 }
 
 export function formatDate(inputDate, removeTime = false, onlyTime = false) {

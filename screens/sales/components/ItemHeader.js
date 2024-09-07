@@ -1,12 +1,13 @@
 import { View, Text } from "react-native";
 import React from "react";
-import { userData } from "context/UserContext";
 import RenderCurrency from "@components/RenderCurrency";
 import Colors from "@constants/Colors";
 import { scale } from "react-native-size-matters";
+import { useSelector } from "react-redux";
+import { getSelectedShop } from "reducers/selectors";
 
 const ItemHeader = ({ title, value, isCurrency = false }) => {
-  const { selectedShop } = userData();
+  const selectedShop = useSelector(getSelectedShop);
   return (
     <View style={{ alignItems: "center", justifyContent: "center", gap: 3 }}>
       <Text

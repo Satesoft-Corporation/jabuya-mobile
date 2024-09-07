@@ -28,47 +28,6 @@ export const saveCurrencies = async () => {
   return currencies;
 };
 
-export const resolveUnsavedSales = async () => {
-  const pendingSales = await UserSessionUtils.getPendingSales();
-
-  if (pendingSales.length > 0) {
-    let errors = [];
-
-    // Use map to create an array of promises
-    await Promise.all(
-      pendingSales.map(async (cart, index) => {
-        console.log("Saving sale", index + 1);
-        try {
-          const response = await new BaseApiService(
-            SHOP_SALES_ENDPOINT
-          ).postRequest(cart);
-          const info = await response.json();
-          const status = response.status;
-
-          if (status === 200) {
-            try {
-              const confirmResponse = await new BaseApiService(
-                `/shop-sales/${info?.id}/confirm`
-              ).postRequest();
-              await confirmResponse.json();
-
-              await UserSessionUtils.removePendingSale(index);
-            } catch (error) {
-              errors.push(error?.message);
-            }
-          } else {
-            errors.push(info?.message);
-          }
-        } catch (error) {
-          errors.push(error?.message);
-        }
-      })
-    );
-
-    return errors;
-  }
-};
-
 export const saveShopProductsOnDevice = async (searchParameters) => {
   let pdts = [];
 

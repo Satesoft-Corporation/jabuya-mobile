@@ -9,14 +9,11 @@ import React, { useEffect } from "react";
 import Colors from "@constants/Colors";
 import { scale } from "react-native-size-matters";
 import { StackActions, useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import { LANDING_SCREEN } from "@navigation/ScreenNames";
 
 const LoadingScreen = () => {
   const navigation = useNavigation();
-
-  const isLoggedIn = useSelector((state) => state.userData.isLoggedIn);
 
   const logOut = async () => {
     await UserSessionUtils.clearLocalStorageAndLogout(navigation);
@@ -24,11 +21,13 @@ const LoadingScreen = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      if (isLoggedIn) {
-        navigation.dispatch(StackActions.replace(LANDING_SCREEN));
-      } else {
-        logOut();
-      }
+      UserSessionUtils.getUserDetails().then((data) => {
+        if (data) {
+          navigation.dispatch(StackActions.replace(LANDING_SCREEN));
+        } else {
+          logOut();
+        }
+      });
     }, 3000);
   }, []);
 

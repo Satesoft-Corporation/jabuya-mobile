@@ -1,18 +1,24 @@
 import { View, Text, FlatList } from "react-native";
-import React, { useContext, useEffect } from "react";
-import { SaleEntryContext } from "context/SaleEntryContext";
+import React, { useEffect } from "react";
 import MyInput from "@components/MyInput";
 import { paymentMethods } from "@constants/Constants";
 import { MyDropDown } from "@components/DropdownComponents";
 import Colors from "@constants/Colors";
 import ChipButton from "@components/buttons/ChipButton";
+import {
+  getCart,
+  getCollectClientInfo,
+  getOffersDebt,
+  getShopClients,
+} from "reducers/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import { updateRecievedAmount } from "actions/shopActions";
 
 const PaymentMethodComponent = ({
   soldOnDate,
   setSoldOnDate,
   amountPaid,
   setAmountPaid,
-  clients = [],
   selectedClient,
   setSelectedClient,
   visible,
@@ -20,16 +26,16 @@ const PaymentMethodComponent = ({
   setClientName,
   clientNumber,
   setClientNumber,
+  selectedPaymentMethod,
+  setSelectedPaymentMethod,
 }) => {
-  const {
-    selectedPaymentMethod,
-    setSelectedPaymentMethod,
-    recievedAmount,
-    setRecievedAmount,
-    totalCost,
-  } = useContext(SaleEntryContext);
+  const offersDebt = useSelector(getOffersDebt);
+  const collectInfo = useSelector(getCollectClientInfo);
+  const clients = useSelector(getShopClients) ?? [];
+  const cart = useSelector(getCart);
 
-  const isValidAmount = Number(recievedAmount) >= totalCost;
+  const dispatch = useDispatch();
+  const { totalCartCost, recievedAmount } = cart;
 
   const SoldOnDateComponent = () => {
     return (
@@ -45,28 +51,29 @@ const PaymentMethodComponent = ({
 
   const handleInput = (text) => {
     if (selectedPaymentMethod?.id === 0) {
-      setRecievedAmount(text);
+      dispatch(updateRecievedAmount(text));
     } else {
       setAmountPaid(text);
     }
   };
 
   useEffect(() => {
-    if (!isValidAmount) {
-      setSelectedPaymentMethod(paymentMethods[1]);
-      setAmountPaid(recievedAmount);
+    if (recievedAmount < totalCartCost) {
+      setAmountPaid(String(recievedAmount));
     }
   }, [visible]);
 
   return (
     <View style={{ marginTop: 10 }}>
-      <Text
-        style={{
-          fontWeight: "600",
-        }}
-      >
-        Payment method
-      </Text>
+      {offersDebt && (
+        <Text
+          style={{
+            fontWeight: "600",
+          }}
+        >
+          Payment method
+        </Text>
+      )}
       <View
         style={{
           height: 1,
@@ -75,21 +82,24 @@ const PaymentMethodComponent = ({
           marginVertical: 5,
         }}
       />
-      <FlatList
-        data={paymentMethods}
-        renderItem={({ item }) => (
-          <ChipButton
-            title={item?.name}
-            isSelected={item?.id === selectedPaymentMethod?.id}
-            onPress={() => setSelectedPaymentMethod(item)}
-          />
-        )}
-        keyExtractor={(item) => item?.name.toString()}
-        numColumns={3}
-      />
+
+      {offersDebt && (
+        <FlatList
+          data={paymentMethods}
+          renderItem={({ item }) => (
+            <ChipButton
+              title={item?.name}
+              isSelected={item?.id === selectedPaymentMethod?.id}
+              onPress={() => setSelectedPaymentMethod(item)}
+            />
+          )}
+          keyExtractor={(item) => item?.name.toString()}
+          numColumns={3}
+        />
+      )}
 
       <View>
-        {selectedPaymentMethod?.id === 0 && (
+        {selectedPaymentMethod?.id === 0 && collectInfo === true && (
           <View
             style={{
               flexDirection: "row",
@@ -112,7 +122,8 @@ const PaymentMethodComponent = ({
             />
           </View>
         )}
-        {selectedPaymentMethod?.id === 1 && (
+
+        {selectedPaymentMethod?.id === 1 && offersDebt === true && (
           <MyDropDown
             style={{
               backgroundColor: Colors.light,
@@ -143,7 +154,9 @@ const PaymentMethodComponent = ({
                 : "Amount paid"
             }
             value={
-              selectedPaymentMethod?.id === 0 ? recievedAmount : amountPaid
+              selectedPaymentMethod?.id === 0
+                ? String(recievedAmount)
+                : amountPaid
             }
             onValueChange={(text) => handleInput(text)}
             cursorColor={Colors.dark}

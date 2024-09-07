@@ -3,16 +3,17 @@ import CardHeader from "@components/card_components/CardHeader";
 import DataRow from "@components/card_components/DataRow";
 import SalesTable from "@screens/sales_desk/components/SalesTable";
 import { formatDate, formatNumberWithCommas } from "@utils/Utils";
-import { UserContext, userData } from "context/UserContext";
-import { useCallback, useContext, useEffect, useState } from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { View, StyleSheet } from "react-native";
+import { useSelector } from "react-redux";
+import { getShops } from "reducers/selectors";
 
 function OfflineSaleTxnCard({ data, onRemove }) {
   const { lineItems, soldOnDate, onCredit, shopId } = data;
 
   const [expanded, setExpanded] = useState(false);
 
-  const { shops } = userData();
+  const shops = useSelector(getShops);
 
   const toggleExpand = useCallback(() => {
     setExpanded(!expanded);
@@ -29,7 +30,7 @@ function OfflineSaleTxnCard({ data, onRemove }) {
 
       <SalesTable sales={lineItems} fixHeight={false} />
 
-      {expanded && <TxnCashSummary data={data} />}
+      {expanded && <TxnCashSummary data={data} shop={shop} />}
 
       <CardFooter
         onClick2={toggleExpand}
@@ -43,19 +44,15 @@ function OfflineSaleTxnCard({ data, onRemove }) {
 
 export default OfflineSaleTxnCard;
 
-export const TxnCashSummary = ({ data }) => {
-  const { lineItems, amountPaid, shopId } = data;
+export const TxnCashSummary = ({ data, shop }) => {
+  const { lineItems, amountPaid } = data;
 
   const [itemCount, setItemCount] = useState(0);
   const [totalCost, setTotalCost] = useState(0);
 
-  const { shops } = userData();
-
-  const shop = shops?.find((shop) => shop?.id === shopId);
-
   const currency = shop?.currency;
   useEffect(() => {
-    if (lineItems !== undefined) {
+    if (lineItems) {
       let cartQty = lineItems.reduce((a, item) => a + item.quantity, 0);
       let cartCost = lineItems.reduce((a, i) => a + i.totalCost, 0);
 

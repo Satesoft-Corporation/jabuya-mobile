@@ -1,11 +1,12 @@
-import React, { memo, useContext, useState } from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { UserContext } from "context/UserContext";
 import Colors from "@constants/Colors";
 import PopUpmenu from "./PopUpMenu";
 import SearchBar from "./SearchBar";
 import { scale } from "react-native-size-matters";
+import { useSelector } from "react-redux";
+import { getSelectedShop } from "reducers/selectors";
 
 const TopHeader = ({
   title = "Details",
@@ -19,7 +20,7 @@ const TopHeader = ({
   showShops = false,
 }) => {
   const [showBar, setShowBar] = useState(false);
-  const { selectedShop } = useContext(UserContext);
+  const selectedShop = useSelector(getSelectedShop);
 
   const navigation = useNavigation();
   const toggleSearch = () => {

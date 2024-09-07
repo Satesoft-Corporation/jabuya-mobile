@@ -41,3 +41,5 @@ export const getCart = (state) => state.shop.cart;
 export const getOffersDebt = (state) => state.shop.offersDebt;
 
 export const getCollectClientInfo = (state) => state.shop.collectClientInfo;
+
+export const getMenuList = (state) => state.userData.menuList;

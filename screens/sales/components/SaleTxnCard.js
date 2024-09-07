@@ -6,9 +6,13 @@ import { formatNumberWithCommas } from "@utils/Utils";
 import { memo, useCallback, useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import SaleCardHeader from "./SaleCardHeader";
+import { useSelector } from "react-redux";
+import { getShops } from "reducers/selectors";
 
-function SaleTxnCard({ data, print, shops = [] }) {
+function SaleTxnCard({ data, print }) {
   // sales report item card
+
+  const shops = useSelector(getShops) ?? [];
 
   const { lineItems, totalCost, amountPaid, balanceGivenOut } = data;
 

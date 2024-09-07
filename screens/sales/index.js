@@ -1,8 +1,6 @@
 import { View, Text, SafeAreaView, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { userData } from "context/UserContext";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
 import {
   convertDateFormat,
   formatDate,
@@ -19,6 +17,16 @@ import SaleTxnCard from "./components/SaleTxnCard";
 import { OFFLINE_SALES, SHOP_SUMMARY } from "@navigation/ScreenNames";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { printSale } from "@utils/PrintService";
+import { useSelector } from "react-redux";
+import {
+  getFilterParams,
+  getOfflineSales,
+  getSelectedShop,
+  getUserType,
+} from "reducers/selectors";
+import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
+import { userTypes } from "@constants/Constants";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 export default function ViewSales() {
   const [sales, setSales] = useState([]);
@@ -32,22 +40,22 @@ export default function ViewSales() {
   const [daysCapital, setDaysCapital] = useState(0);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [offlineSales, setOfflineSales] = useState(false);
+
+  const netInfo = useNetInfo();
+
+  const offlineSales = useSelector(getOfflineSales);
+  const filterParams = useSelector(getFilterParams);
+  const selectedShop = useSelector(getSelectedShop);
+  const userType = useSelector(getUserType);
+
+  const isShopOwner = userType === userTypes.isShopOwner;
 
   const navigation = useNavigation();
-  const { userParams, selectedShop, filterParams, shops } = userData();
-
-  const { isShopOwner } = userParams;
 
   const print = async (data) => {
     setLoading(true);
     await printSale(data);
     setLoading(false);
-  };
-
-  const unsavedSales = async () => {
-    let list = await UserSessionUtils.getPendingSales();
-    setOfflineSales(list?.length > 0);
   };
 
   const menuItems = [
@@ -56,7 +64,7 @@ export default function ViewSales() {
       onClick: () => setVisible(true),
     },
 
-    ...(offlineSales === true
+    ...(offlineSales?.length > 0
       ? [
           {
             name: "Offline sales",
@@ -100,10 +108,10 @@ export default function ViewSales() {
     setLoading(true);
     setMessage(null);
 
-    let searchParameters = {
+    const searchParameters = {
       offset: 0,
       limit: 0,
-      ...filterParams(),
+      ...filterParams,
       startDate: getCurrentDay(),
       ...(day && {
         startDate: convertDateFormat(day),
@@ -111,50 +119,57 @@ export default function ViewSales() {
       }),
     };
 
+    console.log(searchParameters);
     clearFields();
 
-    await new BaseApiService("/shop-sales")
-      .getRequestWithJsonResponse(searchParameters)
-      .then((response) => {
-        const data = [...response.records].filter(
-          (sale) => sale?.balanceGivenOut >= 0
-        ); //to filter out credit sales
+    if (netInfo.isInternetReachable === false) {
+      setMessage("Cannot connect to the internet.");
+      setLoading(false);
+    } else {
+      await new BaseApiService(SHOP_SALES_ENDPOINT)
+        .getRequestWithJsonResponse(searchParameters)
+        .then((response) => {
+          console.log(response.records);
+          const data = [...response.records].filter(
+            (sale) => sale?.balanceGivenOut >= 0
+          ); //to filter out credit sales
 
-        let sV = data.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
+          let sV = data.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
 
-        if (response.totalItems === 0) {
-          setMessage(`No sales made on this day for ${selectedShop?.name}`);
-        }
-
-        data.forEach((item) => {
-          const { lineItems } = item;
-          if (lineItems !== undefined) {
-            let cartQty = lineItems.reduce((a, item) => a + item.quantity, 0);
-
-            let cartProfit = lineItems.reduce((a, i) => a + i.totalProfit, 0);
-
-            let cap = lineItems.reduce((a, i) => a + i.totalPurchaseCost, 0); // cart capital
-
-            profits.push(cartProfit);
-            saleCapital.push(cap);
-
-            setCount(cartQty);
+          if (response.totalItems === 0) {
+            setMessage(`No sales made on this day for ${selectedShop?.name}`);
           }
+
+          data.forEach((item) => {
+            const { lineItems } = item;
+            if (lineItems !== undefined) {
+              let cartQty = lineItems.reduce((a, item) => a + item.quantity, 0);
+
+              let cartProfit = lineItems.reduce((a, i) => a + i.totalProfit, 0);
+
+              let cap = lineItems.reduce((a, i) => a + i.totalPurchaseCost, 0); // cart capital
+
+              profits.push(cartProfit);
+              saleCapital.push(cap);
+
+              setCount(cartQty);
+            }
+          });
+
+          let income = profits.reduce((a, b) => a + b, 0); //getting the sum profit in all carts
+          let capital = saleCapital.reduce((a, b) => a + b, 0);
+
+          setDaysProfit(Math.round(income));
+          setDaysCapital(Math.round(capital));
+          setSalesValue(sV);
+          setSales(response?.records);
+          setLoading(false);
+        })
+        .catch((error) => {
+          setLoading(false);
+          setMessage("Cannot get sales!", error?.message);
         });
-
-        let income = profits.reduce((a, b) => a + b, 0); //getting the sum profit in all carts
-        let capital = saleCapital.reduce((a, b) => a + b, 0);
-
-        setDaysProfit(Math.round(income));
-        setDaysCapital(Math.round(capital));
-        setSalesValue(sV);
-        setSales(response?.records);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        setMessage("Cannot get sales!", error?.message);
-      });
+    }
   };
 
   const setCount = (count) => {
@@ -163,7 +178,6 @@ export default function ViewSales() {
 
   useEffect(() => {
     getSales();
-    unsavedSales();
   }, [selectedShop]);
 
   return (
@@ -247,7 +261,6 @@ export default function ViewSales() {
             data={item}
             isShopOwner={isShopOwner}
             print={(data) => print(data)}
-            shops={shops}
           />
         )}
         ListEmptyComponent={() => (

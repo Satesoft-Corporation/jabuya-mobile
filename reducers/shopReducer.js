@@ -51,6 +51,7 @@ const shopReducer = (state = initialState, action) => {
             cartItems: [...state.cart.cartItems, action.payload],
             totalCartCost: totalCartCost + totalCost,
             totalQty: totalQty + quantity,
+            recievedAmount: state.cart.recievedAmount,
           },
         };
       }
@@ -125,6 +126,8 @@ const shopReducer = (state = initialState, action) => {
       return {
         ...state,
         selectedShop: action.payload,
+        offersDebt: action.payload?.supportsCreditSales,
+        collectClientInfo: action.payload?.captureClientDetailsOnAllSales,
       };
     }
 
@@ -158,19 +161,6 @@ const shopReducer = (state = initialState, action) => {
       };
     }
 
-    case actions.OFFERS_DEBT: {
-      return {
-        ...state,
-        offersDebt: action.payload,
-      };
-    }
-
-    case actions.COLLECT_CLIENTS_INFO: {
-      return {
-        ...state,
-        collectClientInfo: action.payload,
-      };
-    }
     default:
       return state;
   }

@@ -1,13 +1,11 @@
 import { View, Text } from "react-native";
-import React, { useContext, useState } from "react";
-import { UserContext } from "context/UserContext";
+import React, { useContext, useEffect, useState } from "react";
 import { SaleEntryContext } from "context/SaleEntryContext";
 import { useNetInfo } from "@react-native-community/netinfo";
 import {
   convertToServerDate,
   formatDate,
   formatNumberWithCommas,
-  isValidNumber,
 } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
 import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
@@ -16,16 +14,31 @@ import PaymentMethodComponent from "./PaymentMethodComponent";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import ModalContent from "@components/ModalContent";
 import Colors from "@constants/Colors";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
 import DataRow from "@components/card_components/DataRow";
-import { useSelector } from "react-redux";
-import { getCart, getSelectedShop, getShopClients } from "reducers/selectors";
-import { clearCart } from "actions/shopActions";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAttendantShopId,
+  getCart,
+  getOffersDebt,
+  getOfflineParams,
+  getSelectedShop,
+  getUserType,
+} from "reducers/selectors";
+import { addOfflineSale, clearCart, setClientSales } from "actions/shopActions";
+import { paymentMethods, userTypes } from "@constants/Constants";
+import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 
 const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
-  const clients = useSelector(getShopClients);
+  const dispatch = useDispatch();
   const selectedShop = useSelector(getSelectedShop);
   const cart = useSelector(getCart);
+  const offlineParams = useSelector(getOfflineParams);
+  const attendantShopId = useSelector(getAttendantShopId);
+
+  const userType = useSelector(getUserType);
+
+  const isShopAttendant = userType === userTypes.isShopAttendant;
+  const isSuperAdmin = userType === userTypes.isSuperAdmin;
 
   const clearEverything = () => dispatch(clearCart());
 
@@ -38,16 +51,11 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
   const [selectedClient, setSelectedClient] = useState(null);
   const [clientName, setClientName] = useState("");
   const [clientNumber, setClientNumber] = useState("");
-
-  const { userParams } = useContext(UserContext);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 
   const netinfo = useNetInfo();
 
-  const { selectedPaymentMethod, setLoading, setSelectedPaymentMethod } =
-    useContext(SaleEntryContext);
-
-  const { isShopAttendant, attendantShopId, isShopOwner, shopOwnerId } =
-    userParams;
+  const { setLoading } = useContext(SaleEntryContext);
 
   const clearForm = () => {
     setAmountPaid("");
@@ -60,13 +68,6 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
   const postSales = async () => {
     setSubmitted(true);
     setError(null);
-
-    const searchParameters = {
-      offset: 0,
-      limit: 10000,
-      ...(isShopAttendant && { shopId: attendantShopId }),
-      ...(isShopOwner && { shopOwnerId }),
-    };
 
     const onCredit = selectedPaymentMethod?.id === 1;
 
@@ -86,8 +87,9 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
 
     setLoading(true);
 
+    console.log(payLoad);
     if (netinfo?.isInternetReachable === true) {
-      await new BaseApiService("/shop-sales")
+      await new BaseApiService(SHOP_SALES_ENDPOINT)
         .postRequest(payLoad)
         .then(async (response) => {
           let d = { info: await response.json(), status: response.status };
@@ -98,7 +100,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
           let id = info?.id;
 
           if (status === 200) {
-            await new BaseApiService(`/shop-sales/${id}/confirm`)
+            await new BaseApiService(`${SHOP_SALES_ENDPOINT}/${id}/confirm`)
               .postRequest()
               .then((d) => d.json())
               .then(async (response) => {
@@ -109,8 +111,9 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
                   clearForm();
                   snackbarRef.current.show("Sale confirmed successfully", 4000);
                   onComplete();
-                  if (onCredit && !userParams?.isSuperAdmin) {
-                    await saveClientSalesOnDevice(searchParameters);
+                  if (onCredit && !isSuperAdmin) {
+                    const c = await saveClientSalesOnDevice(offlineParams);
+                    dispatch(setClientSales(c));
                   }
                 }
               })
@@ -130,7 +133,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
         });
     } else {
       setVisible(false);
-      await UserSessionUtils.addPendingSale(payLoad);
+      dispatch(addOfflineSale(payLoad));
       setTimeout(() => setLoading(false), 1000);
       clearEverything();
       clearForm();
@@ -142,10 +145,10 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
     setError(null);
     const isValidAmount = Number(recievedAmount) >= totalCartCost;
     let isValid = true;
+
     if (selectedPaymentMethod?.id === 0) {
-      if (!isValidNumber(recievedAmount)) {
+      if (isNaN(recievedAmount)) {
         setError("Invalid input for recieved amount.");
-        console.log(recievedAmount);
         isValid = false;
         return;
       }
@@ -160,16 +163,30 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
       }
     }
 
-    if (selectedPaymentMethod?.id === 1 && !selectedClient) {
-      setError("Client selection is required for debt sales.");
-      isValid = false;
-      return;
+    if (selectedPaymentMethod?.id === 1) {
+      if (isNaN(amountPaid)) {
+        setError("Please enter a valid amount.");
+        isValid = false;
+        return;
+      }
+
+      if (!selectedClient) {
+        setError("Client selection is required for debt sales.");
+        isValid = false;
+        return;
+      }
     }
 
     if (isValid === true) {
       postSales();
     }
   };
+
+  useEffect(() => {
+    setSelectedPaymentMethod(
+      recievedAmount < totalCartCost ? paymentMethods[1] : paymentMethods[0]
+    );
+  }, [visible]);
 
   return (
     <ModalContent visible={visible} style={{ padding: 10 }}>
@@ -193,7 +210,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
       </View>
 
       {serverError && (
-        <View style={{ marginVertical: 5 }}>
+        <View style={{ marginVertical: 3 }}>
           <Text
             numberOfLines={4}
             style={{
@@ -247,7 +264,6 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
         setSoldOnDate={setSoldOnDate}
         amountPaid={amountPaid}
         setAmountPaid={setAmountPaid}
-        clients={clients}
         selectedClient={selectedClient}
         setSelectedClient={setSelectedClient}
         visible={visible}
@@ -255,13 +271,15 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
         clientNumber={clientNumber}
         setClientName={setClientName}
         setClientNumber={setClientNumber}
+        selectedPaymentMethod={selectedPaymentMethod}
+        setSelectedPaymentMethod={setSelectedPaymentMethod}
       />
 
       <View
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          marginTop: 30,
+          marginTop: 20,
           gap: 10,
           marginBottom: 10,
         }}

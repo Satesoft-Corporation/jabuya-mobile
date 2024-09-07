@@ -8,8 +8,7 @@ import Loader from "@components/Loader";
 import UserProfile from "@components/UserProfile";
 import { MenuIcon } from "@components/MenuIcon";
 import Colors from "@constants/Colors";
-import { navList } from "./navList";
-import { COMING_SOON, CONTACT_BOOK, ENTRIES } from "@navigation/ScreenNames";
+import { COMING_SOON } from "@navigation/ScreenNames";
 import LockScreenModal from "@screens/applock/LockScreenModal";
 import {
   saveClientSalesOnDevice,
@@ -19,14 +18,12 @@ import {
 } from "@controllers/OfflineControllers";
 import { useSelector } from "react-redux";
 import {
-  getAttendantShopId,
-  getAttendantShopName,
   getConfigureStatus,
   getLastApplockTime,
   getLastLoginTime,
+  getMenuList,
   getOfflineParams,
   getShopOwnerId,
-  getUserData,
   getUserType,
 } from "reducers/selectors";
 import { useDispatch } from "react-redux";
@@ -40,8 +37,6 @@ import { BaseApiService } from "@utils/BaseApiService";
 import {
   changeSelectedShop,
   setClientSales,
-  setCollectClintInfo,
-  setOffersDebt,
   setShopClients,
   setShopProducts,
   setShops,
@@ -52,8 +47,6 @@ import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 const LandingScreen = () => {
   const [loading, setLoading] = useState(false);
   const [showLock, setShowLock] = useState(false);
-
-  const [menu, setMenu] = useState([]);
 
   const navigation = useNavigation();
 
@@ -67,7 +60,9 @@ const LandingScreen = () => {
   const userType = useSelector(getUserType);
   const shopOwnerId = useSelector(getShopOwnerId);
 
+  const menuList = useSelector(getMenuList);
   const isShopAttendant = userType === userTypes.isShopAttendant;
+
   const getRefreshToken = async () => {
     const loginInfo = await UserSessionUtils.getLoginDetails();
     if (loginInfo) {
@@ -87,14 +82,10 @@ const LandingScreen = () => {
     if (refresh === true) {
       setLoading(true);
       let shops = [];
-      let menuList = [...navList];
+
       const shopData = await saveShopDetails(offlineParams, isShopAttendant);
 
       const offersDebt = shopData?.some((s) => s?.supportsCreditSales === true);
-
-      const collectClientInfo = shopData?.some(
-        (s) => s?.captureClientDetailsOnAllSales === true
-      );
 
       if (shopData?.length > 1) {
         shops = [{ name: ALL_SHOPS_LABEL, id: shopOwnerId }, ...shopData];
@@ -104,23 +95,12 @@ const LandingScreen = () => {
 
       dispatch(changeSelectedShop(shops[0]));
       dispatch(setShops(shops));
-      dispatch(setOffersDebt(offersDebt));
-      dispatch(setCollectClintInfo(collectClientInfo));
 
       if (offersDebt === true) {
         const clients = await saveShopClients(offlineParams);
         const clientSales = await saveClientSalesOnDevice(offlineParams);
-        menuList = [...navList];
         dispatch(setShopClients(clients));
         dispatch(setClientSales(clientSales));
-      }
-
-      if (offersDebt === false) {
-        menuList = menuList.filter((i) => i.target !== CONTACT_BOOK);
-      }
-
-      if (isShopAttendant) {
-        menuList = menuList.filter((i) => i.target !== ENTRIES);
       }
 
       if (userType !== userTypes.isSuperAdmin) {
@@ -128,7 +108,6 @@ const LandingScreen = () => {
         dispatch(setShopProducts(products));
       }
 
-      setMenu(menuList);
       dispatch(setIsUserConfigured(true));
     }
   };
@@ -206,7 +185,7 @@ const LandingScreen = () => {
       >
         <FlatList
           style={{ marginTop: 10 }}
-          data={menu}
+          data={menuList}
           renderItem={({ item }) => (
             <MenuIcon icon={item} onPress={() => handleTabPress(item)} />
           )}

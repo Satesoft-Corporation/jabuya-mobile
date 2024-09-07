@@ -11,8 +11,12 @@ import Colors from "@constants/Colors";
 import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
 import StockingIcon from "@components/StockingIcon";
+import { useSelector } from "react-redux";
+import { getOffersDebt } from "reducers/selectors";
 
 const ReportsMenu = ({ navigation }) => {
+  const offersDebt = useSelector(getOffersDebt);
+
   let list = [
     {
       title: "Daily sales",
@@ -35,7 +39,7 @@ const ReportsMenu = ({ navigation }) => {
       title: "Expenses",
       target: EXPENSES,
     },
-  ];
+  ].filter((i) => (!offersDebt ? i.target !== CREDIT_SALES : i));
 
   const onPress = (item) => {
     if (item.target) {

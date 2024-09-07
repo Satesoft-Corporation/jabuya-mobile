@@ -1,4 +1,6 @@
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
+import { CONTACT_BOOK, ENTRIES } from "@navigation/ScreenNames";
+import { navList } from "@screens/landing_screen/navList";
 import * as actions from "actions/actionTypes";
 
 const initialState = {
@@ -14,6 +16,7 @@ const initialState = {
   lastApplockTime: null,
   offlineParams: {},
   filterParams: {},
+  menuList: [],
 };
 
 const userReduer = (state = initialState, action) => {
@@ -59,6 +62,26 @@ const userReduer = (state = initialState, action) => {
             : isSuperAdmin === true
             ? userTypes.isSuperAdmin
             : null,
+      };
+    }
+    case actions.SET_SHOPS: {
+      const offersDebt = action.payload?.some(
+        (s) => s?.supportsCreditSales === true
+      );
+
+      let menuList = [...navList];
+
+      if (state.userType === userTypes.isShopAttendant) {
+        menuList = menuList.filter((i) => i.target !== ENTRIES);
+      }
+
+      if (offersDebt === false) {
+        menuList = menuList.filter((i) => i.target !== CONTACT_BOOK);
+      }
+
+      return {
+        ...state,
+        menuList: menuList,
       };
     }
 
