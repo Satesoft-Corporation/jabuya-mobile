@@ -8,7 +8,6 @@ import ItemHeader from "@screens/sales/components/ItemHeader";
 import VerticalSeparator from "@components/VerticalSeparator";
 import StockLevelCard from "./components/StockLevelCard";
 import Snackbar from "@components/Snackbar";
-import { userData } from "context/UserContext";
 import TopHeader from "@components/TopHeader";
 import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
@@ -21,19 +20,18 @@ import {
   getUserType,
 } from "reducers/selectors";
 import { userTypes } from "@constants/Constants";
+import { setShopProducts } from "actions/shopActions";
 
 const StockLevel = ({ navigation }) => {
   const [message, setMessage] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [stockLevels, setStockLevels] = useState([]);
   const [stockLevelRecords, setStockLevelRecords] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [stock, setStock] = useState(0);
   const [pdtValue, setPdtValue] = useState(0);
 
   const dispatch = useDispatch();
-  // const products = await saveShopProductsOnDevice(offlineParams);
-  // dispatch(setShopProducts(products));
 
   const offlineParams = useSelector(getOfflineParams);
   const selectedShop = useSelector(getSelectedShop);
@@ -45,8 +43,6 @@ const StockLevel = ({ navigation }) => {
 
   const fetchShopProducts = async () => {
     try {
-      setLoading(true);
-
       let pdtList = shopProducts.filter((p) => p.shopId === selectedShop?.id);
 
       pdtList = pdtList?.filter((item) =>
@@ -58,7 +54,7 @@ const StockLevel = ({ navigation }) => {
       setStockLevelRecords(pdtList?.length);
 
       //for calculations
-      const newList = list?.map((data) => {
+      const newList = pdtList?.map((data) => {
         const summary = data?.performanceSummary;
         const productSoldQty = summary?.totalQuantitySold || 0;
         const productStockedQty = summary?.totalQuantityStocked || 0;
@@ -85,17 +81,17 @@ const StockLevel = ({ navigation }) => {
 
       setPdtValue(items);
       setStock(stock);
-      setLoading(false);
 
-      if (list.length === 0) {
+      if (pdtList.length === 0) {
         setMessage("No shop products found");
       }
 
-      if (list.length === 0 && searchTerm !== "") {
+      if (pdtList.length === 0 && searchTerm !== "") {
         setMessage(`No results found for ${searchTerm}`);
       }
+
+      setTimeout(() => setLoading(false), 2000);
     } catch (error) {
-      console.log(error);
       setMessage("Error fetching stock records");
       setLoading(false);
     }
@@ -152,8 +148,19 @@ const StockLevel = ({ navigation }) => {
     });
     const excelData = [titles, ...summarisedata];
 
-    await saveExcelSheet(`${selectedShop?.name}'s product list`, excelData);
+    await saveExcelSheet(`${selectedShop?.name}'s product pdtList`, excelData);
     setLoading(false);
+  };
+
+  const handleRefresh = async () => {
+    setSearchTerm("");
+    setLoading(true);
+    const products = await saveShopProductsOnDevice(
+      offlineParams,
+      shopProducts
+    );
+    dispatch(setShopProducts(products));
+    fetchShopProducts();
   };
 
   useEffect(() => {
@@ -227,11 +234,7 @@ const StockLevel = ({ navigation }) => {
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
         renderItem={({ item }) => <StockLevelCard data={item} />}
-        onRefresh={async () => {
-          setSearchTerm("");
-          await saveShopProductsOnDevice(offlineParams, 2 === 2);
-          fetchShopProducts();
-        }}
+        onRefresh={handleRefresh}
         refreshing={loading}
         ListEmptyComponent={() => (
           <View

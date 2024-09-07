@@ -6,10 +6,11 @@ import { useNavigation } from "@react-navigation/native";
 import { EXPENSE_FORM } from "../../navigation/ScreenNames";
 import ExpenseCard from "./ExpenseCard";
 import { BaseApiService } from "../../utils/BaseApiService";
-import { userData } from "../../context/UserContext";
 import { EXPENSES_ENDPOINT } from "../../utils/EndPointUtils";
 import ItemHeader from "../sales/components/ItemHeader";
 import VerticalSeparator from "../../components/VerticalSeparator";
+import { getFilterParams, getSelectedShop } from "reducers/selectors";
+import { useSelector } from "react-redux";
 
 const Expenses = ({}) => {
   const navigation = useNavigation();
@@ -22,7 +23,8 @@ const Expenses = ({}) => {
 
   const [loading, setLoading] = useState(true);
 
-  const { selectedShop, filterParams, userParams } = userData();
+  const selectedShop = useSelector(getSelectedShop);
+  const filterParams = useSelector(getFilterParams);
 
   const fetchExpenses = async () => {
     setMessage(null);
@@ -31,7 +33,7 @@ const Expenses = ({}) => {
     const searchParameters = {
       limit: 0,
       offset: 0,
-      ...filterParams(),
+      ...filterParams,
     };
 
     await new BaseApiService(EXPENSES_ENDPOINT)

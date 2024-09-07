@@ -1,6 +1,5 @@
 import { View, Text, KeyboardAvoidingView } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import { userData } from "context/UserContext";
 import { BaseApiService } from "@utils/BaseApiService";
 import { SHOP_PRODUCTS_ENDPOINT } from "@utils/EndPointUtils";
 import { hasNull } from "@utils/Utils";
@@ -17,9 +16,22 @@ import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native";
 import MyInput from "@components/MyInput";
 import Snackbar from "@components/Snackbar";
+import {
+  getOfflineParams,
+  getSelectedShop,
+  getShopProducts,
+  getShops,
+} from "reducers/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import { changeSelectedShop, setShopProducts } from "actions/shopActions";
 
 const ProductEntry = ({ route }) => {
-  const { selectedShop, offlineParams, shops, setSelectedShop } = userData();
+  const selectedShop = useSelector(getSelectedShop);
+  const offlineParams = useSelector(getOfflineParams);
+  const shops = useSelector(getShops);
+  const shopProducts = useSelector(getShopProducts);
+
+  const dispatch = useDispatch();
 
   const [edit, setEdit] = useState(false);
   const [manufacturers, setManufacturers] = useState([]);
@@ -188,7 +200,7 @@ const ProductEntry = ({ route }) => {
       });
   };
 
-  const saveProduct = () => {
+  const saveProduct = async () => {
     setSubmitted(true);
     setLoading(true);
 
@@ -213,16 +225,22 @@ const ProductEntry = ({ route }) => {
       setLoading(false); //removing loader if form is invalid
     }
     if (isValidPayload === true) {
-      new BaseApiService(apiUrl)
+      await new BaseApiService(apiUrl)
         .saveRequestWithJsonResponse(payload, edit)
         .then(async (response) => {
           if (!edit) {
             clearForm();
           }
+
+          const newList = await saveShopProductsOnDevice(
+            offlineParams,
+            shopProducts
+          );
+          dispatch(setShopProducts(newList));
           setLoading(false);
           setSubmitted(false);
           snackBarRef.current.show("Product saved successfully", 6000);
-          await saveShopProductsOnDevice(offlineParams, true);
+
           setDisable(false);
         })
         .catch((error) => {
@@ -269,7 +287,7 @@ const ProductEntry = ({ route }) => {
                   data={shops?.filter((shop) => !shop?.name?.includes("All"))}
                   value={selectedShop}
                   onChange={(e) => {
-                    setSelectedShop(e);
+                    dispatch(changeSelectedShop(e));
                   }}
                   placeholder="Select Shop"
                   labelField="name"

@@ -1,8 +1,13 @@
-import { View, Text, SafeAreaView, FlatList, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  FlatList,
+  StyleSheet,
+  Alert,
+} from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { StackActions, useNavigation } from "@react-navigation/native";
-import { userData } from "context/UserContext";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
 import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
 import ItemHeader from "@screens/sales/components/ItemHeader";
@@ -12,74 +17,84 @@ import Snackbar from "@components/Snackbar";
 import CreditSaleCard from "./components/CreditSaleCard";
 import { CLIENT_FORM } from "@navigation/ScreenNames";
 import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
+import {
+  getClientSales,
+  getFilterParams,
+  getOfflineParams,
+  getSelectedShop,
+  getShopClients,
+  getUserType,
+} from "reducers/selectors";
+import { userTypes } from "@constants/Constants";
+import { useSelector } from "react-redux";
+import { setClientSales } from "actions/shopActions";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 const CreditSales = () => {
   const navigation = useNavigation();
-
+  const netInfo = useNetInfo();
   const [loading, setLoading] = useState(false);
 
   const [message, setMessage] = useState(null);
+  const [clients, setClients] = useState([]);
 
   const [debt, setDebt] = useState(0);
   const [paid, setPaid] = useState(0);
   const [bal, setBal] = useState(0);
-  const [clients, setClients] = useState([]);
   const [adds, setAdds] = useState(0);
 
+  const offlineParams = useSelector(getOfflineParams);
+  const selectedShop = useSelector(getSelectedShop);
+  const userType = useSelector(getUserType);
+  const creditSales = useSelector(getClientSales);
+  const shopClients = useSelector(getShopClients);
+
+  const isShopAttendant = userType === userTypes.isShopAttendant;
+  const isShopOwner = userType === userTypes.isShopOwner;
+
   const snackbarRef = useRef(null);
-  const { selectedShop, userParams, offlineParams } = userData();
 
   const fetchClients = async () => {
-    const { name, id } = selectedShop;
     setMessage(null);
     setLoading(true);
     setBal(0);
     setDebt(0);
     setPaid(0);
-    setClients([]);
     setAdds(0);
+    setClients(shopClients?.filter((i) => i?.shop?.id === selectedShop?.id));
 
-    const creditSales = await UserSessionUtils.getClientSales();
-
-    await UserSessionUtils.getShopClients(name?.includes("All") ? null : id)
-      .then((response) => {
-        if (response.length === 0) {
-          setMessage("No records found");
-          setLoading(false);
-          return true;
-        }
-        setClients(response);
-        const debt = creditSales.reduce((a, b) => a + b?.amountLoaned, 0);
-        const paid = creditSales.reduce((a, b) => a + b?.amountRepaid, 0);
-        setDebt(debt);
-        setPaid(paid);
-        setBal(debt - paid);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        setMessage("Error fetching shop clients");
-        console.log(error);
-      });
+    if (creditSales.length === 0) {
+      setMessage("No records found");
+      setLoading(false);
+      return true;
+    }
+    const debt = creditSales.reduce((a, b) => a + b?.amountLoaned, 0);
+    const paid = creditSales.reduce((a, b) => a + b?.amountRepaid, 0);
+    setDebt(debt);
+    setPaid(paid);
+    setBal(debt - paid);
+    setLoading(false);
   };
 
   const handleRefresh = async () => {
-    setLoading(true);
-    await saveClientSalesOnDevice(offlineParams, true);
-    fetchClients();
+    if (netInfo.isInternetReachable) {
+      setLoading(true);
+      const clientSales = await saveClientSalesOnDevice(
+        offlineParams,
+        creditSales
+      );
+      dispatch(setClientSales(clientSales));
+      fetchClients();
+    } else {
+      Alert.alert("Cannot connect to the internet");
+    }
   };
   useEffect(() => {
     fetchClients();
   }, [selectedShop]);
 
-  useEffect(() => {
-    if (clients?.length === adds && clients.length > 0) {
-      setLoading(false);
-    }
-  }, [adds]);
-
   const menuItems = [
-    ...(userParams?.isShopOwner === true
+    ...(isShopOwner === true
       ? [
           {
             name: "Add debtor",
@@ -95,7 +110,7 @@ const CreditSales = () => {
       <AppStatusBar />
       <TopHeader
         title="Debt records"
-        showMenuDots={!userParams?.isShopAttendant}
+        showMenuDots={!isShopAttendant}
         menuItems={menuItems}
         showShops
       />

@@ -4,8 +4,9 @@ import { useNavigation } from "@react-navigation/native";
 import CardHeader from "@components/card_components/CardHeader";
 import DataColumn from "@components/card_components/DataColumn";
 import { CLIENT_DEBTS } from "@navigation/ScreenNames";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
 import CardFooter from "@components/card_components/CardFooter";
+import { getClientSales } from "reducers/selectors";
+import { useSelector } from "react-redux";
 
 const CreditSaleCard = ({ client }) => {
   const navigation = useNavigation();
@@ -21,8 +22,11 @@ const CreditSaleCard = ({ client }) => {
   const mob = client?.phoneNumber;
   const currency = client?.shop?.currency?.symbol;
 
+  const creditSales = useSelector(getClientSales);
+
   const fetchCreditSales = async () => {
-    const list = await UserSessionUtils.getClientSales(client?.id);
+    const list = [...creditSales].filter((i) => i?.client_id === client?.id);
+
     const debt = list.reduce((a, b) => a + b?.amountLoaned, 0);
     const paid = list.reduce((a, b) => a + b?.amountRepaid, 0);
     const bal = debt - paid;

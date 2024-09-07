@@ -12,13 +12,14 @@ import { UserSessionUtils } from "@utils/UserSessionUtils";
 import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
 import Colors from "@constants/Colors";
-import { userData } from "context/UserContext";
+import { useSelector } from "react-redux";
+import { getSelectedShop } from "reducers/selectors";
 
 const ContactBook = () => {
   const [clients, setClients] = useState([]);
   const [message, setMessage] = useState(null);
 
-  const { selectedShop } = userData();
+  const selectedShop = useSelector(getSelectedShop);
 
   const fetchClients = async () => {
     const { name, id } = selectedShop;

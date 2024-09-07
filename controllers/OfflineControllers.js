@@ -5,7 +5,6 @@ import {
   CURRENCIES_ENDPOINT,
   SHOP_ENDPOINT,
   SHOP_PRODUCTS_ENDPOINT,
-  SHOP_SALES_ENDPOINT,
 } from "@utils/EndPointUtils";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 
@@ -28,7 +27,7 @@ export const saveCurrencies = async () => {
   return currencies;
 };
 
-export const saveShopProductsOnDevice = async (searchParameters) => {
+export const saveShopProductsOnDevice = async (searchParameters, prev = []) => {
   let pdts = [];
 
   console.log("saving pdts offline");
@@ -41,12 +40,13 @@ export const saveShopProductsOnDevice = async (searchParameters) => {
     })
     .catch((error) => {
       console.log("Unknown Error", error?.message);
+      pdts = [...prev];
     });
 
   return pdts;
 };
 
-export const saveShopClients = async (searchParameters) => {
+export const saveShopClients = async (searchParameters, prev = []) => {
   let clients = [];
 
   await new BaseApiService(CLIENTS_ENDPOINT)
@@ -57,6 +57,7 @@ export const saveShopClients = async (searchParameters) => {
     })
     .catch((error) => {
       console.log("Unknown Error", error?.message);
+      clients = [...prev];
     });
 
   return clients;
@@ -108,7 +109,7 @@ export const saveShopDetails = async (
   return shopsArray;
 };
 
-export const saveClientSalesOnDevice = async (searchParameters) => {
+export const saveClientSalesOnDevice = async (searchParameters, prev = []) => {
   let clientSales = [];
   console.log("Saving credit sales");
   await new BaseApiService(CLIENT_SALES_ENDPOINT)
@@ -152,6 +153,7 @@ export const saveClientSalesOnDevice = async (searchParameters) => {
     })
     .catch((error) => {
       console.log("Unknown Error", error?.message);
+      clientSales = [...prev];
     });
 
   return clientSales;

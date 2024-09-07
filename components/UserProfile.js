@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React from "react";
 import { View, TouchableOpacity, Image, Text } from "react-native";
-import { UserSessionUtils } from "../utils/UserSessionUtils";
 import Colors from "../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { UserContext } from "../context/UserContext";
 import PopUpmenu from "./PopUpMenu";
 import { SETTINGS } from "../navigation/ScreenNames";
 import { scale } from "react-native-size-matters";

@@ -18,12 +18,15 @@ import {
 } from "@controllers/OfflineControllers";
 import { useSelector } from "react-redux";
 import {
+  getClientSales,
   getConfigureStatus,
   getLastApplockTime,
   getLastLoginTime,
   getMenuList,
   getOfflineParams,
+  getShopClients,
   getShopOwnerId,
+  getShopProducts,
   getUserType,
 } from "reducers/selectors";
 import { useDispatch } from "react-redux";
@@ -59,6 +62,9 @@ const LandingScreen = () => {
   const prevPinTime = useSelector(getLastApplockTime);
   const userType = useSelector(getUserType);
   const shopOwnerId = useSelector(getShopOwnerId);
+  const prevProducts = useSelector(getShopProducts);
+  const prevClients = useSelector(getShopClients);
+  const prevClientSales = useSelector(getClientSales);
 
   const menuList = useSelector(getMenuList);
   const isShopAttendant = userType === userTypes.isShopAttendant;
@@ -97,14 +103,20 @@ const LandingScreen = () => {
       dispatch(setShops(shops));
 
       if (offersDebt === true) {
-        const clients = await saveShopClients(offlineParams);
-        const clientSales = await saveClientSalesOnDevice(offlineParams);
+        const clients = await saveShopClients(offlineParams, prevClients);
+        const clientSales = await saveClientSalesOnDevice(
+          offlineParams,
+          prevClientSales
+        );
         dispatch(setShopClients(clients));
         dispatch(setClientSales(clientSales));
       }
 
       if (userType !== userTypes.isSuperAdmin) {
-        const products = await saveShopProductsOnDevice(offlineParams);
+        const products = await saveShopProductsOnDevice(
+          offlineParams,
+          prevProducts
+        );
         dispatch(setShopProducts(products));
       }
 
@@ -147,16 +159,16 @@ const LandingScreen = () => {
 
         console.log("login time", logintimeDifferance);
 
-        // if (netInfo.isInternetReachable === true) {
-        await configureUserData(configStatus === false);
+        if (netInfo.isInternetReachable === true) {
+          await configureUserData(configStatus === false);
 
-        if (hours >= 13 || days >= 1) {
-          setLoading(true);
-          await getRefreshToken();
-          await configureUserData(true);
+          if (hours >= 13 || days >= 1) {
+            setLoading(true);
+            await getRefreshToken();
+            await configureUserData(true);
+          }
         }
       }
-      // }
       setLoading(false);
     } catch (e) {
       console.error(e);

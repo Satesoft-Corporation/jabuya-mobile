@@ -1,6 +1,5 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView } from "react-native";
 import React, { useState, useRef } from "react";
-import { userData } from "context/UserContext";
 import { convertToServerDate } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
 import TopHeader from "@components/TopHeader";
@@ -11,6 +10,13 @@ import { MyDropDown } from "@components/DropdownComponents";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import Snackbar from "@components/Snackbar";
 import { saveShopClients } from "@controllers/OfflineControllers";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getOfflineParams,
+  getSelectedShop,
+  getShopClients,
+} from "reducers/selectors";
+import { setShopClients } from "actions/shopActions";
 
 const NewClient = () => {
   const [firstName, setFirstName] = useState("");
@@ -23,8 +29,11 @@ const NewClient = () => {
   const [phone2, setPhone2] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { selectedShop, offlineParams } = userData();
+  const selectedShop = useSelector(getSelectedShop);
+  const offlineParams = useSelector(getOfflineParams);
+  const clients = useSelector(getShopClients);
 
+  const dispatch = useDispatch();
   const snackRef = useRef(null);
 
   const clearForm = () => {
@@ -53,10 +62,11 @@ const NewClient = () => {
     new BaseApiService("/clients-controller")
       .saveRequestWithJsonResponse(payload, false)
       .then(async (response) => {
+        const list = await saveShopClients(offlineParams, clients);
+        dispatch(setShopClients(list));
         setLoading(false);
         clearForm();
         snackRef.current.show("Client details saved", 4000);
-        await saveShopClients(offlineParams, true);
       })
       .catch((e) => {
         setLoading(false);

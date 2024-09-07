@@ -22,6 +22,8 @@ import {
   getOffersDebt,
   getOfflineParams,
   getSelectedShop,
+  getShopClients,
+  getShopProducts,
   getUserType,
 } from "reducers/selectors";
 import { addOfflineSale, clearCart, setClientSales } from "actions/shopActions";
@@ -34,6 +36,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
   const cart = useSelector(getCart);
   const offlineParams = useSelector(getOfflineParams);
   const attendantShopId = useSelector(getAttendantShopId);
+  const prevClients = useSelector(getShopClients);
 
   const userType = useSelector(getUserType);
 
@@ -112,7 +115,10 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
                   snackbarRef.current.show("Sale confirmed successfully", 4000);
                   onComplete();
                   if (onCredit && !isSuperAdmin) {
-                    const c = await saveClientSalesOnDevice(offlineParams);
+                    const c = await saveClientSalesOnDevice(
+                      offlineParams,
+                      prevClients
+                    );
                     dispatch(setClientSales(c));
                   }
                 }

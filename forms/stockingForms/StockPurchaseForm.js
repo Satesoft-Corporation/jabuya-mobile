@@ -1,6 +1,5 @@
 import { View, Text, ScrollView, SafeAreaView, StyleSheet } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import { userData } from "context/UserContext";
 import { BaseApiService } from "@utils/BaseApiService";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import {
@@ -23,9 +22,23 @@ import { KeyboardAvoidingView } from "react-native";
 import Loader from "@components/Loader";
 import { packageOptions } from "@constants/Constants";
 import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
+import {
+  getOfflineParams,
+  getSelectedShop,
+  getShopProducts,
+  getShops,
+} from "reducers/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import { changeSelectedShop, setShopProducts } from "actions/shopActions";
 
 const StockPurchaseForm = ({ route }) => {
-  const { selectedShop, shops, setSelectedShop, offlineParams } = userData();
+  const selectedShop = useSelector(getSelectedShop);
+  const offlineParams = useSelector(getOfflineParams);
+  const shopProducts = useSelector(getShopProducts);
+
+  const shops = useSelector(getShops);
+
+  const dispatch = useDispatch();
 
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -145,8 +158,12 @@ const StockPurchaseForm = ({ route }) => {
           if (!edit) {
             clearForm();
           }
-          await resolveUnsavedSales(); //to auto saved a pending sale if the purchase was for that specific item
-          await saveShopProductsOnDevice(offlineParams, 2 === 2);
+          const newList = await saveShopProductsOnDevice(
+            offlineParams,
+            shopProducts
+          );
+
+          dispatch(setShopProducts(newList));
           setSubmitted(false);
           setLoading(false);
           snackBarRef.current.show("Stock entry saved successfully", 6000);
@@ -262,7 +279,7 @@ const StockPurchaseForm = ({ route }) => {
                 data={shops?.filter((shop) => !shop?.name?.includes("All"))}
                 value={selectedShop}
                 onChange={(e) => {
-                  setSelectedShop(e);
+                  dispatch(changeSelectedShop(e));
                 }}
                 placeholder="Select Shop"
                 labelField="name"

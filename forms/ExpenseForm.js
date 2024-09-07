@@ -1,9 +1,7 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView } from "react-native";
-import React, { useContext, useEffect, useState, useRef } from "react";
-import { UserContext } from "context/UserContext";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { BaseApiService } from "@utils/BaseApiService";
-import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
 import Loader from "@components/Loader";
 import Colors from "@constants/Colors";
@@ -12,6 +10,9 @@ import MyInput from "@components/MyInput";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import { BaseStyle } from "@utils/BaseStyle";
 import Snackbar from "@components/Snackbar";
+import { useDispatch, useSelector } from "react-redux";
+import { getSelectedShop, getShops } from "reducers/selectors";
+import { changeSelectedShop } from "actions/shopActions";
 
 const ExpenseForm = () => {
   const [categories, setCategories] = useState([]);
@@ -21,7 +22,9 @@ const ExpenseForm = () => {
   const [remarks, setRemarks] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const { selectedShop, setSelectedShop, shops } = useContext(UserContext);
+  const dispatch = useDispatch();
+  const selectedShop = useSelector(getSelectedShop);
+  const shops = useSelector(getShops);
 
   const snackRef = useRef(null);
   const navigation = useNavigation();
@@ -113,7 +116,7 @@ const ExpenseForm = () => {
                 data={shops?.filter((shop) => !shop?.name?.includes("All"))}
                 value={selectedShop}
                 onChange={(e) => {
-                  setSelectedShop(e);
+                  dispatch(changeSelectedShop(e));
                 }}
                 placeholder="Select "
                 labelField="name"

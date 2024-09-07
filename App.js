@@ -7,7 +7,6 @@ import LandingScreen from "@screens/landing_screen";
 import ViewSales from "@screens/sales";
 import BarCodeScreen from "@screens/sales_desk/BarCodeScreen";
 import ShopSummary from "@screens/shop_summary/ShopSummary";
-import StockingMenu from "@screens/stocking";
 import StockEntries from "@screens/stocking/StockEntries";
 import StockLevel from "@screens/stocking/StockLevels";
 import StockPurchaseForm from "@forms/stockingForms/StockPurchaseForm";
@@ -19,7 +18,6 @@ import NewClient from "@forms/NewClient";
 import ContactBook from "@screens/ContactBook";
 import Expenses from "@screens/expenses";
 import ExpenseForm from "@forms/ExpenseForm";
-import IncomeGraph from "@screens/perfomance_graphs/IncomeGraph";
 import OfflineSales from "@screens/sales/OfflineSales";
 import ClientDebts from "@screens/credit/ClientDebts";
 import { UserProvider } from "context/UserContext";
@@ -68,7 +66,6 @@ export default function App() {
 
                 <Stack.Screen name={s.SHOP_SUMMARY} component={ShopSummary} />
 
-                <Stack.Screen name={s.STOCKNG} component={StockingMenu} />
                 <Stack.Screen name={s.STOCK_ENTRY} component={StockEntries} />
                 <Stack.Screen name={s.STOCK_LEVELS} component={StockLevel} />
 
@@ -93,8 +90,6 @@ export default function App() {
 
                 <Stack.Screen name={s.EXPENSES} component={Expenses} />
                 <Stack.Screen name={s.EXPENSE_FORM} component={ExpenseForm} />
-
-                <Stack.Screen name={s.INCOME_GRAPHS} component={IncomeGraph} />
 
                 <Stack.Screen name={s.OFFLINE_SALES} component={OfflineSales} />
 

@@ -32,9 +32,7 @@ export const EXPENSE_FORM = "expense_form";
 export const LOCK_SCREEN = "lock_screen";
 export const LOCK_SETuP = "lock_setup";
 
-export const INCOME_GRAPHS = "income_graphs";
 export const REPORTS_MENU = "reports_menu";
 export const COMING_SOON = "coming_soon";
 
 export const ENTRIES = "entries";
-

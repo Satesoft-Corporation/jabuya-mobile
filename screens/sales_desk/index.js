@@ -138,7 +138,7 @@ function SalesDesk({ navigation }) {
 
   const onComplete = async () => {
     if (!isSuperAdmin) {
-      const pdts = await saveShopProductsOnDevice(offlineParams); // updating offline products
+      const pdts = await saveShopProductsOnDevice(offlineParams, shopProducts); // updating offline products
       dispatch(setShopProducts(pdts));
     }
   };

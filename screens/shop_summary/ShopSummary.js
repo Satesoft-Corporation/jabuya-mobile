@@ -11,10 +11,11 @@ import AppStatusBar from "../../components/AppStatusBar";
 import Colors from "../../constants/Colors";
 import Loader from "../../components/Loader";
 import UserProfile from "../../components/UserProfile";
-import { UserContext } from "../../context/UserContext";
 import Stripe from "./components/Stripe1";
 import { formatNumberWithCommas } from "../../utils/Utils";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
+import { useSelector } from "react-redux";
+import { getSelectedShop, getShopOwnerId } from "reducers/selectors";
 
 const ShopSummary = ({ navigation, route }) => {
   const [initialCapital, setInitialCapital] = useState("");
@@ -23,9 +24,8 @@ const ShopSummary = ({ navigation, route }) => {
   const [totalSalesValue, setTotalSalesValue] = useState(null); //cash at hand
   const [financialRecords, setFinancialRecords] = useState(null);
 
-  const { userParams, selectedShop } = useContext(UserContext);
-
-  const { shopOwnerId } = userParams;
+  const selectedShop = useSelector(getSelectedShop);
+  const shopOwnerId = useSelector(getShopOwnerId);
 
   const fetchShopProducts = async () => {
     let products = await UserSessionUtils.getShopProducts();

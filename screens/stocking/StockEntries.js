@@ -1,7 +1,6 @@
 import { View, Text, FlatList } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
-import { userData } from "context/UserContext";
-import { MAXIMUM_RECORDS_PER_FETCH } from "@constants/Constants";
+import { MAXIMUM_RECORDS_PER_FETCH, userTypes } from "@constants/Constants";
 import { BaseApiService } from "@utils/BaseApiService";
 import AppStatusBar from "@components/AppStatusBar";
 import Colors from "@constants/Colors";
@@ -10,6 +9,12 @@ import StockEntryCard from "./components/StockEntryCard";
 import Snackbar from "@components/Snackbar";
 import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
 import { STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
+import {
+  getFilterParams,
+  getSelectedShop,
+  getUserType,
+} from "reducers/selectors";
+import { useSelector } from "react-redux";
 
 const StockEntries = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
@@ -22,7 +27,9 @@ const StockEntries = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const snackbarRef = useRef(null);
 
-  const { selectedShop, filterParams, userParams } = userData();
+  const filterParams = useSelector(getFilterParams);
+  const selectedShop = useSelector(getSelectedShop);
+  const userType = useSelector(getUserType);
 
   const fetchStockEntries = async (offsetToUse = 0) => {
     try {
@@ -31,7 +38,7 @@ const StockEntries = ({ navigation }) => {
 
       const searchParameters = {
         limit: MAXIMUM_RECORDS_PER_FETCH,
-        ...filterParams(),
+        ...filterParams,
         offset: offsetToUse,
         ...(searchTerm &&
           searchTerm.trim() !== "" && { searchTerm: searchTerm }),
@@ -107,7 +114,7 @@ const StockEntries = ({ navigation }) => {
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}
         disabled={disable}
-        showMenuDots={userParams?.isShopAttendant === false}
+        showMenuDots={userType !== userTypes.isShopAttendant}
         menuItems={menuItems}
         showShops
       />
