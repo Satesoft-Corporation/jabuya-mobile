@@ -17,8 +17,8 @@ import { changeUser, loginAction } from "actions/userActions";
 import { screenWidth } from "@constants/Constants";
 
 export default function Login() {
-  const [username, setUsername] = useState("mosesjespar@gmail.com");
-  const [password, setPassword] = useState("0701807062");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [disabled, setDisabled] = useState(false);
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState(null);
