@@ -14,7 +14,12 @@ import { LOCK_SETuP, OFFLINE_SALES } from "@navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "@components/Icon";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserData, getUserPinCode, getUserType } from "reducers/selectors";
+import {
+  getOfflineSales,
+  getUserData,
+  getUserPinCode,
+  getUserType,
+} from "reducers/selectors";
 import {
   logOutAction,
   setApplockTime,
@@ -26,7 +31,6 @@ const Settings = () => {
   const [message, setMessage] = useState("");
   const [agreeText, setAgreeText] = useState(null);
   const [canCancel, setCanCancel] = useState(false);
-  const [pendingSales, setPendingSales] = useState(0);
 
   const navigation = useNavigation();
 
@@ -34,6 +38,7 @@ const Settings = () => {
   const userPincode = useSelector(getUserPinCode);
   const sessionObj = useSelector(getUserData);
   const userType = useSelector(getUserType);
+  const pendingSales = useSelector(getOfflineSales);
 
   const onToggleSwitch = async () => {
     if (userPincode === null) {
@@ -53,13 +58,8 @@ const Settings = () => {
     }
   };
 
-  const checkForUnsavedSales = async () => {
-    const data = await UserSessionUtils.getPendingSales();
-    setPendingSales(data?.length);
-  };
-
   const handleLogout = async () => {
-    if (pendingSales === 0) {
+    if (pendingSales?.length === 0) {
       setMessage("Are you sure you want to log out?");
       setAgreeText("Log out");
       setCanCancel(true);
@@ -67,17 +67,13 @@ const Settings = () => {
     } else {
       setAgreeText("View sales");
       setMessage(
-        `Cannot logout, you have ${pendingSales} unsaved sale (s) on your device, please connect to the internet to save them.`
+        `Cannot logout, you have ${pendingSales?.length} unsaved sale(s) on your device, please connect to the internet to save them.`
       );
       setCanCancel(false);
       setShowModal(true);
       return;
     }
   };
-
-  useEffect(() => {
-    checkForUnsavedSales();
-  }, [showMoodal]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

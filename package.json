@@ -15,7 +15,7 @@
     "@react-native-community/netinfo": "^11.3.1",
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.17",
-    "eas-cli": "^5.4.0",
+    "eas-cli": "^12.1.0",
     "expo": "~51.0.31",
     "expo-barcode-scanner": "~13.0.1",
     "expo-constants": "~16.0.2",

@@ -19,7 +19,6 @@ import { CLIENT_FORM } from "@navigation/ScreenNames";
 import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
 import {
   getClientSales,
-  getFilterParams,
   getOfflineParams,
   getSelectedShop,
   getShopClients,
@@ -28,11 +27,10 @@ import {
 import { userTypes } from "@constants/Constants";
 import { useSelector } from "react-redux";
 import { setClientSales } from "actions/shopActions";
-import { useNetInfo } from "@react-native-community/netinfo";
+import { hasInternetConnection } from "@utils/NetWork";
 
 const CreditSales = () => {
   const navigation = useNavigation();
-  const netInfo = useNetInfo();
   const [loading, setLoading] = useState(false);
 
   const [message, setMessage] = useState(null);
@@ -77,7 +75,9 @@ const CreditSales = () => {
   };
 
   const handleRefresh = async () => {
-    if (netInfo.isInternetReachable) {
+    const hasNet = await hasInternetConnection();
+
+    if (hasNet === true) {
       setLoading(true);
       const clientSales = await saveClientSalesOnDevice(
         offlineParams,

@@ -35,7 +35,6 @@ import {
   loginAction,
   setIsUserConfigured,
 } from "actions/userActions";
-import { useNetInfo } from "@react-native-community/netinfo";
 import { BaseApiService } from "@utils/BaseApiService";
 import {
   changeSelectedShop,
@@ -46,6 +45,7 @@ import {
 } from "actions/shopActions";
 import { LOGIN_END_POINT } from "@utils/EndPointUtils";
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
+import { hasInternetConnection } from "@utils/NetWork";
 
 const LandingScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -53,7 +53,6 @@ const LandingScreen = () => {
 
   const navigation = useNavigation();
 
-  const netInfo = useNetInfo();
   const dispatch = useDispatch();
 
   const offlineParams = useSelector(getOfflineParams);
@@ -148,6 +147,7 @@ const LandingScreen = () => {
   const handleLoginSession = async () => {
     try {
       await handlePinLockStatus();
+      const hasNet = await hasInternetConnection();
 
       if (prevLoginTime !== null) {
         const logintimeDifferance = getTimeDifference(
@@ -159,7 +159,7 @@ const LandingScreen = () => {
 
         console.log("login time", logintimeDifferance);
 
-        if (netInfo.isInternetReachable === true) {
+        if (hasNet === true) {
           await configureUserData(configStatus === false);
 
           if (hours >= 13 || days >= 1) {

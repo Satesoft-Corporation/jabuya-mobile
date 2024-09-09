@@ -26,7 +26,7 @@ import {
 } from "reducers/selectors";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { userTypes } from "@constants/Constants";
-import { useNetInfo } from "@react-native-community/netinfo";
+import { hasInternetConnection } from "@utils/NetWork";
 
 export default function ViewSales() {
   const [sales, setSales] = useState([]);
@@ -40,8 +40,6 @@ export default function ViewSales() {
   const [daysCapital, setDaysCapital] = useState(0);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  const netInfo = useNetInfo();
 
   const offlineSales = useSelector(getOfflineSales);
   const filterParams = useSelector(getFilterParams);
@@ -119,10 +117,10 @@ export default function ViewSales() {
       }),
     };
 
-    console.log(searchParameters);
     clearFields();
+    const hasNet = await hasInternetConnection();
 
-    if (netInfo.isInternetReachable === false) {
+    if (hasNet === false) {
       setMessage("Cannot connect to the internet.");
       setLoading(false);
     } else {

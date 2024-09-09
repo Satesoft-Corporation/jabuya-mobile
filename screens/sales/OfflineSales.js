@@ -12,11 +12,11 @@ import VerticalSeparator from "@components/VerticalSeparator";
 import { formatNumberWithCommas } from "@utils/Utils";
 import ItemHeader from "./components/ItemHeader";
 import Snackbar from "@components/Snackbar";
-import { useNetInfo } from "@react-native-community/netinfo";
 import { useDispatch, useSelector } from "react-redux";
 import { getOffersDebt, getOfflineSales } from "reducers/selectors";
 import { BaseApiService } from "@utils/BaseApiService";
 import { removeOfflineSale } from "actions/shopActions";
+import { hasInternetConnection } from "@utils/NetWork";
 
 const OfflineSales = () => {
   const [sales, setSales] = useState([]);
@@ -29,7 +29,6 @@ const OfflineSales = () => {
   const [debts, setDebts] = useState(0);
 
   const snackbarRef = useRef(null);
-  const netinfo = useNetInfo();
   const salesList = useSelector(getOfflineSales);
   const offersDebt = useSelector(getOffersDebt);
   const dispatch = useDispatch();
@@ -102,7 +101,9 @@ const OfflineSales = () => {
     }
   };
   const handleSave = async () => {
-    if (netinfo.isInternetReachable === true && !loading) {
+    const hasNet = await hasInternetConnection();
+
+    if (hasNet === true && !loading) {
       setSavingErrors([]);
       setLoading(true);
       const errors = await saveSales();

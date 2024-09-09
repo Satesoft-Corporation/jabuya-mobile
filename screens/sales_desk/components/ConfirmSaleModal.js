@@ -1,7 +1,6 @@
 import { View, Text } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { SaleEntryContext } from "context/SaleEntryContext";
-import { useNetInfo } from "@react-native-community/netinfo";
 import {
   convertToServerDate,
   formatDate,
@@ -19,16 +18,15 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getAttendantShopId,
   getCart,
-  getOffersDebt,
   getOfflineParams,
   getSelectedShop,
   getShopClients,
-  getShopProducts,
   getUserType,
 } from "reducers/selectors";
 import { addOfflineSale, clearCart, setClientSales } from "actions/shopActions";
 import { paymentMethods, userTypes } from "@constants/Constants";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
+import { hasInternetConnection } from "@utils/NetWork";
 
 const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
   const dispatch = useDispatch();
@@ -55,8 +53,6 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
   const [clientName, setClientName] = useState("");
   const [clientNumber, setClientNumber] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-
-  const netinfo = useNetInfo();
 
   const { setLoading } = useContext(SaleEntryContext);
 
@@ -90,8 +86,9 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
 
     setLoading(true);
 
-    console.log(payLoad);
-    if (netinfo?.isInternetReachable === true) {
+    const hasNet = await hasInternetConnection();
+
+    if (hasNet === true) {
       await new BaseApiService(SHOP_SALES_ENDPOINT)
         .postRequest(payLoad)
         .then(async (response) => {
