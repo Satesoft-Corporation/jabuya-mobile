@@ -1,6 +1,5 @@
 import { View, Text } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import { SaleEntryContext } from "context/SaleEntryContext";
 import {
   convertToServerDate,
   formatDate,
@@ -28,7 +27,13 @@ import { paymentMethods, userTypes } from "@constants/Constants";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { hasInternetConnection } from "@utils/NetWork";
 
-const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
+const ConfirmSaleModal = ({
+  setVisible,
+  snackbarRef,
+  visible,
+  onComplete,
+  setLoading,
+}) => {
   const dispatch = useDispatch();
   const selectedShop = useSelector(getSelectedShop);
   const cart = useSelector(getCart);
@@ -53,8 +58,6 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete }) => {
   const [clientName, setClientName] = useState("");
   const [clientNumber, setClientNumber] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-
-  const { setLoading } = useContext(SaleEntryContext);
 
   const clearForm = () => {
     setAmountPaid("");

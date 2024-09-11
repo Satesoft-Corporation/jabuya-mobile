@@ -189,7 +189,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
                 marginLeft: 4,
               }}
             >
-              Quantity {unitCost} {salesPrice}
+              Quantity 
             </Text>
             <TextInput
               onFocus={() => setErrors(null)}

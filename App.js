@@ -20,8 +20,6 @@ import Expenses from "@screens/expenses";
 import ExpenseForm from "@forms/ExpenseForm";
 import OfflineSales from "@screens/sales/OfflineSales";
 import ClientDebts from "@screens/credit/ClientDebts";
-import { UserProvider } from "context/UserContext";
-import { SaleEntryProvider } from "context/SaleEntryContext";
 import SalesDesk from "@screens/sales_desk";
 import * as s from "@navigation/ScreenNames";
 import Login from "@screens/auth";
@@ -30,80 +28,67 @@ import ComingSoon from "@screens/coming_soon";
 import Entries from "@screens/entries";
 import AppStatusBar from "@components/AppStatusBar";
 import { Provider } from "react-redux";
-import { store } from "store";
 import LoadingScreen from "@screens/landing_screen/LoadingScreen";
+import { duqactStore } from "duqactStore";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
 
   return (
-    <Provider store={store}>
+    <Provider store={duqactStore}>
       <MenuProvider>
-        <UserProvider>
-          <SaleEntryProvider>
-            <NavigationContainer>
-              <AppStatusBar />
-              <Stack.Navigator
-                screenOptions={{
-                  headerShown: false,
-                }}
-              >
-                <Stack.Screen name={"Loading"} component={LoadingScreen} />
+        <NavigationContainer>
+          <AppStatusBar />
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name={"Loading"} component={LoadingScreen} />
 
-                <Stack.Screen
-                  name={s.LANDING_SCREEN}
-                  component={LandingScreen}
-                />
+            <Stack.Screen name={s.LANDING_SCREEN} component={LandingScreen} />
 
-                <Stack.Screen name={s.LOGIN} component={Login} />
+            <Stack.Screen name={s.LOGIN} component={Login} />
 
-                <Stack.Screen name={s.SALES_DESK} component={SalesDesk} />
-                <Stack.Screen name={s.SALES_REPORTS} component={ViewSales} />
-                <Stack.Screen
-                  name={s.BARCODE_SCREEN}
-                  component={BarCodeScreen}
-                />
+            <Stack.Screen name={s.SALES_DESK} component={SalesDesk} />
+            <Stack.Screen name={s.SALES_REPORTS} component={ViewSales} />
+            <Stack.Screen name={s.BARCODE_SCREEN} component={BarCodeScreen} />
 
-                <Stack.Screen name={s.SHOP_SUMMARY} component={ShopSummary} />
+            <Stack.Screen name={s.SHOP_SUMMARY} component={ShopSummary} />
 
-                <Stack.Screen name={s.STOCK_ENTRY} component={StockEntries} />
-                <Stack.Screen name={s.STOCK_LEVELS} component={StockLevel} />
+            <Stack.Screen name={s.STOCK_ENTRY} component={StockEntries} />
+            <Stack.Screen name={s.STOCK_LEVELS} component={StockLevel} />
 
-                <Stack.Screen name={s.PDT_ENTRY} component={ProductEntry} />
-                <Stack.Screen
-                  name={s.STOCK_ENTRY_FORM}
-                  component={StockPurchaseForm}
-                />
+            <Stack.Screen name={s.PDT_ENTRY} component={ProductEntry} />
+            <Stack.Screen
+              name={s.STOCK_ENTRY_FORM}
+              component={StockPurchaseForm}
+            />
 
-                <Stack.Screen name={s.SETTINGS} component={Settings} />
-                <Stack.Screen name={s.LOCK_SETuP} component={LockSetUp} />
+            <Stack.Screen name={s.SETTINGS} component={Settings} />
+            <Stack.Screen name={s.LOCK_SETuP} component={LockSetUp} />
 
-                <Stack.Screen name={s.CREDIT_SALES} component={CreditSales} />
-                <Stack.Screen
-                  name={s.CREDIT_PAYMENTS}
-                  component={CreditPayment}
-                />
+            <Stack.Screen name={s.CREDIT_SALES} component={CreditSales} />
+            <Stack.Screen name={s.CREDIT_PAYMENTS} component={CreditPayment} />
 
-                <Stack.Screen name={s.CLIENT_FORM} component={NewClient} />
+            <Stack.Screen name={s.CLIENT_FORM} component={NewClient} />
 
-                <Stack.Screen name={s.CONTACT_BOOK} component={ContactBook} />
+            <Stack.Screen name={s.CONTACT_BOOK} component={ContactBook} />
 
-                <Stack.Screen name={s.EXPENSES} component={Expenses} />
-                <Stack.Screen name={s.EXPENSE_FORM} component={ExpenseForm} />
+            <Stack.Screen name={s.EXPENSES} component={Expenses} />
+            <Stack.Screen name={s.EXPENSE_FORM} component={ExpenseForm} />
 
-                <Stack.Screen name={s.OFFLINE_SALES} component={OfflineSales} />
+            <Stack.Screen name={s.OFFLINE_SALES} component={OfflineSales} />
 
-                <Stack.Screen name={s.CLIENT_DEBTS} component={ClientDebts} />
+            <Stack.Screen name={s.CLIENT_DEBTS} component={ClientDebts} />
 
-                <Stack.Screen name={s.REPORTS_MENU} component={ReportsMenu} />
+            <Stack.Screen name={s.REPORTS_MENU} component={ReportsMenu} />
 
-                <Stack.Screen name={s.COMING_SOON} component={ComingSoon} />
+            <Stack.Screen name={s.COMING_SOON} component={ComingSoon} />
 
-                <Stack.Screen name={s.ENTRIES} component={Entries} />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </SaleEntryProvider>
-        </UserProvider>
+            <Stack.Screen name={s.ENTRIES} component={Entries} />
+          </Stack.Navigator>
+        </NavigationContainer>
       </MenuProvider>
     </Provider>
   );

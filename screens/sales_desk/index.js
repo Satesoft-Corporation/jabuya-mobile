@@ -1,5 +1,12 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Text, View, TextInput, ScrollView, SafeAreaView } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  Text,
+  View,
+  TextInput,
+  ScrollView,
+  SafeAreaView,
+  Alert,
+} from "react-native";
 import { useRef } from "react";
 import {
   BARCODE_SCREEN,
@@ -7,7 +14,6 @@ import {
   SALES_REPORTS,
 } from "@navigation/ScreenNames";
 import Colors from "@constants/Colors";
-import AppStatusBar from "@components/AppStatusBar";
 import ConfirmSaleModal from "./components/ConfirmSaleModal";
 import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
 import { BlackScreen } from "@components/BlackAndWhiteScreen";
@@ -16,10 +22,9 @@ import {
   MyDropDown,
   SalesDropdownComponent,
 } from "@components/DropdownComponents";
-import { formatNumberWithCommas, isValidNumber } from "@utils/Utils";
+import { formatNumberWithCommas } from "@utils/Utils";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import SalesTable from "./components/SalesTable";
-import { SaleEntryContext } from "context/SaleEntryContext";
 import Snackbar from "@components/Snackbar";
 import DataRow from "@components/card_components/DataRow";
 import { scale } from "react-native-size-matters";
@@ -47,6 +52,7 @@ import {
   setShopProducts,
   updateRecievedAmount,
 } from "actions/shopActions";
+import Loader from "@components/Loader";
 
 function SalesDesk({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -54,6 +60,7 @@ function SalesDesk({ navigation }) {
   const [showConfirmed, setShowConfirmed] = useState(false); //the confirm dialog
   const [clients, setClients] = useState([]);
   const [showMoodal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const snackbarRef = useRef(null);
 
@@ -76,8 +83,6 @@ function SalesDesk({ navigation }) {
 
   const { cartItems, totalCartCost, recievedAmount, totalQty } = cart;
 
-  const { setLoading } = useContext(SaleEntryContext);
-
   const isSuperAdmin = userType === userTypes.isSuperAdmin;
   const isShopAttendant = userType === userTypes.isShopAttendant;
 
@@ -95,7 +100,6 @@ function SalesDesk({ navigation }) {
   const fetchProducts = async () => {
     if (isSuperAdmin) {
       await fetchProductsFromServer();
-      setLoading(false);
       return;
     } else {
       const pdtList = shopProducts.filter((p) => p.shopId === selectedShop?.id);
@@ -112,7 +116,6 @@ function SalesDesk({ navigation }) {
         });
       setProducts(inStock);
       setClients(clist);
-      setLoading(false);
     }
   };
 
@@ -128,18 +131,24 @@ function SalesDesk({ navigation }) {
         .getRequestWithJsonResponse(searchParameters)
         .then(async (response) => {
           setProducts(response.records);
-          setLoading(false);
         })
         .catch((error) => {
-          setLoading(false);
+          Alert.alert(error?.message);
         });
     }
   };
 
   const onComplete = async () => {
-    if (!isSuperAdmin) {
-      const pdts = await saveShopProductsOnDevice(offlineParams, shopProducts); // updating offline products
-      dispatch(setShopProducts(pdts));
+    setLoading(false);
+
+    if (isSuperAdmin === false) {
+      setTimeout(async () => {
+        const pdts = await saveShopProductsOnDevice(
+          offlineParams,
+          shopProducts
+        );
+        dispatch(setShopProducts(pdts));
+      }, 10000);
     }
   };
 
@@ -189,14 +198,14 @@ function SalesDesk({ navigation }) {
   };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <AppStatusBar />
-
+      <Loader loading={loading} />
       <ConfirmSaleModal
         visible={showConfirmed}
         setVisible={() => setShowConfirmed(false)}
         snackbarRef={snackbarRef}
         clients={clients}
         onComplete={onComplete}
+        setLoading={setLoading}
       />
 
       <EnterSaleQtyModal showMoodal={showMoodal} setShowModal={setShowModal} />
