@@ -147,9 +147,9 @@ function SalesDesk({ navigation }) {
     fetchProducts();
   }, [searchTerm, selectedShop]);
 
-  // useEffect(() => {
-  //   clearEverything();
-  // }, [selectedShop]);
+  useEffect(() => {
+    clearEverything();
+  }, [selectedShop]);
 
   const handleChange = (value) => {
     setSearchTerm(value);

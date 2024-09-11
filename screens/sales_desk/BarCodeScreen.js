@@ -1,30 +1,26 @@
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
-import AppStatusBar from "@components/AppStatusBar";
 import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
 import Colors from "@constants/Colors";
 import { screenHeight, screenWidth } from "@constants/Constants";
-import { SaleEntryContext } from "context/SaleEntryContext";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
+import { useDispatch } from "react-redux";
+import { makeProductSelection } from "actions/shopActions";
 
 const BarCodeScreen = ({ navigation, route }) => {
   const [hasPermission, setHasPermission] = useState(null);
+  const [showMoodal, setShowModal] = useState(false);
+  const [scanned, setScanned] = useState(false);
 
   const { products } = route?.params;
 
-  const {
-    setQuantity,
-    setSelection,
-    scanned,
-    setScanned,
-    setLoading,
-    setShowModal,
-    setSaleUnits,
-    setSelectedSaleUnit,
-    setInitialUnitCost,
-    setUnitCost,
-  } = useContext(SaleEntryContext);
+  const dispatch = useDispatch();
+
+  const makeSelection = (item) => {
+    dispatch(makeProductSelection(item));
+    setShowModal(true);
+    setScanned(true);
+  };
 
   const handleBarCodeScanned = ({ data }) => {
     try {
@@ -34,55 +30,25 @@ const BarCodeScreen = ({ navigation, route }) => {
     } catch (e) {
       console.error(e);
       setScanned(false);
-      setLoading(false);
     }
   };
 
   const fetchProductByBarCode = async (barcode) => {
-    setLoading(true);
     console.log("scanning");
-    let item;
     if (products) {
-      item = products.find((item) => item.barcode === barcode);
-      console.log("looking through instock pdts");
-    } else {
-      item = await UserSessionUtils.getProductByBarcode(barcode);
-    }
-
-    if (!item) {
-      setLoading(false);
-      setQuantity(null);
-      Alert.alert("Cannot find product in your shop", "", [
-        {
-          text: "Ok",
-          onPress: () => setScanned(false),
-          style: "cancel",
-        },
-      ]);
-    } else {
-      setShowModal(true);
-
-      const { multipleSaleUnits, saleUnitName, salesPrice } = item;
-
-      let defUnit = {
-        productSaleUnitName: saleUnitName,
-        unitPrice: salesPrice,
-      };
-      setSelection(item);
-
-      setShowModal(true);
-
-      if (multipleSaleUnits) {
-        setSaleUnits([defUnit, ...multipleSaleUnits]);
+      const item = products.find((item) => item.barcode === barcode);
+      console.log(item, "ghgggh", products);
+      if (!item) {
+        Alert.alert("Cannot find product in your shop", "", [
+          {
+            text: "Ok",
+            onPress: () => setScanned(false),
+            style: "cancel",
+          },
+        ]);
       } else {
-        setSaleUnits([{ ...defUnit }]);
-        setSelectedSaleUnit(defUnit);
-        setInitialUnitCost(salesPrice);
-        setUnitCost(String(salesPrice));
+        makeSelection(item);
       }
-      setScanned(true);
-      setShowModal(true);
-      setLoading(false);
     }
   };
 
@@ -97,9 +63,7 @@ const BarCodeScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <AppStatusBar />
-
-      <EnterSaleQtyModal />
+      <EnterSaleQtyModal showMoodal={showMoodal} setShowModal={setShowModal} />
 
       <BarCodeScanner
         height={screenHeight}

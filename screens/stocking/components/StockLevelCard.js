@@ -88,11 +88,11 @@ function StockLevelCard({ data }) {
           <DataRow label={"Portion"} value={data?.saleUnitName} />
           <DataRow label={"Barcode"} value={data?.barcode} />
           <DataRow label={"Category"} value={data?.categoryName} />
-          <DataRow label={"Restocked by"} value={data?.changedByFullName} />
-          <DataRow
+          {/* <DataRow label={"Restocked by"} value={data?.changedByFullName} /> */}
+          {/* <DataRow
             label={"Last restock"}
             value={formatDate(data?.dateChanged, true)}
-          />
+          /> */}
           <DataRow label={"Listed by"} value={data?.createdByFullName} />
 
           {data?.remarks && (
