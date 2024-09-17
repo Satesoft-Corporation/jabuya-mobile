@@ -135,7 +135,7 @@ export const saveClientSalesOnDevice = async (searchParameters, prev = []) => {
         return {
           amountLoaned,
           amountRepaid,
-          balance,
+          balance: balance || 0,
           changedByFullName,
           createdByFullName,
           createdByUsername,

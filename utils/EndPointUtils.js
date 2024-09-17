@@ -16,4 +16,4 @@ export const CURRENCIES_ENDPOINT = "/currencies";
 
 export const CLIENT_SALES_ENDPOINT = "/credit-sales";
 
-export const STOCK_INFO_ENDPOINT = " api/v1/reports/product-stock-info";
+export const STOCK_INFO_ENDPOINT = "/reports/product-stock-info";

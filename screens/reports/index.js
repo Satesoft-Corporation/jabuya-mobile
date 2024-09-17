@@ -3,6 +3,7 @@ import React from "react";
 import {
   CREDIT_SALES,
   EXPENSES,
+  SALES_BY_PDT,
   SALES_REPORTS,
   STOCK_ENTRY,
   STOCK_LEVELS,
@@ -13,14 +14,20 @@ import TopHeader from "@components/TopHeader";
 import StockingIcon from "@components/StockingIcon";
 import { useSelector } from "react-redux";
 import { getOffersDebt } from "reducers/selectors";
+import { useNavigation } from "@react-navigation/native";
 
-const ReportsMenu = ({ navigation }) => {
+const ReportsMenu = () => {
   const offersDebt = useSelector(getOffersDebt);
+  const navigation = useNavigation();
 
   let list = [
     {
       title: "Daily sales",
       target: SALES_REPORTS,
+    },
+    {
+      title: "Sales by product",
+      target: SALES_BY_PDT,
     },
     {
       title: "Debts",

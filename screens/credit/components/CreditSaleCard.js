@@ -66,7 +66,7 @@ const CreditSaleCard = ({ client }) => {
         </View>
 
         <CardFooter
-          btnTitle1={bal > 0 ? "More" : null}
+          btnTitle1={bal > 0 ? "View" : null}
           onClick1={() =>
             navigation.navigate(CLIENT_DEBTS, {
               client,

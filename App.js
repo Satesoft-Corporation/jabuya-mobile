@@ -30,6 +30,7 @@ import AppStatusBar from "@components/AppStatusBar";
 import { Provider } from "react-redux";
 import LoadingScreen from "@screens/landing_screen/LoadingScreen";
 import { duqactStore } from "duqactStore";
+import SalesByProduct from "@screens/sales_by_pdt";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -87,6 +88,8 @@ export default function App() {
             <Stack.Screen name={s.COMING_SOON} component={ComingSoon} />
 
             <Stack.Screen name={s.ENTRIES} component={Entries} />
+
+            <Stack.Screen name={s.SALES_BY_PDT} component={SalesByProduct} />
           </Stack.Navigator>
         </NavigationContainer>
       </MenuProvider>

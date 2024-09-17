@@ -141,6 +141,9 @@ export function getCurrentDay(getTomorrowDate = false) {
 export function convertDateFormat(dateString, getTomorrowDate = false) {
   const date = new Date(dateString); // Create a Date object from the input string
 
+  if (getTomorrowDate === true) {
+    date.setDate(date.getDate() + 1); // Increment the date by 1 to get tomorrow's date
+  }
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, "0");
   const day = String(date.getUTCDate()).padStart(2, "0");
@@ -148,10 +151,6 @@ export function convertDateFormat(dateString, getTomorrowDate = false) {
   let minutes = "00";
   let seconds = "00";
   let milliseconds = "00";
-
-  if (getTomorrowDate === true) {
-    date.setDate(date.getDate() + 1); // Increment the date by 1 to get tomorrow's date
-  }
 
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
 }

@@ -19,7 +19,7 @@ import {
   getShopProducts,
   getUserType,
 } from "reducers/selectors";
-import { userTypes } from "@constants/Constants";
+import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { setShopProducts } from "actions/shopActions";
 
 const StockLevel = ({ navigation }) => {
@@ -43,7 +43,13 @@ const StockLevel = ({ navigation }) => {
 
   const fetchShopProducts = async () => {
     try {
+      setLoading(true);
+
       let pdtList = shopProducts.filter((p) => p.shopId === selectedShop?.id);
+
+      if (selectedShop?.name === ALL_SHOPS_LABEL) {
+        pdtList = [...shopProducts];
+      }
 
       pdtList = pdtList?.filter((item) =>
         item?.productName?.toLowerCase()?.includes(searchTerm.toLowerCase())
@@ -184,11 +190,11 @@ const StockLevel = ({ navigation }) => {
           },
         ]
       : []),
-    {
-      name: "Share excel sheet",
-      onClick: () => downloadExcelSheet(),
-      share: true,
-    },
+    // {
+    //   name: "Share excel sheet",
+    //   onClick: () => downloadExcelSheet(),
+    //   share: true,
+    // },
   ];
 
   return (
