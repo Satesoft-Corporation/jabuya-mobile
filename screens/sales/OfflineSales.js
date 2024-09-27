@@ -17,6 +17,7 @@ import { getOffersDebt, getOfflineSales } from "reducers/selectors";
 import { BaseApiService } from "@utils/BaseApiService";
 import { removeOfflineSale } from "actions/shopActions";
 import { hasInternetConnection } from "@utils/NetWork";
+import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 
 const OfflineSales = () => {
   const [sales, setSales] = useState([]);

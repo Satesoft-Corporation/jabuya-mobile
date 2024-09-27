@@ -81,3 +81,16 @@ export const updateRecievedAmount = (amount) => {
     payload: amount,
   };
 };
+
+export const addManufacturers = (list) => {
+  return {
+    type: actionTypes.ADD_MANUFACTURERS,
+    payload: list,
+  };
+};
+export const addSuppliers = (list) => {
+  return {
+    type: actionTypes.ADD_SUPPLIERS,
+    payload: list,
+  };
+};

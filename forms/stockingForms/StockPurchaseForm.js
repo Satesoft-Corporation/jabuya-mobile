@@ -1,17 +1,12 @@
 import { View, Text, ScrollView, SafeAreaView, StyleSheet } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { BaseApiService } from "@utils/BaseApiService";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
 import {
   convertToServerDate,
   formatNumberWithCommas,
   hasNull,
 } from "@utils/Utils";
-import {
-  resolveUnsavedSales,
-  saveShopProductsOnDevice,
-} from "@controllers/OfflineControllers";
-import AppStatusBar from "@components/AppStatusBar";
+import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 import TopHeader from "@components/TopHeader";
 import { MyDropDown } from "@components/DropdownComponents";
 import MyInput from "@components/MyInput";
@@ -27,6 +22,7 @@ import {
   getSelectedShop,
   getShopProducts,
   getShops,
+  getSuppliers,
 } from "reducers/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { changeSelectedShop, setShopProducts } from "actions/shopActions";
@@ -35,6 +31,7 @@ const StockPurchaseForm = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
   const offlineParams = useSelector(getOfflineParams);
   const shopProducts = useSelector(getShopProducts);
+  const suppliers = useSelector(getSuppliers);
 
   const shops = useSelector(getShops);
 
@@ -42,7 +39,6 @@ const StockPurchaseForm = ({ route }) => {
 
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [suppliers, setSuppliers] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [expiryDate, setExpiryDate] = useState(new Date());
   const [isPackedProduct, setIsPackedProduct] = useState(null);
@@ -58,26 +54,13 @@ const StockPurchaseForm = ({ route }) => {
 
   const snackBarRef = useRef(null);
 
-  const fetchSuppliers = async () => {
-    let searchParameters = { offset: 0, limit: 0 };
-    await new BaseApiService("/suppliers")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        setSuppliers(response.records);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-      });
-  };
-
   const fetchProducts = async () => {
     setIsPackedProduct(null);
     setSelectedProduct(null);
 
     setLoading(true);
+    const pdtList = shopProducts.filter((p) => p.shopId === selectedShop?.id);
 
-    const pdtList = await UserSessionUtils.getShopProducts(selectedShop?.id);
     setProducts(pdtList);
     setLoading(false);
   };
@@ -103,7 +86,7 @@ const StockPurchaseForm = ({ route }) => {
     setSubmitted(false);
   };
 
-  const saveStockEntry = () => {
+  const saveStockEntry = async () => {
     setSubmitted(true);
     setLoading(true);
     let payload;
@@ -152,7 +135,7 @@ const StockPurchaseForm = ({ route }) => {
         ? STOCK_ENTRY_ENDPOINT + "/" + selectedProduct.id
         : STOCK_ENTRY_ENDPOINT;
 
-      new BaseApiService(apiUrl)
+      await new BaseApiService(apiUrl)
         .saveRequestWithJsonResponse(payload, edit)
         .then(async (response) => {
           if (!edit) {
@@ -212,9 +195,6 @@ const StockPurchaseForm = ({ route }) => {
       setBatchNo(selectedRecord?.batchNumber);
       setRemarks(selectedRecord?.remarks);
     } else {
-      if (suppliers?.length === 0) {
-        fetchSuppliers();
-      }
       fetchProducts();
     }
   };
@@ -253,8 +233,6 @@ const StockPurchaseForm = ({ route }) => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <AppStatusBar />
-
         <TopHeader title="Stock purchase" />
         <Loader loading={loading} />
         <ScrollView

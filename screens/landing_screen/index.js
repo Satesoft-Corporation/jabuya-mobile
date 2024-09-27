@@ -12,9 +12,11 @@ import { COMING_SOON } from "@navigation/ScreenNames";
 import LockScreenModal from "@screens/applock/LockScreenModal";
 import {
   saveClientSalesOnDevice,
+  saveManufactures,
   saveShopClients,
   saveShopDetails,
   saveShopProductsOnDevice,
+  saveSuppliers,
 } from "@controllers/OfflineControllers";
 import { useSelector } from "react-redux";
 import {
@@ -22,11 +24,13 @@ import {
   getConfigureStatus,
   getLastApplockTime,
   getLastLoginTime,
+  getManufactures,
   getMenuList,
   getOfflineParams,
   getShopClients,
   getShopOwnerId,
   getShopProducts,
+  getSuppliers,
   getUserType,
 } from "reducers/selectors";
 import { useDispatch } from "react-redux";
@@ -37,6 +41,8 @@ import {
 } from "actions/userActions";
 import { BaseApiService } from "@utils/BaseApiService";
 import {
+  addManufacturers,
+  addSuppliers,
   changeSelectedShop,
   setClientSales,
   setShopClients,
@@ -64,6 +70,8 @@ const LandingScreen = () => {
   const prevProducts = useSelector(getShopProducts);
   const prevClients = useSelector(getShopClients);
   const prevClientSales = useSelector(getClientSales);
+  const manufacturers = useSelector(getManufactures);
+  const suppliers = useSelector(getSuppliers);
 
   const menuList = useSelector(getMenuList);
   const isShopAttendant = userType === userTypes.isShopAttendant;
@@ -93,7 +101,15 @@ const LandingScreen = () => {
       const offersDebt = shopData?.some((s) => s?.supportsCreditSales === true);
 
       if (shopData?.length > 1) {
-        shops = [{ name: ALL_SHOPS_LABEL, id: shopOwnerId }, ...shopData];
+        shops = [
+          {
+            name: ALL_SHOPS_LABEL,
+            id: shopOwnerId,
+            supportsCreditSales: offersDebt,
+            captureClientDetailsOnAllSales: false,
+          },
+          ...shopData,
+        ];
       } else {
         shops = [...shopData];
       }
@@ -117,6 +133,15 @@ const LandingScreen = () => {
           prevProducts
         );
         dispatch(setShopProducts(products));
+      }
+
+      if (configStatus === false) {
+        const newManufactures = await saveManufactures(manufacturers);
+
+        const newSuppliers = await saveSuppliers(suppliers);
+
+        dispatch(addManufacturers(newManufactures));
+        dispatch(addSuppliers(newSuppliers));
       }
 
       dispatch(setIsUserConfigured(true));
@@ -146,7 +171,6 @@ const LandingScreen = () => {
 
   const handleLoginSession = async () => {
     try {
-      await handlePinLockStatus();
       const hasNet = await hasInternetConnection();
 
       if (prevLoginTime !== null) {
@@ -159,16 +183,17 @@ const LandingScreen = () => {
 
         console.log("login time", logintimeDifferance);
 
-        if (hasNet === true) {
-          await configureUserData(configStatus === false);
+        // if (hasNet === true) {
+        await configureUserData(configStatus === false);
 
-          if (hours >= 13 || days >= 1) {
-            setLoading(true);
-            await getRefreshToken();
-            await configureUserData(true);
-          }
+        if (hours >= 13 || days >= 1) {
+          setLoading(true);
+          await getRefreshToken();
+          await configureUserData(true);
         }
       }
+      await handlePinLockStatus();
+      // }
       setLoading(false);
     } catch (e) {
       console.error(e);

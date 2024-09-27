@@ -7,6 +7,8 @@ const initialState = {
   offlineSales: [],
   clients: [],
   clientSales: [],
+  manufactures: [],
+  suppliers: [],
   cart: {
     cartItems: [],
     totalCartCost: 0,
@@ -160,7 +162,19 @@ const shopReducer = (state = initialState, action) => {
         clients: action.payload,
       };
     }
+    case actions.ADD_MANUFACTURERS: {
+      return {
+        ...state,
+        manufactures: action.payload,
+      };
+    }
 
+    case actions.ADD_SUPPLIERS: {
+      return {
+        ...state,
+        suppliers: action.payload,
+      };
+    }
     default:
       return state;
   }

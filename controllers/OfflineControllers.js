@@ -3,10 +3,42 @@ import {
   CLIENTS_ENDPOINT,
   CLIENT_SALES_ENDPOINT,
   CURRENCIES_ENDPOINT,
+  MANUFACTURERS_ENDPOINT,
   SHOP_ENDPOINT,
   SHOP_PRODUCTS_ENDPOINT,
+  SUPPLIERS_ENDPOINT,
 } from "@utils/EndPointUtils";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
+
+export const saveManufactures = async (prev = []) => {
+  let manufacturers = [];
+  await new BaseApiService(MANUFACTURERS_ENDPOINT)
+    .getRequestWithJsonResponse({ limit: 0, offset: 0 })
+    .then((response) => {
+      manufacturers = [...response?.records];
+    })
+    .catch((error) => {
+      console.error(error, "manufacturers");
+      manufacturers = [...prev];
+    });
+
+  return manufacturers;
+};
+
+export const saveSuppliers = async (prev = []) => {
+  let suppliers = [];
+  await new BaseApiService(SUPPLIERS_ENDPOINT)
+    .getRequestWithJsonResponse({ limit: 0, offset: 0 })
+    .then((response) => {
+      suppliers = [...response?.records];
+    })
+    .catch((error) => {
+      console.error(error, "manufacturers");
+      suppliers = [...prev];
+    });
+
+  return suppliers;
+};
 
 export const saveCurrencies = async () => {
   const searchParameters = {

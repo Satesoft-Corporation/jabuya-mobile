@@ -43,3 +43,7 @@ export const getOffersDebt = (state) => state.shop.offersDebt;
 export const getCollectClientInfo = (state) => state.shop.collectClientInfo;
 
 export const getMenuList = (state) => state.userData.menuList;
+
+export const getManufactures = (state) => state.shop.manufactures;
+
+export const getSuppliers = (state) => state.shop.suppliers;

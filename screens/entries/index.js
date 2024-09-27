@@ -1,4 +1,4 @@
-import { View, SafeAreaView } from "react-native";
+import { View, SafeAreaView, Text } from "react-native";
 import React from "react";
 import TopHeader from "@components/TopHeader";
 import EntryBar from "@components/EntryBar";
@@ -8,8 +8,12 @@ import {
   PDT_ENTRY,
   STOCK_ENTRY_FORM,
 } from "@navigation/ScreenNames";
+import { useSelector } from "react-redux";
+import { getOffersDebt } from "reducers/selectors";
 
 const Entries = () => {
+  const offersDebt = useSelector(getOffersDebt);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <TopHeader title="Entries" />
@@ -38,13 +42,20 @@ const Entries = () => {
             target={PDT_ENTRY}
             icon="cart-plus"
           />
-          <EntryBar title={"Add Expense"} target={EXPENSE_FORM} icon="wallet" />
           <EntryBar
-            title={"Add Debtor"}
-            target={CLIENT_FORM}
-            isLast
-            icon="hand-holding"
+            title={"Add Expense"}
+            target={EXPENSE_FORM}
+            icon="wallet"
+            isLast={!offersDebt}
           />
+          {offersDebt === true && (
+            <EntryBar
+              title={"Add Debtor"}
+              target={CLIENT_FORM}
+              isLast
+              icon="hand-holding"
+            />
+          )}
         </View>
       </View>
     </SafeAreaView>

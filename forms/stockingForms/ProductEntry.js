@@ -17,6 +17,7 @@ import { SafeAreaView } from "react-native";
 import MyInput from "@components/MyInput";
 import Snackbar from "@components/Snackbar";
 import {
+  getManufactures,
   getOfflineParams,
   getSelectedShop,
   getShopProducts,
@@ -30,15 +31,15 @@ const ProductEntry = ({ route }) => {
   const offlineParams = useSelector(getOfflineParams);
   const shops = useSelector(getShops);
   const shopProducts = useSelector(getShopProducts);
+  const manufacturers = useSelector(getManufactures);
 
   const dispatch = useDispatch();
 
   const [edit, setEdit] = useState(false);
-  const [manufacturers, setManufacturers] = useState([]);
   const [selectedManufacturer, setSelectedManufacturer] = useState(null);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [remarks, setRemarks] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [disable, setDisable] = useState(false);
@@ -49,19 +50,6 @@ const ProductEntry = ({ route }) => {
   const [salesPrice, setSalesPrice] = useState("");
 
   const snackBarRef = useRef(null);
-
-  const fetchManufacturers = async () => {
-    let searchParameters = { searchTerm: "", offset: 0, limit: 0 };
-    await new BaseApiService("/manufacturers")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        setManufacturers(response.records);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-      });
-  };
 
   const fetchProducts = async (manufacturerId) => {
     setSelectedProduct(null);
@@ -175,11 +163,10 @@ const ProductEntry = ({ route }) => {
 
   const populateForm = () => {
     if (route.params) {
-      const record = { ...route.params };
       setEdit(true);
+      setLoading(true);
+      const record = { ...route.params };
       fetchProductDetails(record?.productId);
-    } else {
-      fetchManufacturers();
     }
   };
 
@@ -205,6 +192,7 @@ const ProductEntry = ({ route }) => {
     setLoading(true);
 
     let payload = {
+      id: route.params?.id || 0,
       manufacturerId: selectedManufacturer?.id,
       shopId: edit ? route?.params?.shopId : selectedShop?.id,
       productId: selectedProduct?.id,
@@ -215,23 +203,15 @@ const ProductEntry = ({ route }) => {
       multipleSaleUnits: selectedSaleUnits,
     };
 
-    const apiUrl = edit
-      ? `${SHOP_PRODUCTS_ENDPOINT}/${route?.params?.id}`
-      : SHOP_PRODUCTS_ENDPOINT;
-
     let isValidPayload = hasNull(payload) === false && salesPrice.trim() !== "";
 
     if (isValidPayload === false) {
       setLoading(false); //removing loader if form is invalid
     }
     if (isValidPayload === true) {
-      await new BaseApiService(apiUrl)
-        .saveRequestWithJsonResponse(payload, edit)
+      await new BaseApiService(SHOP_PRODUCTS_ENDPOINT)
+        .saveRequestWithJsonResponse(payload, false)
         .then(async (response) => {
-          if (!edit) {
-            clearForm();
-          }
-
           const newList = await saveShopProductsOnDevice(
             offlineParams,
             shopProducts
@@ -239,7 +219,9 @@ const ProductEntry = ({ route }) => {
           dispatch(setShopProducts(newList));
           setLoading(false);
           setSubmitted(false);
-          snackBarRef.current.show("Product saved successfully", 6000);
+          clearForm();
+
+          snackBarRef.current.show("Product saved successfully", 9000);
 
           setDisable(false);
         })
@@ -329,34 +311,36 @@ const ProductEntry = ({ route }) => {
               )}
             </View>
 
-            <FlatList
-              data={saleUnits?.filter(
-                (item) =>
-                  item?.productSaleUnitName !==
-                    selectedSaleUnit?.productSaleUnitName ||
-                  item?.saleUnitName !== selectedSaleUnit?.saleUnitName
-              )}
-              ListHeaderComponent={() =>
-                saleUnits?.length > 1 && (
-                  <Text style={styles.inputLabel}>Container portions</Text>
-                )
-              }
-              renderItem={({ item }) => (
-                <ChipButton
-                  isSelected={selectedSaleUnits?.find(
-                    (unit) =>
-                      item?.saleUnitName === unit?.productSaleUnitName ||
-                      item?.saleUnitName === unit?.saleUnitName
-                  )}
-                  key={item.saleUnitName}
-                  onPress={() => onSaleUnitSelect(item)}
-                  title={item?.saleUnitName}
-                  style={{ width: "fit-content" }}
-                />
-              )}
-              keyExtractor={(item) => item.saleUnitName.toString()}
-              numColumns={3}
-            />
+            {saleUnits?.length > 1 && (
+              <FlatList
+                data={saleUnits?.filter(
+                  (item) =>
+                    item?.productSaleUnitName !==
+                      selectedSaleUnit?.productSaleUnitName ||
+                    item?.saleUnitName !== selectedSaleUnit?.saleUnitName
+                )}
+                ListHeaderComponent={() =>
+                  saleUnits?.length > 1 && (
+                    <Text style={styles.inputLabel}>Container portions</Text>
+                  )
+                }
+                renderItem={({ item }) => (
+                  <ChipButton
+                    isSelected={selectedSaleUnits?.find(
+                      (unit) =>
+                        item?.saleUnitName === unit?.productSaleUnitName ||
+                        item?.saleUnitName === unit?.saleUnitName
+                    )}
+                    key={item.saleUnitName}
+                    onPress={() => onSaleUnitSelect(item)}
+                    title={item?.saleUnitName}
+                    style={{ width: "fit-content" }}
+                  />
+                )}
+                keyExtractor={(item) => item.saleUnitName.toString()}
+                numColumns={3}
+              />
+            )}
             <View style={styles.row}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.inputLabel}>Sale unit</Text>

@@ -1,10 +1,9 @@
 import { View, Text, Image } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native";
 import Constants from "expo-constants";
 import { Switch } from "react-native-paper";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
-import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
 import Colors from "@constants/Colors";
 import SettingsBar from "./SettingsBar";
@@ -15,7 +14,15 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "@components/Icon";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  getClientSales,
+  getConfigureStatus,
+  getManufactures,
+  getOfflineParams,
   getOfflineSales,
+  getShopClients,
+  getShopOwnerId,
+  getShopProducts,
+  getSuppliers,
   getUserData,
   getUserPinCode,
   getUserType,
@@ -25,6 +32,25 @@ import {
   setApplockTime,
   setUserPinCode,
 } from "actions/userActions";
+import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
+import {
+  saveClientSalesOnDevice,
+  saveManufactures,
+  saveShopClients,
+  saveShopDetails,
+  saveShopProductsOnDevice,
+  saveSuppliers,
+} from "@controllers/OfflineControllers";
+import {
+  addManufacturers,
+  addSuppliers,
+  changeSelectedShop,
+  setClientSales,
+  setShopClients,
+  setShopProducts,
+  setShops,
+} from "actions/shopActions";
+import Loader from "@components/Loader";
 
 const Settings = () => {
   const [showMoodal, setShowModal] = useState(false);
@@ -39,6 +65,17 @@ const Settings = () => {
   const sessionObj = useSelector(getUserData);
   const userType = useSelector(getUserType);
   const pendingSales = useSelector(getOfflineSales);
+
+  const [loading, setLoading] = useState(false);
+  const offlineParams = useSelector(getOfflineParams);
+  const shopOwnerId = useSelector(getShopOwnerId);
+  const prevProducts = useSelector(getShopProducts);
+  const prevClients = useSelector(getShopClients);
+  const prevClientSales = useSelector(getClientSales);
+  const manufacturers = useSelector(getManufactures);
+  const suppliers = useSelector(getSuppliers);
+
+  const isShopAttendant = userType === userTypes.isShopAttendant;
 
   const onToggleSwitch = async () => {
     if (userPincode === null) {
@@ -75,9 +112,70 @@ const Settings = () => {
     }
   };
 
+  const configureUserData = async (refresh = false) => {
+    try {
+      if (refresh === true) {
+        setLoading(true);
+        let shops = [];
+
+        const shopData = await saveShopDetails(offlineParams, isShopAttendant);
+
+        const offersDebt = shopData?.some(
+          (s) => s?.supportsCreditSales === true
+        );
+
+        if (shopData?.length > 1) {
+          shops = [
+            {
+              name: ALL_SHOPS_LABEL,
+              id: shopOwnerId,
+              supportsCreditSales: offersDebt,
+              captureClientDetailsOnAllSales: false,
+            },
+            ...shopData,
+          ];
+        } else {
+          shops = [...shopData];
+        }
+
+        dispatch(changeSelectedShop(shops[0]));
+        dispatch(setShops(shops));
+
+        if (offersDebt === true) {
+          const clients = await saveShopClients(offlineParams, prevClients);
+          const clientSales = await saveClientSalesOnDevice(
+            offlineParams,
+            prevClientSales
+          );
+          dispatch(setShopClients(clients));
+          dispatch(setClientSales(clientSales));
+        }
+
+        if (userType !== userTypes.isSuperAdmin) {
+          const products = await saveShopProductsOnDevice(
+            offlineParams,
+            prevProducts
+          );
+          dispatch(setShopProducts(products));
+        }
+
+        const newManufactures = await saveManufactures(manufacturers);
+
+        const newSuppliers = await saveSuppliers(suppliers);
+
+        dispatch(addManufacturers(newManufactures));
+        dispatch(addSuppliers(newSuppliers));
+        setLoading(false);
+      }
+    } catch (e) {
+      console.error(e);
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <AppStatusBar />
+      <Loader loading={loading} message="Please wait..." />
 
       <TopHeader title="Settings" showShopName={false} />
 
@@ -137,8 +235,15 @@ const Settings = () => {
             />
 
             <SettingsBar
-              icon={<Icon name={"bell"} groupName="FontAwesome" size={20} />}
-              text="Notfications"
+              icon={
+                <Icon
+                  name={"cloud-sync-outline"}
+                  groupName="MaterialCommunityIcons"
+                  size={20}
+                />
+              }
+              onPress={() => configureUserData(true)}
+              text="Sync data"
             />
 
             <SettingsBar
