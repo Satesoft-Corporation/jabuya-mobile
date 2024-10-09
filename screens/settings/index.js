@@ -1,5 +1,5 @@
 import { View, Text, Image } from "react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { SafeAreaView } from "react-native";
 import Constants from "expo-constants";
 import { Switch } from "react-native-paper";
@@ -51,6 +51,8 @@ import {
   setShops,
 } from "actions/shopActions";
 import Loader from "@components/Loader";
+import { hasInternetConnection } from "@utils/NetWork";
+import Snackbar from "@components/Snackbar";
 
 const Settings = () => {
   const [showMoodal, setShowModal] = useState(false);
@@ -74,6 +76,8 @@ const Settings = () => {
   const prevClientSales = useSelector(getClientSales);
   const manufacturers = useSelector(getManufactures);
   const suppliers = useSelector(getSuppliers);
+
+  const snackbarRef = useRef(null);
 
   const isShopAttendant = userType === userTypes.isShopAttendant;
 
@@ -114,7 +118,14 @@ const Settings = () => {
 
   const configureUserData = async (refresh = false) => {
     try {
-      if (refresh === true) {
+      const hasNet = await hasInternetConnection();
+
+      if (hasNet === false) {
+        snackbarRef.current.show("Cannot connect to the internet.", 5000);
+        return;
+      }
+
+      if (refresh === true && !loading) {
         setLoading(true);
         let shops = [];
 
@@ -166,9 +177,10 @@ const Settings = () => {
         dispatch(addManufacturers(newManufactures));
         dispatch(addSuppliers(newSuppliers));
         setLoading(false);
+        return;
       }
     } catch (e) {
-      console.error(e);
+      snackbarRef.current.show(e, 5000);
       setLoading(false);
     }
   };
@@ -176,6 +188,7 @@ const Settings = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Loader loading={loading} message="Please wait..." />
+      <Snackbar ref={snackbarRef} />
 
       <TopHeader title="Settings" showShopName={false} />
 

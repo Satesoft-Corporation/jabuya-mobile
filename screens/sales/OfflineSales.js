@@ -114,7 +114,7 @@ const OfflineSales = () => {
       return;
     }
 
-    if (netinfo.isInternetReachable === false) {
+    if (hasNet === false) {
       snackbarRef.current.show("Cannot connect to the internet.", 5000);
       return;
     }
@@ -198,6 +198,8 @@ const OfflineSales = () => {
       <FlatList
         containerStyle={{ padding: 5 }}
         showsHorizontalScrollIndicator={false}
+        refreshing={loading}
+        onRefresh={getOfflineSale}
         data={salesList}
         renderItem={({ item, index }) => (
           <OfflineSaleTxnCard

@@ -84,7 +84,7 @@ export default function ViewSales() {
 
   const onChange = (event, selectedDate) => {
     setVisible(false);
-    getSales(selectedDate);
+    getSales(new Date(selectedDate));
     setDate(selectedDate);
   };
 
@@ -113,7 +113,7 @@ export default function ViewSales() {
       startDate: getCurrentDay(),
       ...(day && {
         startDate: convertDateFormat(day),
-        endDate: convertDateFormat(day),
+        endDate: convertDateFormat(day, true),
       }),
     };
 
@@ -127,12 +127,9 @@ export default function ViewSales() {
       await new BaseApiService(SHOP_SALES_ENDPOINT)
         .getRequestWithJsonResponse(searchParameters)
         .then((response) => {
-          console.log(response.records);
           const data = [...response.records].filter(
             (sale) => sale?.balanceGivenOut >= 0
           ); //to filter out credit sales
-
-          let sV = data.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
 
           if (response.totalItems === 0) {
             setMessage(`No sales made on this day for ${selectedShop?.name}`);
@@ -142,24 +139,13 @@ export default function ViewSales() {
             const { lineItems } = item;
             if (lineItems !== undefined) {
               let cartQty = lineItems.reduce((a, item) => a + item.quantity, 0);
-
-              let cartProfit = lineItems.reduce((a, i) => a + i.totalProfit, 0);
-
-              let cap = lineItems.reduce((a, i) => a + i.totalPurchaseCost, 0); // cart capital
-
-              profits.push(cartProfit);
-              saleCapital.push(cap);
-
               setCount(cartQty);
             }
           });
 
-          let income = profits.reduce((a, b) => a + b, 0); //getting the sum profit in all carts
-          let capital = saleCapital.reduce((a, b) => a + b, 0);
-
-          setDaysProfit(Math.round(income));
-          setDaysCapital(Math.round(capital));
-          setSalesValue(sV);
+          setDaysProfit(Math.round(response?.totalProfit));
+          setDaysCapital(Math.round(response?.totalPurchaseCost));
+          setSalesValue(Math.round(response?.totalCost));
           setSales(response?.records);
           setLoading(false);
         })

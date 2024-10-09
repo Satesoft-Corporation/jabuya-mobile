@@ -91,10 +91,14 @@ function SalesDesk({ navigation }) {
       name: "Daily sales",
       onClick: () => navigation.navigate(SALES_REPORTS),
     },
-    {
-      name: "Debts",
-      onClick: () => navigation.navigate(CREDIT_SALES),
-    },
+    ...(offersDebt === true
+      ? [
+          {
+            name: "Debts",
+            onClick: () => navigation.navigate(CREDIT_SALES),
+          },
+        ]
+      : []),
   ];
 
   const fetchProducts = async () => {
@@ -112,7 +116,8 @@ function SalesDesk({ navigation }) {
           const { totalQuantityStocked, totalQuantitySold } =
             pdt?.performanceSummary;
           const qtyInStock = totalQuantityStocked - totalQuantitySold;
-          return qtyInStock > 0;
+
+          return qtyInStock >= 1;
         });
       setProducts(inStock);
       setClients(clist);
