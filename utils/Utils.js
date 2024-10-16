@@ -138,7 +138,9 @@ export function getCurrentDay(getTomorrowDate = false) {
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
 }
 
-export function convertDateFormat(date, getTomorrowDate = false) {
+export function convertDateFormat(dateString, getTomorrowDate = false) {
+  const date = new Date(dateString); // Create a Date object from the input string
+
   if (getTomorrowDate === true) {
     date.setDate(date.getDate() + 1); // Increment the date by 1 to get tomorrow's date
   }

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   convertDateFormat,
+  convertToServerDate,
   formatDate,
   formatNumberWithCommas,
   getCurrentDay,
@@ -84,7 +85,7 @@ export default function ViewSales() {
 
   const onChange = (event, selectedDate) => {
     setVisible(false);
-    getSales(new Date(selectedDate));
+    getSales(convertToServerDate(selectedDate));
     setDate(selectedDate);
   };
 
@@ -119,7 +120,6 @@ export default function ViewSales() {
 
     clearFields();
     const hasNet = await hasInternetConnection();
-
     if (hasNet === false) {
       setMessage("Cannot connect to the internet.");
       setLoading(false);
