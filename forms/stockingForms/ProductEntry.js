@@ -25,6 +25,8 @@ import {
 } from "reducers/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { changeSelectedShop, setShopProducts } from "actions/shopActions";
+import { useNavigation } from "@react-navigation/native"; 
+import { STOCK_LEVELS } from "@navigation/ScreenNames";
 
 const ProductEntry = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
@@ -34,6 +36,7 @@ const ProductEntry = ({ route }) => {
   const manufacturers = useSelector(getManufactures);
 
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const [edit, setEdit] = useState(false);
   const [selectedManufacturer, setSelectedManufacturer] = useState(null);
@@ -243,7 +246,8 @@ const ProductEntry = ({ route }) => {
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
         <AppStatusBar />
 
-        <TopHeader title="List product" />
+        <TopHeader title="List product" showMenuDots 
+        menuItems={[{name: 'Products', onClick: ()=> navigation.navigate(STOCK_LEVELS) }]}/>
         <Loader loading={loading} />
         <View
           style={{

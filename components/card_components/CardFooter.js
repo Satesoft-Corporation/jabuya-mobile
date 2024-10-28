@@ -29,13 +29,13 @@ const CardFooter = ({
       ]}
     >
       {renderLeft()}
-      <Text style={{ fontSize: 13, fontWeight: 600 }}>
+      <Text style={{ fontSize: 13, fontWeight: 400 }}>
         {restocked === true && "Restocked by: "}
         {entered === true && "Entered by: "}
         {listed === true && "Listed by: "}
         {served === true && "Served by: "}
         {cleared === true && "Cleared by: "}
-        <Text style={{ fontWeight: 400 }}>{label}</Text>
+        <Text style={{ fontWeight: 600 }}>{label}</Text>
       </Text>
 
       <View style={{ flexDirection: "row", gap: 10 }}>

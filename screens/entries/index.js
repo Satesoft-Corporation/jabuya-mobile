@@ -5,6 +5,7 @@ import EntryBar from "@components/EntryBar";
 import {
   CLIENT_FORM,
   EXPENSE_FORM,
+  LEADS_FORM,
   PDT_ENTRY,
   STOCK_ENTRY_FORM,
 } from "@navigation/ScreenNames";
@@ -47,6 +48,11 @@ const Entries = () => {
             target={EXPENSE_FORM}
             icon="wallet"
             isLast={!offersDebt}
+          />
+          <EntryBar
+            title={"Add Lead"}
+            target={LEADS_FORM}
+            icon="users"
           />
           {offersDebt === true && (
             <EntryBar

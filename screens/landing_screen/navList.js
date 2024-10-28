@@ -3,6 +3,7 @@ import {
   ENTRIES,
   REPORTS_MENU,
   SALES_DESK,
+  LEADS,
 } from "@navigation/ScreenNames";
 
 export const navList = [
@@ -36,5 +37,11 @@ export const navList = [
   {
     icon: require("../../assets/icons/icons8-chat-50.png"),
     title: "Chat",
+  },
+
+  {
+    icon: require("../../assets/icons/group-solid-24.png"),
+    title: "Leads",
+    target: LEADS,
   },
 ];

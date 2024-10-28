@@ -27,3 +27,5 @@ export const REPORTS_MENU = "reports_menu";
 export const COMING_SOON = "coming_soon";
 export const ENTRIES = "entries";
 export const SALES_BY_PDT = "sales_by_product";
+export const LEADS = "Leads";
+export const LEADS_FORM = "Leads_form";

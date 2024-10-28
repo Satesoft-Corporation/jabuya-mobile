@@ -26,6 +26,9 @@ import {
 } from "reducers/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { changeSelectedShop, setShopProducts } from "actions/shopActions";
+import { useNavigation } from "@react-navigation/native";
+import { STOCK_ENTRY } from "@navigation/ScreenNames";
+
 
 const StockPurchaseForm = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
@@ -36,6 +39,7 @@ const StockPurchaseForm = ({ route }) => {
   const shops = useSelector(getShops);
 
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -233,7 +237,8 @@ const StockPurchaseForm = ({ route }) => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <TopHeader title="Stock purchase" />
+        <TopHeader title="Stock purchase" showMenuDots 
+        menuItems={[{name: 'Stock Purchases', onClick: () => navigation.navigate(STOCK_ENTRY)}]} />
         <Loader loading={loading} />
         <ScrollView
           contentContainerStyle={{ gap: 8, paddingBottom: 30 }}

@@ -11,6 +11,7 @@ const PrimaryButton = ({
   style,
   darkMode = true,
   width,
+  round = false,
 }) => {
   return (
     <TouchableOpacity
@@ -21,7 +22,7 @@ const PrimaryButton = ({
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: darkMode ? Colors.dark : Colors.light,
-          borderRadius: 5,
+          borderRadius: round ? 20 : 5,
           borderWidth: darkMode ? 0 : 1,
           borderColor: Colors.dark,
           height: 40,
