@@ -28,10 +28,4 @@ export const navList = [
     title: "Contacts",
     target: CONTACT_BOOK,
   },
-
-  {
-    icon: require("../../assets/icons/group-solid-24.png"),
-    title: "Leads",
-    target: LEADS,
-  },
 ];

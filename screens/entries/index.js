@@ -1,4 +1,4 @@
-import { View, SafeAreaView, Text } from "react-native";
+import { View, SafeAreaView } from "react-native";
 import React from "react";
 import TopHeader from "@components/TopHeader";
 import EntryBar from "@components/EntryBar";
@@ -10,10 +10,15 @@ import {
   STOCK_ENTRY_FORM,
 } from "@navigation/ScreenNames";
 import { useSelector } from "react-redux";
-import { getOffersDebt } from "reducers/selectors";
+import { getOffersDebt, getUserType } from "reducers/selectors";
+import { userTypes } from "@constants/Constants";
 
 const Entries = () => {
   const offersDebt = useSelector(getOffersDebt);
+
+  const userType = useSelector(getUserType);
+
+  const isAdmin = userType === userTypes.isSuperAdmin;
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -49,11 +54,11 @@ const Entries = () => {
             icon="wallet"
             isLast={!offersDebt}
           />
-          <EntryBar
-            title={"Add Lead"}
-            target={LEADS_FORM}
-            icon="users"
-          />
+
+          {isAdmin && (
+            <EntryBar title={"Add Lead"} target={LEADS_FORM} icon="users" />
+          )}
+
           {offersDebt === true && (
             <EntryBar
               title={"Add Debtor"}

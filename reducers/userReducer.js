@@ -1,5 +1,5 @@
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
-import { CONTACT_BOOK, ENTRIES } from "@navigation/ScreenNames";
+import { CONTACT_BOOK, ENTRIES, LEADS } from "@navigation/ScreenNames";
 import { navList } from "@screens/landing_screen/navList";
 import * as actions from "actions/actionTypes";
 
@@ -73,6 +73,17 @@ const userReduer = (state = initialState, action) => {
 
       if (state.userType === userTypes.isShopAttendant) {
         menuList = menuList.filter((i) => i.target !== ENTRIES);
+      }
+
+      if (state.userType === userTypes.isSuperAdmin) {
+        menuList = [
+          ...menuList,
+          {
+            icon: require("../assets/icons/group-solid-24.png"),
+            title: "Leads",
+            target: LEADS,
+          },
+        ];
       }
 
       if (offersDebt === false) {

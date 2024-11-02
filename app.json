@@ -2,7 +2,7 @@
   "expo": {
     "name": "Duqact",
     "slug": "duqact",
-    "version": "1.4.3",
+    "version": "1.4.3.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -12,6 +12,12 @@
       "backgroundColor": "#ffffff"
     },
     "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Duqact to use your location."
+        }
+      ],
       [
         "expo-local-authentication",
         {
@@ -37,7 +43,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.byaffe.duqact",
-      "versionCode": 27
+      "versionCode": 28
     },
     "web": {
       "favicon": "./assets/favicon.png"
