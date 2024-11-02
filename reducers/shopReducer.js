@@ -9,6 +9,7 @@ const initialState = {
   clientSales: [],
   manufactures: [],
   suppliers: [],
+  heldSales:[],
   cart: {
     cartItems: [],
     totalCartCost: 0,
@@ -173,6 +174,30 @@ const shopReducer = (state = initialState, action) => {
       return {
         ...state,
         suppliers: action.payload,
+      };
+    }
+
+    case actions.ADD_HELD_TXN: {
+      return {
+        ...state,
+        heldSales: [...state.heldSales, action.payload],
+      };
+    }
+
+    case actions.ADD_HELD_TXNS_TO_CART: {
+      const { items } = action.payload;
+
+      const newCost = items?.reduce((a, b) => a + b?.totalCost, 0);
+      const newQty = items?.reduce((a, b) => a + b?.quantity, 0);
+
+      return {
+        ...state,
+        cart: {
+          cartItems: items,
+          totalCartCost: newCost,
+          totalQty: newQty,
+          recievedAmount: 0,
+        },
       };
     }
     default:

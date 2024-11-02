@@ -30,16 +30,6 @@ export const navList = [
   },
 
   {
-    icon: require("../../assets/icons/cctv.png"),
-    title: "Camera",
-  },
-
-  {
-    icon: require("../../assets/icons/icons8-chat-50.png"),
-    title: "Chat",
-  },
-
-  {
     icon: require("../../assets/icons/group-solid-24.png"),
     title: "Leads",
     target: LEADS,
