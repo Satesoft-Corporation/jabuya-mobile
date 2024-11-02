@@ -94,3 +94,17 @@ export const addSuppliers = (list) => {
     payload: list,
   };
 };
+
+export const holdSale = (sale) => {
+  return {
+    type: actionTypes.ADD_HELD_TXN,
+    payload: sale,
+  };
+};
+
+export const addHeldSalesToCart = (sales) => {
+  return {
+    type: actionTypes.ADD_HELD_TXNS_TO_CART,
+    payload: sales,
+  };
+};

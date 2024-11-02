@@ -27,14 +27,4 @@ export const navList = [
     title: "Contacts",
     target: CONTACT_BOOK,
   },
-
-  {
-    icon: require("../../assets/icons/cctv.png"),
-    title: "Camera",
-  },
-
-  {
-    icon: require("../../assets/icons/icons8-chat-50.png"),
-    title: "Chat",
-  },
 ];
