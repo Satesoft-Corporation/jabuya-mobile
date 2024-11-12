@@ -16,12 +16,12 @@ const HeldSaleModal = ({ visible = false, setVisible }) => {
 
   const hide = () => {
     setVisible(false);
+    setClientName("");
+    setClientNumber("");
   };
   const cart = useSelector(getCart);
 
-  const clearEverything = () => dispatch(clearCart());
-
-  const { cartItems, totalCartCost, recievedAmount, totalQty } = cart;
+  const { cartItems } = cart;
 
   const dispatch = useDispatch();
 
@@ -29,7 +29,14 @@ const HeldSaleModal = ({ visible = false, setVisible }) => {
     if (clientName === "") {
       setError(true);
     } else {
-      dispatch(holdSale({ items: cartItems, clientName, clientNumber }));
+      dispatch(
+        holdSale({
+          items: cartItems,
+          clientName,
+          clientNumber,
+          label: clientName + " " + clientNumber,
+        })
+      );
       setError(false);
       dispatch(clearCart());
       hide();

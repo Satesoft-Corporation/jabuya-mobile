@@ -9,7 +9,7 @@ const initialState = {
   clientSales: [],
   manufactures: [],
   suppliers: [],
-  heldSales:[],
+  heldSales: [],
   cart: {
     cartItems: [],
     totalCartCost: 0,
@@ -181,6 +181,16 @@ const shopReducer = (state = initialState, action) => {
       return {
         ...state,
         heldSales: [...state.heldSales, action.payload],
+      };
+    }
+
+    case actions.REMOVE_HELD_TXN: {
+      const filtered = [...state.heldSales].filter(
+        (item) => item?.clientName !== action.payload
+      );
+      return {
+        ...state,
+        heldSales: filtered,
       };
     }
 

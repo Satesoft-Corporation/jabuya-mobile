@@ -16,7 +16,6 @@ import {
 import Colors from "@constants/Colors";
 import ConfirmSaleModal from "./components/ConfirmSaleModal";
 import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
-import { BlackScreen } from "@components/BlackAndWhiteScreen";
 import UserProfile from "@components/UserProfile";
 import {
   MyDropDown,
@@ -48,11 +47,10 @@ import {
 } from "reducers/selectors";
 import {
   addHeldSalesToCart,
-  addItemToCart,
   changeSelectedShop,
   clearCart,
-  holdSale,
   makeProductSelection,
+  removeHeldSale,
   setShopProducts,
   updateRecievedAmount,
 } from "actions/shopActions";
@@ -82,9 +80,9 @@ function SalesDesk({ navigation }) {
   const shops = useSelector(getShops);
   const selection = useSelector(getCartSelection);
   const heldSales = useSelector(getHeldSales);
-
-  // const offersDebt = false;
   const offersDebt = useSelector(getOffersDebt);
+
+  const canHoldSales = false;
 
   const cart = useSelector(getCart);
 
@@ -154,7 +152,9 @@ function SalesDesk({ navigation }) {
 
   const onComplete = async () => {
     setLoading(false);
-
+    if (selectedHeldSale) {
+      dispatch(removeHeldSale(selectedHeldSale?.clientName));
+    }
     if (isSuperAdmin === false) {
       setTimeout(async () => {
         const pdts = await saveShopProductsOnDevice(
@@ -179,6 +179,7 @@ function SalesDesk({ navigation }) {
   };
 
   const makeSelection = (item) => {
+    setSelectedHeldSale(null);
     dispatch(makeProductSelection(item));
     setShowModal(true);
   };
@@ -262,20 +263,22 @@ function SalesDesk({ navigation }) {
             }
           />
 
-          <View style={{ paddingHorizontal: 10 }}>
-            <MyDropDown
-              data={[...heldSales]}
-              labelField={"clientName"}
-              valueField="clientName"
-              onChange={(e) => {
-                setSelectedHeldSale(e);
-                dispatch(addHeldSalesToCart(e));
-              }}
-              value={selectedHeldSale}
-              placeholder="Select a held txn"
-              search={false}
-            />
-          </View>
+          {heldSales?.length > 0 && canHoldSales && (
+            <View style={{ paddingHorizontal: 10 }}>
+              <MyDropDown
+                data={[...heldSales]}
+                labelField={"label"}
+                valueField="label"
+                onChange={(e) => {
+                  setSelectedHeldSale(e);
+                  dispatch(addHeldSalesToCart(e));
+                }}
+                value={selectedHeldSale}
+                placeholder="Select a held txn"
+                search={false}
+              />
+            </View>
+          )}
         </View>
       </View>
 
@@ -392,7 +395,10 @@ function SalesDesk({ navigation }) {
               <View style={{ flex: 0.3 }}>
                 <PrimaryButton
                   title={"Clear"}
-                  onPress={clearEverything}
+                  onPress={() => {
+                    setSelectedHeldSale(null);
+                    clearEverything();
+                  }}
                   darkMode={false}
                 />
               </View>
@@ -404,7 +410,7 @@ function SalesDesk({ navigation }) {
               </View>
             </View>
 
-            {cartItems?.length > 0 && (
+            {cartItems?.length > 0 && !selectedHeldSale && canHoldSales && (
               <PrimaryButton
                 title={"Hold sale"}
                 onPress={() => setHoldSaleModal(true)}

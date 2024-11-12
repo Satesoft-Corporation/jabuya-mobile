@@ -239,7 +239,6 @@ const ConfirmSaleModal = ({
         >
           {formatDate(new Date())}
         </Text>
-        <Text>Currency : {selectedShop?.currency}</Text>
       </View>
 
       <SalesTable sales={cartItems} fixHeight={false} />

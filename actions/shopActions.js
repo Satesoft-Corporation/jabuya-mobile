@@ -108,3 +108,10 @@ export const addHeldSalesToCart = (sales) => {
     payload: sales,
   };
 };
+
+export const removeHeldSale = (clientName) => {
+  return {
+    type: actionTypes.REMOVE_HELD_TXN,
+    payload: clientName,
+  };
+};
