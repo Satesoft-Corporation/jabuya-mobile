@@ -230,16 +230,21 @@ const StockLevel = ({ navigation }) => {
 
         <VerticalSeparator />
         <ItemHeader value={formatNumberWithCommas(pdtValue)} title="Items" />
-
-        <VerticalSeparator />
-        <ItemHeader title="Value " value={stock} isCurrency />
+        {!isShopAttendant && (
+          <>
+            <VerticalSeparator />
+            <ItemHeader title="Value " value={stock} isCurrency />
+          </>
+        )}
       </View>
       <FlatList
         keyExtractor={(item) => item.id.toString()}
         style={{ marginTop: 5 }}
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
-        renderItem={({ item }) => <StockLevelCard data={item} />}
+        renderItem={({ item }) => (
+          <StockLevelCard data={item} isShopAttendant={isShopAttendant} />
+        )}
         onRefresh={handleRefresh}
         refreshing={loading}
         ListEmptyComponent={() => (

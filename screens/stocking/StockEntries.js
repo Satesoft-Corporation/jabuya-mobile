@@ -31,6 +31,8 @@ const StockEntries = ({ navigation }) => {
   const selectedShop = useSelector(getSelectedShop);
   const userType = useSelector(getUserType);
 
+  const isShopAttendant = userType === userTypes.isShopAttendant;
+
   const fetchStockEntries = async (offsetToUse = 0) => {
     try {
       setMessage(null);
@@ -123,7 +125,9 @@ const StockEntries = ({ navigation }) => {
         style={{ marginTop: 5 }}
         keyExtractor={(item) => item.id.toString()}
         data={stockEntries}
-        renderItem={({ item }) => <StockEntryCard data={item} />}
+        renderItem={({ item }) => (
+          <StockEntryCard data={item} isShopAttendant={isShopAttendant} />
+        )}
         onRefresh={() => onSearch()}
         refreshing={loading}
         ListEmptyComponent={() => (

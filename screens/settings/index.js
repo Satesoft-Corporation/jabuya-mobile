@@ -15,7 +15,6 @@ import Icon from "@components/Icon";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getClientSales,
-  getConfigureStatus,
   getManufactures,
   getOfflineParams,
   getOfflineSales,
@@ -53,12 +52,14 @@ import {
 import Loader from "@components/Loader";
 import { hasInternetConnection } from "@utils/NetWork";
 import Snackbar from "@components/Snackbar";
+import SubscriptionsAlert from "@components/SubscriptionsAlert";
 
 const Settings = () => {
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
   const [agreeText, setAgreeText] = useState(null);
   const [canCancel, setCanCancel] = useState(false);
+  const [showSubAlert, setShowSubAlert] = useState(false);
 
   const navigation = useNavigation();
 
@@ -190,6 +191,11 @@ const Settings = () => {
       <Loader loading={loading} message="Please wait..." />
       <Snackbar ref={snackbarRef} />
 
+      <SubscriptionsAlert
+        showModal={showSubAlert}
+        setShowModal={setShowSubAlert}
+      />
+
       <TopHeader title="Settings" showShopName={false} />
 
       <View
@@ -263,6 +269,7 @@ const Settings = () => {
               icon={
                 <Icon name={"credit-card"} groupName="FontAwesome" size={20} />
               }
+              onPress={() => setShowSubAlert(true)}
               text="Subscriptions"
             />
           </View>

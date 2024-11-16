@@ -81,8 +81,11 @@ const ConfirmSaleModal = ({
       paymentMode: selectedPaymentMethod?.id,
       onCredit: onCredit,
       soldOnDate: convertToServerDate(soldOnDate),
-      ...(onCredit && { clientPhoneNumber: selectedClient?.phoneNumber }),
-      ...(onCredit && { clientId: selectedClient?.id }),
+      ...(selectedClient && {
+        clientPhoneNumber: selectedClient?.phoneNumber,
+        clientId: selectedClient?.id,
+        clientName: selectedClient?.fullName,
+      }),
       ...(!onCredit && clientNumber && { clientPhoneNumber: clientNumber }),
       ...(!onCredit && clientName && { clientName: clientName }),
     };

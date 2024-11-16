@@ -8,7 +8,7 @@ import { formatDate } from "@utils/Utils";
 import React, { useState } from "react";
 import { View, Text } from "react-native";
 
-const StockEntryCard = ({ data }) => {
+const StockEntryCard = ({ data, isShopAttendant }) => {
   const [expanded, setExpanded] = useState(false);
 
   const navigation = useNavigation();
@@ -57,19 +57,22 @@ const StockEntryCard = ({ data }) => {
 
         <DataColumn title={"Qty"} value={purchasedQuantity} key={2} />
 
-        <DataColumn
-          title={"Cost"}
-          value={Math.round(purchasePrice / purchasedQuantity)}
-          key={3}
-          currency={data?.currency}
-        />
-
-        <DataColumn
-          title={"Amount"}
-          value={purchasePrice}
-          key={4}
-          currency={data?.currency}
-        />
+        {!isShopAttendant && (
+          <>
+            <DataColumn
+              title={"Cost"}
+              value={Math.round(purchasePrice / purchasedQuantity)}
+              key={3}
+              currency={data?.currency}
+            />
+            <DataColumn
+              title={"Amount"}
+              value={purchasePrice}
+              key={4}
+              currency={data?.currency}
+            />
+          </>
+        )}
       </View>
 
       {expanded && (

@@ -35,8 +35,6 @@ export default function ViewSales() {
   const [totalSalesQty, setTotalSalesQty] = useState(0); //total quantity for all sold items
   const [visible, setVisible] = useState(false);
   const [salesValue, setSalesValue] = useState(0); //total money value sold
-  const [saleCapital, setSaleCapital] = useState([]); //capital list
-  const [profits, setProfits] = useState([]); //profits list
   const [daysProfit, setDaysProfit] = useState(0);
   const [daysCapital, setDaysCapital] = useState(0);
   const [message, setMessage] = useState(null);
@@ -48,6 +46,7 @@ export default function ViewSales() {
   const userType = useSelector(getUserType);
 
   const isShopOwner = userType === userTypes.isShopOwner;
+  const isShopAttendant = userType === userTypes.isShopAttendant;
 
   const navigation = useNavigation();
 
@@ -94,8 +93,6 @@ export default function ViewSales() {
     setSales([]);
     setSalesValue(0);
     setTotalSalesQty(0);
-    setProfits([]);
-    setSaleCapital([]);
     setDaysCapital(0);
     setDaysProfit(0);
     setMessage(null);
@@ -214,6 +211,17 @@ export default function ViewSales() {
               paddingHorizontal: 12,
             }}
           >
+            {isShopAttendant && (
+              <>
+                <ItemHeader
+                  value={formatNumberWithCommas(sales?.length) || 0}
+                  title="Txns"
+                />
+
+                <VerticalSeparator />
+              </>
+            )}
+
             <ItemHeader
               value={formatNumberWithCommas(totalSalesQty) || 0}
               title="Qty"
@@ -223,13 +231,17 @@ export default function ViewSales() {
 
             <ItemHeader title="Sales" value={salesValue} isCurrency />
 
-            <VerticalSeparator />
+            {!isShopAttendant && (
+              <>
+                <VerticalSeparator />
 
-            <ItemHeader title="Capital " value={daysCapital} isCurrency />
+                <ItemHeader title="Capital " value={daysCapital} isCurrency />
 
-            <VerticalSeparator />
+                <VerticalSeparator />
 
-            <ItemHeader title="Income" value={daysProfit} isCurrency />
+                <ItemHeader title="Income" value={daysProfit} isCurrency />
+              </>
+            )}
           </View>
         </View>
       </View>
@@ -243,8 +255,8 @@ export default function ViewSales() {
           <SaleTxnCard
             key={i}
             data={item}
-            isShopOwner={isShopOwner}
             print={(data) => print(data)}
+            isShopAttendant={isShopAttendant}
           />
         )}
         ListEmptyComponent={() => (

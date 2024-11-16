@@ -2,15 +2,16 @@ import CardFooter from "@components/card_components/CardFooter";
 import DataColumn from "@components/card_components/DataColumn";
 import DataRow from "@components/card_components/DataRow";
 import SalesTable from "@screens/sales_desk/components/SalesTable";
-import { formatNumberWithCommas } from "@utils/Utils";
+import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { memo, useCallback, useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
-import SaleCardHeader from "./SaleCardHeader";
+import { Text, View } from "react-native";
 import { useSelector } from "react-redux";
 import { getShops } from "reducers/selectors";
+import { scale } from "react-native-size-matters";
+import Colors from "@constants/Colors";
 
-function SaleTxnCard({ data, print }) {
-  // sales report item card
+function SaleTxnCard({ data, print, isShopAttendant }) {
+  // sales report item carduserType === userTypes.isShopAttendant;
 
   const shops = useSelector(getShops) ?? [];
 
@@ -34,14 +35,67 @@ function SaleTxnCard({ data, print }) {
     }
   }, [data]);
 
+  const serialNumber = () => {
+    return (
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: !expanded ? 10 : 0,
+        }}
+      >
+        <Text
+          style={[
+            {
+              fontSize: scale(12),
+            },
+          ]}
+        >
+          SN: {data?.serialNumber}
+        </Text>
+        <Text
+          style={{
+            fontSize: scale(12),
+            color: Colors.gray,
+            alignSelf: "flex-end",
+          }}
+        >
+          {formatDate(data?.dateCreated)}
+        </Text>
+      </View>
+    );
+  };
   return (
     <View
-      style={[
-        styles.container,
-        { borderWidth: balanceGivenOut < 0 ? 1 : 0, gap: 8 },
-      ]}
+      style={{
+        flex: 1,
+        marginTop: 10,
+        marginHorizontal: 10,
+        borderRadius: 3,
+        backgroundColor: "white",
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        borderWidth: balanceGivenOut < 0 ? 1 : 0,
+        gap: 8,
+      }}
     >
-      <SaleCardHeader data={data} expanded={expanded} />
+      {expanded && serialNumber()}
+
+      {!expanded && (
+        <View>
+          <Text
+            style={{
+              fontWeight: 600,
+              fontSize: scale(14),
+            }}
+          >
+            Items
+          </Text>
+          <Text numberOfLines={2} style={{ fontWeight: "500" }}>
+            {data?.name}
+          </Text>
+        </View>
+      )}
 
       {!expanded && (
         <>
@@ -75,14 +129,14 @@ function SaleTxnCard({ data, print }) {
       )}
       {expanded && (
         <View style={{ flex: 1, marginTop: 10 }}>
-          <SalesTable sales={lineItems} fixHeight={false} />
+          <View style={{ marginVertical: 5 }}>
+            <SalesTable sales={lineItems} fixHeight={false} />
+          </View>
           <DataRow
             key={1}
             label={"Total"}
             value={formatNumberWithCommas(totalCost)}
-            labelTextStyle={styles.label}
             style={{ marginTop: 5, marginBottom: 10 }}
-            valueTextStyle={styles.value}
             currency={data?.currency}
           />
 
@@ -90,8 +144,6 @@ function SaleTxnCard({ data, print }) {
             key={2}
             label={"Recieved"}
             value={formatNumberWithCommas(amountPaid)}
-            labelTextStyle={styles.label}
-            valueTextStyle={styles.value}
             currency={data?.currency}
           />
           <DataRow
@@ -100,8 +152,6 @@ function SaleTxnCard({ data, print }) {
               itemCount > 1 ? `${itemCount} items` : `${itemCount} item`
             }`}
             value={formatNumberWithCommas(totalCost)}
-            labelTextStyle={styles.label}
-            valueTextStyle={styles.value}
             currency={data?.currency}
           />
 
@@ -109,27 +159,19 @@ function SaleTxnCard({ data, print }) {
             key={4}
             label={"Balance"}
             value={formatNumberWithCommas(balanceGivenOut)}
-            labelTextStyle={styles.label}
-            valueTextStyle={styles.value}
             currency={data?.currency}
           />
-          <DataRow
-            key={5}
-            label={"Income"}
-            value={formatNumberWithCommas(profit)}
-            labelTextStyle={styles.label}
-            valueTextStyle={styles.value}
-            currency={data?.currency}
-          />
+          {!isShopAttendant && (
+            <DataRow
+              key={5}
+              label={"Income"}
+              value={formatNumberWithCommas(profit)}
+              currency={data?.currency}
+            />
+          )}
 
           {data?.clientName && (
-            <DataRow
-              key={6}
-              label={"Client's name"}
-              value={data?.clientName}
-              labelTextStyle={styles.label}
-              valueTextStyle={styles.value}
-            />
+            <DataRow key={6} label={"Client's name"} value={data?.clientName} />
           )}
 
           {data?.clientPhoneNumber && (
@@ -137,12 +179,14 @@ function SaleTxnCard({ data, print }) {
               key={7}
               label={"Client's mobile"}
               value={data?.clientPhoneNumber}
-              labelTextStyle={styles.label}
-              valueTextStyle={styles.value}
             />
           )}
         </View>
       )}
+
+      {shops?.length > 1 && <Text>{data?.shopName}</Text>}
+
+      {!expanded && serialNumber()}
 
       <CardFooter
         onClick2={toggleExpand}
@@ -153,34 +197,8 @@ function SaleTxnCard({ data, print }) {
         btnTitle2={expanded ? "Hide" : "More"}
         onClick1={() => print(data)}
       />
-
-      {shops?.length > 1 && <CardFooter label={data?.shopName} />}
     </View>
   );
 }
 
 export default memo(SaleTxnCard);
-const styles = StyleSheet.create({
-  label: {
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  value: { fontWeight: "600", fontSize: 14 },
-  footerText1: {
-    fontWeight: "600",
-    fontSize: 12,
-  },
-  footerText2: {
-    fontWeight: "300",
-    fontSize: 12,
-  },
-  container: {
-    flex: 1,
-    marginTop: 10,
-    marginHorizontal: 10,
-    borderRadius: 3,
-    backgroundColor: "white",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-  },
-});

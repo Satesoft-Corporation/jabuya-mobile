@@ -7,60 +7,25 @@ import {
   Linking,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
-import AppStatusBar from "@components/AppStatusBar";
+import React from "react";
 import TopHeader from "@components/TopHeader";
 import Colors from "@constants/Colors";
 import { useSelector } from "react-redux";
-import { getSelectedShop } from "reducers/selectors";
+import { getShopClients } from "reducers/selectors";
 
 const ContactBook = () => {
-  const [clients, setClients] = useState([]);
-  const [message, setMessage] = useState(null);
-
-  const selectedShop = useSelector(getSelectedShop);
-
-  const fetchClients = async () => {
-    const { name, id } = selectedShop;
-    await UserSessionUtils.getShopClients(name?.includes("All") ? null : id)
-      .then((response) => {
-        setClients(response);
-
-        if (response?.length === 0) {
-          setMessage("No shop clients found");
-        }
-      })
-      .catch((error) => {
-        setMessage("Error fetching shop clients");
-      });
-  };
-
-  useEffect(() => {
-    fetchClients();
-  }, []);
+  const clients = useSelector(getShopClients);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <AppStatusBar />
-
       <TopHeader title="Contact List" />
       <View style={{ flex: 1, paddingHorizontal: 5 }}>
         <FlatList
           data={clients}
           renderItem={({ item }) => <Card client={item} />}
-          ListEmptyComponent={() => (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {clients === 0 && <Text>{message}</Text>}
-            </View>
-          )}
         />
+
+        {clients?.length === 0 && <Text>No clients found</Text>}
       </View>
     </SafeAreaView>
   );
@@ -101,7 +66,7 @@ function Card({ client }) {
           }}
         >
           <Text style={{ fontSize: 25, fontWeight: 600 }}>
-            {client?.fullName[0]}
+            {String(client?.fullName).charAt(0).toUpperCase()}
           </Text>
         </View>
         <View>

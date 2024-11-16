@@ -1,5 +1,5 @@
 import { View, Text, FlatList } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import MyInput from "@components/MyInput";
 import { paymentMethods } from "@constants/Constants";
 import { MyDropDown } from "@components/DropdownComponents";
@@ -13,6 +13,7 @@ import {
 } from "reducers/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { updateRecievedAmount } from "actions/shopActions";
+import { Switch } from "react-native-paper";
 
 const PaymentMethodComponent = ({
   soldOnDate,
@@ -33,6 +34,15 @@ const PaymentMethodComponent = ({
   const collectInfo = useSelector(getCollectClientInfo);
   const clients = useSelector(getShopClients) ?? [];
   const cart = useSelector(getCart);
+
+  const [existingClient, setExistingClient] = useState(false);
+
+  const onToggleSwitch = () => {
+    setClientName("");
+    setClientNumber("");
+    setSelectedClient(null);
+    setExistingClient(!existingClient);
+  };
 
   const dispatch = useDispatch();
   const { totalCartCost, recievedAmount } = cart;
@@ -98,28 +108,67 @@ const PaymentMethodComponent = ({
         />
       )}
 
+      {collectInfo == true && selectedPaymentMethod?.id === 0 && (
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 10,
+            marginVertical: 5,
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ fontSize: 15 }}>Existing client</Text>
+          <Switch
+            value={existingClient}
+            onValueChange={onToggleSwitch}
+            color="#000"
+            style={{ height: 25 }}
+          />
+        </View>
+      )}
+
       <View>
         {selectedPaymentMethod?.id === 0 && collectInfo === true && (
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: 10,
-              marginTop: 5,
-            }}
-          >
-            <MyInput
-              label={"Client Name"}
-              value={clientName}
-              onValueChange={(text) => setClientName(text)}
-            />
+          <View>
+            {!existingClient && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  gap: 10,
+                  marginTop: 5,
+                }}
+              >
+                <MyInput
+                  label={"Client Name"}
+                  value={clientName}
+                  onValueChange={(text) => setClientName(text)}
+                />
 
-            <MyInput
-              label={"Client Phone Number"}
-              value={clientNumber}
-              onValueChange={(text) => setClientNumber(text)}
-              inputMode="numeric"
-            />
+                <MyInput
+                  label={"Client Phone Number"}
+                  value={clientNumber}
+                  onValueChange={(text) => setClientNumber(text)}
+                  inputMode="numeric"
+                />
+              </View>
+            )}
+
+            {existingClient && (
+              <MyDropDown
+                style={{
+                  backgroundColor: Colors.light,
+                  borderColor: Colors.dark,
+                  marginTop: 5,
+                }}
+                data={clients}
+                onChange={(e) => setSelectedClient(e)}
+                value={selectedClient}
+                placeholder="Select client"
+                labelField="fullName"
+                valueField="id"
+              />
+            )}
           </View>
         )}
 

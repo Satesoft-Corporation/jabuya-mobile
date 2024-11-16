@@ -7,33 +7,35 @@ import { scale } from "react-native-size-matters";
 const SaleCardHeader = ({ data, expanded }) => {
   return (
     <View style={{ gap: 10 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text
-          style={[
-            {
-              fontSize: scale(12),
-            },
-          ]}
-        >
-          SN: {data?.serialNumber}
-        </Text>
-        <Text
+      {expanded && (
+        <View
           style={{
-            fontSize: scale(12),
-            color: Colors.gray,
-            alignSelf: "flex-end",
+            flexDirection: "row",
+            justifyContent: "space-between",
           }}
         >
-          {formatDate(data?.dateCreated)}
-        </Text>
-      </View>
+          <Text
+            style={[
+              {
+                fontSize: scale(12),
+              },
+            ]}
+          >
+            SN: {data?.serialNumber}
+          </Text>
+          <Text
+            style={{
+              fontSize: scale(12),
+              color: Colors.gray,
+              alignSelf: "flex-end",
+            }}
+          >
+            {formatDate(data?.dateCreated)}
+          </Text>
+        </View>
+      )}
 
-      {expanded === false && (
+      {!expanded && (
         <View>
           <Text
             style={{

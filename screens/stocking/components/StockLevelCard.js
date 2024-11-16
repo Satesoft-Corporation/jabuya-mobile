@@ -3,12 +3,12 @@ import DataColumn from "@components/card_components/DataColumn";
 import DataRow from "@components/card_components/DataRow";
 import { PDT_ENTRY } from "@navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
-import { formatDate, formatNumberWithCommas } from "@utils/Utils";
+import { formatNumberWithCommas } from "@utils/Utils";
 import React, { useState } from "react";
 import { View, Text } from "react-native";
 import CardFooter from "@components/card_components/CardFooter";
 
-function StockLevelCard({ data }) {
+function StockLevelCard({ data, isShopAttendant }) {
   const [expanded, setExpanded] = useState(false);
   const navigation = useNavigation();
 
@@ -58,11 +58,13 @@ function StockLevelCard({ data }) {
           value={Math.round(summary?.totalQuantitySold) || 0}
         />
         <DataColumn title={"Stock"} value={Math.round(remainingStock)} />
-        <DataColumn
-          title={"Value"}
-          value={Math.round(remainingStock * data?.salesPrice)}
-          currency={data?.currency}
-        />
+        {!isShopAttendant && (
+          <DataColumn
+            title={"Value"}
+            value={Math.round(remainingStock * data?.salesPrice)}
+            currency={data?.currency}
+          />
+        )}
       </View>
 
       {expanded && (
@@ -105,7 +107,7 @@ function StockLevelCard({ data }) {
       )}
 
       <CardFooter
-        btnTitle1={expanded ? "Edit" : null}
+        btnTitle1={expanded && !isShopAttendant ? "Edit" : null}
         btnTitle2={expanded ? "Hide" : "More"}
         onClick2={toggleExpand}
         onClick1={() => navigation.navigate(PDT_ENTRY, data)}

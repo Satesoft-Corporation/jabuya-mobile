@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   dropdown: {
-    height: 40,
+    height: 35,
     borderColor: Colors.primary,
     borderWidth: 0.5,
     borderRadius: 5,
