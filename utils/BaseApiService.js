@@ -181,4 +181,43 @@ export class BaseApiService {
       throw new TypeError(INTERNAL_SERVER_ERROR);
     }
   }
+
+  async deleteRequest(requestBody) {
+    let token = await UserSessionUtils.getBearerToken();
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    };
+    return fetch(this.apiEndpoint, {
+      method: "DELETE",
+      headers: headers,
+      body: requestBody !== null ? JSON.stringify(requestBody) : "",
+    });
+  }
+
+  /**
+   * This method is used to make a POST/PUT  API request to the provided constructor endpoint.
+   * This returns a JSON response or redirects to the login screen if a 401 is detected.
+   *
+   * @param requestBody
+   * @returns
+   */
+  async deleteRequestWithJsonResponse(requestBody) {
+    const response = await this.deleteRequest(requestBody);
+    if (response.ok) {
+      return response.json();
+    } else if (
+      response.status === 400 ||
+      response.status === 403 ||
+      response.status === 500
+    ) {
+      let data = await response.json();
+      let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
+      throw new TypeError(errorMessage);
+    } else if (response.status === 401) {
+      UserSessionUtils.clearLocalStorageAndLogout();
+    } else {
+      throw new TypeError(INTERNAL_SERVER_ERROR);
+    }
+  }
 }

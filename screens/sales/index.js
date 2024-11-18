@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, FlatList } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   convertDateFormat,
@@ -28,6 +28,8 @@ import {
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { userTypes } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
+import DeleteSaleModal from "./components/DeleteSaleModal";
+import Snackbar from "@components/Snackbar";
 
 export default function ViewSales() {
   const [sales, setSales] = useState([]);
@@ -39,6 +41,8 @@ export default function ViewSales() {
   const [daysCapital, setDaysCapital] = useState(0);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [selectedSale, setSelectedSale] = useState(null);
 
   const offlineSales = useSelector(getOfflineSales);
   const filterParams = useSelector(getFilterParams);
@@ -47,6 +51,7 @@ export default function ViewSales() {
 
   const isShopOwner = userType === userTypes.isShopOwner;
   const isShopAttendant = userType === userTypes.isShopAttendant;
+  const snackbarRef = useRef(null);
 
   const navigation = useNavigation();
 
@@ -115,7 +120,6 @@ export default function ViewSales() {
       }),
     };
 
-    clearFields();
     const hasNet = await hasInternetConnection();
     if (hasNet === false) {
       setMessage("Cannot connect to the internet.");
@@ -163,7 +167,15 @@ export default function ViewSales() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <AppStatusBar />
+      <DeleteSaleModal
+        selectedSale={selectedSale}
+        showMoodal={deleteModal}
+        setShowModal={setDeleteModal}
+        onComplete={() => {
+          snackbarRef.current.show("Sale record deleted");
+          getSales();
+        }}
+      />
 
       <View style={{ backgroundColor: Colors.dark }}>
         <UserProfile
@@ -250,13 +262,17 @@ export default function ViewSales() {
         containerStyle={{ padding: 5 }}
         showsHorizontalScrollIndicator={false}
         data={sales}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item?.id?.toString()}
         renderItem={({ item, i }) => (
           <SaleTxnCard
             key={i}
             data={item}
             print={(data) => print(data)}
             isShopAttendant={isShopAttendant}
+            onDelete={() => {
+              setSelectedSale(item);
+              setDeleteModal(true);
+            }}
           />
         )}
         ListEmptyComponent={() => (
@@ -264,9 +280,13 @@ export default function ViewSales() {
             {message}
           </Text>
         )}
-        onRefresh={() => getSales()}
+        onRefresh={() => {
+          clearFields();
+          getSales();
+        }}
         refreshing={loading}
       />
+      <Snackbar ref={snackbarRef} />
 
       {visible && (
         <DateTimePicker

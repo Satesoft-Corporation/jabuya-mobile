@@ -10,7 +10,7 @@ import { getShops } from "reducers/selectors";
 import { scale } from "react-native-size-matters";
 import Colors from "@constants/Colors";
 
-function SaleTxnCard({ data, print, isShopAttendant }) {
+function SaleTxnCard({ data, print, isShopAttendant, onDelete }) {
   // sales report item carduserType === userTypes.isShopAttendant;
 
   const shops = useSelector(getShops) ?? [];
@@ -196,6 +196,8 @@ function SaleTxnCard({ data, print, isShopAttendant }) {
         darkMode={!expanded}
         btnTitle2={expanded ? "Hide" : "More"}
         onClick1={() => print(data)}
+        deleteIcon={expanded}
+        onDelete={onDelete}
       />
     </View>
   );
