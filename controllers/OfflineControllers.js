@@ -179,6 +179,7 @@ export const saveClientSalesOnDevice = async (searchParameters, prev = []) => {
           client_name: shopClient?.fullName,
           serialNumber,
           creditSaleId: sale?.id,
+          shopId: sale?.shop?.id,
         };
       });
       clientSales = [...modified];

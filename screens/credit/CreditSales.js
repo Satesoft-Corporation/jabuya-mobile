@@ -24,7 +24,7 @@ import {
   getShopClients,
   getUserType,
 } from "reducers/selectors";
-import { userTypes } from "@constants/Constants";
+import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { useSelector } from "react-redux";
 import { setClientSales } from "actions/shopActions";
 import { hasInternetConnection } from "@utils/NetWork";
@@ -61,13 +61,19 @@ const CreditSales = () => {
     setAdds(0);
     setClients(shopClients?.filter((i) => i?.shop?.id === selectedShop?.id));
 
+    let filteredSales = [...creditSales];
+
+    if (selectedShop?.name !== ALL_SHOPS_LABEL) {
+      filteredSales = creditSales.filter((i) => i.shopId === selectedShop?.id);
+    }
+
     if (creditSales.length === 0) {
       setMessage("No records found");
       setLoading(false);
       return true;
     }
-    const debt = creditSales.reduce((a, b) => a + b?.amountLoaned, 0);
-    const paid = creditSales.reduce((a, b) => a + b?.amountRepaid, 0);
+    const debt = filteredSales.reduce((a, b) => a + b?.amountLoaned, 0);
+    const paid = filteredSales.reduce((a, b) => a + b?.amountRepaid, 0);
     setDebt(debt);
     setPaid(paid);
     setBal(debt - paid);
