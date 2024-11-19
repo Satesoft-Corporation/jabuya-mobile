@@ -173,6 +173,7 @@ export default function ViewSales() {
         setShowModal={setDeleteModal}
         onComplete={() => {
           snackbarRef.current.show("Sale record deleted");
+          clearFields();
           getSales();
         }}
       />
