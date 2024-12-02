@@ -20,7 +20,7 @@ const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = false }) => {
         backgroundColor: Colors.light_3,
         flex: 1,
         justifyContent: "flex-end",
-        paddingRight: 10,
+        paddingRight: 15,
         flexDirection: "row",
         gap: 15,
       }}
