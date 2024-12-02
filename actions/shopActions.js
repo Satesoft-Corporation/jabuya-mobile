@@ -69,6 +69,13 @@ export const addItemToCart = (item) => {
   };
 };
 
+export const removeItemFromCart = (item) => {
+  return {
+    type: actionTypes.REMOVE_FROM_CART,
+    payload: item,
+  };
+};
+
 export const clearCart = () => {
   return {
     type: actionTypes.CLEAR_CART,

@@ -244,7 +244,7 @@ const ConfirmSaleModal = ({
         </Text>
       </View>
 
-      <SalesTable sales={cartItems} fixHeight={false} />
+      <SalesTable sales={cartItems} fixHeight={false} disableSwipe />
 
       <DataRow
         label={"Recieved"}

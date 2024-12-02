@@ -60,6 +60,31 @@ const shopReducer = (state = initialState, action) => {
       }
     }
 
+    case actions.REMOVE_FROM_CART: {
+      const { productName } = action.payload;
+
+      const { cartItems, totalCartCost, totalQty } = state.cart;
+
+      const exists = cartItems.find((item) => item.productName === productName);
+
+      if (exists) {
+        const newCost = totalCartCost - exists?.totalCost;
+        const newQty = totalQty - exists?.quantity;
+
+        return {
+          ...state,
+          cart: {
+            cartItems: cartItems.filter(
+              (item) => item.productName !== productName
+            ),
+            totalCartCost: newCost,
+            totalQty: newQty,
+            recievedAmount: state.cart.recievedAmount,
+          },
+        };
+      }
+    }
+
     case actions.MAKE_PRODUCT_SELECTION: {
       if (action.payload !== null) {
         let newSelection = { ...action.payload };

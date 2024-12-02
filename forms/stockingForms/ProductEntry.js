@@ -27,6 +27,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { changeSelectedShop, setShopProducts } from "actions/shopActions";
 import { useNavigation } from "@react-navigation/native";
 import { STOCK_LEVELS } from "@navigation/ScreenNames";
+import { ScrollView } from "react-native";
 
 const ProductEntry = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
@@ -244,8 +245,6 @@ const ProductEntry = ({ route }) => {
   return (
     <KeyboardAvoidingView enabled={true} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <AppStatusBar />
-
         <TopHeader
           title="List product"
           showMenuDots
@@ -257,13 +256,14 @@ const ProductEntry = ({ route }) => {
           ]}
         />
         <Loader loading={loading} />
-        <View
+        <ScrollView
+          contentContainerStyle={{
+            justifyContent: "space-between",
+            paddingBottom: 30,
+            gap: 20,
+          }}
           style={{
             paddingHorizontal: 8,
-            gap: 8,
-            paddingBottom: 30,
-            justifyContent: "space-between",
-            flex: 1,
           }}
         >
           <View style={{ gap: 8 }}>
@@ -387,20 +387,17 @@ const ProductEntry = ({ route }) => {
 
             {selectedSaleUnits?.map((item, index) => (
               <View style={styles.row} key={index}>
-                <View style={{ flex: 1 }}>
-                  <MyInput
-                    label=""
-                    value={item.saleUnitName || item?.productSaleUnitName}
-                    editable={false}
-                  />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <MyInput
-                    label=""
-                    value={item.unitPrice}
-                    onValueChange={(e) => handleUnitPriceChange(index, e)}
-                  />
-                </View>
+                <MyInput
+                  label=""
+                  value={item.saleUnitName || item?.productSaleUnitName}
+                  editable={false}
+                />
+
+                <MyInput
+                  label=""
+                  value={item.unitPrice}
+                  onValueChange={(e) => handleUnitPriceChange(index, e)}
+                />
               </View>
             ))}
             <View style={{ flexDirection: "row" }}>
@@ -424,7 +421,7 @@ const ProductEntry = ({ route }) => {
               disabled={disable}
             />
           </View>
-        </View>
+        </ScrollView>
 
         <Snackbar ref={snackBarRef} />
       </SafeAreaView>

@@ -1,13 +1,20 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import * as Icone from "react-native-vector-icons"; // Use wildcard import
+import * as Icons from "react-native-vector-icons"; // Correct wildcard import
 
-export default function Icon(props) {
-  const { style, enableRTL, groupName = "FontAwesome5", ...rest } = props; // Added iconName
-  const Icon = Icone[groupName]; // Dynamically select icon based on iconName prop
-  if (!Icon) {
-    console.error(`Icon ${groupName} not found`);
+export default function Icon({
+  groupName = "FontAwesome5",
+  name = "question",
+  style,
+  ...props
+}) {
+  const SelectedIcon = Icons[groupName]; // Dynamically select icon group
+  if (!SelectedIcon) {
+    console.error(`Icon group "${groupName}" not found. Check the group name.`);
     return null;
   }
-  return <Icon style={StyleSheet.flatten([style])} {...rest} />;
+
+  return (
+    <SelectedIcon name={name} style={StyleSheet.flatten([style])} {...props} />
+  );
 }

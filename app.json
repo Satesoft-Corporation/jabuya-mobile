@@ -24,7 +24,6 @@
           "faceIDPermission": "Allow Duqact to access device biometrics."
         }
       ],
-
       [
         "expo-barcode-scanner",
         {
@@ -37,7 +36,11 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.byaffe.duqact"
     },
+    "platforms": ["ios", "android"],
     "android": {
+      "targetSdkVersion": 14,
+      "minSdkVersion": 21,
+      "compileSdkVersion": 14,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

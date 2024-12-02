@@ -130,7 +130,11 @@ function SaleTxnCard({ data, print, isShopAttendant, onDelete }) {
       {expanded && (
         <View style={{ flex: 1, marginTop: 10 }}>
           <View style={{ marginVertical: 5 }}>
-            <SalesTable sales={lineItems} fixHeight={false} />
+            <SalesTable
+              sales={lineItems}
+              fixHeight={false}
+              disableSwipe={true}
+            />
           </View>
           <DataRow
             key={1}

@@ -3,8 +3,39 @@ import React from "react";
 import Colors from "@constants/Colors";
 import { screenHeight } from "@constants/Constants";
 import { formatNumberWithCommas } from "@utils/Utils";
+import { SwipeListView } from "react-native-swipe-list-view";
+import Icon from "@components/Icon";
+import { useDispatch } from "react-redux";
+import { removeItemFromCart } from "actions/shopActions";
+import { useRef } from "react";
 
-const SalesTable = ({ sales = [], fixHeight = true }) => {
+const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = false }) => {
+  const dispatch = useDispatch();
+  const listViewRef = useRef(null);
+
+  const renderHiddenItem = (data) => (
+    <View
+      style={{
+        alignItems: "center",
+        backgroundColor: Colors.light_3,
+        flex: 1,
+        justifyContent: "flex-end",
+        paddingRight: 10,
+        flexDirection: "row",
+        gap: 15,
+      }}
+    >
+      <Icon
+        name="trash-alt"
+        color={Colors.error}
+        size={17}
+        onPress={() => {
+          dispatch(removeItemFromCart(data?.item));
+        }}
+      />
+    </View>
+  );
+
   return (
     <View>
       <View
@@ -41,31 +72,37 @@ const SalesTable = ({ sales = [], fixHeight = true }) => {
               }
         }
       >
-        {[...sales]?.map((item, i) => (
-          <SaleListItem data={item} key={i} />
-        ))}
+        <SwipeListView
+          ref={listViewRef}
+          data={sales}
+          renderItem={(data, rowMap) => (
+            <SaleListItem data={data.item} key={data?.index} />
+          )}
+          renderHiddenItem={renderHiddenItem}
+          rightOpenValue={-50}
+          disableRightSwipe
+          disableLeftSwipe={disableSwipe}
+        />
       </ScrollView>
     </View>
   );
 };
 
 const SaleListItem = ({ data }) => {
-  // table item on sales entry
   const { productName, shopProductName, saleUnitName } = data;
 
   let unitName = saleUnitName ? " - " + saleUnitName : "";
 
   return (
     <View
-      key={productName}
       style={{
         flexDirection: "row",
         justifyContent: "space-between",
         borderBottomColor: Colors.gray,
         borderBottomWidth: 0.3,
         alignItems: "center",
-        height: "fit-content",
         paddingVertical: 8,
+        backgroundColor: "#fff",
       }}
     >
       <Text style={{ flex: 2.5, justifyContent: "center" }} numberOfLines={2}>

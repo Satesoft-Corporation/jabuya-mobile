@@ -183,17 +183,17 @@ const LandingScreen = () => {
 
         console.log("login time", logintimeDifferance);
 
-        // if (hasNet === true) {
-        await configureUserData(configStatus === false);
+        if (hasNet === true) {
+          await configureUserData(configStatus === false);
 
-        if (hours >= 13 || days >= 1) {
-          setLoading(true);
-          await getRefreshToken();
-          await configureUserData(true);
+          if (hours >= 13 || days >= 1) {
+            setLoading(true);
+            await getRefreshToken();
+            await configureUserData(true);
+          }
         }
+        await handlePinLockStatus();
       }
-      await handlePinLockStatus();
-      // }
       setLoading(false);
     } catch (e) {
       console.error(e);
