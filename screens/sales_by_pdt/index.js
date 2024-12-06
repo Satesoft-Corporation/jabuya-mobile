@@ -80,22 +80,9 @@ const SalesByProduct = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      {visible && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          mode={"date"}
-          onChange={onChange}
-          maximumDate={new Date()}
-        />
-      )}
+      {visible && <DateTimePicker testID="dateTimePicker" value={date} mode={"date"} onChange={onChange} maximumDate={new Date()} />}
 
-      <TopHeader
-        title={`Sales by product  ${formatDate(date, true)}`}
-        showMenuDots
-        showShops
-        menuItems={menuItems}
-      />
+      <TopHeader title={`Sales by product  ${formatDate(date, true)}`} showMenuDots showShops menuItems={menuItems} />
 
       <FlatList
         style={{ marginTop: 5 }}
@@ -104,9 +91,7 @@ const SalesByProduct = () => {
         renderItem={({ item }) => <SBPCard product={item} />}
         onRefresh={() => getRecords()}
         refreshing={loading}
-        ListEmptyComponent={() => (
-          <Text style={{ textAlign: "center" }}>{message}</Text>
-        )}
+        ListEmptyComponent={() => <Text style={{ textAlign: "center" }}>{message}</Text>}
       />
     </SafeAreaView>
   );

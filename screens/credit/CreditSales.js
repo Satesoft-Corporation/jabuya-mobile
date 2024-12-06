@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  FlatList,
-  StyleSheet,
-  Alert,
-} from "react-native";
+import { View, Text, SafeAreaView, FlatList, StyleSheet, Alert } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import AppStatusBar from "@components/AppStatusBar";
@@ -17,13 +10,7 @@ import Snackbar from "@components/Snackbar";
 import CreditSaleCard from "./components/CreditSaleCard";
 import { CLIENT_FORM } from "@navigation/ScreenNames";
 import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
-import {
-  getClientSales,
-  getOfflineParams,
-  getSelectedShop,
-  getShopClients,
-  getUserType,
-} from "reducers/selectors";
+import { getClientSales, getOfflineParams, getSelectedShop, getShopClients, getUserType } from "reducers/selectors";
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { useSelector } from "react-redux";
 import { setClientSales } from "actions/shopActions";
@@ -85,10 +72,7 @@ const CreditSales = () => {
 
     if (hasNet === true) {
       setLoading(true);
-      const clientSales = await saveClientSalesOnDevice(
-        offlineParams,
-        creditSales
-      );
+      const clientSales = await saveClientSalesOnDevice(offlineParams, creditSales);
       dispatch(setClientSales(clientSales));
       fetchClients();
     } else {
@@ -104,8 +88,7 @@ const CreditSales = () => {
       ? [
           {
             name: "Add debtor",
-            onClick: () =>
-              navigation.dispatch(StackActions.replace(CLIENT_FORM)),
+            onClick: () => navigation.dispatch(StackActions.replace(CLIENT_FORM)),
           },
         ]
       : []),
@@ -114,12 +97,7 @@ const CreditSales = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark }}>
       <AppStatusBar />
-      <TopHeader
-        title="Debt records"
-        showMenuDots={!isShopAttendant}
-        menuItems={menuItems}
-        showShops
-      />
+      <TopHeader title="Debt records" showMenuDots={!isShopAttendant} menuItems={menuItems} showShops />
       <View style={{ paddingBottom: 10 }}>
         <View style={styles.debtHeader}>
           <Text

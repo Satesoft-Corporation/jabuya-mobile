@@ -79,18 +79,9 @@ const HeldSaleModal = ({ visible = false, setVisible }) => {
           marginTop: 5,
         }}
       >
-        <MyInput
-          label={"Client Name"}
-          value={clientName}
-          onValueChange={(text) => setClientName(text)}
-        />
+        <MyInput label={"Client Name"} value={clientName} onValueChange={(text) => setClientName(text)} />
 
-        <MyInput
-          label={"Client Phone Number"}
-          value={clientNumber}
-          onValueChange={(text) => setClientNumber(text)}
-          inputMode="numeric"
-        />
+        <MyInput label={"Client Phone Number"} value={clientNumber} onValueChange={(text) => setClientNumber(text)} inputMode="numeric" />
       </View>
 
       <View

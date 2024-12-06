@@ -57,26 +57,20 @@ const Leads = () => {
   }, []);
 
   return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }}>
-        <TopHeader title={"Leads"} showShopName={false} showMenuDots menuItems={[{name: 'Add Lead', onClick: () => navigate.navigate(LEADS_FORM)}]} />
-        <FlatList
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id.toString()}
-          data={leads}
-          renderItem={({ item, i }) => (
-            <LeadsCard item={item} key={i} data={item} />
-          )}
-          ListEmptyComponent={() => (
-            <Text style={{ flex: 1, textAlign: "center", alignSelf: "center" }}>
-              {message}
-            </Text>
-          )}
-          onRefresh={() => {
-            fetchLeads();
-          }}
-          refreshing={loading}
-        />
-      </SafeAreaView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }}>
+      <TopHeader title={"Leads"} showShopName={false} showMenuDots menuItems={[{ name: "Add Lead", onClick: () => navigate.navigate(LEADS_FORM) }]} />
+      <FlatList
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => item.id.toString()}
+        data={leads}
+        renderItem={({ item, i }) => <LeadsCard item={item} key={i} data={item} />}
+        ListEmptyComponent={() => <Text style={{ flex: 1, textAlign: "center", alignSelf: "center" }}>{message}</Text>}
+        onRefresh={() => {
+          fetchLeads();
+        }}
+        refreshing={loading}
+      />
+    </SafeAreaView>
   );
 };
 

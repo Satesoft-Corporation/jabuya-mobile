@@ -1,10 +1,4 @@
-import {
-  CONTACT_BOOK,
-  ENTRIES,
-  REPORTS_MENU,
-  SALES_DESK,
-  LEADS,
-} from "@navigation/ScreenNames";
+import { CONTACT_BOOK, ENTRIES, REPORTS_MENU, SALES_DESK } from "@navigation/ScreenNames";
 
 export const navList = [
   // landing screen icons

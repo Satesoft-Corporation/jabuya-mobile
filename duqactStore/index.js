@@ -19,10 +19,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-const duqactStore = createStore(
-  persistedReducer,
-  applyMiddleware(...middleware)
-);
+const duqactStore = createStore(persistedReducer, applyMiddleware(...middleware));
 const persistor = persistStore(duqactStore);
 
 export { duqactStore, persistor };

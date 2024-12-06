@@ -49,10 +49,7 @@ export class UserSessionUtils {
    * @param bearerToken
    */
   static async setFullSessionObject(fullObject) {
-    await AsyncStorage.setItem(
-      StorageParams.FULL_LOGIN_DETAILS_JSON,
-      JSON.stringify(fullObject)
-    );
+    await AsyncStorage.setItem(StorageParams.FULL_LOGIN_DETAILS_JSON, JSON.stringify(fullObject));
   }
 
   /**
@@ -61,9 +58,7 @@ export class UserSessionUtils {
    * @param bearerToken
    */
   static async getFullSessionObject() {
-    const value = await AsyncStorage.getItem(
-      StorageParams.FULL_LOGIN_DETAILS_JSON
-    );
+    const value = await AsyncStorage.getItem(StorageParams.FULL_LOGIN_DETAILS_JSON);
     return JSON.parse(value);
   }
   /**
@@ -81,10 +76,7 @@ export class UserSessionUtils {
    * @param userDetails
    */
   static async setUserDetails(userDetails) {
-    await AsyncStorage.setItem(
-      StorageParams.USER_DETAILS_JSON,
-      JSON.stringify(userDetails)
-    );
+    await AsyncStorage.setItem(StorageParams.USER_DETAILS_JSON, JSON.stringify(userDetails));
   }
 
   /**
@@ -159,9 +151,7 @@ export class UserSessionUtils {
     let parsed = JSON.parse(shops);
 
     let finalList = parsed?.map((item) => {
-      const currency = currencyList?.find(
-        (cur) => cur?.id === item?.currencyId
-      );
+      const currency = currencyList?.find((cur) => cur?.id === item?.currencyId);
 
       return {
         ...item,
@@ -189,10 +179,7 @@ export class UserSessionUtils {
   }
 
   static async setShopProducts(productList) {
-    await AsyncStorage.setItem(
-      StorageParams.SHOP_PRODUCTS,
-      JSON.stringify(productList)
-    );
+    await AsyncStorage.setItem(StorageParams.SHOP_PRODUCTS, JSON.stringify(productList));
   }
 
   static async getShopProducts(shopId = null) {
@@ -222,20 +209,14 @@ export class UserSessionUtils {
   static async addPendingSale(salePayLoad) {
     let pendingSales = await this.getPendingSales();
 
-    await AsyncStorage.setItem(
-      StorageParams.PENDING_SALES,
-      JSON.stringify([...pendingSales, salePayLoad])
-    );
+    await AsyncStorage.setItem(StorageParams.PENDING_SALES, JSON.stringify([...pendingSales, salePayLoad]));
   }
 
   static async removePendingSale(index) {
     let pendingSales = await this.getPendingSales();
     pendingSales.splice(index, 1); // Removes the sale record at the specified index
 
-    await AsyncStorage.setItem(
-      StorageParams.PENDING_SALES,
-      JSON.stringify([...pendingSales])
-    );
+    await AsyncStorage.setItem(StorageParams.PENDING_SALES, JSON.stringify([...pendingSales]));
   }
 
   /**
@@ -304,10 +285,7 @@ export class UserSessionUtils {
   }
 
   static async setLoginDetails(data) {
-    await AsyncStorage.setItem(
-      StorageParams.LOGIN_DETAILS,
-      JSON.stringify(data)
-    );
+    await AsyncStorage.setItem(StorageParams.LOGIN_DETAILS, JSON.stringify(data));
   }
 
   static async getLoginDetails() {
@@ -361,10 +339,7 @@ export class UserSessionUtils {
   }
 
   static async setClientSales(list) {
-    await AsyncStorage.setItem(
-      StorageParams.CLIENT_SALES,
-      JSON.stringify(list)
-    );
+    await AsyncStorage.setItem(StorageParams.CLIENT_SALES, JSON.stringify(list));
   }
 
   static async getClientSales(client_id = null) {

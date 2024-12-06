@@ -47,11 +47,7 @@ const ExpenseCard = ({ exp }) => {
       >
         <DataColumn value={exp?.categoryName} title={"Category"} left />
 
-        <DataColumn
-          value={exp?.amount}
-          title={"Amount"}
-          currency={exp?.currency}
-        />
+        <DataColumn value={exp?.amount} title={"Amount"} currency={exp?.currency} />
       </View>
 
       <CardFooter label={exp?.createdByFullName} entered />

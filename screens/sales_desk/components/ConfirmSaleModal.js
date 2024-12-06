@@ -1,10 +1,6 @@
 import { View, Text } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import {
-  convertToServerDate,
-  formatDate,
-  formatNumberWithCommas,
-} from "@utils/Utils";
+import { convertToServerDate, formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
 import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
 import SalesTable from "./SalesTable";
@@ -14,26 +10,13 @@ import ModalContent from "@components/ModalContent";
 import Colors from "@constants/Colors";
 import DataRow from "@components/card_components/DataRow";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getAttendantShopId,
-  getCart,
-  getOfflineParams,
-  getSelectedShop,
-  getShopClients,
-  getUserType,
-} from "reducers/selectors";
+import { getAttendantShopId, getCart, getOfflineParams, getSelectedShop, getShopClients, getUserType } from "reducers/selectors";
 import { addOfflineSale, clearCart, setClientSales } from "actions/shopActions";
 import { paymentMethods, userTypes } from "@constants/Constants";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { hasInternetConnection } from "@utils/NetWork";
 
-const ConfirmSaleModal = ({
-  setVisible,
-  snackbarRef,
-  visible,
-  onComplete,
-  setLoading,
-}) => {
+const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoading }) => {
   const dispatch = useDispatch();
   const selectedShop = useSelector(getSelectedShop);
   const cart = useSelector(getCart);
@@ -118,10 +101,7 @@ const ConfirmSaleModal = ({
                   snackbarRef.current.show("Sale confirmed successfully", 4000);
                   onComplete();
                   if (onCredit && !isSuperAdmin) {
-                    const c = await saveClientSalesOnDevice(
-                      offlineParams,
-                      prevClients
-                    );
+                    const c = await saveClientSalesOnDevice(offlineParams, prevClients);
                     dispatch(setClientSales(c));
                   }
                 }
@@ -162,11 +142,7 @@ const ConfirmSaleModal = ({
         return;
       }
       if (!isValidAmount) {
-        setError(
-          `Recieved amount should not be less than ${
-            selectedShop?.currency
-          }${formatNumberWithCommas(totalCartCost)}`
-        );
+        setError(`Recieved amount should not be less than ${selectedShop?.currency}${formatNumberWithCommas(totalCartCost)}`);
         isValid = false;
         return;
       }
@@ -192,9 +168,7 @@ const ConfirmSaleModal = ({
   };
 
   useEffect(() => {
-    setSelectedPaymentMethod(
-      recievedAmount < totalCartCost ? paymentMethods[1] : paymentMethods[0]
-    );
+    setSelectedPaymentMethod(recievedAmount < totalCartCost ? paymentMethods[1] : paymentMethods[0]);
   }, [visible]);
 
   return (
@@ -246,25 +220,15 @@ const ConfirmSaleModal = ({
 
       <SalesTable sales={cartItems} fixHeight={false} disableSwipe />
 
-      <DataRow
-        label={"Recieved"}
-        value={formatNumberWithCommas(recievedAmount)}
-        currency={selectedShop?.currency}
-      />
+      <DataRow label={"Recieved"} value={formatNumberWithCommas(recievedAmount)} currency={selectedShop?.currency} />
 
       <DataRow
-        label={`Sold ${
-          totalQty > 1 ? `${totalQty} items` : `${totalQty} item`
-        }`}
+        label={`Sold ${totalQty > 1 ? `${totalQty} items` : `${totalQty} item`}`}
         value={formatNumberWithCommas(totalCartCost)}
         currency={selectedShop?.currency}
       />
 
-      <DataRow
-        label={"Balance"}
-        value={formatNumberWithCommas(recievedAmount - totalCartCost)}
-        currency={selectedShop?.currency}
-      />
+      <DataRow label={"Balance"} value={formatNumberWithCommas(recievedAmount - totalCartCost)} currency={selectedShop?.currency} />
 
       <PaymentMethodComponent
         submitted={submitted}

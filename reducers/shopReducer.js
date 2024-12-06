@@ -37,11 +37,7 @@ const shopReducer = (state = initialState, action) => {
         return {
           ...state,
           cart: {
-            cartItems: cartItems.map((item) =>
-              item.productName === productName
-                ? { ...item, quantity: newQty, totalCost: newCost }
-                : item
-            ),
+            cartItems: cartItems.map((item) => (item.productName === productName ? { ...item, quantity: newQty, totalCost: newCost } : item)),
             totalCartCost: totalCartCost + totalCost,
             totalQty: totalQty + quantity,
             recievedAmount: state.cart.recievedAmount,
@@ -74,9 +70,7 @@ const shopReducer = (state = initialState, action) => {
         return {
           ...state,
           cart: {
-            cartItems: cartItems.filter(
-              (item) => item.productName !== productName
-            ),
+            cartItems: cartItems.filter((item) => item.productName !== productName),
             totalCartCost: newCost,
             totalQty: newQty,
             recievedAmount: state.cart.recievedAmount,
@@ -210,9 +204,7 @@ const shopReducer = (state = initialState, action) => {
     }
 
     case actions.REMOVE_HELD_TXN: {
-      const filtered = [...state.heldSales].filter(
-        (item) => item?.clientName !== action.payload
-      );
+      const filtered = [...state.heldSales].filter((item) => item?.clientName !== action.payload);
       return {
         ...state,
         heldSales: filtered,

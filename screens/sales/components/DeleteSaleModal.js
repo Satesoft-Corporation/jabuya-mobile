@@ -5,12 +5,7 @@ import Colors from "@constants/Colors";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import { BaseApiService } from "@utils/BaseApiService";
 
-export default function DeleteSaleModal({
-  showMoodal,
-  setShowModal,
-  selectedSale,
-  onComplete,
-}) {
+export default function DeleteSaleModal({ showMoodal, setShowModal, selectedSale, onComplete }) {
   const [password, setPassword] = useState("");
   const [reason, setReason] = useState("");
   const [submitted, setSubmitted] = useState(false);

@@ -33,9 +33,7 @@ const Stripe = ({ label1, label2, value, icon }) => {
       </View>
 
       <View>
-        <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>
-          {formatNumberWithCommas(value)}
-        </Text>
+        <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>{formatNumberWithCommas(value)}</Text>
       </View>
     </View>
   );

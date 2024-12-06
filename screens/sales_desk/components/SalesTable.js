@@ -49,17 +49,11 @@ const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = false }) => {
         }}
       >
         <Text style={{ flex: 2.5, fontWeight: 600 }}>Item</Text>
-        <Text style={{ flex: 0.5, textAlign: "center", fontWeight: 600 }}>
-          Qty
-        </Text>
+        <Text style={{ flex: 0.5, textAlign: "center", fontWeight: 600 }}>Qty</Text>
 
-        <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
-          Cost
-        </Text>
+        <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>Cost</Text>
 
-        <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>
-          Amount
-        </Text>
+        <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>Amount</Text>
       </View>
       <ScrollView
         style={
@@ -75,9 +69,7 @@ const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = false }) => {
         <SwipeListView
           ref={listViewRef}
           data={sales}
-          renderItem={(data, rowMap) => (
-            <SaleListItem data={data.item} key={data?.index} />
-          )}
+          renderItem={(data, rowMap) => <SaleListItem data={data.item} key={data?.index} />}
           renderHiddenItem={renderHiddenItem}
           rightOpenValue={-50}
           disableRightSwipe
@@ -110,12 +102,8 @@ const SaleListItem = ({ data }) => {
       </Text>
       <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>
 
-      <Text style={{ flex: 1, textAlign: "right" }}>
-        {formatNumberWithCommas(data?.unitCost)}
-      </Text>
-      <Text style={{ flex: 1, textAlign: "right", paddingEnd: 10 }}>
-        {formatNumberWithCommas(data?.totalCost)}
-      </Text>
+      <Text style={{ flex: 1, textAlign: "right" }}>{formatNumberWithCommas(data?.unitCost)}</Text>
+      <Text style={{ flex: 1, textAlign: "right", paddingEnd: 10 }}>{formatNumberWithCommas(data?.totalCost)}</Text>
     </View>
   );
 };

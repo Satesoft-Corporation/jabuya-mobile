@@ -227,18 +227,9 @@ const salePrintoutTemplate = async (data) => {
     template = template.replace("{shopPhoneNumber}", data.shopPhoneNumber);
     template = template.replace("{shopAddress}", data.shopAddress);
     template = template.replace("{createdBy}", data.createdByFullName);
-    template = template.replace(
-      "{subTotal}",
-      formatNumberWithCommas(data.totalCost)
-    );
-    template = template.replace(
-      "{total}",
-      formatNumberWithCommas(data.totalCost)
-    );
-    template = template.replace(
-      "{dateCreated}",
-      formatDate(data.dateCreated, true)
-    );
+    template = template.replace("{subTotal}", formatNumberWithCommas(data.totalCost));
+    template = template.replace("{total}", formatNumberWithCommas(data.totalCost));
+    template = template.replace("{dateCreated}", formatDate(data.dateCreated, true));
     template = template.replace("{timeCreated}", extractTime(data.dateCreated));
     template = template.replace("{balanceGivenOut}", data.balanceGivenOut);
     template = template.replace("{cur}", data.currency);
@@ -248,19 +239,10 @@ const salePrintoutTemplate = async (data) => {
     let productsRow = "";
     data.lineItems.map((item) => {
       let itemTemplate = SALE_TABLE_DATA;
-      itemTemplate = itemTemplate.replace(
-        "{productName}",
-        item.shopProductName
-      );
+      itemTemplate = itemTemplate.replace("{productName}", item.shopProductName);
       itemTemplate = itemTemplate.replace("{quantity}", item.quantity);
-      itemTemplate = itemTemplate.replace(
-        "{unitCost}",
-        formatNumberWithCommas(item.unitCost)
-      );
-      itemTemplate = itemTemplate.replace(
-        "{totalCost}",
-        formatNumberWithCommas(item.totalCost)
-      );
+      itemTemplate = itemTemplate.replace("{unitCost}", formatNumberWithCommas(item.unitCost));
+      itemTemplate = itemTemplate.replace("{totalCost}", formatNumberWithCommas(item.totalCost));
       itemTemplate = itemTemplate.replace("{cur}", data.currency);
       itemTemplate = itemTemplate.replace("{cur}", data.currency);
 

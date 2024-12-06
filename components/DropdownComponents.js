@@ -1,25 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-} from "react-native";
+import { StyleSheet, View, TouchableOpacity, Image, Dimensions } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../constants/Colors";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
-export const SalesDropdownComponent = ({
-  products,
-  handleChange,
-  makeSelection,
-  setScanned,
-  value,
-  disable,
-}) => {
+export const SalesDropdownComponent = ({ products, handleChange, makeSelection, setScanned, value, disable }) => {
   const [isFocus, setIsFocus] = useState(false);
 
   return (

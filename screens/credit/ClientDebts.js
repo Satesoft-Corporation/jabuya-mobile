@@ -52,13 +52,7 @@ const ClientDebts = ({ route }) => {
           style={{ marginTop: 10 }}
           data={sales}
           renderItem={({ item, index }) => {
-            return (
-              <ClientDebtsCard
-                debt={item}
-                snackbarRef={snackbarRef}
-                currency={currency}
-              />
-            );
+            return <ClientDebtsCard debt={item} snackbarRef={snackbarRef} currency={currency} />;
           }}
           keyExtractor={(item) => item.id.toString()}
         />

@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  SafeAreaView,
-} from "react-native";
+import { View, Text, TouchableOpacity, Image, SafeAreaView } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { BaseApiService } from "../../utils/BaseApiService";
 import AppStatusBar from "../../components/AppStatusBar";
@@ -133,9 +127,7 @@ const ShopSummary = ({ navigation, route }) => {
             >
               Investment
             </Text>
-            <Text
-              style={{ fontSize: 15, color: Colors.primary, fontWeight: 600 }}
-            >
+            <Text style={{ fontSize: 15, color: Colors.primary, fontWeight: 600 }}>
               <Text
                 style={{
                   fontSize: 10,
@@ -165,9 +157,7 @@ const ShopSummary = ({ navigation, route }) => {
             >
               Shops
             </Text>
-            <Text style={{ color: Colors.primary, alignSelf: "flex-end" }}>
-              01
-            </Text>
+            <Text style={{ color: Colors.primary, alignSelf: "flex-end" }}>01</Text>
           </View>
 
           <TouchableOpacity
@@ -411,19 +401,13 @@ const ShopSummary = ({ navigation, route }) => {
               tintColor={Colors.dark}
             />
             <View>
-              <Text style={{ fontWeight: 400, fontSize: 16 }}>
-                Gross income
-              </Text>
-              <Text style={{ fontWeight: 300, fontSize: 10 }}>
-                Before expenses
-              </Text>
+              <Text style={{ fontWeight: 400, fontSize: 16 }}>Gross income</Text>
+              <Text style={{ fontWeight: 300, fontSize: 10 }}>Before expenses</Text>
             </View>
           </View>
 
           <View>
-            <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>
-              {formatNumberWithCommas(financialRecords?.grossProfit)}
-            </Text>
+            <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>{formatNumberWithCommas(financialRecords?.grossProfit)}</Text>
           </View>
         </View>
 
@@ -450,16 +434,12 @@ const ShopSummary = ({ navigation, route }) => {
             />
             <View>
               <Text style={{ fontWeight: 400, fontSize: 16 }}>Expenses</Text>
-              <Text style={{ fontWeight: 300, fontSize: 10 }}>
-                Monthly total
-              </Text>
+              <Text style={{ fontWeight: 300, fontSize: 10 }}>Monthly total</Text>
             </View>
           </View>
 
           <View>
-            <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>
-              {formatNumberWithCommas(financialRecords?.expenses)}
-            </Text>
+            <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>{formatNumberWithCommas(financialRecords?.expenses)}</Text>
           </View>
         </View>
 
@@ -485,16 +465,8 @@ const ShopSummary = ({ navigation, route }) => {
               tintColor={Colors.primary}
             />
             <View>
-              <Text
-                style={{ fontWeight: 400, color: Colors.primary, fontSize: 16 }}
-              >
-                Net profit
-              </Text>
-              <Text
-                style={{ fontWeight: 300, fontSize: 10, color: Colors.primary }}
-              >
-                After expenses
-              </Text>
+              <Text style={{ fontWeight: 400, color: Colors.primary, fontSize: 16 }}>Net profit</Text>
+              <Text style={{ fontWeight: 300, fontSize: 10, color: Colors.primary }}>After expenses</Text>
             </View>
           </View>
 

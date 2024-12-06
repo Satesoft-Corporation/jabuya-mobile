@@ -17,10 +17,7 @@ const ShopClient = ({ client }) => {
         paddingHorizontal: 10,
       }}
     >
-      <CardHeader
-        value1={`SN: ${client?.serialNumber}`}
-        value2={formatDate(client?.dateCreated)}
-      />
+      <CardHeader value1={`SN: ${client?.serialNumber}`} value2={formatDate(client?.dateCreated)} />
       <View
         style={{
           flexDirection: "row",
@@ -42,9 +39,7 @@ const ShopClient = ({ client }) => {
               alignItems: "center",
             }}
           >
-            <Text style={{ fontSize: 25, fontWeight: 600 }}>
-              {client?.fullName[0]}
-            </Text>
+            <Text style={{ fontSize: 25, fontWeight: 600 }}>{client?.fullName[0]}</Text>
           </View>
           <View>
             <Text style={{ fontWeight: 500 }}>{client?.fullName}</Text>
@@ -67,8 +62,7 @@ const ShopClient = ({ client }) => {
       >
         <View>
           <Text style={{ fontSize: 13, fontWeight: 600 }}>
-            <Text style={{ fontWeight: 400 }}>Registered by:</Text>{" "}
-            {client?.createdByFullName}
+            <Text style={{ fontWeight: 400 }}>Registered by:</Text> {client?.createdByFullName}
           </Text>
         </View>
         <View

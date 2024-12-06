@@ -166,19 +166,8 @@ const LockScreenModal = ({ showLock = false, hideLock = () => {} }) => {
             handleFingerprintAuth();
           }
         }}
-        customRightButton={
-          showRemoveButton ? (
-            <Icon
-              name="delete"
-              groupName="Feather"
-              color={Colors.light}
-              size={25}
-            />
-          ) : null
-        }
-        customLeftButton={
-          hasFP ? <Icon name="fingerprint" color="#fff" size={30} /> : null
-        }
+        customRightButton={showRemoveButton ? <Icon name="delete" groupName="Feather" color={Colors.light} size={25} /> : null}
+        customLeftButton={hasFP ? <Icon name="fingerprint" color="#fff" size={30} /> : null}
       />
 
       <Text

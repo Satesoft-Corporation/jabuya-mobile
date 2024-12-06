@@ -12,10 +12,7 @@ const shareFile = async (fileUri) => {
       Alert.alert("Error", "Sharing is not available on this device.");
     }
   } catch (error) {
-    Alert.alert(
-      "Error",
-      `An error occurred while sharing the file: ${error.message}`
-    );
+    Alert.alert("Error", `An error occurred while sharing the file: ${error.message}`);
     console.error(error);
   }
 };
@@ -43,10 +40,7 @@ export const saveExcelSheet = async (sheetName = "ProductList", data) => {
 
     console.log("sheet created", filePath);
   } catch (error) {
-    Alert.alert(
-      "Error",
-      `An error occurred while creating the Excel file: ${error.message}`
-    );
+    Alert.alert("Error", `An error occurred while creating the Excel file: ${error.message}`);
     console.error(error);
   }
 };

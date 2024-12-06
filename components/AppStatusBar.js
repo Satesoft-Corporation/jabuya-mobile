@@ -6,11 +6,5 @@ export default function AppStatusBar({ mode = "dark" }) {
   let barStyle = mode === "dark" ? "light-content" : "dark-content";
   let bgColor = mode === "dark" ? Colors.dark : Colors.primary;
 
-  return (
-    <StatusBar
-      translucent={false}
-      backgroundColor={bgColor}
-      barStyle={barStyle}
-    />
-  );
+  return <StatusBar translucent={false} backgroundColor={bgColor} barStyle={barStyle} />;
 }

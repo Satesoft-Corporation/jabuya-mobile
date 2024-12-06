@@ -52,11 +52,7 @@ const LockSetUp = () => {
         justifyContent: "center",
       }}
     >
-      <Text
-        style={{ color: Colors.primary, textAlign: "center", fontSize: 17 }}
-      >
-        {lockText}
-      </Text>
+      <Text style={{ color: Colors.primary, textAlign: "center", fontSize: 17 }}>{lockText}</Text>
 
       <ReactNativePinView
         inputSize={25}
@@ -93,23 +89,10 @@ const LockSetUp = () => {
             pinView.current.clear();
           }
         }}
-        customRightButton={
-          showRemoveButton ? (
-            <Icon
-              name="delete"
-              groupName="Feather"
-              color={Colors.light}
-              size={25}
-            />
-          ) : undefined
-        }
+        customRightButton={showRemoveButton ? <Icon name="delete" groupName="Feather" color={Colors.light} size={25} /> : undefined}
       />
 
-      <PrimaryButton
-        title={showCompletedButton ? "Save pin" : ""}
-        style={{ flex: 0, marginHorizontal: 10, marginTop: 20 }}
-        onPress={onConfirmPin}
-      />
+      <PrimaryButton title={showCompletedButton ? "Save pin" : ""} style={{ flex: 0, marginHorizontal: 10, marginTop: 20 }} onPress={onConfirmPin} />
     </SafeAreaView>
   );
 };

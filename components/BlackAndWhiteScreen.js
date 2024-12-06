@@ -17,9 +17,5 @@ export const BlackScreen = ({ children, flex = 12 }) => {
 };
 
 export const WhiteScreen = ({ children }) => {
-  return (
-    <View style={{ flex: 3, padding: 10, backgroundColor: Colors.light_2 }}>
-      {children}
-    </View>
-  );
+  return <View style={{ flex: 3, padding: 10, backgroundColor: Colors.light_2 }}>{children}</View>;
 };

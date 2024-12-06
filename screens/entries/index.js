@@ -2,13 +2,7 @@ import { View, SafeAreaView } from "react-native";
 import React from "react";
 import TopHeader from "@components/TopHeader";
 import EntryBar from "@components/EntryBar";
-import {
-  CLIENT_FORM,
-  EXPENSE_FORM,
-  LEADS_FORM,
-  PDT_ENTRY,
-  STOCK_ENTRY_FORM,
-} from "@navigation/ScreenNames";
+import { CLIENT_FORM, EXPENSE_FORM, LEADS_FORM, PDT_ENTRY, STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
 import { useSelector } from "react-redux";
 import { getOffersDebt, getUserType } from "reducers/selectors";
 import { userTypes } from "@constants/Constants";
@@ -37,36 +31,14 @@ const Entries = () => {
             borderWidth: 0.5,
           }}
         >
-          <EntryBar
-            title={"Add Purchase"}
-            target={STOCK_ENTRY_FORM}
-            icon="store"
-          />
+          <EntryBar title={"Add Purchase"} target={STOCK_ENTRY_FORM} icon="store" />
 
-          <EntryBar
-            title={"List new product"}
-            target={PDT_ENTRY}
-            icon="cart-plus"
-          />
-          <EntryBar
-            title={"Add Expense"}
-            target={EXPENSE_FORM}
-            icon="wallet"
-            isLast={!offersDebt}
-          />
+          <EntryBar title={"List new product"} target={PDT_ENTRY} icon="cart-plus" />
+          <EntryBar title={"Add Expense"} target={EXPENSE_FORM} icon="wallet" isLast={!offersDebt} />
 
-          {isAdmin && (
-            <EntryBar title={"Add Lead"} target={LEADS_FORM} icon="users" />
-          )}
+          {isAdmin && <EntryBar title={"Add Lead"} target={LEADS_FORM} icon="users" />}
 
-          {offersDebt === true && (
-            <EntryBar
-              title={"Add Debtor"}
-              target={CLIENT_FORM}
-              isLast
-              icon="hand-holding"
-            />
-          )}
+          {offersDebt === true && <EntryBar title={"Add Debtor"} target={CLIENT_FORM} isLast icon="hand-holding" />}
         </View>
       </View>
     </SafeAreaView>

@@ -9,11 +9,7 @@ import StockEntryCard from "./components/StockEntryCard";
 import Snackbar from "@components/Snackbar";
 import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
 import { STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
-import {
-  getFilterParams,
-  getSelectedShop,
-  getUserType,
-} from "reducers/selectors";
+import { getFilterParams, getSelectedShop, getUserType } from "reducers/selectors";
 import { useSelector } from "react-redux";
 
 const StockEntries = ({ navigation }) => {
@@ -42,15 +38,12 @@ const StockEntries = ({ navigation }) => {
         limit: MAXIMUM_RECORDS_PER_FETCH,
         ...filterParams,
         offset: offsetToUse,
-        ...(searchTerm &&
-          searchTerm.trim() !== "" && { searchTerm: searchTerm }),
+        ...(searchTerm && searchTerm.trim() !== "" && { searchTerm: searchTerm }),
       };
 
       setIsFetchingMore(true);
 
-      const response = await new BaseApiService(
-        STOCK_ENTRY_ENDPOINT
-      ).getRequestWithJsonResponse(searchParameters);
+      const response = await new BaseApiService(STOCK_ENTRY_ENDPOINT).getRequestWithJsonResponse(searchParameters);
 
       if (offsetToUse === 0) {
         setStockEntries(response.records);
@@ -125,17 +118,11 @@ const StockEntries = ({ navigation }) => {
         style={{ marginTop: 5 }}
         keyExtractor={(item) => item.id.toString()}
         data={stockEntries}
-        renderItem={({ item }) => (
-          <StockEntryCard data={item} isShopAttendant={isShopAttendant} />
-        )}
+        renderItem={({ item }) => <StockEntryCard data={item} isShopAttendant={isShopAttendant} />}
         onRefresh={() => onSearch()}
         refreshing={loading}
         ListEmptyComponent={() => (
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          >
-            {stockEntryRecords === 0 && <Text>{message}</Text>}
-          </View>
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>{stockEntryRecords === 0 && <Text>{message}</Text>}</View>
         )}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.2}

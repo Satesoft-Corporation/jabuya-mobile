@@ -11,11 +11,7 @@ import PrimaryButton from "@components/buttons/PrimaryButton";
 import Snackbar from "@components/Snackbar";
 import { saveShopClients } from "@controllers/OfflineControllers";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getOfflineParams,
-  getSelectedShop,
-  getShopClients,
-} from "reducers/selectors";
+import { getOfflineParams, getSelectedShop, getShopClients } from "reducers/selectors";
 import { setShopClients } from "actions/shopActions";
 
 const NewClient = () => {
@@ -99,18 +95,8 @@ const NewClient = () => {
             </Text>
 
             <View style={{ flexDirection: "row", gap: 10 }}>
-              <MyInput
-                label="First name"
-                value={firstName}
-                style={{ flex: 1 }}
-                onValueChange={(text) => setFirstName(text)}
-              />
-              <MyInput
-                label="Last name"
-                value={lastName}
-                style={{ flex: 1 }}
-                onValueChange={(text) => setLastName(text)}
-              />
+              <MyInput label="First name" value={firstName} style={{ flex: 1 }} onValueChange={(text) => setFirstName(text)} />
+              <MyInput label="Last name" value={lastName} style={{ flex: 1 }} onValueChange={(text) => setLastName(text)} />
             </View>
 
             <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
@@ -135,43 +121,16 @@ const NewClient = () => {
                   valueField="id"
                 />
               </View>
-              <MyInput
-                label="Date of birth"
-                dateValue={dob}
-                isDateInput
-                onDateChange={(date) => setDOB(date)}
-                maximumDate
-              />
+              <MyInput label="Date of birth" dateValue={dob} isDateInput onDateChange={(date) => setDOB(date)} maximumDate />
             </View>
 
             <View style={{ flexDirection: "row", gap: 10 }}>
-              <MyInput
-                inputMode="numeric"
-                label="Phone number"
-                value={phone1}
-                style={{ flex: 1 }}
-                onValueChange={(text) => setPhone1(text)}
-              />
-              <MyInput
-                label="Alternate phone number"
-                value={phone2}
-                style={{ flex: 1 }}
-                inputMode="numeric"
-                onValueChange={(text) => setPhone2(text)}
-              />
+              <MyInput inputMode="numeric" label="Phone number" value={phone1} style={{ flex: 1 }} onValueChange={(text) => setPhone1(text)} />
+              <MyInput label="Alternate phone number" value={phone2} style={{ flex: 1 }} inputMode="numeric" onValueChange={(text) => setPhone2(text)} />
             </View>
 
-            <MyInput
-              label="Email"
-              value={email}
-              inputMode="email"
-              onValueChange={(text) => setEmail(text)}
-            />
-            <MyInput
-              label="Physical address"
-              value={address}
-              onValueChange={(text) => setAddress(text)}
-            />
+            <MyInput label="Email" value={email} inputMode="email" onValueChange={(text) => setEmail(text)} />
+            <MyInput label="Physical address" value={address} onValueChange={(text) => setAddress(text)} />
           </View>
 
           <View style={{ flexDirection: "row" }}>

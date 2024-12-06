@@ -45,20 +45,10 @@ const CreditSaleCard = ({ client }) => {
   if (show === true) {
     return (
       <View style={styles.container}>
-        <CardHeader
-          value1={`CSN: ${client?.serialNumber}`}
-          shop={client?.shop?.name}
-          date={client?.dateCreated}
-        />
+        <CardHeader value1={`CSN: ${client?.serialNumber}`} shop={client?.shop?.name} date={client?.dateCreated} />
 
         <View style={styles.content}>
-          <DataColumn
-            title={"Client"}
-            value={name}
-            left
-            flex={2}
-            value2={`${mob}`}
-          />
+          <DataColumn title={"Client"} value={name} left flex={2} value2={`${mob}`} />
 
           <DataColumn title={"Debt"} value={debt} currency={currency} />
           <DataColumn title={"Paid"} value={paid} currency={currency} />

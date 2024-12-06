@@ -91,9 +91,7 @@ const TopHeader = ({
               </TouchableOpacity>
             )}
 
-            {showMenuDots && (
-              <PopUpmenu menuItems={menuItems} showShops={showShops} />
-            )}
+            {showMenuDots && <PopUpmenu menuItems={menuItems} showShops={showShops} />}
           </View>
         </View>
 

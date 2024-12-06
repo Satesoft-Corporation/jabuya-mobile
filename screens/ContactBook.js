@@ -1,12 +1,4 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  FlatList,
-  Image,
-  Linking,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, SafeAreaView, FlatList, Image, Linking, TouchableOpacity } from "react-native";
 import React from "react";
 import TopHeader from "@components/TopHeader";
 import Colors from "@constants/Colors";
@@ -20,10 +12,7 @@ const ContactBook = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <TopHeader title="Contact List" />
       <View style={{ flex: 1, paddingHorizontal: 5 }}>
-        <FlatList
-          data={clients}
-          renderItem={({ item }) => <Card client={item} />}
-        />
+        <FlatList data={clients} renderItem={({ item }) => <Card client={item} />} />
 
         {clients?.length === 0 && <Text>No clients found</Text>}
       </View>
@@ -65,9 +54,7 @@ function Card({ client }) {
             alignItems: "center",
           }}
         >
-          <Text style={{ fontSize: 25, fontWeight: 600 }}>
-            {String(client?.fullName).charAt(0).toUpperCase()}
-          </Text>
+          <Text style={{ fontSize: 25, fontWeight: 600 }}>{String(client?.fullName).charAt(0).toUpperCase()}</Text>
         </View>
         <View>
           <Text style={{ fontWeight: 500 }}>{client?.fullName}</Text>
@@ -77,16 +64,10 @@ function Card({ client }) {
 
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <TouchableOpacity onPress={makePhoneCall}>
-          <Image
-            source={require("../assets/icons/icons8-phone-50.png")}
-            style={{ height: 25, width: 25 }}
-          />
+          <Image source={require("../assets/icons/icons8-phone-50.png")} style={{ height: 25, width: 25 }} />
         </TouchableOpacity>
         <TouchableOpacity onPress={openWhatsApp}>
-          <Image
-            source={require("../assets/icons/icons8-message-48.png")}
-            style={{ height: 25, width: 25 }}
-          />
+          <Image source={require("../assets/icons/icons8-message-48.png")} style={{ height: 25, width: 25 }} />
         </TouchableOpacity>
       </View>
     </View>

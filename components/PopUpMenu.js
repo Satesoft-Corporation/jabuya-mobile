@@ -1,11 +1,6 @@
 import { Text, FlatList } from "react-native";
 import React, { useCallback, useContext } from "react";
-import {
-  Menu,
-  MenuOptions,
-  MenuOption,
-  MenuTrigger,
-} from "react-native-popup-menu";
+import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
 
 import Colors from "../constants/Colors";
 import Icon from "./Icon";
@@ -34,11 +29,7 @@ const PopUpmenu = ({ menuItems = [], showShops = false }) => {
 
   const renderItem = useCallback(
     ({ item, i }) => (
-      <MenuOption
-        key={i}
-        onSelect={() => item?.onClick()}
-        style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
-      >
+      <MenuOption key={i} onSelect={() => item?.onClick()} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <Text
           style={{
             paddingVertical: 5,
@@ -65,12 +56,7 @@ const PopUpmenu = ({ menuItems = [], showShops = false }) => {
           justifyContent: "center",
         }}
       >
-        <Icon
-          groupName="Entypo"
-          name="dots-three-vertical"
-          size={20}
-          color={Colors.primary}
-        />
+        <Icon groupName="Entypo" name="dots-three-vertical" size={20} color={Colors.primary} />
       </MenuTrigger>
       <MenuOptions
         optionsContainerStyle={{
@@ -81,11 +67,7 @@ const PopUpmenu = ({ menuItems = [], showShops = false }) => {
           maxHeight: screenHeight / 1.5,
         }}
       >
-        <FlatList
-          data={[...menuItems, ...modifiedShopList]}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.name.toString()}
-        />
+        <FlatList data={[...menuItems, ...modifiedShopList]} renderItem={renderItem} keyExtractor={(item) => item.name.toString()} />
       </MenuOptions>
     </Menu>
   );

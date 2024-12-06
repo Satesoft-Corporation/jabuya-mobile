@@ -31,13 +31,10 @@ export class BaseApiService {
       Version_code: Constants.expoConfig.version,
       Platform_type: Platform.OS,
     };
-    return await fetch(
-      this.apiEndpoint + "?" + new URLSearchParams(queryParameters),
-      {
-        method: "GET",
-        headers: headers,
-      }
-    );
+    return await fetch(this.apiEndpoint + "?" + new URLSearchParams(queryParameters), {
+      method: "GET",
+      headers: headers,
+    });
   }
 
   /**
@@ -101,11 +98,7 @@ export class BaseApiService {
       .then((responseData) => {
         if (responseData?.status == 200) {
           return responseData;
-        } else if (
-          responseData?.status == 400 ||
-          responseData?.status == 403 ||
-          responseData?.status == 500
-        ) {
+        } else if (responseData?.status == 400 || responseData?.status == 403 || responseData?.status == 500) {
           let data = responseData;
           let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
           throw new TypeError(errorMessage);
@@ -161,17 +154,10 @@ export class BaseApiService {
    * @returns
    */
   async saveRequestWithJsonResponse(requestBody, update) {
-    const response =
-      update && update === true
-        ? await this.putRequest(requestBody)
-        : await this.postRequest(requestBody);
+    const response = update && update === true ? await this.putRequest(requestBody) : await this.postRequest(requestBody);
     if (response.ok) {
       return response.json();
-    } else if (
-      response.status === 400 ||
-      response.status === 403 ||
-      response.status === 500
-    ) {
+    } else if (response.status === 400 || response.status === 403 || response.status === 500) {
       let data = await response.json();
       let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
       throw new TypeError(errorMessage);
@@ -206,11 +192,7 @@ export class BaseApiService {
     const response = await this.deleteRequest(requestBody);
     if (response.ok) {
       return response.json();
-    } else if (
-      response.status === 400 ||
-      response.status === 403 ||
-      response.status === 500
-    ) {
+    } else if (response.status === 400 || response.status === 403 || response.status === 500) {
       let data = await response.json();
       let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
       throw new TypeError(errorMessage);

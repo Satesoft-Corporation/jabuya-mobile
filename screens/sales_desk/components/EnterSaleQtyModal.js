@@ -43,11 +43,9 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
 
       const cost = Math.round(itemUnitCost * parsedQuantity);
 
-      const isValidQuantity =
-        isValidNumber(parsedQuantity) && parsedQuantity > 0;
+      const isValidQuantity = isValidNumber(parsedQuantity) && parsedQuantity > 0;
 
-      const isValidCost =
-        isValidNumber(itemUnitCost) && itemUnitCost >= unitSalesPrice;
+      const isValidCost = isValidNumber(itemUnitCost) && itemUnitCost >= unitSalesPrice;
 
       if (itemUnitCost < unitSalesPrice) {
         setErrors((prevErrors) => {
@@ -87,8 +85,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
 
       if (isValidQuantity && isValidCost) {
         const { productSaleUnitName } = saleUnit;
-        const name =
-          productSaleUnitName !== "Whole" ? " - " + productSaleUnitName : "";
+        const name = productSaleUnitName !== "Whole" ? " - " + productSaleUnitName : "";
 
         const readyItem = {
           id: selection.id,
@@ -164,10 +161,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
                 renderItem={({ item }) => (
                   <ChipButton
                     title={item?.productSaleUnitName}
-                    isSelected={
-                      saleUnit?.productSaleUnitName ===
-                      item?.productSaleUnitName
-                    }
+                    isSelected={saleUnit?.productSaleUnitName === item?.productSaleUnitName}
                     onPress={() => onChipPress(item)}
                   />
                 )}
@@ -189,7 +183,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
                 marginLeft: 4,
               }}
             >
-              Quantity 
+              Quantity
             </Text>
             <TextInput
               onFocus={() => setErrors(null)}
@@ -207,9 +201,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
                 borderRadius: 5,
                 padding: 6,
                 borderWidth: 1,
-                borderColor: errors?.qtyZeroError
-                  ? Colors.error
-                  : "transparent",
+                borderColor: errors?.qtyZeroError ? Colors.error : "transparent",
                 fontSize: 18,
                 paddingEnd: 10,
               }}
@@ -245,9 +237,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
                 backgroundColor: Colors.light_3,
                 borderRadius: 5,
                 padding: 6,
-                borderColor: errors?.lessPriceError
-                  ? Colors.error
-                  : "transparent",
+                borderColor: errors?.lessPriceError ? Colors.error : "transparent",
                 fontSize: 18,
                 paddingEnd: 10,
               }}
@@ -282,9 +272,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
               dispatch(makeProductSelection(null));
             }}
           />
-          {saleUnit && (
-            <PrimaryButton title={"Confirm"} onPress={handlePress} />
-          )}
+          {saleUnit && <PrimaryButton title={"Confirm"} onPress={handlePress} />}
         </View>
       </View>
     </ModalContent>

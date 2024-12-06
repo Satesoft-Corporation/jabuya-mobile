@@ -3,14 +3,8 @@ import { View } from "react-native";
 import ChipButton2 from "@components/buttons/ChipButton2";
 import Modal from "react-native-modal";
 import Colors from "@constants/Colors";
-export default function DisplayMessage({
-  message,
-  onAgree,
-  showModal,
-  agreeText,
-  canCancel = false,
-  setShowModal,
-}) {
+
+export default function DisplayMessage({ message, onAgree, showModal, agreeText, canCancel = false, setShowModal }) {
   const hideModal = () => {
     setShowModal(false);
   };
@@ -40,17 +34,9 @@ export default function DisplayMessage({
             marginTop: 10,
           }}
         >
-          {canCancel && (
-            <ChipButton2
-              title={"Cancel"}
-              onPress={hideModal}
-              darkMode={false}
-            />
-          )}
+          {canCancel && <ChipButton2 title={"Cancel"} onPress={hideModal} darkMode={false} />}
 
-          {agreeText && (
-            <ChipButton2 title={agreeText} onPress={() => onAgree()} />
-          )}
+          {agreeText && <ChipButton2 title={agreeText} onPress={() => onAgree()} />}
         </View>
       </View>
     </Modal>

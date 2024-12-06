@@ -1,11 +1,7 @@
 import { View, Text, ScrollView, SafeAreaView, StyleSheet } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { BaseApiService } from "@utils/BaseApiService";
-import {
-  convertToServerDate,
-  formatNumberWithCommas,
-  hasNull,
-} from "@utils/Utils";
+import { convertToServerDate, formatNumberWithCommas, hasNull } from "@utils/Utils";
 import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 import TopHeader from "@components/TopHeader";
 import { MyDropDown } from "@components/DropdownComponents";
@@ -17,18 +13,11 @@ import { KeyboardAvoidingView } from "react-native";
 import Loader from "@components/Loader";
 import { packageOptions } from "@constants/Constants";
 import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
-import {
-  getOfflineParams,
-  getSelectedShop,
-  getShopProducts,
-  getShops,
-  getSuppliers,
-} from "reducers/selectors";
+import { getOfflineParams, getSelectedShop, getShopProducts, getShops, getSuppliers } from "reducers/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { changeSelectedShop, setShopProducts } from "actions/shopActions";
 import { useNavigation } from "@react-navigation/native";
 import { STOCK_ENTRY } from "@navigation/ScreenNames";
-
 
 const StockPurchaseForm = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
@@ -135,9 +124,7 @@ const StockPurchaseForm = ({ route }) => {
     }
 
     if (isValidPayload === true) {
-      const apiUrl = edit
-        ? STOCK_ENTRY_ENDPOINT + "/" + selectedProduct.id
-        : STOCK_ENTRY_ENDPOINT;
+      const apiUrl = edit ? STOCK_ENTRY_ENDPOINT + "/" + selectedProduct.id : STOCK_ENTRY_ENDPOINT;
 
       await new BaseApiService(apiUrl)
         .saveRequestWithJsonResponse(payload, edit)
@@ -145,10 +132,7 @@ const StockPurchaseForm = ({ route }) => {
           if (!edit) {
             clearForm();
           }
-          const newList = await saveShopProductsOnDevice(
-            offlineParams,
-            shopProducts
-          );
+          const newList = await saveShopProductsOnDevice(offlineParams, shopProducts);
 
           dispatch(setShopProducts(newList));
           setSubmitted(false);
@@ -209,9 +193,7 @@ const StockPurchaseForm = ({ route }) => {
     let price = Number(purchasePrice);
 
     if (isPackedProduct) {
-      return String(
-        Math.round(price / (selectedProduct?.packageQuantity * Number(qty)))
-      );
+      return String(Math.round(price / (selectedProduct?.packageQuantity * Number(qty))));
     } else {
       return String(Math.round(price / qty));
     }
@@ -223,12 +205,7 @@ const StockPurchaseForm = ({ route }) => {
 
   useEffect(() => {
     getUnitPurchasePrice();
-  }, [
-    selectedProduct,
-    purchasePrice,
-    packedPurchasedQuantity,
-    unpackedPurchasedQty,
-  ]);
+  }, [selectedProduct, purchasePrice, packedPurchasedQuantity, unpackedPurchasedQty]);
 
   return (
     <KeyboardAvoidingView
@@ -237,8 +214,7 @@ const StockPurchaseForm = ({ route }) => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <TopHeader title="Stock purchase" showMenuDots 
-        menuItems={[{name: 'Stock Purchases', onClick: () => navigation.navigate(STOCK_ENTRY)}]} />
+        <TopHeader title="Stock purchase" showMenuDots menuItems={[{ name: "Stock Purchases", onClick: () => navigation.navigate(STOCK_ENTRY) }]} />
         <Loader loading={loading} />
         <ScrollView
           contentContainerStyle={{ gap: 8, paddingBottom: 30 }}
@@ -246,9 +222,7 @@ const StockPurchaseForm = ({ route }) => {
             paddingHorizontal: 10,
           }}
         >
-          <Text style={styles.headerText}>
-            {edit ? "Edit" : "Enter"} stock detail
-          </Text>
+          <Text style={styles.headerText}>{edit ? "Edit" : "Enter"} stock detail</Text>
 
           {!edit && (
             <View style={{ gap: 5 }}>
@@ -281,9 +255,7 @@ const StockPurchaseForm = ({ route }) => {
               labelField="productName"
               valueField="id"
             />
-            {submitted && !selectedProduct && (
-              <Text style={styles.errorText}>Product is required</Text>
-            )}
+            {submitted && !selectedProduct && <Text style={styles.errorText}>Product is required</Text>}
           </View>
 
           <View>
@@ -297,9 +269,7 @@ const StockPurchaseForm = ({ route }) => {
               labelField="companyOrBusinessName"
               valueField="id"
             />
-            {submitted && !selectedSupplier && (
-              <Text style={styles.errorText}>Supplier is required</Text>
-            )}
+            {submitted && !selectedSupplier && <Text style={styles.errorText}>Supplier is required</Text>}
           </View>
 
           <View>
@@ -317,38 +287,24 @@ const StockPurchaseForm = ({ route }) => {
               labelField="value"
               valueField="type"
             />
-            {submitted && !isPackedProduct && (
-              <Text style={styles.errorText}>Package type is required</Text>
-            )}
+            {submitted && !isPackedProduct && <Text style={styles.errorText}>Package type is required</Text>}
           </View>
 
           {isPackedProduct !== null && (
             <View style={styles.row}>
               <View style={{ flex: 1 }}>
                 <MyInput
-                  label={
-                    isPackedProduct === true
-                      ? `Quantity (${selectedProduct?.packageUnitName || ""})`
-                      : "Unpacked quantity"
-                  }
-                  value={
-                    isPackedProduct === true
-                      ? packedPurchasedQuantity
-                      : unpackedPurchasedQty
-                  }
+                  label={isPackedProduct === true ? `Quantity (${selectedProduct?.packageUnitName || ""})` : "Unpacked quantity"}
+                  value={isPackedProduct === true ? packedPurchasedQuantity : unpackedPurchasedQty}
                   cursorColor={Colors.dark}
                   onValueChange={(text) => {
-                    isPackedProduct === true
-                      ? setPackedPurchasedQuantity(text)
-                      : setUnpackedPurchasedQty(text);
+                    isPackedProduct === true ? setPackedPurchasedQuantity(text) : setUnpackedPurchasedQty(text);
                   }}
                   inputMode="numeric"
                 />
-                {submitted &&
-                  ((!unpackedPurchasedQty && !isPackedProduct) ||
-                    (!packedPurchasedQuantity && isPackedProduct)) && (
-                    <Text style={styles.errorText}>Quantity is required</Text>
-                  )}
+                {submitted && ((!unpackedPurchasedQty && !isPackedProduct) || (!packedPurchasedQuantity && isPackedProduct)) && (
+                  <Text style={styles.errorText}>Quantity is required</Text>
+                )}
               </View>
 
               <View style={{ flex: 1 }}>
@@ -359,76 +315,38 @@ const StockPurchaseForm = ({ route }) => {
                   onValueChange={(text) => setPurchasePrice(text)}
                   inputMode="numeric"
                 />
-                {submitted && !purchasePrice && (
-                  <Text style={styles.errorText}>Price is required</Text>
-                )}
+                {submitted && !purchasePrice && <Text style={styles.errorText}>Price is required</Text>}
               </View>
             </View>
           )}
 
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <MyInput
-                label=" Batch no."
-                value={batchNo}
-                onValueChange={(text) => setBatchNo(text)}
-              />
-              {submitted && batchNo === "" && (
-                <Text style={styles.errorText}>Batch number is required</Text>
-              )}
+              <MyInput label=" Batch no." value={batchNo} onValueChange={(text) => setBatchNo(text)} />
+              {submitted && batchNo === "" && <Text style={styles.errorText}>Batch number is required</Text>}
             </View>
 
             <View style={{ flex: 1 }}>
-              <MyInput
-                isDateInput
-                dateValue={expiryDate}
-                label="Expiry Date"
-                onDateChange={(date) => setExpiryDate(date)}
-                minimumDate
-              />
-              {submitted && !expiryDate && (
-                <Text style={styles.errorText}>Expiry date is required</Text>
-              )}
+              <MyInput isDateInput dateValue={expiryDate} label="Expiry Date" onDateChange={(date) => setExpiryDate(date)} minimumDate />
+              {submitted && !expiryDate && <Text style={styles.errorText}>Expiry date is required</Text>}
             </View>
           </View>
 
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <MyInput
-                label="Unit purchase price"
-                editable={false}
-                value={formatNumberWithCommas(getUnitPurchasePrice())}
-              />
+              <MyInput label="Unit purchase price" editable={false} value={formatNumberWithCommas(getUnitPurchasePrice())} />
             </View>
 
             <View style={{ flex: 1 }}>
-              <MyInput
-                label="Purchase date"
-                dateValue={purchaseDate}
-                isDateInput
-                onDateChange={(date) => setPurchaseDate(date)}
-                maximumDate
-              />
-              {submitted && !purchaseDate && (
-                <Text style={styles.errorText}>Purchase date is required</Text>
-              )}
+              <MyInput label="Purchase date" dateValue={purchaseDate} isDateInput onDateChange={(date) => setPurchaseDate(date)} maximumDate />
+              {submitted && !purchaseDate && <Text style={styles.errorText}>Purchase date is required</Text>}
             </View>
           </View>
 
-          <MyInput
-            value={remarks}
-            label="Remarks"
-            multiline
-            onValueChange={(text) => setRemarks(text)}
-            numberOfLines={3}
-          />
+          <MyInput value={remarks} label="Remarks" multiline onValueChange={(text) => setRemarks(text)} numberOfLines={3} />
 
           <View style={[styles.row, { marginTop: 15 }]}>
-            <PrimaryButton
-              darkMode={false}
-              title={"Clear"}
-              onPress={clearForm}
-            />
+            <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} />
             <PrimaryButton title={"Save"} onPress={saveStockEntry} />
           </View>
         </ScrollView>

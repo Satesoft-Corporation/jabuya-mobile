@@ -36,7 +36,6 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.byaffe.duqact"
     },
-    "platforms": ["ios", "android"],
     "android": {
       "targetSdkVersion": 14,
       "minSdkVersion": 21,

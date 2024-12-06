@@ -1,13 +1,7 @@
 import { View, Text, SafeAreaView, FlatList } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import {
-  convertDateFormat,
-  convertToServerDate,
-  formatDate,
-  formatNumberWithCommas,
-  getCurrentDay,
-} from "@utils/Utils";
+import { convertDateFormat, convertToServerDate, formatDate, formatNumberWithCommas, getCurrentDay } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
 import AppStatusBar from "@components/AppStatusBar";
 import UserProfile from "@components/UserProfile";
@@ -19,12 +13,7 @@ import { OFFLINE_SALES, SHOP_SUMMARY } from "@navigation/ScreenNames";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { printSale } from "@utils/PrintService";
 import { useSelector } from "react-redux";
-import {
-  getFilterParams,
-  getOfflineSales,
-  getSelectedShop,
-  getUserType,
-} from "reducers/selectors";
+import { getFilterParams, getOfflineSales, getSelectedShop, getUserType } from "reducers/selectors";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { userTypes } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
@@ -128,9 +117,7 @@ export default function ViewSales() {
       await new BaseApiService(SHOP_SALES_ENDPOINT)
         .getRequestWithJsonResponse(searchParameters)
         .then((response) => {
-          const data = [...response.records].filter(
-            (sale) => sale?.balanceGivenOut >= 0
-          ); //to filter out credit sales
+          const data = [...response.records].filter((sale) => sale?.balanceGivenOut >= 0); //to filter out credit sales
 
           if (response.totalItems === 0) {
             setMessage(`No sales made on this day for ${selectedShop?.name}`);
@@ -179,12 +166,7 @@ export default function ViewSales() {
       />
 
       <View style={{ backgroundColor: Colors.dark }}>
-        <UserProfile
-          renderNtnIcon={false}
-          renderMenu
-          menuItems={menuItems}
-          showShops
-        />
+        <UserProfile renderNtnIcon={false} renderMenu menuItems={menuItems} showShops />
 
         <View style={{ marginTop: 5, paddingBottom: 10 }}>
           <View
@@ -226,19 +208,13 @@ export default function ViewSales() {
           >
             {isShopAttendant && (
               <>
-                <ItemHeader
-                  value={formatNumberWithCommas(sales?.length) || 0}
-                  title="Txns"
-                />
+                <ItemHeader value={formatNumberWithCommas(sales?.length) || 0} title="Txns" />
 
                 <VerticalSeparator />
               </>
             )}
 
-            <ItemHeader
-              value={formatNumberWithCommas(totalSalesQty) || 0}
-              title="Qty"
-            />
+            <ItemHeader value={formatNumberWithCommas(totalSalesQty) || 0} title="Qty" />
 
             <VerticalSeparator />
 
@@ -276,11 +252,7 @@ export default function ViewSales() {
             }}
           />
         )}
-        ListEmptyComponent={() => (
-          <Text style={{ flex: 1, textAlign: "center", alignSelf: "center" }}>
-            {message}
-          </Text>
-        )}
+        ListEmptyComponent={() => <Text style={{ flex: 1, textAlign: "center", alignSelf: "center" }}>{message}</Text>}
         onRefresh={() => {
           clearFields();
           getSales();
@@ -289,15 +261,7 @@ export default function ViewSales() {
       />
       <Snackbar ref={snackbarRef} />
 
-      {visible && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          mode={"date"}
-          onChange={onChange}
-          maximumDate={new Date()}
-        />
-      )}
+      {visible && <DateTimePicker testID="dateTimePicker" value={date} mode={"date"} onChange={onChange} maximumDate={new Date()} />}
     </SafeAreaView>
   );
 }

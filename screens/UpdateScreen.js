@@ -35,11 +35,7 @@ const UpdateScreen = () => {
       />
       <Text style={{ fontSize: 15, textAlign: "center", lineHeight: 22 }}>
         The current Duqact version
-        <Text style={{ fontWeight: 500 }}>
-          {" "}
-          {Constants.expoConfig.version}
-        </Text>{" "}
-        you are using is out of date, update to the latest version for better
+        <Text style={{ fontWeight: 500 }}> {Constants.expoConfig.version}</Text> you are using is out of date, update to the latest version for better
         experience.
       </Text>
 

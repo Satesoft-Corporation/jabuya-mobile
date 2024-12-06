@@ -108,83 +108,34 @@ function SaleTxnCard({ data, print, isShopAttendant, onDelete }) {
           >
             <DataColumn title={"Qty"} value={itemCount} />
 
-            <DataColumn
-              title={"Recieved"}
-              value={amountPaid}
-              currency={data?.currency}
-            />
+            <DataColumn title={"Recieved"} value={amountPaid} currency={data?.currency} />
 
-            <DataColumn
-              title={"Amount"}
-              value={totalCost}
-              currency={data?.currency}
-            />
-            <DataColumn
-              title={"Balance"}
-              value={balanceGivenOut}
-              currency={data?.currency}
-            />
+            <DataColumn title={"Amount"} value={totalCost} currency={data?.currency} />
+            <DataColumn title={"Balance"} value={balanceGivenOut} currency={data?.currency} />
           </View>
         </>
       )}
       {expanded && (
         <View style={{ flex: 1, marginTop: 10 }}>
           <View style={{ marginVertical: 5 }}>
-            <SalesTable
-              sales={lineItems}
-              fixHeight={false}
-              disableSwipe={true}
-            />
+            <SalesTable sales={lineItems} fixHeight={false} disableSwipe={true} />
           </View>
-          <DataRow
-            key={1}
-            label={"Total"}
-            value={formatNumberWithCommas(totalCost)}
-            style={{ marginTop: 5, marginBottom: 10 }}
-            currency={data?.currency}
-          />
+          <DataRow key={1} label={"Total"} value={formatNumberWithCommas(totalCost)} style={{ marginTop: 5, marginBottom: 10 }} currency={data?.currency} />
 
-          <DataRow
-            key={2}
-            label={"Recieved"}
-            value={formatNumberWithCommas(amountPaid)}
-            currency={data?.currency}
-          />
+          <DataRow key={2} label={"Recieved"} value={formatNumberWithCommas(amountPaid)} currency={data?.currency} />
           <DataRow
             key={3}
-            label={`Purchased ${
-              itemCount > 1 ? `${itemCount} items` : `${itemCount} item`
-            }`}
+            label={`Purchased ${itemCount > 1 ? `${itemCount} items` : `${itemCount} item`}`}
             value={formatNumberWithCommas(totalCost)}
             currency={data?.currency}
           />
 
-          <DataRow
-            key={4}
-            label={"Balance"}
-            value={formatNumberWithCommas(balanceGivenOut)}
-            currency={data?.currency}
-          />
-          {!isShopAttendant && (
-            <DataRow
-              key={5}
-              label={"Income"}
-              value={formatNumberWithCommas(profit)}
-              currency={data?.currency}
-            />
-          )}
+          <DataRow key={4} label={"Balance"} value={formatNumberWithCommas(balanceGivenOut)} currency={data?.currency} />
+          {!isShopAttendant && <DataRow key={5} label={"Income"} value={formatNumberWithCommas(profit)} currency={data?.currency} />}
 
-          {data?.clientName && (
-            <DataRow key={6} label={"Client's name"} value={data?.clientName} />
-          )}
+          {data?.clientName && <DataRow key={6} label={"Client's name"} value={data?.clientName} />}
 
-          {data?.clientPhoneNumber && (
-            <DataRow
-              key={7}
-              label={"Client's mobile"}
-              value={data?.clientPhoneNumber}
-            />
-          )}
+          {data?.clientPhoneNumber && <DataRow key={7} label={"Client's mobile"} value={data?.clientPhoneNumber} />}
         </View>
       )}
 

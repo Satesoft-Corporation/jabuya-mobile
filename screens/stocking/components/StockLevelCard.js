@@ -17,14 +17,9 @@ function StockLevelCard({ data, isShopAttendant }) {
     setExpanded(!expanded);
   };
 
-  let remainingStock =
-    summary?.totalQuantityStocked - summary?.totalQuantitySold;
+  let remainingStock = summary?.totalQuantityStocked - summary?.totalQuantitySold;
 
-  if (
-    remainingStock === undefined ||
-    isNaN(remainingStock) ||
-    remainingStock < 1
-  ) {
+  if (remainingStock === undefined || isNaN(remainingStock) || remainingStock < 1) {
     remainingStock = 0;
   }
   return (
@@ -38,11 +33,7 @@ function StockLevelCard({ data, isShopAttendant }) {
         paddingHorizontal: 10,
       }}
     >
-      <CardHeader
-        value1={`SN: ${data?.serialNumber}`}
-        date={data?.dateCreated}
-        shop={data?.shopName}
-      />
+      <CardHeader value1={`SN: ${data?.serialNumber}`} date={data?.dateCreated} shop={data?.shopName} />
 
       <View
         style={{
@@ -53,18 +44,9 @@ function StockLevelCard({ data, isShopAttendant }) {
       >
         <DataColumn title={"Product"} value={data?.productName} left />
 
-        <DataColumn
-          title={"Sold"}
-          value={Math.round(summary?.totalQuantitySold) || 0}
-        />
+        <DataColumn title={"Sold"} value={Math.round(summary?.totalQuantitySold) || 0} />
         <DataColumn title={"Stock"} value={Math.round(remainingStock)} />
-        {!isShopAttendant && (
-          <DataColumn
-            title={"Value"}
-            value={Math.round(remainingStock * data?.salesPrice)}
-            currency={data?.currency}
-          />
-        )}
+        {!isShopAttendant && <DataColumn title={"Value"} value={Math.round(remainingStock * data?.salesPrice)} currency={data?.currency} />}
       </View>
 
       {expanded && (
@@ -75,18 +57,8 @@ function StockLevelCard({ data, isShopAttendant }) {
           }}
         >
           <DataRow label={"Product"} value={data?.productName} />
-          <DataRow
-            label={"Price"}
-            value={formatNumberWithCommas(data?.salesPrice)}
-            currency={data?.currency}
-          />
-          <DataRow
-            label={"Status"}
-            value={
-              data?.recordStatus[0] +
-              String(data?.recordStatus).slice(1).toLowerCase()
-            }
-          />
+          <DataRow label={"Price"} value={formatNumberWithCommas(data?.salesPrice)} currency={data?.currency} />
+          <DataRow label={"Status"} value={data?.recordStatus[0] + String(data?.recordStatus).slice(1).toLowerCase()} />
           <DataRow label={"Portion"} value={data?.saleUnitName} />
           <DataRow label={"Barcode"} value={data?.barcode} />
           <DataRow label={"Category"} value={data?.categoryName} />

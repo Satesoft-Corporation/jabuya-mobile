@@ -23,21 +23,13 @@ function OfflineSaleTxnCard({ data, onRemove }) {
 
   return (
     <View style={[styles.container, { borderWidth: onCredit ? 1 : 0 }]}>
-      <CardHeader
-        value1={shop?.name}
-        value2={`${formatDate(soldOnDate, true)}`}
-      />
+      <CardHeader value1={shop?.name} value2={`${formatDate(soldOnDate, true)}`} />
 
       <SalesTable sales={lineItems} fixHeight={false} />
 
       {expanded && <TxnCashSummary data={data} shop={shop} />}
 
-      <CardFooter
-        onClick2={toggleExpand}
-        btnTitle2={!expanded ? "More" : "Hide"}
-        btnTitle1={expanded ? "Remove" : null}
-        onClick1={onRemove}
-      />
+      <CardFooter onClick2={toggleExpand} btnTitle2={!expanded ? "More" : "Hide"} btnTitle1={expanded ? "Remove" : null} onClick1={onRemove} />
     </View>
   );
 }
@@ -63,34 +55,17 @@ export const TxnCashSummary = ({ data, shop }) => {
 
   return (
     <View>
-      <DataRow
-        key={1}
-        label={"Total"}
-        value={formatNumberWithCommas(totalCost)}
-        currency={currency}
-      />
+      <DataRow key={1} label={"Total"} value={formatNumberWithCommas(totalCost)} currency={currency} />
 
-      <DataRow
-        key={2}
-        label={"Recieved"}
-        value={formatNumberWithCommas(amountPaid)}
-        currency={currency}
-      />
+      <DataRow key={2} label={"Recieved"} value={formatNumberWithCommas(amountPaid)} currency={currency} />
       <DataRow
         key={3}
-        label={`Purchased ${
-          itemCount > 1 ? `${itemCount} items` : `${itemCount} item`
-        }`}
+        label={`Purchased ${itemCount > 1 ? `${itemCount} items` : `${itemCount} item`}`}
         value={formatNumberWithCommas(totalCost)}
         currency={currency}
       />
 
-      <DataRow
-        key={4}
-        label={"Balance"}
-        value={amountPaid - totalCost}
-        currency={currency}
-      />
+      <DataRow key={4} label={"Balance"} value={amountPaid - totalCost} currency={currency} />
     </View>
   );
 };

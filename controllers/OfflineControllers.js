@@ -95,18 +95,12 @@ export const saveShopClients = async (searchParameters, prev = []) => {
   return clients;
 };
 
-export const saveShopDetails = async (
-  searchParameters,
-  isShopAttendant = false
-) => {
+export const saveShopDetails = async (searchParameters, isShopAttendant = false) => {
   let shopsArray = [];
   console.log("Saving shops");
   const currencyList = await saveCurrencies();
 
-  const apiUrl =
-    isShopAttendant === false
-      ? SHOP_ENDPOINT
-      : `${SHOP_ENDPOINT}/${searchParameters?.shopId}`;
+  const apiUrl = isShopAttendant === false ? SHOP_ENDPOINT : `${SHOP_ENDPOINT}/${searchParameters?.shopId}`;
 
   console.log(isShopAttendant);
   await new BaseApiService(apiUrl)
@@ -114,9 +108,7 @@ export const saveShopDetails = async (
     .then(async (response) => {
       if (isShopAttendant === false) {
         const finalList = response?.records?.map((item) => {
-          const currency = currencyList?.find(
-            (cur) => cur?.id === item?.currencyId
-          );
+          const currency = currencyList?.find((cur) => cur?.id === item?.currencyId);
           return {
             ...item,
             currency: currency?.symbol || "",
@@ -126,9 +118,7 @@ export const saveShopDetails = async (
       }
 
       if (isShopAttendant === true) {
-        const currency = currencyList?.find(
-          (cur) => cur?.id === response?.data?.currencyId
-        );
+        const currency = currencyList?.find((cur) => cur?.id === response?.data?.currencyId);
 
         shopsArray = [{ ...response?.data, currency: currency?.symbol || "" }];
       }

@@ -142,12 +142,7 @@ export default function Login() {
       >
         v {Constants.expoConfig.version}
       </Text>
-      <DisplayMessage
-        showModal={showMoodal}
-        message={message}
-        onAgree={() => setShowModal(false)}
-        agreeText="OK"
-      />
+      <DisplayMessage showModal={showMoodal} message={message} onAgree={() => setShowModal(false)} agreeText="OK" />
     </SafeAreaView>
   );
 }

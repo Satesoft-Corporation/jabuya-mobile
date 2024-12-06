@@ -2,9 +2,7 @@ import { View, Text, FlatList, SafeAreaView } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import Colors from "@constants/Colors";
 import TopHeader from "@components/TopHeader";
-import OfflineSaleTxnCard, {
-  TxnCashSummary,
-} from "./components/OfflineSaleTxnCard";
+import OfflineSaleTxnCard, { TxnCashSummary } from "./components/OfflineSaleTxnCard";
 import ModalContent from "@components/ModalContent";
 import SalesTable from "@screens/sales_desk/components/SalesTable";
 import PrimaryButton from "@components/buttons/PrimaryButton";
@@ -71,17 +69,13 @@ const OfflineSales = () => {
         salesList.map(async (cart, index) => {
           console.log("Saving sale", index + 1);
           try {
-            const response = await new BaseApiService(
-              SHOP_SALES_ENDPOINT
-            ).postRequest(cart);
+            const response = await new BaseApiService(SHOP_SALES_ENDPOINT).postRequest(cart);
             const info = await response.json();
             const status = response.status;
 
             if (status === 200) {
               try {
-                const confirmResponse = await new BaseApiService(
-                  `/shop-sales/${info?.id}/confirm`
-                ).postRequest();
+                const confirmResponse = await new BaseApiService(`/shop-sales/${info?.id}/confirm`).postRequest();
 
                 await confirmResponse.json();
 
@@ -147,10 +141,7 @@ const OfflineSales = () => {
 
             <VerticalSeparator />
 
-            <ItemHeader
-              title="Sales"
-              value={formatNumberWithCommas(totalValue)}
-            />
+            <ItemHeader title="Sales" value={formatNumberWithCommas(totalValue)} />
 
             <VerticalSeparator />
 
@@ -172,11 +163,7 @@ const OfflineSales = () => {
               paddingHorizontal: 10,
             }}
           >
-            <PrimaryButton
-              title={"Save Sales"}
-              darkMode={false}
-              onPress={handleSave}
-            />
+            <PrimaryButton title={"Save Sales"} darkMode={false} onPress={handleSave} />
           </View>
 
           <View
@@ -201,18 +188,8 @@ const OfflineSales = () => {
         refreshing={loading}
         onRefresh={getOfflineSale}
         data={salesList}
-        renderItem={({ item, index }) => (
-          <OfflineSaleTxnCard
-            key={index}
-            data={item}
-            onRemove={() => handleRemove(item, index)}
-          />
-        )}
-        ListEmptyComponent={() => (
-          <Text style={{ flex: 1, textAlign: "center", alignSelf: "center" }}>
-            {!loading ? "No sales found" : ""}
-          </Text>
-        )}
+        renderItem={({ item, index }) => <OfflineSaleTxnCard key={index} data={item} onRemove={() => handleRemove(item, index)} />}
+        ListEmptyComponent={() => <Text style={{ flex: 1, textAlign: "center", alignSelf: "center" }}>{!loading ? "No sales found" : ""}</Text>}
       />
 
       <Snackbar ref={snackbarRef} />
@@ -271,11 +248,7 @@ const RemoveSaleModal = ({ visible = false, data, ...props }) => {
           marginBottom: 5,
         }}
       >
-        <PrimaryButton
-          darkMode={false}
-          title={"Cancel"}
-          onPress={props?.hide}
-        />
+        <PrimaryButton darkMode={false} title={"Cancel"} onPress={props?.hide} />
         <PrimaryButton title={"Remove"} onPress={removeSale} />
       </View>
     </ModalContent>

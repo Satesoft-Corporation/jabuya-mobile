@@ -34,21 +34,9 @@ import {
   getUserType,
 } from "reducers/selectors";
 import { useDispatch } from "react-redux";
-import {
-  changeUser,
-  loginAction,
-  setIsUserConfigured,
-} from "actions/userActions";
+import { changeUser, loginAction, setIsUserConfigured } from "actions/userActions";
 import { BaseApiService } from "@utils/BaseApiService";
-import {
-  addManufacturers,
-  addSuppliers,
-  changeSelectedShop,
-  setClientSales,
-  setShopClients,
-  setShopProducts,
-  setShops,
-} from "actions/shopActions";
+import { addManufacturers, addSuppliers, changeSelectedShop, setClientSales, setShopClients, setShopProducts, setShops } from "actions/shopActions";
 import { LOGIN_END_POINT } from "@utils/EndPointUtils";
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
@@ -79,15 +67,13 @@ const LandingScreen = () => {
   const getRefreshToken = async () => {
     const loginInfo = await UserSessionUtils.getLoginDetails();
     if (loginInfo) {
-      await new BaseApiService(LOGIN_END_POINT)
-        .saveRequestWithJsonResponse(loginInfo, false)
-        .then(async (response) => {
-          await UserSessionUtils.setUserAuthToken(response.accessToken);
-          await UserSessionUtils.setUserRefreshToken(response.refreshToken);
-          dispatch(loginAction(true));
-          dispatch(changeUser(response.user));
-          console.log("token refreshed");
-        });
+      await new BaseApiService(LOGIN_END_POINT).saveRequestWithJsonResponse(loginInfo, false).then(async (response) => {
+        await UserSessionUtils.setUserAuthToken(response.accessToken);
+        await UserSessionUtils.setUserRefreshToken(response.refreshToken);
+        dispatch(loginAction(true));
+        dispatch(changeUser(response.user));
+        console.log("token refreshed");
+      });
     }
   };
 
@@ -119,19 +105,13 @@ const LandingScreen = () => {
 
       if (offersDebt === true) {
         const clients = await saveShopClients(offlineParams, prevClients);
-        const clientSales = await saveClientSalesOnDevice(
-          offlineParams,
-          prevClientSales
-        );
+        const clientSales = await saveClientSalesOnDevice(offlineParams, prevClientSales);
         dispatch(setShopClients(clients));
         dispatch(setClientSales(clientSales));
       }
 
       if (userType !== userTypes.isSuperAdmin) {
-        const products = await saveShopProductsOnDevice(
-          offlineParams,
-          prevProducts
-        );
+        const products = await saveShopProductsOnDevice(offlineParams, prevProducts);
         dispatch(setShopProducts(products));
       }
 
@@ -174,10 +154,7 @@ const LandingScreen = () => {
       const hasNet = await hasInternetConnection();
 
       if (prevLoginTime !== null) {
-        const logintimeDifferance = getTimeDifference(
-          new Date(prevLoginTime),
-          new Date()
-        );
+        const logintimeDifferance = getTimeDifference(new Date(prevLoginTime), new Date());
 
         const { days, hours } = logintimeDifferance;
 
@@ -210,10 +187,7 @@ const LandingScreen = () => {
       <Loader loading={loading} />
       <UserProfile renderNtnIcon={false} showShops />
 
-      <LockScreenModal
-        showLock={showLock}
-        hideLock={() => setShowLock(false)}
-      />
+      <LockScreenModal showLock={showLock} hideLock={() => setShowLock(false)} />
       <View
         style={{
           paddingHorizontal: 10,
@@ -223,9 +197,7 @@ const LandingScreen = () => {
         <FlatList
           style={{ marginTop: 10 }}
           data={menuList}
-          renderItem={({ item }) => (
-            <MenuIcon icon={item} onPress={() => handleTabPress(item)} />
-          )}
+          renderItem={({ item }) => <MenuIcon icon={item} onPress={() => handleTabPress(item)} />}
           keyExtractor={(item) => item.title.toString()}
           numColumns={3}
         />

@@ -3,13 +3,7 @@ import React from "react";
 import { scale } from "react-native-size-matters";
 import Colors from "@constants/Colors";
 
-export function MenuIcon({
-  icon,
-  containerStyle,
-  onPress,
-  iconStyle,
-  titleStyle,
-}) {
+export function MenuIcon({ icon, containerStyle, onPress, iconStyle, titleStyle }) {
   return (
     <TouchableOpacity
       key={icon.id}

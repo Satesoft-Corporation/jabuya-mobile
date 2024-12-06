@@ -55,10 +55,7 @@ const CreditPayment = ({ route }) => {
       await new BaseApiService(`/credit-sales/${sale?.id}/payments`)
         .saveRequestWithJsonResponse(payLoad, false)
         .then(async (response) => {
-          const newList = await saveClientSalesOnDevice(
-            offlineParams,
-            creditSales
-          );
+          const newList = await saveClientSalesOnDevice(offlineParams, creditSales);
 
           dispatch(setClientSales(newList));
           setLoading(false);
@@ -70,12 +67,7 @@ const CreditPayment = ({ route }) => {
           snackRef.current.show(error?.message, 5000);
         });
     } else {
-      snackRef.current.show(
-        `Enter valid amount, amount should not exceed ${
-          sale?.currency
-        }${formatNumberWithCommas(balance)}`,
-        5000
-      );
+      snackRef.current.show(`Enter valid amount, amount should not exceed ${sale?.currency}${formatNumberWithCommas(balance)}`, 5000);
     }
   };
 
@@ -110,18 +102,9 @@ const CreditPayment = ({ route }) => {
             </Text>
           </View>
 
-          <DataRow
-            label={"Balance "}
-            currency={sale?.currency}
-            value={balance}
-          />
+          <DataRow label={"Balance "} currency={sale?.currency} value={balance} />
           <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
-            <MyInput
-              label="Client name"
-              value={sale?.client_name}
-              style={{ flex: 1 }}
-              editable={false}
-            />
+            <MyInput label="Client name" value={sale?.client_name} style={{ flex: 1 }} editable={false} />
             <MyInput
               label="Id number"
               value={sale?.serialNumber}
@@ -132,29 +115,12 @@ const CreditPayment = ({ route }) => {
           </View>
 
           <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
-            <MyInput
-              label="Payment date"
-              dateValue={paymentDate}
-              isDateInput
-              onDateChange={(date) => setPaymentDate(date)}
-              style={{ flex: 1 }}
-            />
+            <MyInput label="Payment date" dateValue={paymentDate} isDateInput onDateChange={(date) => setPaymentDate(date)} style={{ flex: 1 }} />
 
-            <MyInput
-              label="Amount"
-              value={amount}
-              style={{ flex: 1 }}
-              onValueChange={(text) => setAmount(text)}
-              inputMode="numeric"
-            />
+            <MyInput label="Amount" value={amount} style={{ flex: 1 }} onValueChange={(text) => setAmount(text)} inputMode="numeric" />
           </View>
 
-          <MyInput
-            label="Remarks"
-            numberOfLines={4}
-            value={remarks}
-            onValueChange={(text) => setRemarks(text)}
-          />
+          <MyInput label="Remarks" numberOfLines={4} value={remarks} onValueChange={(text) => setRemarks(text)} />
         </View>
 
         <View

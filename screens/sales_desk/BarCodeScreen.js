@@ -65,12 +65,7 @@ const BarCodeScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       <EnterSaleQtyModal showMoodal={showMoodal} setShowModal={setShowModal} />
 
-      <BarCodeScanner
-        height={screenHeight}
-        width={screenWidth}
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={{ marginTop: -20 }}
-      />
+      <BarCodeScanner height={screenHeight} width={screenWidth} onBarCodeScanned={scanned ? undefined : handleBarCodeScanned} style={{ marginTop: -20 }} />
       <View style={styles.overlay}>
         <View style={styles.unfocusedContainer}></View>
         <View style={{ flexDirection: "row" }}>

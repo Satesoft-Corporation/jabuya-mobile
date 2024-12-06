@@ -55,6 +55,8 @@ const ProductEntry = ({ route }) => {
 
   const snackBarRef = useRef(null);
 
+  console.log(route?.params)
+
   const fetchProducts = async (manufacturerId) => {
     setSelectedProduct(null);
     setDisable(true);

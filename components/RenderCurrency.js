@@ -4,11 +4,7 @@ import { formatNumberWithCommas } from "@utils/Utils";
 import Colors from "@constants/Colors";
 import { scale } from "react-native-size-matters";
 
-const RenderCurrency = ({
-  value = 0,
-  color = Colors.dark,
-  currencySymbol = "",
-}) => {
+const RenderCurrency = ({ value = 0, color = Colors.dark, currencySymbol = "" }) => {
   return (
     <Text
       style={{
@@ -19,12 +15,8 @@ const RenderCurrency = ({
         textAlign: "center",
       }}
     >
-      <Text style={{ fontSize: scale(11), fontWeight: 400 }}>
-        {currencySymbol}{" "}
-      </Text>
-      {Number(value) < 0
-        ? `(${formatNumberWithCommas(Math.abs(value))})`
-        : formatNumberWithCommas(value)}
+      <Text style={{ fontSize: scale(11), fontWeight: 400 }}>{currencySymbol} </Text>
+      {Number(value) < 0 ? `(${formatNumberWithCommas(Math.abs(value))})` : formatNumberWithCommas(value)}
     </Text>
   );
 };

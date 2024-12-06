@@ -9,12 +9,7 @@ import { scale } from "react-native-size-matters";
 import { useSelector } from "react-redux";
 import { getSelectedShop, getUserData, getUserType } from "reducers/selectors";
 
-const UserProfile = ({
-  renderNtnIcon = true,
-  renderMenu = false,
-  menuItems,
-  showShops,
-}) => {
+const UserProfile = ({ renderNtnIcon = true, renderMenu = false, menuItems, showShops }) => {
   const navigation = useNavigation();
 
   const selectedShop = useSelector(getSelectedShop);
@@ -89,16 +84,10 @@ const UserProfile = ({
       <View style={{ flexDirection: "row", gap: 10 }}>
         {renderNtnIcon && (
           <TouchableOpacity style={{ marginEnd: 10 }}>
-            <Ionicons
-              name="notifications-outline"
-              size={20}
-              color={Colors.primary_light}
-            />
+            <Ionicons name="notifications-outline" size={20} color={Colors.primary_light} />
           </TouchableOpacity>
         )}
-        {renderMenu && (
-          <PopUpmenu menuItems={menuItems} showShops={showShops} />
-        )}
+        {renderMenu && <PopUpmenu menuItems={menuItems} showShops={showShops} />}
       </View>
     </View>
   );

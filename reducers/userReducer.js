@@ -32,15 +32,7 @@ const userReduer = (state = initialState, action) => {
     }
 
     case actions.CHANGE_USER: {
-      const {
-        isShopOwner,
-        isShopAttendant,
-        isSuperAdmin,
-        attendantShopId,
-        shopOwnerId,
-        firstName,
-        lastName,
-      } = action.payload ?? {};
+      const { isShopOwner, isShopAttendant, isSuperAdmin, attendantShopId, shopOwnerId, firstName, lastName } = action.payload ?? {};
 
       return {
         ...state,
@@ -65,9 +57,7 @@ const userReduer = (state = initialState, action) => {
       };
     }
     case actions.SET_SHOPS: {
-      const offersDebt = action.payload?.some(
-        (s) => s?.supportsCreditSales === true
-      );
+      const offersDebt = action.payload?.some((s) => s?.supportsCreditSales === true);
 
       let menuList = [...navList];
 

@@ -26,11 +26,7 @@ import {
   getUserPinCode,
   getUserType,
 } from "reducers/selectors";
-import {
-  logOutAction,
-  setApplockTime,
-  setUserPinCode,
-} from "actions/userActions";
+import { logOutAction, setApplockTime, setUserPinCode } from "actions/userActions";
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import {
   saveClientSalesOnDevice,
@@ -40,15 +36,7 @@ import {
   saveShopProductsOnDevice,
   saveSuppliers,
 } from "@controllers/OfflineControllers";
-import {
-  addManufacturers,
-  addSuppliers,
-  changeSelectedShop,
-  setClientSales,
-  setShopClients,
-  setShopProducts,
-  setShops,
-} from "actions/shopActions";
+import { addManufacturers, addSuppliers, changeSelectedShop, setClientSales, setShopClients, setShopProducts, setShops } from "actions/shopActions";
 import Loader from "@components/Loader";
 import { hasInternetConnection } from "@utils/NetWork";
 import Snackbar from "@components/Snackbar";
@@ -108,9 +96,7 @@ const Settings = () => {
       setShowModal(true);
     } else {
       setAgreeText("View sales");
-      setMessage(
-        `Cannot logout, you have ${pendingSales?.length} unsaved sale(s) on your device, please connect to the internet to save them.`
-      );
+      setMessage(`Cannot logout, you have ${pendingSales?.length} unsaved sale(s) on your device, please connect to the internet to save them.`);
       setCanCancel(false);
       setShowModal(true);
       return;
@@ -132,9 +118,7 @@ const Settings = () => {
 
         const shopData = await saveShopDetails(offlineParams, isShopAttendant);
 
-        const offersDebt = shopData?.some(
-          (s) => s?.supportsCreditSales === true
-        );
+        const offersDebt = shopData?.some((s) => s?.supportsCreditSales === true);
 
         if (shopData?.length > 1) {
           shops = [
@@ -155,19 +139,13 @@ const Settings = () => {
 
         if (offersDebt === true) {
           const clients = await saveShopClients(offlineParams, prevClients);
-          const clientSales = await saveClientSalesOnDevice(
-            offlineParams,
-            prevClientSales
-          );
+          const clientSales = await saveClientSalesOnDevice(offlineParams, prevClientSales);
           dispatch(setShopClients(clients));
           dispatch(setClientSales(clientSales));
         }
 
         if (userType !== userTypes.isSuperAdmin) {
-          const products = await saveShopProductsOnDevice(
-            offlineParams,
-            prevProducts
-          );
+          const products = await saveShopProductsOnDevice(offlineParams, prevProducts);
           dispatch(setShopProducts(products));
         }
 
@@ -191,10 +169,7 @@ const Settings = () => {
       <Loader loading={loading} message="Please wait..." />
       <Snackbar ref={snackbarRef} />
 
-      <SubscriptionsAlert
-        showModal={showSubAlert}
-        setShowModal={setShowSubAlert}
-      />
+      <SubscriptionsAlert showModal={showSubAlert} setShowModal={setShowSubAlert} />
 
       <TopHeader title="Settings" showShopName={false} />
 
@@ -254,24 +229,12 @@ const Settings = () => {
             />
 
             <SettingsBar
-              icon={
-                <Icon
-                  name={"cloud-sync-outline"}
-                  groupName="MaterialCommunityIcons"
-                  size={20}
-                />
-              }
+              icon={<Icon name={"cloud-sync-outline"} groupName="MaterialCommunityIcons" size={20} />}
               onPress={() => configureUserData(true)}
               text="Sync data"
             />
 
-            <SettingsBar
-              icon={
-                <Icon name={"credit-card"} groupName="FontAwesome" size={20} />
-              }
-              onPress={() => setShowSubAlert(true)}
-              text="Subscriptions"
-            />
+            <SettingsBar icon={<Icon name={"credit-card"} groupName="FontAwesome" size={20} />} onPress={() => setShowSubAlert(true)} text="Subscriptions" />
           </View>
         </View>
 
@@ -281,43 +244,17 @@ const Settings = () => {
             <SettingsBar
               icon={<Icon name={"user-lock"} size={20} />}
               text="Pin Lock"
-              renderRight={() => (
-                <Switch
-                  style={{ height: 20 }}
-                  value={userPincode !== null}
-                  onValueChange={onToggleSwitch}
-                  color="#000"
-                />
-              )}
+              renderRight={() => <Switch style={{ height: 20 }} value={userPincode !== null} onValueChange={onToggleSwitch} color="#000" />}
             />
 
-            <SettingsBar
-              icon={<Icon name={"help-circle"} groupName="Feather" size={20} />}
-              text="Help center"
-            />
-            <SettingsBar
-              icon={
-                <Icon
-                  name={"privacy-tip"}
-                  groupName="MaterialIcons"
-                  size={20}
-                />
-              }
-              text="Terms and privacy"
-            />
+            <SettingsBar icon={<Icon name={"help-circle"} groupName="Feather" size={20} />} text="Help center" />
+            <SettingsBar icon={<Icon name={"privacy-tip"} groupName="MaterialIcons" size={20} />} text="Terms and privacy" />
           </View>
         </View>
 
         <SettingsBar
           onPress={handleLogout}
-          icon={
-            <Icon
-              name={"logout"}
-              groupName="AntDesign"
-              size={20}
-              color={Colors.primary}
-            />
-          }
+          icon={<Icon name={"logout"} groupName="AntDesign" size={20} color={Colors.primary} />}
           text="Logout"
           tintColor={Colors.primary}
           textColor={Colors.primary}
@@ -340,19 +277,10 @@ const Settings = () => {
           bottom: 10,
         }}
       >
-        <Text style={{ alignSelf: "center", fontSize: 12 }}>
-          v {Constants.expoConfig.version}
-        </Text>
+        <Text style={{ alignSelf: "center", fontSize: 12 }}>v {Constants.expoConfig.version}</Text>
       </View>
 
-      <DisplayMessage
-        showModal={showMoodal}
-        message={message}
-        onAgree={logOut}
-        agreeText={agreeText}
-        setShowModal={setShowModal}
-        canCancel={canCancel}
-      />
+      <DisplayMessage showModal={showMoodal} message={message} onAgree={logOut} agreeText={agreeText} setShowModal={setShowModal} canCancel={canCancel} />
     </SafeAreaView>
   );
 };

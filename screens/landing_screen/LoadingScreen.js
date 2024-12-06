@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  Image,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, SafeAreaView, Image, ActivityIndicator } from "react-native";
 import React, { useEffect } from "react";
 import Colors from "@constants/Colors";
 import { scale } from "react-native-size-matters";
@@ -52,9 +46,7 @@ const LoadingScreen = () => {
 
       <View style={{ flexDirection: "row", gap: 5 }}>
         <ActivityIndicator color={Colors.primary} />
-        <Text style={{ color: Colors.primary, fontSize: scale(17) }}>
-          ...in real time
-        </Text>
+        <Text style={{ color: Colors.primary, fontSize: scale(17) }}>...in real time</Text>
       </View>
     </SafeAreaView>
   );

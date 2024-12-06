@@ -16,11 +16,7 @@ export default function ({ children, onBackDropPress, visible = true, style }) {
           <View style={{ flex: 1 }}>{/*<Text>qwe</Text>*/}</View>
         </TouchableWithoutFeedback>
         <View style={[{ padding: 20 }, style]}>
-          <Surface
-            style={{ borderRadius: 9, paddingHorizontal: 15, paddingBottom: 5 }}
-          >
-            {children}
-          </Surface>
+          <Surface style={{ borderRadius: 9, paddingHorizontal: 15, paddingBottom: 5 }}>{children}</Surface>
         </View>
         <TouchableWithoutFeedback onPress={onBackDropPress}>
           <View style={{ flex: 1 }}>{/*<Text>qwe</Text>*/}</View>

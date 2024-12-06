@@ -5,12 +5,7 @@ import { paymentMethods } from "@constants/Constants";
 import { MyDropDown } from "@components/DropdownComponents";
 import Colors from "@constants/Colors";
 import ChipButton from "@components/buttons/ChipButton";
-import {
-  getCart,
-  getCollectClientInfo,
-  getOffersDebt,
-  getShopClients,
-} from "reducers/selectors";
+import { getCart, getCollectClientInfo, getOffersDebt, getShopClients } from "reducers/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { updateRecievedAmount } from "actions/shopActions";
 import { Switch } from "react-native-paper";
@@ -48,15 +43,7 @@ const PaymentMethodComponent = ({
   const { totalCartCost, recievedAmount } = cart;
 
   const SoldOnDateComponent = () => {
-    return (
-      <MyInput
-        isDateInput
-        dateValue={soldOnDate}
-        label="Sold on"
-        onDateChange={(date) => setSoldOnDate(date)}
-        maximumDate
-      />
-    );
+    return <MyInput isDateInput dateValue={soldOnDate} label="Sold on" onDateChange={(date) => setSoldOnDate(date)} maximumDate />;
   };
 
   const handleInput = (text) => {
@@ -97,11 +84,7 @@ const PaymentMethodComponent = ({
         <FlatList
           data={paymentMethods}
           renderItem={({ item }) => (
-            <ChipButton
-              title={item?.name}
-              isSelected={item?.id === selectedPaymentMethod?.id}
-              onPress={() => setSelectedPaymentMethod(item)}
-            />
+            <ChipButton title={item?.name} isSelected={item?.id === selectedPaymentMethod?.id} onPress={() => setSelectedPaymentMethod(item)} />
           )}
           keyExtractor={(item) => item?.name.toString()}
           numColumns={3}
@@ -118,12 +101,7 @@ const PaymentMethodComponent = ({
           }}
         >
           <Text style={{ fontSize: 15 }}>Existing client</Text>
-          <Switch
-            value={existingClient}
-            onValueChange={onToggleSwitch}
-            color="#000"
-            style={{ height: 25 }}
-          />
+          <Switch value={existingClient} onValueChange={onToggleSwitch} color="#000" style={{ height: 25 }} />
         </View>
       )}
 
@@ -139,18 +117,9 @@ const PaymentMethodComponent = ({
                   marginTop: 5,
                 }}
               >
-                <MyInput
-                  label={"Client Name"}
-                  value={clientName}
-                  onValueChange={(text) => setClientName(text)}
-                />
+                <MyInput label={"Client Name"} value={clientName} onValueChange={(text) => setClientName(text)} />
 
-                <MyInput
-                  label={"Client Phone Number"}
-                  value={clientNumber}
-                  onValueChange={(text) => setClientNumber(text)}
-                  inputMode="numeric"
-                />
+                <MyInput label={"Client Phone Number"} value={clientNumber} onValueChange={(text) => setClientNumber(text)} inputMode="numeric" />
               </View>
             )}
 
@@ -197,16 +166,8 @@ const PaymentMethodComponent = ({
           }}
         >
           <MyInput
-            label={
-              selectedPaymentMethod?.id === 0
-                ? "Recieved amount"
-                : "Amount paid"
-            }
-            value={
-              selectedPaymentMethod?.id === 0
-                ? String(recievedAmount)
-                : amountPaid
-            }
+            label={selectedPaymentMethod?.id === 0 ? "Recieved amount" : "Amount paid"}
+            value={selectedPaymentMethod?.id === 0 ? String(recievedAmount) : amountPaid}
             onValueChange={(text) => handleInput(text)}
             cursorColor={Colors.dark}
             inputMode="numeric"

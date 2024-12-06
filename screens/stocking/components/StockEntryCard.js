@@ -17,18 +17,8 @@ const StockEntryCard = ({ data, isShopAttendant }) => {
     setExpanded(!expanded);
   };
 
-  const {
-    purchasedQuantity,
-    productName,
-    purchasePrice,
-    createdByFullName,
-    dateCreated,
-    barcode,
-    expiryDate,
-    supplierName,
-    batchNumber,
-    remarks,
-  } = data ?? {};
+  const { purchasedQuantity, productName, purchasePrice, createdByFullName, dateCreated, barcode, expiryDate, supplierName, batchNumber, remarks } =
+    data ?? {};
 
   return (
     <View
@@ -41,11 +31,7 @@ const StockEntryCard = ({ data, isShopAttendant }) => {
         paddingHorizontal: 10,
       }}
     >
-      <CardHeader
-        value1={`SN: ${data?.serialNumber}`}
-        date={data?.dateCreated}
-        shop={data?.shopName}
-      />
+      <CardHeader value1={`SN: ${data?.serialNumber}`} date={data?.dateCreated} shop={data?.shopName} />
       <View
         style={{
           flexDirection: "row",
@@ -59,18 +45,8 @@ const StockEntryCard = ({ data, isShopAttendant }) => {
 
         {!isShopAttendant && (
           <>
-            <DataColumn
-              title={"Cost"}
-              value={Math.round(purchasePrice / purchasedQuantity)}
-              key={3}
-              currency={data?.currency}
-            />
-            <DataColumn
-              title={"Amount"}
-              value={purchasePrice}
-              key={4}
-              currency={data?.currency}
-            />
+            <DataColumn title={"Cost"} value={Math.round(purchasePrice / purchasedQuantity)} key={3} currency={data?.currency} />
+            <DataColumn title={"Amount"} value={purchasePrice} key={4} currency={data?.currency} />
           </>
         )}
       </View>

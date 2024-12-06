@@ -47,21 +47,9 @@ const CardFooter = ({
       </Text>
 
       <View style={{ flexDirection: "row", gap: 10 }}>
-        {deleteIcon && !isShopAttendant && (
-          <ChipButton2
-            title={<Icon name="trash" />}
-            onPress={onDelete}
-            darkMode={false}
-          />
-        )}
+        {deleteIcon && !isShopAttendant && <ChipButton2 title={<Icon name="trash" />} onPress={onDelete} darkMode={false} />}
 
-        {btnTitle1 && (
-          <ChipButton2
-            title={btnTitle1}
-            onPress={onClick1}
-            darkMode={darkMode}
-          />
-        )}
+        {btnTitle1 && <ChipButton2 title={btnTitle1} onPress={onClick1} darkMode={darkMode} />}
         {btnTitle2 && <ChipButton2 title={btnTitle2} onPress={onClick2} />}
       </View>
     </View>

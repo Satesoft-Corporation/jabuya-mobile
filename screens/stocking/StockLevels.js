@@ -13,12 +13,7 @@ import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 import { saveExcelSheet } from "@utils/FileSystem";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getOfflineParams,
-  getSelectedShop,
-  getShopProducts,
-  getUserType,
-} from "reducers/selectors";
+import { getOfflineParams, getSelectedShop, getShopProducts, getUserType } from "reducers/selectors";
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { setShopProducts } from "actions/shopActions";
 
@@ -51,9 +46,7 @@ const StockLevel = ({ navigation }) => {
         pdtList = [...shopProducts];
       }
 
-      pdtList = pdtList?.filter((item) =>
-        item?.productName?.toLowerCase()?.includes(searchTerm.toLowerCase())
-      );
+      pdtList = pdtList?.filter((item) => item?.productName?.toLowerCase()?.includes(searchTerm.toLowerCase()));
 
       setStockLevels(pdtList);
 
@@ -68,11 +61,7 @@ const StockLevel = ({ navigation }) => {
 
         let remainingStock = Math.round(productStockedQty - productSoldQty);
 
-        if (
-          remainingStock === undefined ||
-          isNaN(remainingStock) ||
-          remainingStock < 1
-        ) {
+        if (remainingStock === undefined || isNaN(remainingStock) || remainingStock < 1) {
           remainingStock = 0;
         }
 
@@ -129,11 +118,7 @@ const StockLevel = ({ navigation }) => {
 
       let remainingStock = Math.round(productStockedQty - productSoldQty);
 
-      if (
-        remainingStock === undefined ||
-        isNaN(remainingStock) ||
-        remainingStock < 1
-      ) {
+      if (remainingStock === undefined || isNaN(remainingStock) || remainingStock < 1) {
         remainingStock = 0;
       }
 
@@ -161,10 +146,7 @@ const StockLevel = ({ navigation }) => {
   const handleRefresh = async () => {
     setSearchTerm("");
     setLoading(true);
-    const products = await saveShopProductsOnDevice(
-      offlineParams,
-      shopProducts
-    );
+    const products = await saveShopProductsOnDevice(offlineParams, shopProducts);
     dispatch(setShopProducts(products));
     fetchShopProducts();
   };
@@ -242,9 +224,7 @@ const StockLevel = ({ navigation }) => {
         style={{ marginTop: 5 }}
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
-        renderItem={({ item }) => (
-          <StockLevelCard data={item} isShopAttendant={isShopAttendant} />
-        )}
+        renderItem={({ item }) => <StockLevelCard data={item} isShopAttendant={isShopAttendant} />}
         onRefresh={handleRefresh}
         refreshing={loading}
         ListEmptyComponent={() => (

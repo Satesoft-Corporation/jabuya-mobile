@@ -21,15 +21,9 @@ const ItemHeader = ({ title, value, isCurrency = false }) => {
         {title}
       </Text>
       {isCurrency ? (
-        <RenderCurrency
-          value={value}
-          color={Colors.primary}
-          currencySymbol={selectedShop?.currency || ""}
-        />
+        <RenderCurrency value={value} color={Colors.primary} currencySymbol={selectedShop?.currency || ""} />
       ) : (
-        <Text style={{ fontSize: scale(13), color: Colors.primary }}>
-          {value}
-        </Text>
+        <Text style={{ fontSize: scale(13), color: Colors.primary }}>{value}</Text>
       )}
     </View>
   );

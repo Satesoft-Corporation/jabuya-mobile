@@ -44,9 +44,7 @@ const Expenses = ({}) => {
 
         setExpenseValue(response?.records?.reduce((a, b) => a + b?.amount, 0));
 
-        let cats = [
-          ...new Set(response?.records?.map((exp) => exp?.categoryName)),
-        ]?.length;
+        let cats = [...new Set(response?.records?.map((exp) => exp?.categoryName))]?.length;
 
         setCategories(cats);
 

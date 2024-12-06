@@ -23,37 +23,19 @@ const SubscriptionsAlert = ({ showModal, setShowModal }) => {
       }}
     >
       <View style={{ paddingHorizontal: 5, gap: 2, paddingVertical: 10 }}>
-        <Text style={{ textAlign: "center", fontSize: 18 }}>
-          Make your payment to
-        </Text>
+        <Text style={{ textAlign: "center", fontSize: 18 }}>Make your payment to</Text>
 
-        <View
-          style={{ justifyContent: "center", flexDirection: "row", gap: 5 }}
-        >
+        <View style={{ justifyContent: "center", flexDirection: "row", gap: 5 }}>
           <Text style={{ textAlign: "center", fontSize: 15 }}>Bank name:</Text>
-          <Text
-            style={{ textAlign: "center", fontSize: 15, fontWeight: "bold" }}
-          >
-            Equity Bank
-          </Text>
+          <Text style={{ textAlign: "center", fontSize: 15, fontWeight: "bold" }}>Equity Bank</Text>
         </View>
 
-        <View
-          style={{ justifyContent: "center", flexDirection: "row", gap: 5 }}
-        >
+        <View style={{ justifyContent: "center", flexDirection: "row", gap: 5 }}>
           <Text style={{ textAlign: "center", fontSize: 15 }}>A/C no:</Text>
-          <Text
-            style={{ textAlign: "center", fontSize: 15, fontWeight: "bold" }}
-          >
-            {accNo}
-          </Text>
+          <Text style={{ textAlign: "center", fontSize: 15, fontWeight: "bold" }}>{accNo}</Text>
         </View>
 
-        {copied && (
-          <Text style={{ color: Colors.green, textAlign: "center" }}>
-            copied!
-          </Text>
-        )}
+        {copied && <Text style={{ color: Colors.green, textAlign: "center" }}>copied!</Text>}
 
         <View
           style={{

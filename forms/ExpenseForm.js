@@ -78,11 +78,7 @@ const ExpenseForm = () => {
     fetchCategories();
   }, []);
   return (
-    <KeyboardAvoidingView
-      enabled={true}
-      behavior={"height"}
-      style={{ flex: 1 }}
-    >
+    <KeyboardAvoidingView enabled={true} behavior={"height"} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
         <TopHeader title="Enter Expense" />
 
@@ -142,29 +138,11 @@ const ExpenseForm = () => {
               />
             </View>
             <View style={{ flexDirection: "row", gap: 10 }}>
-              <MyInput
-                label="Amount"
-                inputMode="numeric"
-                value={amount}
-                onValueChange={(text) => setAmount(text)}
-                style={{ flex: 1 }}
-              />
-              <MyInput
-                label="Date "
-                dateValue={dob}
-                isDateInput
-                onDateChange={(date) => setDOB(date)}
-                maximumDate
-                style={{ flex: 1 }}
-              />
+              <MyInput label="Amount" inputMode="numeric" value={amount} onValueChange={(text) => setAmount(text)} style={{ flex: 1 }} />
+              <MyInput label="Date " dateValue={dob} isDateInput onDateChange={(date) => setDOB(date)} maximumDate style={{ flex: 1 }} />
             </View>
             <View style={{ flexDirection: "row" }}>
-              <MyInput
-                label="Desciprition"
-                multiline
-                value={remarks}
-                onValueChange={(text) => setRemarks(text)}
-              />
+              <MyInput label="Desciprition" multiline value={remarks} onValueChange={(text) => setRemarks(text)} />
             </View>
           </View>
 

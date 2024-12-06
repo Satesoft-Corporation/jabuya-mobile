@@ -3,16 +3,7 @@ import React from "react";
 import Colors from "@constants/Colors";
 import { scale } from "react-native-size-matters";
 
-const PrimaryButton = ({
-  onPress,
-  title,
-  disabled = false,
-  titleStyle = {},
-  style,
-  darkMode = true,
-  width,
-  round = false,
-}) => {
+const PrimaryButton = ({ onPress, title, disabled = false, titleStyle = {}, style, darkMode = true, width, round = false }) => {
   return (
     <TouchableOpacity
       activeOpacity={0.7}

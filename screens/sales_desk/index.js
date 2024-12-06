@@ -1,26 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  Text,
-  View,
-  TextInput,
-  ScrollView,
-  SafeAreaView,
-  Alert,
-} from "react-native";
+import { Text, View, TextInput, ScrollView, SafeAreaView, Alert } from "react-native";
 import { useRef } from "react";
-import {
-  BARCODE_SCREEN,
-  CREDIT_SALES,
-  SALES_REPORTS,
-} from "@navigation/ScreenNames";
+import { BARCODE_SCREEN, CREDIT_SALES, SALES_REPORTS } from "@navigation/ScreenNames";
 import Colors from "@constants/Colors";
 import ConfirmSaleModal from "./components/ConfirmSaleModal";
 import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
 import UserProfile from "@components/UserProfile";
-import {
-  MyDropDown,
-  SalesDropdownComponent,
-} from "@components/DropdownComponents";
+import { MyDropDown, SalesDropdownComponent } from "@components/DropdownComponents";
 import { formatNumberWithCommas } from "@utils/Utils";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import SalesTable from "./components/SalesTable";
@@ -120,8 +106,7 @@ function SalesDesk({ navigation }) {
       const inStock = pdtList
         ?.filter((pdt) => pdt?.performanceSummary)
         .filter((pdt) => {
-          const { totalQuantityStocked, totalQuantitySold } =
-            pdt?.performanceSummary;
+          const { totalQuantityStocked, totalQuantitySold } = pdt?.performanceSummary;
           const qtyInStock = totalQuantityStocked - totalQuantitySold;
 
           return qtyInStock >= 1;
@@ -157,10 +142,7 @@ function SalesDesk({ navigation }) {
     }
     if (isSuperAdmin === false) {
       setTimeout(async () => {
-        const pdts = await saveShopProductsOnDevice(
-          offlineParams,
-          shopProducts
-        );
+        const pdts = await saveShopProductsOnDevice(offlineParams, shopProducts);
         dispatch(setShopProducts(pdts));
       }, 10000);
     }
@@ -196,12 +178,7 @@ function SalesDesk({ navigation }) {
         }
 
         if (Number(recievedAmount) < totalCartCost) {
-          snackbarRef.current.show(
-            `Recieved amount should not be less than ${
-              selectedShop?.currency
-            } ${formatNumberWithCommas(totalCartCost)}`,
-            4000
-          );
+          snackbarRef.current.show(`Recieved amount should not be less than ${selectedShop?.currency} ${formatNumberWithCommas(totalCartCost)}`, 4000);
           return;
         }
 
@@ -282,10 +259,7 @@ function SalesDesk({ navigation }) {
         </View>
       </View>
 
-      <ScrollView
-        style={{ backgroundColor: Colors.light_2, flex: 1 }}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={{ backgroundColor: Colors.light_2, flex: 1 }} showsVerticalScrollIndicator={false}>
         <View style={{ paddingHorizontal: 10, marginTop: 7, gap: 10 }}>
           <View
             style={{
@@ -310,9 +284,7 @@ function SalesDesk({ navigation }) {
               alignItems: "baseline",
             }}
           >
-            <Text style={{ fontWeight: "bold", fontSize: scale(14) }}>
-              Recieved amount
-            </Text>
+            <Text style={{ fontWeight: "bold", fontSize: scale(14) }}>Recieved amount</Text>
             <View
               style={{
                 flexDirection: "row",
@@ -357,13 +329,7 @@ function SalesDesk({ navigation }) {
             }}
           >
             <DataRow
-              label={`Sold ${
-                totalQty > 1
-                  ? `${totalQty} items`
-                  : totalQty === 1
-                  ? `${totalQty} item`
-                  : ""
-              }`}
+              label={`Sold ${totalQty > 1 ? `${totalQty} items` : totalQty === 1 ? `${totalQty} item` : ""}`}
               value={formatNumberWithCommas(totalCartCost)}
               currency={selectedShop?.currency}
               labelTextStyle={{ fontWeight: 600 }}
@@ -377,11 +343,7 @@ function SalesDesk({ navigation }) {
               padding: 10,
             }}
           >
-            <DataRow
-              label={"Balance"}
-              value={formatNumberWithCommas(recievedAmount - totalCartCost)}
-              currency={selectedShop?.currency}
-            />
+            <DataRow label={"Balance"} value={formatNumberWithCommas(recievedAmount - totalCartCost)} currency={selectedShop?.currency} />
           </View>
 
           <View style={{ marginBottom: 20, gap: 5 }}>
@@ -403,19 +365,11 @@ function SalesDesk({ navigation }) {
                 />
               </View>
               <View style={{ flex: 0.7 }}>
-                <PrimaryButton
-                  title={"Confirm purchase"}
-                  onPress={handleSubmit}
-                />
+                <PrimaryButton title={"Confirm purchase"} onPress={handleSubmit} />
               </View>
             </View>
 
-            {cartItems?.length > 0 && !selectedHeldSale && canHoldSales && (
-              <PrimaryButton
-                title={"Hold sale"}
-                onPress={() => setHoldSaleModal(true)}
-              />
-            )}
+            {cartItems?.length > 0 && !selectedHeldSale && canHoldSales && <PrimaryButton title={"Hold sale"} onPress={() => setHoldSaleModal(true)} />}
           </View>
         </View>
       </ScrollView>

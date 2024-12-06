@@ -63,10 +63,7 @@ export default function App() {
             <Stack.Screen name={s.STOCK_LEVELS} component={StockLevel} />
 
             <Stack.Screen name={s.PDT_ENTRY} component={ProductEntry} />
-            <Stack.Screen
-              name={s.STOCK_ENTRY_FORM}
-              component={StockPurchaseForm}
-            />
+            <Stack.Screen name={s.STOCK_ENTRY_FORM} component={StockPurchaseForm} />
 
             <Stack.Screen name={s.SETTINGS} component={Settings} />
             <Stack.Screen name={s.LOCK_SETuP} component={LockSetUp} />

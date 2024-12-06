@@ -1,14 +1,7 @@
 import { LEADS_ENDPOINT } from "@utils/EndPointUtils";
 import { useEffect, useRef, useState } from "react";
 import { BaseApiService } from "@utils/BaseApiService";
-import {
-  KeyboardAvoidingView,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  StyleSheet,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, SafeAreaView, ScrollView, Text, StyleSheet, View } from "react-native";
 import Colors from "@constants/Colors";
 import TopHeader from "@components/TopHeader";
 import Loader from "@components/Loader";
@@ -172,13 +165,7 @@ const LeadsForm = ({ route }) => {
   return (
     <KeyboardAvoidingView enabled={true} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <TopHeader
-          title={edit ? "Edit Lead" : "Add Lead"}
-          showMenuDots
-          menuItems={[
-            { name: "Leads", onClick: () => navigate.navigate(LEADS) },
-          ]}
-        />
+        <TopHeader title={edit ? "Edit Lead" : "Add Lead"} showMenuDots menuItems={[{ name: "Leads", onClick: () => navigate.navigate(LEADS) }]} />
         <Loader loading={loading} />
         {locationEnabled === true && (
           <ScrollView
@@ -187,9 +174,7 @@ const LeadsForm = ({ route }) => {
               paddingHorizontal: 10,
             }}
           >
-            <Text style={styles.headerText}>
-              {edit ? "Edit" : "Enter"} lead details
-            </Text>
+            <Text style={styles.headerText}>{edit ? "Edit" : "Enter"} lead details</Text>
             <View style={{ flex: 1 }}>
               <MyInput
                 label={"Shop Name"}
@@ -199,9 +184,7 @@ const LeadsForm = ({ route }) => {
                   setShopName(e);
                 }}
               />
-              {submitted && !shopName && (
-                <Text style={styles.errorText}> Shop name is required.</Text>
-              )}
+              {submitted && !shopName && <Text style={styles.errorText}> Shop name is required.</Text>}
             </View>
             <View style={styles.row}>
               <View style={{ flex: 1 }}>
@@ -265,18 +248,8 @@ const LeadsForm = ({ route }) => {
             </View>
             <View style={styles.row}>
               <View style={{ flex: 1 }}>
-                <MyInput
-                  value={physicalAddress}
-                  onValueChange={(e) => {
-                    setPhysicalAddress(e);
-                  }}
-                  label="Physical Address"
-                />
-                {submitted && !physicalAddress && (
-                  <Text style={styles.errorText}>
-                    Physical Address is required.
-                  </Text>
-                )}
+                <MyInput value={physicalAddress} onValueChange={(e) => setPhysicalAddress(e)} label="Physical Address" />
+                {submitted && !physicalAddress && <Text style={styles.errorText}>Physical Address is required.</Text>}
               </View>
             </View>
 
@@ -291,11 +264,7 @@ const LeadsForm = ({ route }) => {
             </View>
 
             <View style={styles.rowGap}>
-              <PrimaryButton
-                darkMode={false}
-                onPress={clearForm}
-                title={"Clear"}
-              />
+              <PrimaryButton darkMode={false} onPress={clearForm} title={"Clear"} />
               <PrimaryButton onPress={saveLead} title={"Save"} />
             </View>
           </ScrollView>

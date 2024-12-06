@@ -3,15 +3,7 @@ import React from "react";
 import { Image } from "react-native";
 import Colors from "../../constants/Colors";
 
-const SettingsBar = ({
-  icon,
-  text = "",
-  onPress = () => {},
-  renderRight = () => {},
-  style,
-  textColor = Colors.dark,
-  textStyle,
-}) => {
+const SettingsBar = ({ icon, text = "", onPress = () => {}, renderRight = () => {}, style, textColor = Colors.dark, textStyle }) => {
   return (
     <TouchableOpacity
       onPress={onPress}

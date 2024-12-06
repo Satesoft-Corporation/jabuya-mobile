@@ -16,10 +16,7 @@ const DataRow = ({ label, value, currency, style }) => {
       ]}
     >
       <Text style={[{ fontWeight: 400, fontSize: scale(14) }]}>{label}</Text>
-      <Text
-        style={[{ fontWeight: 600, fontSize: scale(14) }]}
-        numberOfLines={2}
-      >
+      <Text style={[{ fontWeight: 600, fontSize: scale(14) }]} numberOfLines={2}>
         {currency && (
           <Text
             style={{
