@@ -19,7 +19,7 @@ import { changeSelectedShop, setShopProducts } from "actions/shopActions";
 import { useNavigation } from "@react-navigation/native";
 import { STOCK_ENTRY } from "@navigation/ScreenNames";
 
-const StockPurchaseForm = ({ route }) => {
+const StockEntryForm = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
   const offlineParams = useSelector(getOfflineParams);
   const shopProducts = useSelector(getShopProducts);
@@ -32,7 +32,7 @@ const StockPurchaseForm = ({ route }) => {
 
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [selectedSupplier, setSelectedSupplier] = useState(suppliers?.find((i) => i?.companyOrBusinessName?.toLowerCase() === "unknown"));
   const [expiryDate, setExpiryDate] = useState(new Date());
   const [isPackedProduct, setIsPackedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -224,7 +224,7 @@ const StockPurchaseForm = ({ route }) => {
         >
           <Text style={styles.headerText}>{edit ? "Edit" : "Enter"} stock detail</Text>
 
-          {!edit && (
+          {!edit && shops?.length > 1 && (
             <View style={{ gap: 5 }}>
               <Text>Shop</Text>
               <MyDropDown
@@ -322,6 +322,17 @@ const StockPurchaseForm = ({ route }) => {
 
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
+              <MyInput label="Unit purchase price" editable={false} value={formatNumberWithCommas(getUnitPurchasePrice())} />
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <MyInput label="Purchase date" dateValue={purchaseDate} isDateInput onDateChange={(date) => setPurchaseDate(date)} maximumDate />
+              {submitted && !purchaseDate && <Text style={styles.errorText}>Purchase date is required</Text>}
+            </View>
+          </View>
+
+          <View style={styles.row}>
+            <View style={{ flex: 1 }}>
               <MyInput label=" Batch no." value={batchNo} onValueChange={(text) => setBatchNo(text)} />
               {submitted && batchNo === "" && <Text style={styles.errorText}>Batch number is required</Text>}
             </View>
@@ -332,22 +343,11 @@ const StockPurchaseForm = ({ route }) => {
             </View>
           </View>
 
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <MyInput label="Unit purchase price" editable={false} value={formatNumberWithCommas(getUnitPurchasePrice())} />
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <MyInput label="Purchase date" dateValue={purchaseDate} isDateInput onDateChange={(date) => setPurchaseDate(date)} maximumDate />
-              {submitted && !purchaseDate && <Text style={styles.errorText}>Purchase date is required</Text>}
-            </View>
-          </View>
-
           <MyInput value={remarks} label="Remarks" multiline onValueChange={(text) => setRemarks(text)} numberOfLines={3} />
 
           <View style={[styles.row, { marginTop: 15 }]}>
-            <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} />
-            <PrimaryButton title={"Save"} onPress={saveStockEntry} />
+            <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} style={{ flex: 0.5 }} />
+            <PrimaryButton title={"Save"} onPress={saveStockEntry} style={{ flex: 0.5 }} />
           </View>
         </ScrollView>
 
@@ -357,7 +357,7 @@ const StockPurchaseForm = ({ route }) => {
   );
 };
 
-export default StockPurchaseForm;
+export default StockEntryForm;
 const styles = StyleSheet.create({
   headerText: {
     marginVertical: 10,

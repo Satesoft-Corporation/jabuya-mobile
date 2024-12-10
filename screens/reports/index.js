@@ -1,6 +1,6 @@
 import { View, FlatList } from "react-native";
 import React from "react";
-import { CREDIT_SALES, EXPENSES, SALES_REPORTS, STOCK_ENTRY, STOCK_LEVELS } from "@navigation/ScreenNames";
+import { CREDIT_SALES, DAMAGES, EXPENSES, SALES_REPORTS, STOCK_ENTRY, STOCK_LEVELS } from "@navigation/ScreenNames";
 import Colors from "@constants/Colors";
 import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
@@ -18,10 +18,7 @@ const ReportsMenu = () => {
       title: "Daily sales",
       target: SALES_REPORTS,
     },
-    // {
-    //   title: "Sales by product",
-    //   target: SALES_BY_PDT,
-    // },
+
     {
       title: "Debts",
       target: CREDIT_SALES,
@@ -38,6 +35,10 @@ const ReportsMenu = () => {
     {
       title: "Expenses",
       target: EXPENSES,
+    },
+    {
+      title: "Damages",
+      target: DAMAGES,
     },
   ].filter((i) => (!offersDebt ? i.target !== CREDIT_SALES : i));
 

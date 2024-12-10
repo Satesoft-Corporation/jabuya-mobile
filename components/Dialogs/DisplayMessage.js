@@ -16,6 +16,9 @@ export default function DisplayMessage({ message, onAgree, showModal, agreeText,
         padding: 10,
       }}
       onBackButtonPress={hideModal}
+      animationIn={"fadeIn"}
+      animationOut={"fadeOut"}
+      animationOutTiming={0.1}
     >
       <View
         style={{

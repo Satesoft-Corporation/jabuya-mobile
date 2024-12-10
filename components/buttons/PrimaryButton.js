@@ -1,7 +1,6 @@
 import { Text, TouchableOpacity } from "react-native";
 import React from "react";
 import Colors from "@constants/Colors";
-import { scale } from "react-native-size-matters";
 
 const PrimaryButton = ({ onPress, title, disabled = false, titleStyle = {}, style, darkMode = true, width, round = false }) => {
   return (
@@ -16,10 +15,9 @@ const PrimaryButton = ({ onPress, title, disabled = false, titleStyle = {}, styl
           borderRadius: round ? 20 : 5,
           borderWidth: darkMode ? 0 : 1,
           borderColor: Colors.dark,
-          height: 40,
+          height: 35,
           minWidth: 100,
-          width,
-          flex: 1,
+          width: "100%",
         },
         style,
       ]}
@@ -30,7 +28,6 @@ const PrimaryButton = ({ onPress, title, disabled = false, titleStyle = {}, styl
           {
             fontWeight: "500",
             color: darkMode ? Colors.primary : Colors.dark,
-            fontSize: scale(15),
           },
           titleStyle,
         ]}

@@ -1,4 +1,4 @@
-import { View, Text, TextInput } from "react-native";
+import { View, Text, TextInput, Pressable } from "react-native";
 import React, { memo, useState } from "react";
 import Colors from "../constants/Colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -22,7 +22,7 @@ const MyInput = ({
   minimumDate = false,
   onDateChange,
   darkMode = false,
-  boldLabel = false,
+  ...props
 }) => {
   const [visible, setVisible] = useState(false);
 
@@ -32,19 +32,24 @@ const MyInput = ({
   };
 
   return (
-    <View style={[{ gap: 5, flex: 1, maxHeight: 70 }, style]}>
+    <View style={[{ gap: 5, maxHeight: 70 }, style]}>
       {label !== "" && (
         <Text
           style={{
             paddingHorizontal: 4,
             color: darkMode ? Colors.primary : Colors.dark,
-            fontWeight: boldLabel ? 600 : 400,
+            fontSize: 15,
           }}
         >
           {label}
         </Text>
       )}
-      <View
+      <Pressable
+        onPress={() => {
+          if (isDateInput) {
+            setVisible(true);
+          }
+        }}
         style={{
           height: 40,
           alignItems: "center",
@@ -72,6 +77,7 @@ const MyInput = ({
             textAlign: inputMode === "numeric" ? "right" : "left",
             flex: 1,
           }}
+          {...props}
         />
 
         {isDateInput && (
@@ -92,7 +98,7 @@ const MyInput = ({
             )}
           </>
         )}
-      </View>
+      </Pressable>
     </View>
   );
 };

@@ -6,14 +6,16 @@ import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { memo, useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { useSelector } from "react-redux";
-import { getShops } from "reducers/selectors";
+import { getShops, getUserType } from "reducers/selectors";
 import { scale } from "react-native-size-matters";
 import Colors from "@constants/Colors";
+import { userTypes } from "@constants/Constants";
 
-function SaleTxnCard({ data, print, isShopAttendant, onDelete }) {
-  // sales report item carduserType === userTypes.isShopAttendant;
-
+function SaleTxnCard({ data, print, onDelete }) {
   const shops = useSelector(getShops) ?? [];
+  const userType = useSelector(getUserType);
+
+  const isShopAttendant = userType === userTypes.isShopAttendant;
 
   const { lineItems, totalCost, amountPaid, balanceGivenOut } = data;
 
@@ -37,31 +39,10 @@ function SaleTxnCard({ data, print, isShopAttendant, onDelete }) {
 
   const serialNumber = () => {
     return (
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: !expanded ? 10 : 0,
-        }}
-      >
-        <Text
-          style={[
-            {
-              fontSize: scale(12),
-            },
-          ]}
-        >
-          SN: {data?.serialNumber}
-        </Text>
-        <Text
-          style={{
-            fontSize: scale(12),
-            color: Colors.gray,
-            alignSelf: "flex-end",
-          }}
-        >
-          {formatDate(data?.dateCreated)}
-        </Text>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: !expanded ? 10 : 0 }}>
+        <Text style={{ fontSize: scale(12) }}>SN: {data?.serialNumber}</Text>
+
+        <Text style={{ fontSize: scale(12), color: Colors.gray, alignSelf: "flex-end" }}>{formatDate(data?.dateCreated)}</Text>
       </View>
     );
   };
@@ -82,15 +63,19 @@ function SaleTxnCard({ data, print, isShopAttendant, onDelete }) {
       {expanded && serialNumber()}
 
       {!expanded && (
-        <View>
-          <Text
-            style={{
-              fontWeight: 600,
-              fontSize: scale(14),
-            }}
-          >
-            Items
-          </Text>
+        <View style={{ gap: 2 }}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <Text style={{ fontWeight: 600 }}>Items</Text>
+
+            {data?.clientName && (
+              <Text>
+                Client:{" "}
+                <Text style={{ fontWeight: "600" }}>
+                  {data?.clientName} {data?.clientPhoneNumber}
+                </Text>
+              </Text>
+            )}
+          </View>
           <Text numberOfLines={2} style={{ fontWeight: "500" }}>
             {data?.name}
           </Text>
@@ -99,19 +84,13 @@ function SaleTxnCard({ data, print, isShopAttendant, onDelete }) {
 
       {!expanded && (
         <>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 5,
-            }}
-          >
+          <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
             <DataColumn title={"Qty"} value={itemCount} />
 
-            <DataColumn title={"Recieved"} value={amountPaid} currency={data?.currency} />
+            <DataColumn title={"Recieved"} value={formatNumberWithCommas(amountPaid, data?.currency)} />
 
-            <DataColumn title={"Amount"} value={totalCost} currency={data?.currency} />
-            <DataColumn title={"Balance"} value={balanceGivenOut} currency={data?.currency} />
+            <DataColumn title={"Amount"} value={formatNumberWithCommas(totalCost, data?.currency)} />
+            <DataColumn title={"Balance"} value={formatNumberWithCommas(balanceGivenOut, data?.currency)} />
           </View>
         </>
       )}
@@ -120,18 +99,18 @@ function SaleTxnCard({ data, print, isShopAttendant, onDelete }) {
           <View style={{ marginVertical: 5 }}>
             <SalesTable sales={lineItems} fixHeight={false} disableSwipe={true} />
           </View>
-          <DataRow key={1} label={"Total"} value={formatNumberWithCommas(totalCost)} style={{ marginTop: 5, marginBottom: 10 }} currency={data?.currency} />
+          <DataRow key={1} label={"Total"} value={formatNumberWithCommas(totalCost, data?.currency)} style={{ marginTop: 5, marginBottom: 10 }} />
 
-          <DataRow key={2} label={"Recieved"} value={formatNumberWithCommas(amountPaid)} currency={data?.currency} />
+          <DataRow key={2} label={"Recieved"} value={formatNumberWithCommas(amountPaid, data?.currency)} />
+
           <DataRow
-            key={3}
             label={`Purchased ${itemCount > 1 ? `${itemCount} items` : `${itemCount} item`}`}
-            value={formatNumberWithCommas(totalCost)}
-            currency={data?.currency}
+            value={formatNumberWithCommas(totalCost, data?.currency)}
           />
 
-          <DataRow key={4} label={"Balance"} value={formatNumberWithCommas(balanceGivenOut)} currency={data?.currency} />
-          {!isShopAttendant && <DataRow key={5} label={"Income"} value={formatNumberWithCommas(profit)} currency={data?.currency} />}
+          {balanceGivenOut !== 0 && <DataRow key={4} label={"Balance"} value={formatNumberWithCommas(balanceGivenOut, data?.currency)} />}
+
+          {!isShopAttendant && <DataRow key={5} label={"Income"} value={formatNumberWithCommas(profit, data?.currency)} />}
 
           {data?.clientName && <DataRow key={6} label={"Client's name"} value={data?.clientName} />}
 

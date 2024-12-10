@@ -24,7 +24,7 @@ const CreditPayment = ({ route }) => {
 
   const dispatch = useDispatch();
 
-  let balance = sale?.amountLoaned - sale?.amountRepaid;
+  const balance = sale?.amountLoaned - sale?.amountRepaid;
 
   const [paymentDate, setPaymentDate] = useState(new Date());
   const [amount, setAmount] = useState("");
@@ -39,7 +39,6 @@ const CreditPayment = ({ route }) => {
   };
 
   const savePayment = async () => {
-    // setSubmitted(true);
     let payLoad = {
       id: 0,
       creditSaleId: sale?.creditSaleId,
@@ -81,37 +80,16 @@ const CreditPayment = ({ route }) => {
       <AppStatusBar />
       <TopHeader title={`Credit payment for ${sale?.client_name}`} />
       <Loader loading={loading} />
-      <View
-        style={{
-          marginVertical: 10,
-          paddingHorizontal: 12,
-          justifyContent: "space-between",
-          flex: 1,
-        }}
-      >
-        <View>
-          <View style={{ gap: 5, marginBottom: 5, paddingHorizontal: 2 }}>
-            <Text
-              style={{
-                marginTop: 10,
-                fontSize: 16,
-                fontWeight: 600,
-              }}
-            >
-              Credit Payment
-            </Text>
+      <View style={{ marginVertical: 10, paddingHorizontal: 10, justifyContent: "space-between", flex: 1 }}>
+        <View style={{ gap: 10 }}>
+          <View style={{ gap: 5, marginBottom: 5 }}>
+            <Text style={{ marginTop: 10, fontSize: 16, fontWeight: 600 }}>Credit Payment</Text>
+            <DataRow label={"Balance "} currency={sale?.currency} value={balance} />
           </View>
 
-          <DataRow label={"Balance "} currency={sale?.currency} value={balance} />
-          <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+          <View style={{ flexDirection: "row", gap: 10 }}>
             <MyInput label="Client name" value={sale?.client_name} style={{ flex: 1 }} editable={false} />
-            <MyInput
-              label="Id number"
-              value={sale?.serialNumber}
-              style={{ flex: 1 }}
-              editable={false}
-              // onValueChange={(text) => setFirstName(text)}
-            />
+            <MyInput label="Id number" value={sale?.serialNumber} style={{ flex: 1 }} editable={false} />
           </View>
 
           <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>

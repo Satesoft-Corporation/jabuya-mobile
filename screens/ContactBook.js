@@ -4,17 +4,50 @@ import TopHeader from "@components/TopHeader";
 import Colors from "@constants/Colors";
 import { useSelector } from "react-redux";
 import { getShopClients } from "reducers/selectors";
+import { useState } from "react";
+import { useEffect } from "react";
+import { useCallback } from "react";
 
 const ContactBook = () => {
   const clients = useSelector(getShopClients);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filtered, setFiltered] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const filterClients = () => {
+    const list = clients
+      ?.filter((item) => item?.fullName?.toLowerCase()?.includes(searchTerm.toLowerCase().trim()))
+      .sort((a, b) => {
+        if (a?.fullName < b?.fullName) {
+          return -1;
+        }
+        if (a?.fullName > b?.fullName) {
+          return 1;
+        }
+        return 0;
+      });
+    //must arrange alphabetically
+    setFiltered(list);
+  };
+
+  useEffect(() => {
+    filterClients();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <TopHeader title="Contact List" />
+      <TopHeader title="Contact List" showSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} onSearch={filterClients} />
       <View style={{ flex: 1, paddingHorizontal: 5 }}>
-        <FlatList data={clients} renderItem={({ item }) => <Card client={item} />} />
-
-        {clients?.length === 0 && <Text>No clients found</Text>}
+        <FlatList
+          data={filtered}
+          renderItem={({ item }) => <Card client={item} />}
+          onRefresh={() => {
+            setSearchTerm("");
+            filterClients();
+          }}
+          refreshing={loading}
+          ListEmptyComponent={<Text style={{ textAlign: "center" }}>No clients found</Text>}
+        />
       </View>
     </SafeAreaView>
   );
@@ -22,11 +55,11 @@ const ContactBook = () => {
 
 function Card({ client }) {
   const makePhoneCall = () => {
-    Linking.openURL(`tel:${client?.phoneNumber}`);
+    Linking.openURL(`tel:+${client?.phoneNumber}`);
   };
 
   const openWhatsApp = () => {
-    Linking.openURL(`whatsapp://send?phone=${client?.phoneNumber}`);
+    Linking.openURL(`whatsapp://send?phone=+${client?.phoneNumber}`);
   };
   return (
     <View

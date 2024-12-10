@@ -35,38 +35,24 @@ function StockLevelCard({ data, isShopAttendant }) {
     >
       <CardHeader value1={`SN: ${data?.serialNumber}`} date={data?.dateCreated} shop={data?.shopName} />
 
-      <View
-        style={{
-          flexDirection: "row",
-          marginVertical: 10,
-          justifyContent: "space-between",
-        }}
-      >
+      <View style={{ flexDirection: "row", marginVertical: 10, justifyContent: "space-between" }}>
         <DataColumn title={"Product"} value={data?.productName} left />
 
         <DataColumn title={"Sold"} value={Math.round(summary?.totalQuantitySold) || 0} />
+
         <DataColumn title={"Stock"} value={Math.round(remainingStock)} />
-        {!isShopAttendant && <DataColumn title={"Value"} value={Math.round(remainingStock * data?.salesPrice)} currency={data?.currency} />}
+
+        {!isShopAttendant && <DataColumn title={"Value"} value={formatNumberWithCommas(remainingStock * data?.salesPrice, data?.currency)} />}
       </View>
 
       {expanded && (
-        <View
-          style={{
-            justifyContent: "space-between",
-            marginBottom: 10,
-          }}
-        >
+        <View style={{ justifyContent: "space-between", marginBottom: 10 }}>
           <DataRow label={"Product"} value={data?.productName} />
-          <DataRow label={"Price"} value={formatNumberWithCommas(data?.salesPrice)} currency={data?.currency} />
-          <DataRow label={"Status"} value={data?.recordStatus[0] + String(data?.recordStatus).slice(1).toLowerCase()} />
+          <DataRow label={"Price"} value={formatNumberWithCommas(data?.salesPrice, data?.currency)} />
           <DataRow label={"Portion"} value={data?.saleUnitName} />
           <DataRow label={"Barcode"} value={data?.barcode} />
           <DataRow label={"Category"} value={data?.categoryName} />
-          {/* <DataRow label={"Restocked by"} value={data?.changedByFullName} /> */}
-          {/* <DataRow
-            label={"Last restock"}
-            value={formatDate(data?.dateChanged, true)}
-          /> */}
+
           <DataRow label={"Listed by"} value={data?.createdByFullName} />
 
           {data?.remarks && (

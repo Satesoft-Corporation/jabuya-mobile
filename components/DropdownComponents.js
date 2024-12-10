@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, TouchableOpacity, Image, Dimensions } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Image, Dimensions, Text } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../constants/Colors";
 
@@ -73,33 +73,16 @@ export const SalesDropdownComponent = ({ products, handleChange, makeSelection, 
   );
 };
 
-export const MyDropDown = ({
-  onChange,
-  style = {},
-  data,
-  labelField,
-  valueField,
-  value,
-  placeholder = "Select item",
-  disable = false,
-  search = true,
-}) => {
+export const MyDropDown = ({ onChange, style = {}, data, labelField, valueField, value, label, disable = false }) => {
   const [isFocus, setIsFocus] = useState(false);
 
   return (
-    <View style={{ marginBottom: 1 }}>
+    <View style={{ gap: 5 }}>
+      {label && <Text style={{ fontSize: 15 }}>{label}</Text>}
       <Dropdown
         disable={disable}
         style={[
-          {
-            height: 40,
-            borderColor: Colors.dark,
-            borderWidth: 0.5,
-            borderRadius: 5,
-            paddingHorizontal: 13,
-            backgroundColor: Colors.primary,
-            width: "100%",
-          },
+          { height: 40, borderColor: Colors.dark, borderWidth: 0.5, borderRadius: 5, paddingHorizontal: 13, width: "100%" },
           isFocus && { borderColor: Colors.primary },
           style,
         ]}
@@ -111,10 +94,10 @@ export const MyDropDown = ({
         maxHeight={screenHeight / 2}
         labelField={labelField}
         valueField={valueField}
-        placeholder={!isFocus ? placeholder : "..."}
+        placeholder={"Select item"}
         searchPlaceholder="Search..."
         value={value}
-        search={search}
+        search={data?.length > 4}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
@@ -126,12 +109,7 @@ export const MyDropDown = ({
   );
 };
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 8,
-    flexDirection: "row",
-    justifyContent: "center",
-    paddingHorizontal: 8,
-  },
+  container: { marginTop: 8, flexDirection: "row", justifyContent: "center", paddingHorizontal: 8 },
   dropdown: {
     height: 35,
     borderColor: Colors.primary,
@@ -143,9 +121,7 @@ const styles = StyleSheet.create({
     width: "80%",
     alignSelf: "center",
   },
-  icon: {
-    marginRight: 5,
-  },
+  icon: { marginRight: 5 },
 
   label: {
     position: "absolute",
@@ -156,18 +132,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     fontSize: 14,
   },
-  placeholderStyle: {
-    fontSize: 15,
-  },
-  selectedTextStyle: {
-    fontSize: 15,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
+  placeholderStyle: { fontSize: 15 },
+  selectedTextStyle: { fontSize: 15 },
+  iconStyle: { width: 20, height: 20 },
+  inputSearchStyle: { height: 40, fontSize: 16 },
 });

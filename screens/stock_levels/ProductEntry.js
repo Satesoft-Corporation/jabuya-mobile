@@ -4,7 +4,6 @@ import { BaseApiService } from "@utils/BaseApiService";
 import { SHOP_PRODUCTS_ENDPOINT } from "@utils/EndPointUtils";
 import { hasNull } from "@utils/Utils";
 import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
-import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
 import Loader from "@components/Loader";
 import { MyDropDown } from "@components/DropdownComponents";
@@ -16,13 +15,7 @@ import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native";
 import MyInput from "@components/MyInput";
 import Snackbar from "@components/Snackbar";
-import {
-  getManufactures,
-  getOfflineParams,
-  getSelectedShop,
-  getShopProducts,
-  getShops,
-} from "reducers/selectors";
+import { getManufactures, getOfflineParams, getSelectedShop, getShopProducts, getShops } from "reducers/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { changeSelectedShop, setShopProducts } from "actions/shopActions";
 import { useNavigation } from "@react-navigation/native";
@@ -55,7 +48,7 @@ const ProductEntry = ({ route }) => {
 
   const snackBarRef = useRef(null);
 
-  console.log(route?.params)
+  console.log(route?.params);
 
   const fetchProducts = async (manufacturerId) => {
     setSelectedProduct(null);
@@ -90,14 +83,10 @@ const ProductEntry = ({ route }) => {
       unitPrice: "0",
       saleUnitName,
     };
-    const isSelected = selectedSaleUnits?.find(
-      (item) => item.productSaleUnitId === id
-    );
+    const isSelected = selectedSaleUnits?.find((item) => item.productSaleUnitId === id);
 
     if (isSelected) {
-      const newList = selectedSaleUnits.filter(
-        (item) => item.productSaleUnitId !== id
-      );
+      const newList = selectedSaleUnits.filter((item) => item.productSaleUnitId !== id);
 
       setSelectedSaleUnits([...newList]);
     } else {
@@ -107,9 +96,7 @@ const ProductEntry = ({ route }) => {
 
   const handleSaleUnitChange = (e) => {
     setSelectedSaleUnit(e);
-    const newList = selectedSaleUnits.filter(
-      (item) => item.productSaleUnitId !== e?.id
-    );
+    const newList = selectedSaleUnits.filter((item) => item.productSaleUnitId !== e?.id);
 
     setSelectedSaleUnits(newList);
   };
@@ -135,9 +122,7 @@ const ProductEntry = ({ route }) => {
       setSaleUnits(multipleSaleUnits);
 
       if (itemToEdit) {
-        const defaultUnit = multipleSaleUnits.find(
-          (unit) => unit?.saleUnitName === itemToEdit?.saleUnitName
-        );
+        const defaultUnit = multipleSaleUnits.find((unit) => unit?.saleUnitName === itemToEdit?.saleUnitName);
         setSelectedSaleUnit(defaultUnit);
         setRemarks(itemToEdit?.remarks);
         setSalesPrice(String(itemToEdit?.salesPrice));
@@ -218,10 +203,7 @@ const ProductEntry = ({ route }) => {
       await new BaseApiService(SHOP_PRODUCTS_ENDPOINT)
         .saveRequestWithJsonResponse(payload, false)
         .then(async (response) => {
-          const newList = await saveShopProductsOnDevice(
-            offlineParams,
-            shopProducts
-          );
+          const newList = await saveShopProductsOnDevice(offlineParams, shopProducts);
           dispatch(setShopProducts(newList));
           setLoading(false);
           setSubmitted(false);
@@ -247,27 +229,10 @@ const ProductEntry = ({ route }) => {
   return (
     <KeyboardAvoidingView enabled={true} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <TopHeader
-          title="List product"
-          showMenuDots
-          menuItems={[
-            {
-              name: "Products",
-              onClick: () => navigation.navigate(STOCK_LEVELS),
-            },
-          ]}
-        />
+        <TopHeader title="List product" showMenuDots menuItems={[{ name: "Products", onClick: () => navigation.navigate(STOCK_LEVELS) }]} />
+
         <Loader loading={loading} />
-        <ScrollView
-          contentContainerStyle={{
-            justifyContent: "space-between",
-            paddingBottom: 30,
-            gap: 20,
-          }}
-          style={{
-            paddingHorizontal: 8,
-          }}
-        >
+        <ScrollView contentContainerStyle={{ justifyContent: "space-between", paddingBottom: 30, gap: 20 }} style={{ paddingHorizontal: 8 }}>
           <View style={{ gap: 8 }}>
             <Text style={styles.headerText}>Enter product details</Text>
 
@@ -303,9 +268,7 @@ const ProductEntry = ({ route }) => {
                 labelField="name"
                 valueField="id"
               />
-              {submitted && !selectedManufacturer && (
-                <Text style={styles.errorText}>Manufacturer is required</Text>
-              )}
+              {submitted && !selectedManufacturer && <Text style={styles.errorText}>Manufacturer is required</Text>}
             </View>
 
             <View>
@@ -320,30 +283,20 @@ const ProductEntry = ({ route }) => {
                 labelField="displayName"
                 valueField="id"
               />
-              {submitted && !selectedProduct && (
-                <Text style={styles.errorText}>Product is required</Text>
-              )}
+              {submitted && !selectedProduct && <Text style={styles.errorText}>Product is required</Text>}
             </View>
 
             {saleUnits?.length > 1 && (
               <FlatList
                 data={saleUnits?.filter(
                   (item) =>
-                    item?.productSaleUnitName !==
-                      selectedSaleUnit?.productSaleUnitName ||
-                    item?.saleUnitName !== selectedSaleUnit?.saleUnitName
+                    item?.productSaleUnitName !== selectedSaleUnit?.productSaleUnitName || item?.saleUnitName !== selectedSaleUnit?.saleUnitName
                 )}
-                ListHeaderComponent={() =>
-                  saleUnits?.length > 1 && (
-                    <Text style={styles.inputLabel}>Container portions</Text>
-                  )
-                }
+                ListHeaderComponent={() => saleUnits?.length > 1 && <Text style={styles.inputLabel}>Container portions</Text>}
                 renderItem={({ item }) => (
                   <ChipButton
                     isSelected={selectedSaleUnits?.find(
-                      (unit) =>
-                        item?.saleUnitName === unit?.productSaleUnitName ||
-                        item?.saleUnitName === unit?.saleUnitName
+                      (unit) => item?.saleUnitName === unit?.productSaleUnitName || item?.saleUnitName === unit?.saleUnitName
                     )}
                     key={item.saleUnitName}
                     onPress={() => onSaleUnitSelect(item)}
@@ -368,9 +321,7 @@ const ProductEntry = ({ route }) => {
                   valueField="id"
                   search={false}
                 />
-                {submitted && !selectedSaleUnit && (
-                  <Text style={styles.errorText}>Sale unit is required</Text>
-                )}
+                {submitted && !selectedSaleUnit && <Text style={styles.errorText}>Sale unit is required</Text>}
               </View>
 
               <View style={{ flex: 1 }}>
@@ -381,47 +332,23 @@ const ProductEntry = ({ route }) => {
                   inputMode="numeric"
                 />
 
-                {submitted && salesPrice.trim() === "" && (
-                  <Text style={styles.errorText}>Sales price is required</Text>
-                )}
+                {submitted && salesPrice.trim() === "" && <Text style={styles.errorText}>Sales price is required</Text>}
               </View>
             </View>
 
             {selectedSaleUnits?.map((item, index) => (
               <View style={styles.row} key={index}>
-                <MyInput
-                  label=""
-                  value={item.saleUnitName || item?.productSaleUnitName}
-                  editable={false}
-                />
+                <MyInput label="" value={item.saleUnitName || item?.productSaleUnitName} editable={false} />
 
-                <MyInput
-                  label=""
-                  value={item.unitPrice}
-                  onValueChange={(e) => handleUnitPriceChange(index, e)}
-                />
+                <MyInput label="" value={item.unitPrice} onValueChange={(e) => handleUnitPriceChange(index, e)} />
               </View>
             ))}
-            <View style={{ flexDirection: "row" }}>
-              <MyInput
-                label="Remarks"
-                value={remarks}
-                onValueChange={(text) => setRemarks(text)}
-                multiline
-              />
-            </View>
+
+            <MyInput label="Remarks" value={remarks} onValueChange={(text) => setRemarks(text)} multiline />
           </View>
           <View style={styles.bottomContent}>
-            <PrimaryButton
-              darkMode={false}
-              title={"Clear"}
-              onPress={clearForm}
-            />
-            <PrimaryButton
-              title={"Save"}
-              onPress={saveProduct}
-              disabled={disable}
-            />
+            <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} style={{ flex: 0.5 }} />
+            <PrimaryButton title={"Save"} onPress={saveProduct} disabled={disable} style={{ flex: 0.5 }} />
           </View>
         </ScrollView>
 

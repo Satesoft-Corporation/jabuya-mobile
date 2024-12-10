@@ -1,6 +1,5 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigation } from "@react-navigation/native";
 import { BaseApiService } from "@utils/BaseApiService";
 import TopHeader from "@components/TopHeader";
 import Loader from "@components/Loader";
@@ -27,7 +26,6 @@ const ExpenseForm = () => {
   const shops = useSelector(getShops);
 
   const snackRef = useRef(null);
-  const navigation = useNavigation();
 
   const clearForm = () => {
     setAmount("");
@@ -141,9 +139,7 @@ const ExpenseForm = () => {
               <MyInput label="Amount" inputMode="numeric" value={amount} onValueChange={(text) => setAmount(text)} style={{ flex: 1 }} />
               <MyInput label="Date " dateValue={dob} isDateInput onDateChange={(date) => setDOB(date)} maximumDate style={{ flex: 1 }} />
             </View>
-            <View style={{ flexDirection: "row" }}>
-              <MyInput label="Desciprition" multiline value={remarks} onValueChange={(text) => setRemarks(text)} />
-            </View>
+            <MyInput label="Desciprition" multiline value={remarks} onValueChange={(text) => setRemarks(text)} />
           </View>
 
           <View style={BaseStyle.bottomContent}>

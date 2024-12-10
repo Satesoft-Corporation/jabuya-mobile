@@ -177,9 +177,18 @@ const shopReducer = (state = initialState, action) => {
     }
 
     case actions.ADD_SHOP_CLIENTS: {
+      const sorted = action?.payload?.sort((a, b) => {
+        if (a?.fullName < b?.fullName) {
+          return -1;
+        }
+        if (a?.fullName > b?.fullName) {
+          return 1;
+        }
+        return 0;
+      });
       return {
         ...state,
-        clients: action.payload,
+        clients: sorted,
       };
     }
     case actions.ADD_MANUFACTURERS: {

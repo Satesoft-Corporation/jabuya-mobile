@@ -4,7 +4,7 @@ import DataColumn from "@components/card_components/DataColumn";
 import DataRow from "@components/card_components/DataRow";
 import { STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
-import { formatDate } from "@utils/Utils";
+import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import React, { useState } from "react";
 import { View, Text } from "react-native";
 
@@ -32,21 +32,15 @@ const StockEntryCard = ({ data, isShopAttendant }) => {
       }}
     >
       <CardHeader value1={`SN: ${data?.serialNumber}`} date={data?.dateCreated} shop={data?.shopName} />
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginVertical: 10,
-        }}
-      >
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 10 }}>
         <DataColumn title={"Product"} left value={productName} key={1} />
 
         <DataColumn title={"Qty"} value={purchasedQuantity} key={2} />
 
         {!isShopAttendant && (
           <>
-            <DataColumn title={"Cost"} value={Math.round(purchasePrice / purchasedQuantity)} key={3} currency={data?.currency} />
-            <DataColumn title={"Amount"} value={purchasePrice} key={4} currency={data?.currency} />
+            <DataColumn title={"Cost"} value={formatNumberWithCommas(Math.round(purchasePrice / purchasedQuantity), data?.currency)} key={3} />
+            <DataColumn title={"Amount"} value={formatNumberWithCommas(purchasePrice, data?.currency)} key={4} />
           </>
         )}
       </View>

@@ -2,6 +2,12 @@ export const getUserData = (state) => state.userData.user;
 
 export const getUserType = (state) => state.userData.userType;
 
+export const getIsShopOwner = (state) => state.userData.isShopOwner;
+
+export const getIsAdmin = (state) => state.userData.isSuperAdmin;
+
+export const getIsShopAttendant = (state) => state.userData.isShopAttendant;
+
 export const getUserPinCode = (state) => state.userData.userPincode;
 
 export const getOfflineParams = (state) => state.userData.offlineParams;

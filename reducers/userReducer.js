@@ -12,6 +12,9 @@ const initialState = {
   attendantShopId: 0,
   attendantShopName: null,
   shopOwnerId: 0,
+  isShopAttendant: false,
+  isShopOwner: false,
+  isSuperAdmin: false,
   userPincode: null,
   lastApplockTime: null,
   offlineParams: {},
@@ -46,6 +49,9 @@ const userReduer = (state = initialState, action) => {
           ...(isShopAttendant && { shopId: attendantShopId }),
           ...(isShopOwner && { shopOwnerId: shopOwnerId }),
         },
+        isShopOwner,
+        isShopAttendant,
+        isSuperAdmin,
         userType:
           isShopAttendant === true
             ? userTypes.isShopAttendant

@@ -100,9 +100,9 @@ const NewClient = () => {
             </View>
 
             <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
-              <View style={{ flex: 1, gap: 5 }}>
-                <Text>Gender</Text>
+              <View style={{ flex: 1 }}>
                 <MyDropDown
+                  label={"Gender"}
                   search={false}
                   style={{
                     backgroundColor: Colors.light,
@@ -121,21 +121,25 @@ const NewClient = () => {
                   valueField="id"
                 />
               </View>
-              <MyInput label="Date of birth" dateValue={dob} isDateInput onDateChange={(date) => setDOB(date)} maximumDate />
+              <MyInput style={{ flex: 1 }} label="Date of birth" dateValue={dob} isDateInput onDateChange={(date) => setDOB(date)} maximumDate />
             </View>
 
             <View style={{ flexDirection: "row", gap: 10 }}>
               <MyInput inputMode="numeric" label="Phone number" value={phone1} style={{ flex: 1 }} onValueChange={(text) => setPhone1(text)} />
-              <MyInput label="Alternate phone number" value={phone2} style={{ flex: 1 }} inputMode="numeric" onValueChange={(text) => setPhone2(text)} />
+              <MyInput
+                label="Alternate phone number"
+                value={phone2}
+                style={{ flex: 1 }}
+                inputMode="numeric"
+                onValueChange={(text) => setPhone2(text)}
+              />
             </View>
 
             <MyInput label="Email" value={email} inputMode="email" onValueChange={(text) => setEmail(text)} />
             <MyInput label="Physical address" value={address} onValueChange={(text) => setAddress(text)} />
           </View>
 
-          <View style={{ flexDirection: "row" }}>
-            <PrimaryButton title={"Save"} onPress={handleSubmit} />
-          </View>
+          <PrimaryButton title={"Save"} onPress={handleSubmit} />
         </View>
 
         <Snackbar ref={snackRef} />

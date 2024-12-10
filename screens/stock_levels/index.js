@@ -6,7 +6,6 @@ import Colors from "@constants/Colors";
 import AppStatusBar from "@components/AppStatusBar";
 import ItemHeader from "@screens/sales/components/ItemHeader";
 import VerticalSeparator from "@components/VerticalSeparator";
-import StockLevelCard from "./components/StockLevelCard";
 import Snackbar from "@components/Snackbar";
 import TopHeader from "@components/TopHeader";
 import { formatDate, formatNumberWithCommas } from "@utils/Utils";
@@ -16,8 +15,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { getOfflineParams, getSelectedShop, getShopProducts, getUserType } from "reducers/selectors";
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { setShopProducts } from "actions/shopActions";
+import StockLevelCard from "./StockLevelCard";
 
-const StockLevel = ({ navigation }) => {
+const StockLevels = ({ navigation }) => {
   const [message, setMessage] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [stockLevels, setStockLevels] = useState([]);
@@ -92,57 +92,6 @@ const StockLevel = ({ navigation }) => {
     }
   };
 
-  const downloadExcelSheet = async () => {
-    setLoading(true);
-    const clabel = selectedShop?.currency ? `(${selectedShop?.currency})` : "";
-    const titles = [
-      "Product ",
-      `Price ${clabel}`,
-      "Items sold",
-      "Items in stock",
-      "Stock value",
-      "Category",
-      "Manufacturer",
-      "Barcode",
-      "Package Unit",
-      "SerialNumber",
-      "Listed by",
-      "Listed on",
-    ];
-
-    const summarisedata = stockLevels.map((data) => {
-      const summary = data?.performanceSummary;
-      const productSoldQty = summary?.totalQuantitySold || 0;
-      const productStockedQty = summary?.totalQuantityStocked || 0;
-      const price = data?.salesPrice;
-
-      let remainingStock = Math.round(productStockedQty - productSoldQty);
-
-      if (remainingStock === undefined || isNaN(remainingStock) || remainingStock < 1) {
-        remainingStock = 0;
-      }
-
-      return [
-        data?.productName,
-        price,
-        productSoldQty,
-        remainingStock,
-        Math.round(remainingStock * price),
-        data?.categoryName,
-        data?.manufacturerName,
-        data?.barcode,
-        data?.packageUnitName,
-        data?.serialNumber,
-        data?.createdByFullName,
-        formatDate(data?.dateCreated, true),
-      ];
-    });
-    const excelData = [titles, ...summarisedata];
-
-    await saveExcelSheet(`${selectedShop?.name}'s product pdtList`, excelData);
-    setLoading(false);
-  };
-
   const handleRefresh = async () => {
     setSearchTerm("");
     setLoading(true);
@@ -163,21 +112,7 @@ const StockLevel = ({ navigation }) => {
     }
   };
 
-  const menuItems = [
-    ...(!isShopAttendant
-      ? [
-          {
-            name: "List product",
-            onClick: () => toProductEntry(),
-          },
-        ]
-      : []),
-    // {
-    //   name: "Share excel sheet",
-    //   onClick: () => downloadExcelSheet(),
-    //   share: true,
-    // },
-  ];
+  const menuItems = [...(!isShopAttendant ? [{ name: "List product", onClick: () => toProductEntry() }] : [])];
 
   return (
     <View
@@ -244,4 +179,4 @@ const StockLevel = ({ navigation }) => {
   );
 };
 
-export default StockLevel;
+export default StockLevels;

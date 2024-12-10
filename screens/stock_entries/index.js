@@ -5,7 +5,7 @@ import { BaseApiService } from "@utils/BaseApiService";
 import AppStatusBar from "@components/AppStatusBar";
 import Colors from "@constants/Colors";
 import TopHeader from "@components/TopHeader";
-import StockEntryCard from "./components/StockEntryCard";
+import StockEntryCard from "./StockEntryCard";
 import Snackbar from "@components/Snackbar";
 import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
 import { STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
@@ -64,7 +64,7 @@ const StockEntries = ({ navigation }) => {
       setLoading(false);
     } catch (error) {
       setDisable(false);
-
+      console.log(error);
       setMessage("Error fetching stock records");
       setLoading(false);
     }

@@ -29,3 +29,4 @@ export const ENTRIES = "entries";
 export const SALES_BY_PDT = "sales_by_product";
 export const LEADS = "Leads";
 export const LEADS_FORM = "Leads_form";
+export const DAMAGES = "Damages";

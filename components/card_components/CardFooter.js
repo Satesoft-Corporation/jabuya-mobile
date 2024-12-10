@@ -13,7 +13,6 @@ const CardFooter = ({
   onClick1,
   onClick2,
   onDelete,
-  style,
   renderLeft = () => {},
   restocked = false,
   entered = false,
@@ -26,27 +25,19 @@ const CardFooter = ({
   const userType = useSelector(getUserType);
   const isShopAttendant = userType === userTypes.isShopAttendant;
   return (
-    <View
-      style={[
-        {
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        },
-        style,
-      ]}
-    >
-      {renderLeft()}
-      <Text style={{ fontSize: 13, fontWeight: 400 }}>
-        {restocked === true && "Restocked by: "}
-        {entered === true && "Entered by: "}
-        {listed === true && "Listed by: "}
-        {served === true && "Served by: "}
-        {cleared === true && "Cleared by: "}
-        <Text style={{ fontWeight: 600 }}>{label}</Text>
-      </Text>
-
-      <View style={{ flexDirection: "row", gap: 10 }}>
+    <View style={{ gap: 3 }}>
+      <View>
+        {renderLeft()}
+        <Text style={{ fontSize: 13, fontWeight: 400 }}>
+          {restocked === true && "Restocked by: "}
+          {entered === true && "Entered by: "}
+          {listed === true && "Listed by: "}
+          {served === true && "Served by: "}
+          {cleared === true && "Cleared by: "}
+          {label && <Text style={{ fontWeight: 600 }}>{label}</Text>}
+        </Text>
+      </View>
+      <View style={{ flexDirection: "row", gap: 10, alignSelf: "flex-end" }}>
         {deleteIcon && !isShopAttendant && <ChipButton2 title={<Icon name="trash" />} onPress={onDelete} darkMode={false} />}
 
         {btnTitle1 && <ChipButton2 title={btnTitle1} onPress={onClick1} darkMode={darkMode} />}
