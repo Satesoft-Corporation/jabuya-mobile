@@ -7,6 +7,7 @@ import { CLIENT_DEBTS } from "@navigation/ScreenNames";
 import CardFooter from "@components/card_components/CardFooter";
 import { getClientSales } from "reducers/selectors";
 import { useSelector } from "react-redux";
+import { formatNumberWithCommas } from "@utils/Utils";
 
 const CreditSaleCard = ({ client }) => {
   const navigation = useNavigation();
@@ -50,9 +51,9 @@ const CreditSaleCard = ({ client }) => {
         <View style={styles.content}>
           <DataColumn title={"Client"} value={name} left flex={2} value2={`${mob}`} />
 
-          <DataColumn title={"Debt"} value={debt} currency={currency} />
-          <DataColumn title={"Paid"} value={paid} currency={currency} />
-          <DataColumn title={"Balance"} value={bal} currency={currency} />
+          <DataColumn title={"Debt"} value={formatNumberWithCommas(debt, currency)} />
+          <DataColumn title={"Paid"} value={formatNumberWithCommas(paid, currency)} />
+          <DataColumn title={"Balance"} value={formatNumberWithCommas(bal, currency)} />
         </View>
 
         <CardFooter

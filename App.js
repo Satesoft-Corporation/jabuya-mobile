@@ -11,7 +11,6 @@ import LockSetUp from "@screens/applock/LockSetUp";
 import CreditSales from "@screens/credit/CreditSales";
 import CreditPayment from "@screens/credit/CreditPayment";
 import NewClient from "@screens/credit/NewClient";
-import ContactBook from "@screens/ContactBook";
 import Expenses from "@screens/expenses";
 import ExpenseForm from "@screens/expenses/ExpenseForm";
 import OfflineSales from "@screens/sales/OfflineSales";
@@ -34,6 +33,8 @@ import StockEntries from "@screens/stock_entries";
 import StockEntryForm from "@screens/stock_entries/StockEntryForm";
 import ProductEntry from "@screens/stock_levels/ProductEntry";
 import Damages from "@screens/damages";
+import ContactBook from "@screens/contacts";
+import ContactDetails from "@screens/contacts/ContactDetails";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -43,11 +44,7 @@ export default function App() {
       <MenuProvider>
         <NavigationContainer>
           <AppStatusBar />
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name={"Loading"} component={LoadingScreen} />
             <Stack.Screen name={s.LANDING_SCREEN} component={LandingScreen} />
             <Stack.Screen name={s.LOGIN} component={Login} />
@@ -76,6 +73,7 @@ export default function App() {
             <Stack.Screen name={s.LEADS} component={Leads} />
             <Stack.Screen name={s.LEADS_FORM} component={LeadsForm} />
             <Stack.Screen name={s.DAMAGES} component={Damages} />
+            <Stack.Screen name={s.CONTACT_DETAILS} component={ContactDetails} />
           </Stack.Navigator>
         </NavigationContainer>
       </MenuProvider>

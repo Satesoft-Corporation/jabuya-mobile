@@ -11,6 +11,7 @@ import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
 import { STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
 import { getFilterParams, getSelectedShop, getUserType } from "reducers/selectors";
 import { useSelector } from "react-redux";
+import DeleteRecordModal from "@components/DeleteRecordModal";
 
 const StockEntries = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
@@ -21,6 +22,9 @@ const StockEntries = ({ navigation }) => {
   const [offset, setOffset] = useState(0);
   const [disable, setDisable] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState(null);
+
   const snackbarRef = useRef(null);
 
   const filterParams = useSelector(getFilterParams);
@@ -91,17 +95,10 @@ const StockEntries = ({ navigation }) => {
     fetchStockEntries();
   }, [selectedShop]);
 
-  const menuItems = [
-    {
-      name: "Add purchase",
-      onClick: () => navigation.navigate(STOCK_ENTRY_FORM),
-    },
-  ];
+  const menuItems = [{ name: "Add purchase", onClick: () => navigation.navigate(STOCK_ENTRY_FORM) }];
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <AppStatusBar />
-
       <TopHeader
         title="Stock purchases"
         showSearch={true}
@@ -114,11 +111,31 @@ const StockEntries = ({ navigation }) => {
         showShops
       />
 
+      <DeleteRecordModal
+        selectedRecord={selectedEntry}
+        showModal={deleteModal}
+        setShowModal={setDeleteModal}
+        showForm
+        isStockEntry
+        onComplete={() => {
+          snackbarRef?.current?.show("Record deleted successfully.");
+          fetchStockEntries();
+        }}
+      />
+
       <FlatList
         style={{ marginTop: 5 }}
         keyExtractor={(item) => item.id.toString()}
         data={stockEntries}
-        renderItem={({ item }) => <StockEntryCard data={item} isShopAttendant={isShopAttendant} />}
+        renderItem={({ item }) => (
+          <StockEntryCard
+            data={item}
+            handleDelete={() => {
+              setSelectedEntry(item);
+              setDeleteModal(true);
+            }}
+          />
+        )}
         onRefresh={() => onSearch()}
         refreshing={loading}
         ListEmptyComponent={() => (

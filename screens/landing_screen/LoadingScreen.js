@@ -22,7 +22,7 @@ const LoadingScreen = () => {
           logOut();
         }
       });
-    }, 5000);
+    }, 3000);
   }, []);
 
   return (

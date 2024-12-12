@@ -1,48 +1,44 @@
-import { View, Text, SafeAreaView, FlatList, Image, Linking, TouchableOpacity } from "react-native";
+import { View, Text, SafeAreaView, FlatList, Linking, Pressable } from "react-native";
 import React from "react";
 import TopHeader from "@components/TopHeader";
 import Colors from "@constants/Colors";
 import { useSelector } from "react-redux";
 import { getShopClients } from "reducers/selectors";
 import { useState } from "react";
-import { useEffect } from "react";
-import { useCallback } from "react";
+import Icon from "@components/Icon";
+import { useNavigation } from "@react-navigation/native";
+import { CONTACT_DETAILS } from "@navigation/ScreenNames";
 
 const ContactBook = () => {
   const clients = useSelector(getShopClients);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filtered, setFiltered] = useState([]);
+  const [filtered, setFiltered] = useState(clients);
   const [loading, setLoading] = useState(false);
 
-  const filterClients = () => {
-    const list = clients
-      ?.filter((item) => item?.fullName?.toLowerCase()?.includes(searchTerm.toLowerCase().trim()))
-      .sort((a, b) => {
-        if (a?.fullName < b?.fullName) {
-          return -1;
-        }
-        if (a?.fullName > b?.fullName) {
-          return 1;
-        }
-        return 0;
-      });
-    //must arrange alphabetically
+  const filterClients = (searchParam = "") => {
+    const list = clients?.filter((item) => item?.fullName?.toLowerCase()?.includes(searchParam.toLowerCase().trim()));
     setFiltered(list);
+    setLoading(false);
   };
-
-  useEffect(() => {
-    filterClients();
-  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <TopHeader title="Contact List" showSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} onSearch={filterClients} />
+      <TopHeader
+        title="Contact List"
+        showSearch
+        searchTerm={searchTerm}
+        setSearchTerm={(e) => {
+          filterClients(e);
+          setSearchTerm(e);
+        }}
+        onSearch={() => {}}
+      />
       <View style={{ flex: 1, paddingHorizontal: 5 }}>
         <FlatList
           data={filtered}
           renderItem={({ item }) => <Card client={item} />}
           onRefresh={() => {
-            setSearchTerm("");
+            setLoading(true);
             filterClients();
           }}
           refreshing={loading}
@@ -61,6 +57,8 @@ function Card({ client }) {
   const openWhatsApp = () => {
     Linking.openURL(`whatsapp://send?phone=+${client?.phoneNumber}`);
   };
+
+  const navigation = useNavigation();
   return (
     <View
       style={{
@@ -72,9 +70,15 @@ function Card({ client }) {
         paddingHorizontal: 10,
         flexDirection: "row",
         justifyContent: "space-between",
+        alignItems: "center",
       }}
     >
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+      <Pressable
+        style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+        onPress={() => {
+          navigation.navigate(CONTACT_DETAILS, client);
+        }}
+      >
         <View
           style={{
             backgroundColor: Colors.gray,
@@ -93,15 +97,10 @@ function Card({ client }) {
           <Text style={{ fontWeight: 500 }}>{client?.fullName}</Text>
           <Text style={{ fontSize: 12 }}>Mob: {client?.phoneNumber}</Text>
         </View>
-      </View>
-
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <TouchableOpacity onPress={makePhoneCall}>
-          <Image source={require("../assets/icons/icons8-phone-50.png")} style={{ height: 25, width: 25 }} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={openWhatsApp}>
-          <Image source={require("../assets/icons/icons8-message-48.png")} style={{ height: 25, width: 25 }} />
-        </TouchableOpacity>
+      </Pressable>
+      <View style={{ flexDirection: "row", gap: 8 }}>
+        <Icon name="call-outline" size={25} onPress={makePhoneCall} groupName="Ionicons" />
+        <Icon name="android-messages" size={25} onPress={openWhatsApp} groupName="MaterialCommunityIcons" />
       </View>
     </View>
   );

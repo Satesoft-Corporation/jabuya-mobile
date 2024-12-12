@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView } from "react-native";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { convertToServerDate } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
 import TopHeader from "@components/TopHeader";
@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getOfflineParams, getSelectedShop, getShopClients } from "reducers/selectors";
 import { setShopClients } from "actions/shopActions";
 
-const NewClient = () => {
+const NewClient = ({ route }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [gender, setGender] = useState(null);
@@ -32,6 +32,17 @@ const NewClient = () => {
   const dispatch = useDispatch();
   const snackRef = useRef(null);
 
+  const fillFields = (client) => {
+    const first = client?.fullName?.split(" ")[0] || "";
+    setFirstName(first || "");
+    setLastName(client?.fullName?.split(first)[1] || "");
+    setPhone1(client?.phoneNumber);
+    setEmail(client?.email);
+    setAddress(client?.address);
+    setGender(client?.gender);
+    setDOB(client?.dateOfBirth);
+  };
+
   const clearForm = () => {
     setFirstName("");
     setLastName("");
@@ -42,27 +53,22 @@ const NewClient = () => {
     setAddress("");
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setLoading(true);
     const payload = {
-      id: 0,
+      id: route?.params?.id || 0,
       phoneNumber: phone1,
-      fullName: firstName + " " + lastName,
-      shopId: selectedShop?.id,
-      dateOfBirth: convertToServerDate(dob),
-      email,
-      address,
-      gender,
+      fullName: firstName?.trim() + " " + lastName?.trim(),
+      shopId: route?.params ? route?.params?.shop?.id : selectedShop?.id,
     };
 
-    new BaseApiService("/clients-controller")
-      .saveRequestWithJsonResponse(payload, false)
+    await new BaseApiService("/clients-controller")
+      .postRequestWithJsonResponse(payload)
       .then(async (response) => {
         const list = await saveShopClients(offlineParams, clients);
         dispatch(setShopClients(list));
         setLoading(false);
-        clearForm();
-        snackRef.current.show("Client details saved", 4000);
+        snackRef.current.show("Client details saved successfully.", 8000);
       })
       .catch((e) => {
         setLoading(false);
@@ -71,10 +77,16 @@ const NewClient = () => {
       });
   };
 
+  useEffect(() => {
+    if (route?.params) {
+      fillFields(route?.params);
+    }
+  }, []);
+
   return (
     <KeyboardAvoidingView enabled={true} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <TopHeader title="Add Debtor" />
+        <TopHeader title={route?.params ? "Edit Client" : "New Client"} />
         <Loader loading={loading} />
         <View
           style={{
@@ -99,7 +111,7 @@ const NewClient = () => {
               <MyInput label="Last name" value={lastName} style={{ flex: 1 }} onValueChange={(text) => setLastName(text)} />
             </View>
 
-            <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
+            {/* <View style={{ flexDirection: "row", gap: 10, marginTop: 5 }}>
               <View style={{ flex: 1 }}>
                 <MyDropDown
                   label={"Gender"}
@@ -122,7 +134,7 @@ const NewClient = () => {
                 />
               </View>
               <MyInput style={{ flex: 1 }} label="Date of birth" dateValue={dob} isDateInput onDateChange={(date) => setDOB(date)} maximumDate />
-            </View>
+            </View> */}
 
             <View style={{ flexDirection: "row", gap: 10 }}>
               <MyInput inputMode="numeric" label="Phone number" value={phone1} style={{ flex: 1 }} onValueChange={(text) => setPhone1(text)} />

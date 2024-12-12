@@ -27,7 +27,7 @@ import {
   getUserType,
 } from "reducers/selectors";
 import { logOutAction, setApplockTime, setUserPinCode } from "actions/userActions";
-import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
+import { ALL_SHOPS_LABEL, APP_VERSION, userTypes } from "@constants/Constants";
 import {
   saveClientSalesOnDevice,
   saveManufactures,
@@ -234,7 +234,11 @@ const Settings = () => {
               text="Sync data"
             />
 
-            <SettingsBar icon={<Icon name={"credit-card"} groupName="FontAwesome" size={20} />} onPress={() => setShowSubAlert(true)} text="Subscriptions" />
+            <SettingsBar
+              icon={<Icon name={"credit-card"} groupName="FontAwesome" size={20} />}
+              onPress={() => setShowSubAlert(true)}
+              text="Subscriptions"
+            />
           </View>
         </View>
 
@@ -277,10 +281,17 @@ const Settings = () => {
           bottom: 10,
         }}
       >
-        <Text style={{ alignSelf: "center", fontSize: 12 }}>v {Constants.expoConfig.version}</Text>
+        <Text style={{ alignSelf: "center", fontSize: 12 }}>{APP_VERSION} </Text>
       </View>
 
-      <DisplayMessage showModal={showMoodal} message={message} onAgree={logOut} agreeText={agreeText} setShowModal={setShowModal} canCancel={canCancel} />
+      <DisplayMessage
+        showModal={showMoodal}
+        message={message}
+        onAgree={logOut}
+        agreeText={agreeText}
+        setShowModal={setShowModal}
+        canCancel={canCancel}
+      />
     </SafeAreaView>
   );
 };

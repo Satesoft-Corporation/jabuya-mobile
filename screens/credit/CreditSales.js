@@ -15,6 +15,7 @@ import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { useSelector } from "react-redux";
 import { setClientSales } from "actions/shopActions";
 import { hasInternetConnection } from "@utils/NetWork";
+import { formatNumberWithCommas } from "@utils/Utils";
 
 const CreditSales = () => {
   const navigation = useNavigation();
@@ -100,14 +101,7 @@ const CreditSales = () => {
       <TopHeader title="Debt records" showMenuDots={!isShopAttendant} menuItems={menuItems} showShops />
       <View style={{ paddingBottom: 10 }}>
         <View style={styles.debtHeader}>
-          <Text
-            style={{
-              color: Colors.primary,
-              fontSize: 16,
-            }}
-          >
-            Debt summary
-          </Text>
+          <Text style={{ color: Colors.primary, fontSize: 16 }}>Debt summary</Text>
         </View>
 
         <View style={styles.summaryContainer}>
@@ -115,15 +109,15 @@ const CreditSales = () => {
 
           <VerticalSeparator />
 
-          <ItemHeader title="Debt" value={debt} isCurrency />
+          <ItemHeader title="Debt" value={formatNumberWithCommas(debt)} />
 
           <VerticalSeparator />
 
-          <ItemHeader title="Paid " value={paid} isCurrency />
+          <ItemHeader title="Paid " value={formatNumberWithCommas(paid)} isCurrency />
 
           <VerticalSeparator />
 
-          <ItemHeader title="Balance" value={bal} isCurrency />
+          <ItemHeader title="Balance" value={formatNumberWithCommas(bal)} isCurrency />
         </View>
       </View>
 

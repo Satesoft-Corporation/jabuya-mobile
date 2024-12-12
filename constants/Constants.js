@@ -1,4 +1,5 @@
 import { Dimensions } from "react-native";
+import Constants from "expo-constants";
 
 export const packageOptions = [
   { value: "Packed", type: true },
@@ -22,3 +23,5 @@ export const userTypes = {
 };
 
 export const ALL_SHOPS_LABEL = "All Shops";
+
+export const APP_VERSION = `v ${Constants.expoConfig.version}`;

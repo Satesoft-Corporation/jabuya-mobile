@@ -25,4 +25,7 @@ export const SUPPLIERS_ENDPOINT = "/suppliers";
 export const LEADS_ENDPOINT = "/leads";
 
 export const LEADS_STATUS_ENDPOINT = "/leads/leadStatuses";
+
 export const LEADS_STAGES_ENDPOINT = "/leads/leadStages";
+
+export const DAMAGES_ENDPOINT = "/damages";

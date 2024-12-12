@@ -7,11 +7,15 @@ import { useNavigation } from "@react-navigation/native";
 import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import React, { useState } from "react";
 import { View, Text } from "react-native";
+import { useSelector } from "react-redux";
+import { getIsShopAttendant } from "reducers/selectors";
 
-const StockEntryCard = ({ data, isShopAttendant }) => {
+const StockEntryCard = ({ data, handleDelete }) => {
   const [expanded, setExpanded] = useState(false);
 
   const navigation = useNavigation();
+
+  const isShopAttendant = useSelector(getIsShopAttendant);
 
   const toggleExpand = () => {
     setExpanded(!expanded);
@@ -71,6 +75,8 @@ const StockEntryCard = ({ data, isShopAttendant }) => {
         onClick1={() => navigation?.navigate(STOCK_ENTRY_FORM, data)}
         darkMode={false}
         onClick2={toggleExpand}
+        deleteIcon={expanded}
+        onDelete={handleDelete}
       />
     </View>
   );

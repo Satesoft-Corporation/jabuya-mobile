@@ -96,7 +96,7 @@ export class BaseApiService {
         response.json()
       )
       .then((responseData) => {
-        if (responseData?.status == 200) {
+        if (responseData?.status == 200 || responseData?.status == "Success") {
           return responseData;
         } else if (responseData?.status == 400 || responseData?.status == 403 || responseData?.status == 500) {
           let data = responseData;
