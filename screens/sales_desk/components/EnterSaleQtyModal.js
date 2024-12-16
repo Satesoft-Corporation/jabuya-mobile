@@ -49,37 +49,25 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
 
       if (itemUnitCost < unitSalesPrice) {
         setErrors((prevErrors) => {
-          return {
-            ...prevErrors,
-            lessPriceError: `Unit cost for ${selection.productName} should be greater than ${unitSalesPrice}`,
-          };
+          return { ...prevErrors, lessPriceError: `Unit cost for ${selection.productName} should be greater than ${unitSalesPrice}` };
         });
       }
 
       if (!isValidNumber(itemUnitCost)) {
         setErrors((prevErrors) => {
-          return {
-            ...prevErrors,
-            lessPriceError: "Invalid input for unit cost",
-          };
+          return { ...prevErrors, lessPriceError: "Invalid input for unit cost" };
         });
       }
 
       if (parsedQuantity === 0) {
         setErrors((prevErrors) => {
-          return {
-            ...prevErrors,
-            qtyZeroError: "Quantity should be greater than 0",
-          };
+          return { ...prevErrors, qtyZeroError: "Quantity should be greater than 0" };
         });
       }
 
       if (!isValidNumber(parsedQuantity)) {
         setErrors((prevErrors) => {
-          return {
-            ...prevErrors,
-            qtyZeroError: "Invalid quantity input",
-          };
+          return { ...prevErrors, qtyZeroError: "Invalid quantity input" };
         });
       }
 
@@ -107,16 +95,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
 
   const renderFooter = () => {
     if (submitted && !saleUnit) {
-      return (
-        <Text
-          style={{
-            fontSize: 12,
-            color: Colors.error,
-          }}
-        >
-          Sale unit is required
-        </Text>
-      );
+      return <Text style={{ fontSize: 12, color: Colors.error }}>Sale unit is required</Text>;
     }
   };
 
@@ -129,32 +108,13 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
   return (
     <ModalContent visible={showMoodal} style={{ padding: 30 }}>
       <View style={{ paddingHorizontal: 5 }}>
-        <View
-          style={{
-            marginTop: 10,
-            marginBottom: 5,
-          }}
-        >
-          <Text
-            style={{
-              fontWeight: "600",
-              fontSize: 20,
-              marginBottom: 5,
-            }}
-          >
-            Successfull
-          </Text>
+        <View style={{ marginTop: 10, marginBottom: 5 }}>
+          <Text style={{ fontWeight: "600", fontSize: 20, marginBottom: 5 }}>Successfull</Text>
           <Text>{selection?.productName} has been selected.</Text>
 
           {!saleUnit && (
             <View style={{ marginTop: 10 }}>
-              <Text
-                style={{
-                  fontWeight: "600",
-                }}
-              >
-                Select sale unit
-              </Text>
+              <Text style={{ fontWeight: "600" }}>Select sale unit</Text>
 
               <FlatList
                 data={saleUnits}
@@ -175,16 +135,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
 
         {saleUnit && (
           <View>
-            <Text
-              style={{
-                fontWeight: "600",
-                fontSize: 13,
-                marginTop: 10,
-                marginLeft: 4,
-              }}
-            >
-              Quantity
-            </Text>
+            <Text style={{ fontWeight: "600", fontSize: 13, marginTop: 10, marginLeft: 4 }}>Quantity</Text>
             <TextInput
               onFocus={() => setErrors(null)}
               onBlur={() => setErrors(null)}
@@ -206,27 +157,8 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
                 paddingEnd: 10,
               }}
             />
-            {errors?.qtyZeroError && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: Colors.error,
-                }}
-              >
-                {errors?.qtyZeroError}
-              </Text>
-            )}
-            <Text
-              style={{
-                fontWeight: "600",
-                fontSize: 13,
-                marginTop: 10,
-                marginBottom: 5,
-                marginLeft: 4,
-              }}
-            >
-              Unit cost
-            </Text>
+            {errors?.qtyZeroError && <Text style={{ fontSize: 12, color: Colors.error }}>{errors?.qtyZeroError}</Text>}
+            <Text style={{ fontWeight: "600", fontSize: 13, marginTop: 10, marginBottom: 5, marginLeft: 4 }}>Unit cost</Text>
             <TextInput
               textAlign="right"
               value={unitCost}
@@ -242,29 +174,13 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
                 paddingEnd: 10,
               }}
             />
-            {errors?.lessPriceError && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: Colors.error,
-                }}
-              >
-                {errors?.lessPriceError}
-              </Text>
-            )}
+            {errors?.lessPriceError && <Text style={{ fontSize: 12, color: Colors.error }}>{errors?.lessPriceError}</Text>}
           </View>
         )}
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 40,
-            marginBottom: 10,
-            gap: 5,
-          }}
-        >
+        <View style={{ flexDirection: "row", marginTop: 40, marginBottom: 10, gap: 5 }}>
           <PrimaryButton
+            style={{ flex: saleUnit ? 0.5 : 1 }}
             darkMode={false}
             title={"Cancel"}
             onPress={() => {
@@ -272,7 +188,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
               dispatch(makeProductSelection(null));
             }}
           />
-          {saleUnit && <PrimaryButton title={"Confirm"} onPress={handlePress} />}
+          {saleUnit && <PrimaryButton title={"Confirm"} onPress={handlePress} style={{ flex: 0.5 }} />}
         </View>
       </View>
     </ModalContent>

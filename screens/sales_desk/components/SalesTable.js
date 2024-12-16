@@ -55,17 +55,7 @@ const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = false }) => {
 
         <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>Amount</Text>
       </View>
-      <ScrollView
-        style={
-          fixHeight
-            ? {
-                height: screenHeight / 3,
-              }
-            : {
-                maxHeight: screenHeight / 4,
-              }
-        }
-      >
+      <ScrollView style={fixHeight ? { height: screenHeight / 3 } : { maxHeight: screenHeight / 4 }}>
         <SwipeListView
           ref={listViewRef}
           data={sales}

@@ -97,51 +97,29 @@ const shopReducer = (state = initialState, action) => {
           newSelection.salesPrice = salesPrice;
         }
 
-        return {
-          ...state,
-          cartSelection: newSelection,
-        };
+        return { ...state, cartSelection: newSelection };
       } else {
-        return {
-          ...state,
-          cartSelection: action.payload,
-        };
+        return { ...state, cartSelection: action.payload };
       }
     }
 
     case actions.UPDATE_RECIEVED_AMOUNT: {
-      return {
-        ...state,
-        cart: {
-          ...state.cart,
-          recievedAmount: action.payload,
-        },
-      };
+      return { ...state, cart: { ...state.cart, recievedAmount: action.payload } };
     }
 
     case actions.CLEAR_CART: {
-      return {
-        ...state,
-        cart: initialState.cart,
-        cartSelection: initialState.cartSelection,
-      };
+      return { ...state, cart: initialState.cart, cartSelection: initialState.cartSelection };
     }
     case actions.LOG_OUT: {
       return initialState;
     }
 
     case actions.SET_SHOPS: {
-      return {
-        ...state,
-        shops: action.payload,
-      };
+      return { ...state, shops: action.payload };
     }
 
     case actions.SET_SHOP_PRODUCTS: {
-      return {
-        ...state,
-        shopProducts: action.payload,
-      };
+      return { ...state, shopProducts: action.payload };
     }
 
     case actions.CHANGE_SELECTED_SHOP: {
@@ -154,26 +132,17 @@ const shopReducer = (state = initialState, action) => {
     }
 
     case actions.ADD_OFFLINE_SALE: {
-      return {
-        ...state,
-        offlineSales: [...state.offlineSales, action.payload],
-      };
+      return { ...state, offlineSales: [...state.offlineSales, action.payload] };
     }
 
     case actions.REMOVE_OFFLINE_SALE: {
       let pendingSales = state.offlineSales;
       pendingSales.splice(action.payload, 1); // Removes the sale record at the specified index
-      return {
-        ...state,
-        offlineSales: pendingSales,
-      };
+      return { ...state, offlineSales: pendingSales };
     }
 
     case actions.ADD_CLIENT_SALES: {
-      return {
-        ...state,
-        clientSales: action.payload,
-      };
+      return { ...state, clientSales: action.payload };
     }
 
     case actions.ADD_SHOP_CLIENTS: {
@@ -186,38 +155,23 @@ const shopReducer = (state = initialState, action) => {
         }
         return 0;
       });
-      return {
-        ...state,
-        clients: sorted,
-      };
+      return { ...state, clients: sorted };
     }
     case actions.ADD_MANUFACTURERS: {
-      return {
-        ...state,
-        manufactures: action.payload,
-      };
+      return { ...state, manufactures: action.payload };
     }
 
     case actions.ADD_SUPPLIERS: {
-      return {
-        ...state,
-        suppliers: action.payload,
-      };
+      return { ...state, suppliers: action.payload };
     }
 
     case actions.ADD_HELD_TXN: {
-      return {
-        ...state,
-        heldSales: [...state.heldSales, action.payload],
-      };
+      return { ...state, heldSales: [...state.heldSales, action.payload] };
     }
 
     case actions.REMOVE_HELD_TXN: {
       const filtered = [...state.heldSales].filter((item) => item?.clientName !== action.payload);
-      return {
-        ...state,
-        heldSales: filtered,
-      };
+      return { ...state, heldSales: filtered };
     }
 
     case actions.ADD_HELD_TXNS_TO_CART: {
@@ -226,15 +180,7 @@ const shopReducer = (state = initialState, action) => {
       const newCost = items?.reduce((a, b) => a + b?.totalCost, 0);
       const newQty = items?.reduce((a, b) => a + b?.quantity, 0);
 
-      return {
-        ...state,
-        cart: {
-          cartItems: items,
-          totalCartCost: newCost,
-          totalQty: newQty,
-          recievedAmount: 0,
-        },
-      };
+      return { ...state, cart: { cartItems: items, totalCartCost: newCost, totalQty: newQty, recievedAmount: 0 } };
     }
     default:
       return state;

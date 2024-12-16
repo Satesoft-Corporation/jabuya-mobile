@@ -1,12 +1,10 @@
 import { View, Text, SafeAreaView, KeyboardAvoidingView } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
-import { convertToServerDate } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
 import TopHeader from "@components/TopHeader";
 import Loader from "@components/Loader";
 import Colors from "@constants/Colors";
 import MyInput from "@components/MyInput";
-import { MyDropDown } from "@components/DropdownComponents";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import Snackbar from "@components/Snackbar";
 import { saveShopClients } from "@controllers/OfflineControllers";
@@ -88,23 +86,9 @@ const NewClient = ({ route }) => {
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
         <TopHeader title={route?.params ? "Edit Client" : "New Client"} />
         <Loader loading={loading} />
-        <View
-          style={{
-            marginVertical: 10,
-            paddingHorizontal: 10,
-            justifyContent: "space-between",
-            flex: 1,
-          }}
-        >
+        <View style={{ marginVertical: 10, paddingHorizontal: 10, justifyContent: "space-between", flex: 1 }}>
           <View style={{ gap: 10, flex: 1 }}>
-            <Text
-              style={{
-                marginTop: 10,
-                fontSize: 16,
-              }}
-            >
-              Client Details
-            </Text>
+            <Text style={{ marginTop: 10, fontSize: 16 }}>Client Details</Text>
 
             <View style={{ flexDirection: "row", gap: 10 }}>
               <MyInput label="First name" value={firstName} style={{ flex: 1 }} onValueChange={(text) => setFirstName(text)} />
@@ -138,13 +122,7 @@ const NewClient = ({ route }) => {
 
             <View style={{ flexDirection: "row", gap: 10 }}>
               <MyInput inputMode="numeric" label="Phone number" value={phone1} style={{ flex: 1 }} onValueChange={(text) => setPhone1(text)} />
-              <MyInput
-                label="Alternate phone number"
-                value={phone2}
-                style={{ flex: 1 }}
-                inputMode="numeric"
-                onValueChange={(text) => setPhone2(text)}
-              />
+              <MyInput label="Alternate number" value={phone2} style={{ flex: 1 }} inputMode="numeric" onValueChange={(text) => setPhone2(text)} />
             </View>
 
             <MyInput label="Email" value={email} inputMode="email" onValueChange={(text) => setEmail(text)} />

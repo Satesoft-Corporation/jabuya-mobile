@@ -28,10 +28,7 @@ const userReduer = (state = initialState, action) => {
       return initialState;
     }
     case actions.LOGIN_ACTION: {
-      return {
-        ...state,
-        isLoggedIn: action.payload,
-      };
+      return { ...state, isLoggedIn: action.payload };
     }
 
     case actions.CHANGE_USER: {
@@ -72,45 +69,26 @@ const userReduer = (state = initialState, action) => {
       }
 
       if (state.userType === userTypes.isSuperAdmin) {
-        menuList = [
-          ...menuList,
-          {
-            icon: require("../assets/icons/group-solid-24.png"),
-            title: "Leads",
-            target: LEADS,
-          },
-        ];
+        menuList = [...menuList, { icon: require("../assets/icons/group-solid-24.png"), title: "Leads", target: LEADS }];
       }
 
       if (offersDebt === false) {
         menuList = menuList.filter((i) => i.target !== CONTACT_BOOK);
       }
 
-      return {
-        ...state,
-        menuList: menuList,
-      };
+      return { ...state, menuList: menuList };
     }
 
     case actions.SET_USER_PIN_CODE: {
-      return {
-        ...state,
-        userPincode: action.payload,
-      };
+      return { ...state, userPincode: action.payload };
     }
 
     case actions.SET_APPLOCK_TIME: {
-      return {
-        ...state,
-        lastApplockTime: action.payload,
-      };
+      return { ...state, lastApplockTime: action.payload };
     }
 
     case actions.SET_IS_USER_CONFIGURED: {
-      return {
-        ...state,
-        dataConfigured: action.payload,
-      };
+      return { ...state, dataConfigured: action.payload };
     }
 
     case actions.CHANGE_SELECTED_SHOP: {
@@ -126,10 +104,7 @@ const userReduer = (state = initialState, action) => {
         obj.shopId = action.payload?.id;
       }
 
-      return {
-        ...state,
-        filterParams: obj,
-      };
+      return { ...state, filterParams: obj };
     }
 
     default:

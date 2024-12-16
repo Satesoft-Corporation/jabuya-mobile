@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { convertToServerDate, formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
 import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
@@ -64,11 +64,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
       paymentMode: selectedPaymentMethod?.id,
       onCredit: onCredit,
       soldOnDate: convertToServerDate(soldOnDate),
-      ...(selectedClient && {
-        clientPhoneNumber: selectedClient?.phoneNumber,
-        clientId: selectedClient?.id,
-        clientName: selectedClient?.fullName,
-      }),
+      ...(selectedClient && { clientPhoneNumber: selectedClient?.phoneNumber, clientId: selectedClient?.id, clientName: selectedClient?.fullName }),
       ...(!onCredit && clientNumber && { clientPhoneNumber: clientNumber }),
       ...(!onCredit && clientName && { clientName: clientName }),
     };
@@ -173,49 +169,20 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
 
   return (
     <ModalContent visible={visible} style={{ padding: 10 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text
-          style={{
-            marginTop: 10,
-            fontWeight: "bold",
-            fontSize: 18,
-            marginBottom: 12,
-            marginStart: 1,
-          }}
-        >
-          Confirm sale
-        </Text>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Text style={{ marginTop: 10, fontWeight: "bold", fontSize: 18, marginBottom: 12, marginStart: 1 }}>Confirm sale</Text>
       </View>
 
       {serverError && (
         <View style={{ marginVertical: 3 }}>
-          <Text
-            numberOfLines={4}
-            style={{
-              color: Colors.error,
-              fontWeight: 500,
-            }}
-          >
+          <Text numberOfLines={4} style={{ color: Colors.error, fontWeight: 500 }}>
             {serverError}
           </Text>
         </View>
       )}
 
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <Text
-          style={{
-            fontSize: 12,
-            color: Colors.gray,
-            alignSelf: "flex-end",
-          }}
-        >
-          {formatDate(new Date())}
-        </Text>
+        <Text style={{ fontSize: 12, color: Colors.gray, alignSelf: "flex-end" }}>{formatDate(new Date())}</Text>
       </View>
 
       <SalesTable sales={cartItems} fixHeight={false} disableSwipe />
@@ -247,18 +214,11 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
         setSelectedPaymentMethod={setSelectedPaymentMethod}
       />
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 20,
-          gap: 10,
-          marginBottom: 10,
-        }}
-      >
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, gap: 10, marginBottom: 10 }}>
         <PrimaryButton
           darkMode={false}
           title={"Cancel"}
+          style={{ flex: 0.5 }}
           onPress={() => {
             setLoading(false);
             setVisible();
@@ -268,7 +228,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
             setSelectedPaymentMethod(null);
           }}
         />
-        <PrimaryButton title={"Save"} onPress={validate} />
+        <PrimaryButton title={"Save"} onPress={validate} style={{ flex: 0.5 }} />
       </View>
     </ModalContent>
   );

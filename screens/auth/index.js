@@ -29,10 +29,7 @@ export default function Login() {
   const date = new Date();
 
   const onLogin = async () => {
-    const loginInfo = {
-      username,
-      password,
-    };
+    const loginInfo = { username, password };
 
     setDisabled(true);
     await new BaseApiService(LOGIN_END_POINT)
@@ -63,23 +60,10 @@ export default function Login() {
   };
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: Colors.dark,
-        paddingHorizontal: 15,
-        justifyContent: "space-between",
-      }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark, paddingHorizontal: 15, justifyContent: "space-between" }}>
       <Image
         source={require("../../assets/icons/yellow_transparent.png")}
-        style={{
-          height: 100,
-          width: 100,
-          resizeMode: "contain",
-          alignSelf: "center",
-          marginTop: screenWidth / 4,
-        }}
+        style={{ height: 100, width: 100, resizeMode: "contain", alignSelf: "center", marginTop: screenWidth / 4 }}
       />
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: 10 }}>
@@ -108,10 +92,7 @@ export default function Login() {
           {!disabled ? (
             <PrimaryButton
               title={"Login"}
-              style={{
-                borderColor: Colors.primary,
-                backgroundColor: Colors.primary,
-              }}
+              style={{ borderColor: Colors.primary, backgroundColor: Colors.primary }}
               onPress={onLogin}
               titleStyle={{ color: Colors.dark, fontSize: 16 }}
             />
@@ -121,27 +102,11 @@ export default function Login() {
         </View>
 
         <View style={{ alignItems: "center" }}>
-          <Text
-            style={{
-              fontWeight: 200,
-              color: Colors.primary,
-            }}
-          >
-            Powered by
-          </Text>
+          <Text style={{ fontWeight: 200, color: Colors.primary }}>Powered by</Text>
           <Text style={{ color: Colors.primary }}>Satesoft</Text>
         </View>
       </ScrollView>
-      <Text
-        style={{
-          color: Colors.primary,
-          alignSelf: "center",
-          fontSize: 14,
-          paddingBottom: 30,
-        }}
-      >
-        v {Constants.expoConfig.version}
-      </Text>
+      <Text style={{ color: Colors.primary, alignSelf: "center", fontSize: 14, paddingBottom: 30 }}>v {Constants.expoConfig.version}</Text>
       <DisplayMessage showModal={showMoodal} message={message} onAgree={() => setShowModal(false)} agreeText="OK" />
     </SafeAreaView>
   );

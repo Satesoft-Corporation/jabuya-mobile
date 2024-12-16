@@ -21,7 +21,7 @@ const ReportsMenu = () => {
     { title: "Stock purchases", target: STOCK_ENTRY, icon: "inventory", group: "MaterialIcons" },
     { title: "Stock levels", target: STOCK_LEVELS, icon: "production-quantity-limits", group: "MaterialIcons" },
     { title: "Expenses", target: EXPENSES, icon: "wallet", group: "Entypo" },
-    { title: "Damages", target: DAMAGES },
+    //{ title: "Damages", target: DAMAGES },
   ];
 
   return (
