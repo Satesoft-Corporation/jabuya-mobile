@@ -29,3 +29,5 @@ export const LEADS_STATUS_ENDPOINT = "/leads/leadStatuses";
 export const LEADS_STAGES_ENDPOINT = "/leads/leadStages";
 
 export const DAMAGES_ENDPOINT = "/damages";
+
+export const LOOK_UPS_ENDPOINT = "/lookups/lookup-values";

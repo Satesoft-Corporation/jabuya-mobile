@@ -48,8 +48,6 @@ const ProductEntry = ({ route }) => {
 
   const snackBarRef = useRef(null);
 
-  console.log(route?.params);
-
   const fetchProducts = async (manufacturerId) => {
     setSelectedProduct(null);
     setDisable(true);
@@ -236,7 +234,7 @@ const ProductEntry = ({ route }) => {
           <View style={{ gap: 8 }}>
             <Text style={styles.headerText}>Enter product details</Text>
 
-            {!edit && (
+            {!edit && shops?.length > 1 && (
               <View style={{ gap: 5 }}>
                 <Text>Shop</Text>
                 <MyDropDown
@@ -336,19 +334,27 @@ const ProductEntry = ({ route }) => {
               </View>
             </View>
 
-            {selectedSaleUnits?.map((item, index) => (
-              <View style={styles.row} key={index}>
-                <MyInput label="" value={item.saleUnitName || item?.productSaleUnitName} editable={false} />
+            {selectedSaleUnits?.map((item, index) => {
+              return (
+                <View style={styles.row} key={index}>
+                  <MyInput label="" value={item.saleUnitName || item?.productSaleUnitName} editable={false} style={{ flex: 0.5 }} />
 
-                <MyInput label="" value={item.unitPrice} onValueChange={(e) => handleUnitPriceChange(index, e)} />
-              </View>
-            ))}
+                  <MyInput
+                    label=""
+                    value={String(item.unitPrice)}
+                    inputMode="numeric"
+                    onValueChange={(e) => handleUnitPriceChange(index, e)}
+                    style={{ flex: 0.5 }}
+                  />
+                </View>
+              );
+            })}
 
             <MyInput label="Remarks" value={remarks} onValueChange={(text) => setRemarks(text)} multiline />
           </View>
           <View style={styles.bottomContent}>
             <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} style={{ flex: 0.5 }} />
-            <PrimaryButton title={"Save"} onPress={saveProduct} disabled={disable} style={{ flex: 0.5 }} />
+            <PrimaryButton darkMode title={"Save"} onPress={saveProduct} disabled={disable} style={{ flex: 0.5 }} />
           </View>
         </ScrollView>
 

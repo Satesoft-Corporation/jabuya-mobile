@@ -55,3 +55,5 @@ export const getManufactures = (state) => state.shop.manufactures;
 export const getSuppliers = (state) => state.shop.suppliers;
 
 export const getHeldSales = (state) => state.shop.heldSales;
+
+export const getLookUps = (state) => state.userData.lookUps;

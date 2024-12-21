@@ -47,7 +47,9 @@ export default function DeleteRecordModal({
         })
         .catch((error) => {
           setError(error?.message);
-          setSubmitted(false);
+          // setSubmitted(false);
+          setLoading(false);
+
         });
     }
   };
@@ -82,7 +84,6 @@ export default function DeleteRecordModal({
                 padding: 6,
                 borderWidth: 1,
                 borderColor: "transparent",
-                fontSize: 18,
                 paddingEnd: 10,
               }}
             />
@@ -107,8 +108,8 @@ export default function DeleteRecordModal({
         )}
 
         <View style={{ flexDirection: "row", marginTop: 40, marginBottom: 10, gap: 5 }}>
-          <PrimaryButton darkMode={false} title={"Cancel"} onPress={hide} style={{ flex: 0.5 }} />
-          <PrimaryButton title={"Delete"} onPress={handlePress} style={{ flex: 0.5 }} loading={loading} />
+          <PrimaryButton  title={"Cancel"} onPress={hide} style={{ flex: 0.5 }} />
+          <PrimaryButton darkMode title={"Delete"} onPress={handlePress} style={{ flex: 0.5 }} loading={loading} />
         </View>
       </View>
     </ModalContent>

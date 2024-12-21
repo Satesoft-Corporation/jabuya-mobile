@@ -264,8 +264,8 @@ const LeadsForm = ({ route }) => {
             </View>
 
             <View style={styles.rowGap}>
-              <PrimaryButton darkMode={false} onPress={clearForm} title={"Clear"} />
-              <PrimaryButton onPress={saveLead} title={"Save"} />
+              <PrimaryButton onPress={clearForm} title={"Clear"} />
+              <PrimaryButton darkMode onPress={saveLead} title={"Save"} />
             </View>
           </ScrollView>
         )}

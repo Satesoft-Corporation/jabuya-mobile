@@ -22,9 +22,16 @@ const MyInput = ({
   minimumDate = false,
   onDateChange,
   darkMode = false,
+  showError = false,
+  isSubmitted,
   ...props
 }) => {
   const [visible, setVisible] = useState(false);
+  const [viewPassword, setViewPassword] = useState(isPassword);
+
+
+  const togglePassword = (e) => setViewPassword(!viewPassword)
+
 
   const onChange = (event, selectedDate) => {
     setVisible(false);
@@ -32,13 +39,13 @@ const MyInput = ({
   };
 
   return (
-    <View style={[{ gap: 5, maxHeight: 70 }, style]}>
+    <View style={[{}, style]}>
       {label !== "" && (
         <Text
           style={{
             paddingHorizontal: 4,
             color: darkMode ? Colors.primary : Colors.dark,
-            fontSize: 15,
+            marginBottom: 5
           }}
         >
           {label}
@@ -51,7 +58,6 @@ const MyInput = ({
           }
         }}
         style={{
-          height: 40,
           alignItems: "center",
           flexDirection: "row",
           backgroundColor: darkMode ? Colors.dark : Colors.light,
@@ -66,7 +72,7 @@ const MyInput = ({
         <TextInput
           value={isDateInput ? toReadableDate(dateValue) : value}
           onChangeText={onValueChange}
-          secureTextEntry={isPassword}
+          secureTextEntry={viewPassword}
           inputMode={inputMode}
           cursorColor={darkMode ? Colors.primary : Colors.dark}
           editable={isDateInput ? false : editable}
@@ -79,7 +85,10 @@ const MyInput = ({
           }}
           {...props}
         />
+        {
+          isPassword && <Icon size={18} name={viewPassword ? "eye" : "eye-off"} groupName="Feather" onPress={togglePassword} color={darkMode ? Colors.primary : ''} />
 
+        }
         {isDateInput && (
           <>
             <TouchableOpacity onPress={() => setVisible(true)}>
@@ -99,6 +108,10 @@ const MyInput = ({
           </>
         )}
       </Pressable>
+      {
+        isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>
+
+      }
     </View>
   );
 };

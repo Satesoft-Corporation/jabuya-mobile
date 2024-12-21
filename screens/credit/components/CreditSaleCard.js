@@ -26,7 +26,7 @@ const CreditSaleCard = ({ client }) => {
   const creditSales = useSelector(getClientSales);
 
   const fetchCreditSales = async () => {
-    const list = [...creditSales].filter((i) => i?.client_id === client?.id);
+    const list = creditSales?.filter((i) => i?.client_id === client?.id);
 
     const debt = list.reduce((a, b) => a + b?.amountLoaned, 0);
     const paid = list.reduce((a, b) => a + b?.amountRepaid, 0);
@@ -49,7 +49,7 @@ const CreditSaleCard = ({ client }) => {
         <CardHeader value1={`CSN: ${client?.serialNumber}`} shop={client?.shop?.name} date={client?.dateCreated} />
 
         <View style={styles.content}>
-          <DataColumn title={"Client"} value={name} left flex={2} value2={`${mob}`} />
+          <DataColumn title={"Client"} value={name} left flex={2} />
 
           <DataColumn title={"Debt"} value={formatNumberWithCommas(debt, currency)} />
           <DataColumn title={"Paid"} value={formatNumberWithCommas(paid, currency)} />
@@ -57,8 +57,8 @@ const CreditSaleCard = ({ client }) => {
         </View>
 
         <CardFooter
-          btnTitle1={bal > 0 ? "View" : null}
-          onClick1={() =>
+          btnTitle2={bal > 0 ? "View" : null}
+          onClick2={() =>
             navigation.navigate(CLIENT_DEBTS, {
               client,
               sales,

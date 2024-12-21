@@ -20,6 +20,7 @@ const initialState = {
   offlineParams: {},
   filterParams: {},
   menuList: [],
+  lookUps: [],
 };
 
 const userReduer = (state = initialState, action) => {
@@ -106,7 +107,9 @@ const userReduer = (state = initialState, action) => {
 
       return { ...state, filterParams: obj };
     }
-
+    case actions.ADD_LOOK_UPS: {
+      return { ...state, lookUps: action.payload };
+    }
     default:
       return state;
   }

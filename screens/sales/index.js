@@ -122,17 +122,16 @@ export default function ViewSales() {
           renderNtnIcon={false}
           renderMenu={isShopOwner === true}
           menuItems={[{ name: "Investment", onClick: () => navigation.navigate(SHOP_SUMMARY) }]}
+          filter
+          setShowFilters={setShowFilters}
         />
 
         <View style={{ marginTop: 5, paddingBottom: 10 }}>
           <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 10, marginVertical: 10, alignItems: "center" }}>
             <View style={{ gap: 2 }}>
               <Text style={{ color: Colors.primary, fontSize: 16, fontWeight: 600 }}>Sales summary</Text>
-
-              {date && <Text style={{ color: Colors.primary, fontSize: 13, fontWeight: 600 }}>{formatDate(date, true)}</Text>}
             </View>
-
-            <Icon name="filter" color={Colors.primary} size={18} onPress={() => setShowFilters(true)} />
+            {date && <Text style={{ color: Colors.primary, fontSize: 13, fontWeight: 600 }}>{formatDate(date, true)}</Text>}
           </View>
 
           <View style={{ flexDirection: "row", marginTop: 15, justifyContent: "space-between", paddingHorizontal: 12 }}>
@@ -166,7 +165,7 @@ export default function ViewSales() {
           <SaleTxnCard
             key={i}
             data={item}
-            print={(data) => print(data)}
+            print={() => print(item)}
             isShopAttendant={isShopAttendant}
             onDelete={() => {
               setSelectedSale(item);

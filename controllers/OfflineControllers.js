@@ -3,6 +3,7 @@ import {
   CLIENTS_ENDPOINT,
   CLIENT_SALES_ENDPOINT,
   CURRENCIES_ENDPOINT,
+  LOOK_UPS_ENDPOINT,
   MANUFACTURERS_ENDPOINT,
   SHOP_ENDPOINT,
   SHOP_PRODUCTS_ENDPOINT,
@@ -93,6 +94,21 @@ export const saveShopClients = async (searchParameters, prev = []) => {
     });
 
   return clients;
+};
+
+export const saveLookUps = async (prev = []) => {
+  let data = [];
+
+  await new BaseApiService(LOOK_UPS_ENDPOINT)
+    .getRequestWithJsonResponse({ limit: 0, offset: 0 })
+    .then(async (response) => {
+      data = [...response.records];
+    })
+    .catch((error) => {
+      data = [...prev];
+    });
+
+  return data;
 };
 
 export const saveShopDetails = async (searchParameters, isShopAttendant = false) => {

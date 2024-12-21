@@ -39,14 +39,14 @@ const ClientDebtsCard = ({ debt, currency }) => {
       <View style={styles.container}>
         <CardHeader value1={`SN: ${debt?.serialNumber}`} date={debt?.dateCreated} shop={debt?.sale?.shop?.name} />
 
-        <SalesTable sales={debt?.lineItems} fixHeight={false} currency={currency} />
+        <SalesTable sales={debt?.lineItems} fixHeight={false} />
         {expanded && (
           <View style={{ flex: 1, marginTop: 5 }}>
-            <DataRow key={1} label={"Total Debt"} value={formatNumberWithCommas(debt?.amountLoaned)} currency={currency} />
+            <DataRow key={1} label={"Total Debt"} value={formatNumberWithCommas(debt?.amountLoaned, currency)} />
 
-            <DataRow key={2} label={"Paid"} value={formatNumberWithCommas(debt?.amountRepaid)} currency={currency} />
+            <DataRow key={2} label={"Paid"} value={formatNumberWithCommas(debt?.amountRepaid, currency)} />
 
-            <DataRow key={4} label={"Balance"} value={formatNumberWithCommas(debt?.amountLoaned - debt?.amountRepaid)} currency={currency} />
+            <DataRow key={4} label={"Balance"} value={formatNumberWithCommas(debt?.amountLoaned - debt?.amountRepaid, currency)} />
             <DataRow key={5} label={"Served by"} value={debt?.createdByFullName} />
           </View>
         )}

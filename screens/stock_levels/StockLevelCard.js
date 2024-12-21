@@ -65,13 +65,13 @@ function StockLevelCard({ data, isShopAttendant }) {
       )}
 
       <CardFooter
-        btnTitle1={expanded && !isShopAttendant ? "Edit" : null}
         btnTitle2={expanded ? "Hide" : "More"}
         onClick2={toggleExpand}
-        onClick1={() => navigation.navigate(PDT_ENTRY, data)}
         label={expanded ? null : data?.createdByFullName}
         listed={!expanded}
-        darkMode={!expanded}
+        expanded={expanded}
+        edit
+        onEdit={() => navigation.navigate(PDT_ENTRY, data)}
       />
     </View>
   );

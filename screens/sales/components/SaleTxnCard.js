@@ -123,14 +123,14 @@ function SaleTxnCard({ data, print, onDelete }) {
       {!expanded && serialNumber()}
 
       <CardFooter
+        expanded={expanded}
         onClick2={toggleExpand}
-        btnTitle1={expanded ? "Print" : null}
         label={data?.createdByFullName}
         served
-        darkMode={!expanded}
         btnTitle2={expanded ? "Hide" : "More"}
-        onClick1={() => print(data)}
-        deleteIcon={expanded}
+        onPrint={print}
+        print
+        deleteIcon
         onDelete={onDelete}
       />
     </View>

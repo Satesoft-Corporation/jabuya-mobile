@@ -84,7 +84,7 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
         </View>
         <View style={{ flexDirection: "row", gap: 10 }}>
           <PrimaryButton title={"Clear"} onPress={clearFilters} style={{ flex: 0.5 }} darkMode={false} />
-          <PrimaryButton title={"Apply "} onPress={applyFilter} style={{ flex: 0.5 }} />
+          <PrimaryButton darkMode title={"Apply "} onPress={applyFilter} style={{ flex: 0.5 }} />
         </View>
       </View>
     </Modal>

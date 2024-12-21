@@ -178,7 +178,10 @@ function SalesDesk({ navigation }) {
         }
 
         if (Number(recievedAmount) < totalCartCost) {
-          snackbarRef.current.show(`Recieved amount should not be less than ${selectedShop?.currency} ${formatNumberWithCommas(totalCartCost)}`, 4000);
+          snackbarRef.current.show(
+            `Recieved amount should not be less than ${selectedShop?.currency} ${formatNumberWithCommas(totalCartCost)}`,
+            4000
+          );
           return;
         }
 
@@ -361,15 +364,16 @@ function SalesDesk({ navigation }) {
                     setSelectedHeldSale(null);
                     clearEverything();
                   }}
-                  darkMode={false}
                 />
               </View>
               <View style={{ flex: 0.7 }}>
-                <PrimaryButton title={"Confirm purchase"} onPress={handleSubmit} />
+                <PrimaryButton darkMode title={"Confirm purchase"} onPress={handleSubmit} />
               </View>
             </View>
 
-            {cartItems?.length > 0 && !selectedHeldSale && canHoldSales && <PrimaryButton title={"Hold sale"} onPress={() => setHoldSaleModal(true)} />}
+            {cartItems?.length > 0 && !selectedHeldSale && canHoldSales && (
+              <PrimaryButton title={"Hold sale"} onPress={() => setHoldSaleModal(true)} />
+            )}
           </View>
         </View>
       </ScrollView>

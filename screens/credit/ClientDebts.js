@@ -7,6 +7,7 @@ import ClientDebtsCard from "./components/ClientDebtsCard";
 import Snackbar from "../../components/Snackbar";
 import ItemHeader from "../sales/components/ItemHeader";
 import VerticalSeparator from "../../components/VerticalSeparator";
+import { formatNumberWithCommas } from "@utils/Utils";
 
 const ClientDebts = ({ route }) => {
   const { client, sales, debt, paid, bal, currency } = route?.params ?? {};
@@ -35,15 +36,15 @@ const ClientDebts = ({ route }) => {
 
           <VerticalSeparator />
 
-          <ItemHeader title="Debt" value={debt} isCurrency />
+          <ItemHeader title="Debt" value={formatNumberWithCommas(debt, currency)} />
 
           <VerticalSeparator />
 
-          <ItemHeader title="Paid " value={paid} isCurrency />
+          <ItemHeader title="Paid " value={formatNumberWithCommas(paid, currency)} />
 
           <VerticalSeparator />
 
-          <ItemHeader title="Balance" value={bal} isCurrency />
+          <ItemHeader title="Balance" value={formatNumberWithCommas(bal, currency)} />
         </View>
       </View>
 

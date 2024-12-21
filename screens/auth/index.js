@@ -7,7 +7,6 @@ import { LOGIN_END_POINT } from "@utils/EndPointUtils";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import MyInput from "@components/MyInput";
 import PrimaryButton from "@components/buttons/PrimaryButton";
-import CircularProgress from "@components/CircularProgress";
 import Colors from "@constants/Colors";
 import DisplayMessage from "@components/Dialogs/DisplayMessage";
 import { LANDING_SCREEN } from "@navigation/ScreenNames";
@@ -17,9 +16,9 @@ import { changeUser, loginAction } from "actions/userActions";
 import { screenWidth } from "@constants/Constants";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [disabled, setDisabled] = useState(false);
+  const [username, setUsername] = useState("mosesjespar@gmail.com");
+  const [password, setPassword] = useState("0701807062");
+  const [loading, setLoading] = useState(false);
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState(null);
 
@@ -31,42 +30,45 @@ export default function Login() {
   const onLogin = async () => {
     const loginInfo = { username, password };
 
-    setDisabled(true);
-    await new BaseApiService(LOGIN_END_POINT)
-      .saveRequestWithJsonResponse(loginInfo, false)
-      .then(async (response) => {
-        if (response?.accessToken) {
-          await UserSessionUtils.setLoggedIn(true);
-          await UserSessionUtils.setUserDetails(response.user);
-          await UserSessionUtils.setUserAuthToken(response.accessToken);
-          await UserSessionUtils.setUserRefreshToken(response.refreshToken);
-          await UserSessionUtils.setFullSessionObject(response);
-          await UserSessionUtils.setLoginTime(String(date));
-          await UserSessionUtils.resetPendingSales();
-          await UserSessionUtils.setLoginDetails(loginInfo);
+    if (!loading) {
+      setLoading(true);
+      await new BaseApiService(LOGIN_END_POINT)
+        .saveRequestWithJsonResponse(loginInfo, false)
+        .then(async (response) => {
+          if (response?.accessToken) {
+            await UserSessionUtils.setLoggedIn(true);
+            await UserSessionUtils.setUserDetails(response.user);
+            await UserSessionUtils.setUserAuthToken(response.accessToken);
+            await UserSessionUtils.setUserRefreshToken(response.refreshToken);
+            await UserSessionUtils.setFullSessionObject(response);
+            await UserSessionUtils.setLoginTime(String(date));
+            await UserSessionUtils.resetPendingSales();
+            await UserSessionUtils.setLoginDetails(loginInfo);
 
-          dispatch(loginAction(true));
-          dispatch(changeUser(response.user));
-          navigation.dispatch(StackActions.replace(LANDING_SCREEN));
+            dispatch(loginAction(true));
+            dispatch(changeUser(response.user));
+            navigation.dispatch(StackActions.replace(LANDING_SCREEN));
 
-          setDisabled(false);
-        }
-      })
-      .catch((error) => {
-        setMessage(`Login failed!, ${error?.message}`);
-        setShowModal(true);
-        setDisabled(false);
-      });
+            setLoading(false);
+          }
+        })
+        .catch((error) => {
+          setMessage(`Login failed!, ${error?.message}`);
+          setShowModal(true);
+          setLoading(false);
+        });
+    }
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark, paddingHorizontal: 15, justifyContent: "space-between" }}>
-      <Image
-        source={require("../../assets/icons/yellow_transparent.png")}
-        style={{ height: 100, width: 100, resizeMode: "contain", alignSelf: "center", marginTop: screenWidth / 4 }}
-      />
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: 10 }}>
+
+      <ScrollView contentContainerStyle={{ gap: 10 }}>
+        <Image
+          source={require("../../assets/icons/yellow_transparent.png")}
+          style={{ height: 100, width: 100, resizeMode: "contain", alignSelf: "center", marginTop: screenWidth / 4 }}
+        />
         <MyInput
           label="Username"
           value={username}
@@ -89,16 +91,13 @@ export default function Login() {
         />
 
         <View style={{ marginTop: 20, height: 40 }}>
-          {!disabled ? (
-            <PrimaryButton
-              title={"Login"}
-              style={{ borderColor: Colors.primary, backgroundColor: Colors.primary }}
-              onPress={onLogin}
-              titleStyle={{ color: Colors.dark, fontSize: 16 }}
-            />
-          ) : (
-            <CircularProgress />
-          )}
+          <PrimaryButton
+            title={"Login"}
+            style={{ borderColor: Colors.primary, backgroundColor: Colors.primary }}
+            onPress={onLogin}
+            loading={loading}
+            loaderColor={Colors.dark}
+          />
         </View>
 
         <View style={{ alignItems: "center" }}>

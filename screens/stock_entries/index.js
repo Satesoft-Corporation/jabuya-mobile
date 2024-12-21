@@ -2,7 +2,6 @@ import { View, Text, FlatList } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import { MAXIMUM_RECORDS_PER_FETCH, userTypes } from "@constants/Constants";
 import { BaseApiService } from "@utils/BaseApiService";
-import AppStatusBar from "@components/AppStatusBar";
 import Colors from "@constants/Colors";
 import TopHeader from "@components/TopHeader";
 import StockEntryCard from "./StockEntryCard";
@@ -12,6 +11,7 @@ import { STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
 import { getFilterParams, getSelectedShop, getUserType } from "reducers/selectors";
 import { useSelector } from "react-redux";
 import DeleteRecordModal from "@components/DeleteRecordModal";
+import DamagesForm from "@screens/damages/DamagesForm";
 
 const StockEntries = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
@@ -24,14 +24,13 @@ const StockEntries = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState(null);
+  const [damagesForm, setDamagesForm] = useState(false);
 
   const snackbarRef = useRef(null);
 
   const filterParams = useSelector(getFilterParams);
   const selectedShop = useSelector(getSelectedShop);
   const userType = useSelector(getUserType);
-
-  const isShopAttendant = userType === userTypes.isShopAttendant;
 
   const fetchStockEntries = async (offsetToUse = 0) => {
     try {
@@ -68,8 +67,7 @@ const StockEntries = ({ navigation }) => {
       setLoading(false);
     } catch (error) {
       setDisable(false);
-      console.log(error);
-      setMessage("Error fetching stock records");
+      setMessage("Error! " + error?.message);
       setLoading(false);
     }
   };
@@ -123,16 +121,30 @@ const StockEntries = ({ navigation }) => {
         }}
       />
 
+      <DamagesForm
+        setVisible={setDamagesForm}
+        visible={damagesForm}
+        stockEntry={selectedEntry}
+        onSave={() => {
+          snackbarRef.current.show("Damage record saved.");
+        }}
+      />
+
       <FlatList
         style={{ marginTop: 5 }}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item?.id?.toString()}
         data={stockEntries}
-        renderItem={({ item }) => (
+        renderItem={({ item, i }) => (
           <StockEntryCard
             data={item}
+            key={i}
             handleDelete={() => {
               setSelectedEntry(item);
               setDeleteModal(true);
+            }}
+            handleDamage={() => {
+              setSelectedEntry(item);
+              setDamagesForm(true);
             }}
           />
         )}

@@ -49,7 +49,7 @@ const Entries = () => {
               <View style={{ paddingVertical: 10, paddingHorizontal: 10, alignItems: "center", gap: 10 }}>
                 <Icon name={item?.icon} size={20} />
 
-                <Text style={{ fontWeight: 600 }}>{item?.title}</Text>
+                <Text style={{ fontSize: 15 }}>{item?.title}</Text>
               </View>
             </Pressable>
           )}

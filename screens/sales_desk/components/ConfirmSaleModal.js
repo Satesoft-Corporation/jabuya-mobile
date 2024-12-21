@@ -216,7 +216,6 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
 
       <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, gap: 10, marginBottom: 10 }}>
         <PrimaryButton
-          darkMode={false}
           title={"Cancel"}
           style={{ flex: 0.5 }}
           onPress={() => {
@@ -228,7 +227,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
             setSelectedPaymentMethod(null);
           }}
         />
-        <PrimaryButton title={"Save"} onPress={validate} style={{ flex: 0.5 }} />
+        <PrimaryButton title={"Save"} onPress={validate} style={{ flex: 0.5 }} darkMode />
       </View>
     </ModalContent>
   );

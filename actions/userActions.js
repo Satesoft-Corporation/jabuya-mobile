@@ -37,14 +37,13 @@ export const setApplockTime = (timeStamp) => {
 };
 
 export const setIsUserConfigured = (bool) => {
-  return {
-    type: actionTypes.SET_IS_USER_CONFIGURED,
-    payload: bool,
-  };
+  return { type: actionTypes.SET_IS_USER_CONFIGURED, payload: bool };
 };
 
 export const logOutAction = () => {
-  return {
-    type: actionTypes.LOG_OUT,
-  };
+  return { type: actionTypes.LOG_OUT };
+};
+
+export const addLookUps = (data) => {
+  return { type: actionTypes.ADD_LOOK_UPS, payload: data };
 };

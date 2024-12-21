@@ -85,14 +85,7 @@ const CreditSales = () => {
   }, [selectedShop]);
 
   const menuItems = [
-    ...(isShopOwner === true
-      ? [
-          {
-            name: "Add debtor",
-            onClick: () => navigation.dispatch(StackActions.replace(CLIENT_FORM)),
-          },
-        ]
-      : []),
+    ...(isShopOwner === true ? [{ name: "Add debtor", onClick: () => navigation.dispatch(StackActions.replace(CLIENT_FORM)) }] : []),
   ];
 
   return (
@@ -109,15 +102,15 @@ const CreditSales = () => {
 
           <VerticalSeparator />
 
-          <ItemHeader title="Debt" value={formatNumberWithCommas(debt)} />
+          <ItemHeader title="Debt" value={formatNumberWithCommas(debt, selectedShop?.currency)} />
 
           <VerticalSeparator />
 
-          <ItemHeader title="Paid " value={formatNumberWithCommas(paid)} isCurrency />
+          <ItemHeader title="Paid " value={formatNumberWithCommas(paid, selectedShop?.currency)} />
 
           <VerticalSeparator />
 
-          <ItemHeader title="Balance" value={formatNumberWithCommas(bal)} isCurrency />
+          <ItemHeader title="Balance" value={formatNumberWithCommas(bal, selectedShop?.currency)} />
         </View>
       </View>
 

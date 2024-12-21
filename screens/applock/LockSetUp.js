@@ -92,7 +92,12 @@ const LockSetUp = () => {
         customRightButton={showRemoveButton ? <Icon name="delete" groupName="Feather" color={Colors.light} size={25} /> : undefined}
       />
 
-      <PrimaryButton title={showCompletedButton ? "Save pin" : ""} style={{ flex: 0, marginHorizontal: 10, marginTop: 20 }} onPress={onConfirmPin} />
+      <PrimaryButton
+        darkMode
+        title={showCompletedButton ? "Save pin" : ""}
+        style={{ flex: 0, marginHorizontal: 10, marginTop: 20 }}
+        onPress={onConfirmPin}
+      />
     </SafeAreaView>
   );
 };

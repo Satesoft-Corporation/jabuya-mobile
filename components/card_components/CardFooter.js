@@ -3,8 +3,7 @@ import React from "react";
 import ChipButton2 from "../buttons/ChipButton2";
 import Icon from "@components/Icon";
 import { useSelector } from "react-redux";
-import { getUserType } from "reducers/selectors";
-import { userTypes } from "@constants/Constants";
+import { getIsShopAttendant, getUserType } from "reducers/selectors";
 
 const CardFooter = ({
   label,
@@ -13,17 +12,23 @@ const CardFooter = ({
   onClick1,
   onClick2,
   onDelete,
+  onPrint,
+  onEdit,
+  handleDamage,
   renderLeft = () => {},
   restocked = false,
   entered = false,
   listed = false,
   served = false,
   cleared = false,
-  darkMode = true,
   deleteIcon = false,
+  print = false,
+  edit = false,
+  damage = false,
+  expanded,
 }) => {
   const userType = useSelector(getUserType);
-  const isShopAttendant = userType === userTypes.isShopAttendant;
+  const isShopAttendant = useSelector(getIsShopAttendant);
   return (
     <View style={{ gap: 3 }}>
       <View>
@@ -37,10 +42,18 @@ const CardFooter = ({
           {label && <Text style={{ fontWeight: 600 }}>{label}</Text>}
         </Text>
       </View>
-      <View style={{ flexDirection: "row", gap: 10, alignSelf: "flex-end" }}>
-        {deleteIcon && !isShopAttendant && <ChipButton2 title={<Icon name="trash" />} onPress={onDelete} darkMode={false} />}
+      <View style={{ flexDirection: "row", gap: 10, alignSelf: "flex-end", alignItems: "center" }}>
+        {expanded == true && (
+          <>
+            {deleteIcon && !isShopAttendant && <Icon name="trash" borderd onPress={onDelete} size={13} />}
+            {edit && !isShopAttendant && <Icon name="pen" size={13} borderd onPress={onEdit} />}
+            {damage && !isShopAttendant && <Icon name="broken-image" groupName="MaterialIcons" size={16} borderd onPress={handleDamage} />}
 
-        {btnTitle1 && <ChipButton2 title={btnTitle1} onPress={onClick1} darkMode={darkMode} />}
+            {print && <Icon name="printer" groupName="Feather" borderd onPress={onPrint} />}
+          </>
+        )}
+
+        {btnTitle1 && <ChipButton2 title={btnTitle1} onPress={onClick1} darkMode={false} />}
         {btnTitle2 && <ChipButton2 title={btnTitle2} onPress={onClick2} />}
       </View>
     </View>

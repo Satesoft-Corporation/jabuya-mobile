@@ -181,14 +181,13 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
         <View style={{ flexDirection: "row", marginTop: 40, marginBottom: 10, gap: 5 }}>
           <PrimaryButton
             style={{ flex: saleUnit ? 0.5 : 1 }}
-            darkMode={false}
             title={"Cancel"}
             onPress={() => {
               setShowModal(false);
               dispatch(makeProductSelection(null));
             }}
           />
-          {saleUnit && <PrimaryButton title={"Confirm"} onPress={handlePress} style={{ flex: 0.5 }} />}
+          {saleUnit && <PrimaryButton title={"Confirm"} darkMode onPress={handlePress} style={{ flex: 0.5 }} />}
         </View>
       </View>
     </ModalContent>

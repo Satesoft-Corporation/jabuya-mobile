@@ -346,8 +346,8 @@ const StockEntryForm = ({ route }) => {
           <MyInput value={remarks} label="Remarks" multiline onValueChange={(text) => setRemarks(text)} numberOfLines={3} />
 
           <View style={[styles.row, { marginTop: 15 }]}>
-            <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} style={{ flex: 0.5 }} />
-            <PrimaryButton title={"Save"} onPress={saveStockEntry} style={{ flex: 0.5 }} />
+            <PrimaryButton title={"Clear"} onPress={clearForm} style={{ flex: 0.5 }} />
+            <PrimaryButton title={"Save"} onPress={saveStockEntry} darkMode style={{ flex: 0.5 }} />
           </View>
         </ScrollView>
 

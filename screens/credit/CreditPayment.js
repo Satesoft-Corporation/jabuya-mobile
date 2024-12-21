@@ -106,7 +106,7 @@ const CreditPayment = ({ route }) => {
             flexDirection: "row",
           }}
         >
-          <PrimaryButton title={"Save"} onPress={savePayment} />
+          <PrimaryButton title={"Save"} darkMode onPress={savePayment} />
         </View>
       </View>
 

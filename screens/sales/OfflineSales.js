@@ -163,7 +163,7 @@ const OfflineSales = () => {
               paddingHorizontal: 10,
             }}
           >
-            <PrimaryButton title={"Save Sales"} darkMode={false} onPress={handleSave} />
+            <PrimaryButton title={"Save Sales"} onPress={handleSave} />
           </View>
 
           <View
@@ -248,8 +248,8 @@ const RemoveSaleModal = ({ visible = false, data, ...props }) => {
           marginBottom: 5,
         }}
       >
-        <PrimaryButton darkMode={false} title={"Cancel"} onPress={props?.hide} />
-        <PrimaryButton title={"Remove"} onPress={removeSale} />
+        <PrimaryButton title={"Cancel"} onPress={props?.hide} />
+        <PrimaryButton darkMode title={"Remove"} onPress={removeSale} />
       </View>
     </ModalContent>
   );

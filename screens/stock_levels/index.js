@@ -115,12 +115,7 @@ const StockLevels = ({ navigation }) => {
   const menuItems = [...(!isShopAttendant ? [{ name: "List product", onClick: () => toProductEntry() }] : [])];
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: Colors.light_2,
-      }}
-    >
+    <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar />
 
       <TopHeader
@@ -150,12 +145,12 @@ const StockLevels = ({ navigation }) => {
         {!isShopAttendant && (
           <>
             <VerticalSeparator />
-            <ItemHeader title="Value " value={stock} isCurrency />
+            <ItemHeader title="Value " value={formatNumberWithCommas(stock, selectedShop?.currency)}  />
           </>
         )}
       </View>
       <FlatList
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item?.id?.toString()}
         style={{ marginTop: 5 }}
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
@@ -163,13 +158,7 @@ const StockLevels = ({ navigation }) => {
         onRefresh={handleRefresh}
         refreshing={loading}
         ListEmptyComponent={() => (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
             <Text>{message}</Text>
           </View>
         )}

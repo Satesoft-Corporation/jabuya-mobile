@@ -25,3 +25,20 @@ export const userTypes = {
 export const ALL_SHOPS_LABEL = "All Shops";
 
 export const APP_VERSION = `v ${Constants.expoConfig.version}`;
+
+export const subscriptionPaymentMethods = [
+  { id: 1, name: "CASH" },
+  { id: 2, name: "MPESA" },
+  { id: 3, name: "AIRTEL_MONEY" },
+  { id: 4, name: "MTN_MOMO" },
+  { id: 5, name: "SYSTEM" },
+  { id: 6, name: "BANK" }
+];
+
+export const damageTypes = [
+  { type: "EXPIRY", name: "Expiry" },
+  { type: "SALE_TIME", name: "Sale Time" },
+  { type: "FACTORY_ERROR", name: "Factory Error" },
+  { type: "DELIVERY_ERROR", name: "Deliver Error" },
+  { type: "OTHER", name: "Other" }
+];

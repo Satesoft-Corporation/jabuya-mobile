@@ -10,7 +10,7 @@ import { View, Text } from "react-native";
 import { useSelector } from "react-redux";
 import { getIsShopAttendant } from "reducers/selectors";
 
-const StockEntryCard = ({ data, handleDelete }) => {
+const StockEntryCard = ({ data, handleDelete, handleDamage }) => {
   const [expanded, setExpanded] = useState(false);
 
   const navigation = useNavigation();
@@ -68,15 +68,17 @@ const StockEntryCard = ({ data, handleDelete }) => {
       )}
 
       <CardFooter
+        expanded={expanded}
         restocked
         label={createdByFullName}
-        btnTitle1={expanded ? "Edit" : null}
         btnTitle2={expanded ? "Hide" : "More"}
-        onClick1={() => navigation?.navigate(STOCK_ENTRY_FORM, data)}
-        darkMode={false}
+        edit
+        onEdit={() => navigation?.navigate(STOCK_ENTRY_FORM, data)}
         onClick2={toggleExpand}
-        deleteIcon={expanded}
+        deleteIcon
         onDelete={handleDelete}
+        damage
+        handleDamage={handleDamage}
       />
     </View>
   );

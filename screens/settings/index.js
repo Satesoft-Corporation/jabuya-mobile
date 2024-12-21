@@ -268,6 +268,7 @@ const Settings = () => {
             {
               backgroundColor: Colors.dark,
               paddingVertical: 7,
+              paddingHorizontal: 7,
               borderRadius: 8,
             },
           ]}

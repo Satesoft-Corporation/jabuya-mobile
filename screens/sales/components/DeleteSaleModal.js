@@ -155,13 +155,13 @@ export default function DeleteSaleModal({ showMoodal, setShowModal, selectedSale
           }}
         >
           <PrimaryButton
-            darkMode={false}
             title={"Cancel"}
             onPress={() => {
               setShowModal(false);
             }}
+            style={{ flex: 0.5 }}
           />
-          <PrimaryButton title={"Delete"} onPress={handlePress} />
+          <PrimaryButton darkMode title={"Delete"} onPress={handlePress} style={{ flex: 0.5 }} />
         </View>
       </View>
     </ModalContent>

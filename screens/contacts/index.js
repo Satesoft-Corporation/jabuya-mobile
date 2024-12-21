@@ -36,6 +36,7 @@ const ContactBook = () => {
       <View style={{ flex: 1, paddingHorizontal: 5 }}>
         <FlatList
           data={filtered}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => <Card client={item} />}
           onRefresh={() => {
             setLoading(true);

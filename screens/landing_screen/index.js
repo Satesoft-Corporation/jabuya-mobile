@@ -12,6 +12,7 @@ import { COMING_SOON } from "@navigation/ScreenNames";
 import LockScreenModal from "@screens/applock/LockScreenModal";
 import {
   saveClientSalesOnDevice,
+  saveLookUps,
   saveManufactures,
   saveShopClients,
   saveShopDetails,
@@ -24,6 +25,7 @@ import {
   getConfigureStatus,
   getLastApplockTime,
   getLastLoginTime,
+  getLookUps,
   getManufactures,
   getMenuList,
   getOfflineParams,
@@ -34,12 +36,13 @@ import {
   getUserType,
 } from "reducers/selectors";
 import { useDispatch } from "react-redux";
-import { changeUser, loginAction, setIsUserConfigured } from "actions/userActions";
+import { addLookUps, changeUser, loginAction, setIsUserConfigured } from "actions/userActions";
 import { BaseApiService } from "@utils/BaseApiService";
 import { addManufacturers, addSuppliers, changeSelectedShop, setClientSales, setShopClients, setShopProducts, setShops } from "actions/shopActions";
 import { LOGIN_END_POINT } from "@utils/EndPointUtils";
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
+import DamagesForm from "@screens/damages/DamagesForm";
 
 const LandingScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -60,6 +63,7 @@ const LandingScreen = () => {
   const prevClientSales = useSelector(getClientSales);
   const manufacturers = useSelector(getManufactures);
   const suppliers = useSelector(getSuppliers);
+  const prevLookUps = useSelector(getLookUps);
 
   const menuList = useSelector(getMenuList);
   const isShopAttendant = userType === userTypes.isShopAttendant;
@@ -84,18 +88,12 @@ const LandingScreen = () => {
 
       const shopData = await saveShopDetails(offlineParams, isShopAttendant);
 
+      const lookups = await saveLookUps(prevLookUps);
+
       const offersDebt = shopData?.some((s) => s?.supportsCreditSales === true);
 
       if (shopData?.length > 1) {
-        shops = [
-          {
-            name: ALL_SHOPS_LABEL,
-            id: shopOwnerId,
-            supportsCreditSales: offersDebt,
-            captureClientDetailsOnAllSales: false,
-          },
-          ...shopData,
-        ];
+        shops = [{ name: ALL_SHOPS_LABEL, id: shopOwnerId, supportsCreditSales: offersDebt, captureClientDetailsOnAllSales: false }, ...shopData];
       } else {
         shops = [...shopData];
       }
@@ -122,6 +120,7 @@ const LandingScreen = () => {
 
         dispatch(addManufacturers(newManufactures));
         dispatch(addSuppliers(newSuppliers));
+        dispatch(addLookUps(lookups));
       }
 
       dispatch(setIsUserConfigured(true));
@@ -188,6 +187,7 @@ const LandingScreen = () => {
       <UserProfile renderNtnIcon={false} showShops />
 
       <LockScreenModal showLock={showLock} hideLock={() => setShowLock(false)} />
+
       <View
         style={{
           paddingHorizontal: 10,

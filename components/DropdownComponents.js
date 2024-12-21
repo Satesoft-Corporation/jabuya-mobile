@@ -73,12 +73,24 @@ export const SalesDropdownComponent = ({ products, handleChange, makeSelection, 
   );
 };
 
-export const MyDropDown = ({ onChange, style = {}, data, labelField, valueField, value, label, disable = false }) => {
+export const MyDropDown = ({
+  onChange,
+  style = {},
+  data,
+  labelField,
+  valueField,
+  value,
+  label,
+  disable = false,
+  showError = false,
+  isSubmitted,
+  divStyle = {},
+}) => {
   const [isFocus, setIsFocus] = useState(false);
 
   return (
-    <View style={{ gap: 5 }}>
-      {label && <Text style={{ fontSize: 15 }}>{label}</Text>}
+    <View style={[{ width: "100%" }, divStyle]}>
+      {label && <Text style={{ fontSize: 15, marginBottom: 5 }}>{label}</Text>}
       <Dropdown
         disable={disable}
         style={[
@@ -97,7 +109,7 @@ export const MyDropDown = ({ onChange, style = {}, data, labelField, valueField,
         placeholder={"Select item"}
         searchPlaceholder="Search..."
         value={value}
-        search={data?.length > 4}
+        search={data?.length > 6}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
@@ -105,6 +117,7 @@ export const MyDropDown = ({ onChange, style = {}, data, labelField, valueField,
           onChange(item);
         }}
       />
+      {isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>}
     </View>
   );
 };

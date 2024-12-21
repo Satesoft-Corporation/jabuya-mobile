@@ -90,24 +90,18 @@ export class BaseApiService {
    * @returns
    */
   async postRequestWithJsonResponse(requestBody) {
-    return this.postRequest(requestBody)
-      .then((response) =>
-        //{
-        response.json()
-      )
-      .then((responseData) => {
-        if (responseData?.status == 200 || responseData?.status == "Success") {
-          return responseData;
-        } else if (responseData?.status == 400 || responseData?.status == 403 || responseData?.status == 500) {
-          let data = responseData;
-          let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
-          throw new TypeError(errorMessage);
-        } else if (responseData?.status == 401) {
-          UserSessionUtils.clearLocalStorageAndLogout();
-        } else {
-          throw new TypeError(INTERNAL_SERVER_ERROR);
-        }
-      });
+    const response = await this.postRequest(requestBody);
+    if (response.ok) {
+      return response.json();
+    } else if (response.status === 400 || response.status === 403 || response.status === 500) {
+      let data = await response.json();
+      let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
+      throw new TypeError(errorMessage);
+    } else if (response.status === 401) {
+      UserSessionUtils.clearLocalStorageAndLogout();
+    } else {
+      throw new TypeError(INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**

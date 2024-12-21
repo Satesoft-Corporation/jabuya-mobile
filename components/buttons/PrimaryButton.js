@@ -2,7 +2,7 @@ import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import Colors from "@constants/Colors";
 
-const PrimaryButton = ({ onPress, title, disabled = false, titleStyle = {}, style, darkMode = true, loading, round = false }) => {
+const PrimaryButton = ({ onPress, title, disabled = false, loaderColor, style, darkMode = false, loading, round = false }) => {
   return (
     <TouchableOpacity
       activeOpacity={0.7}
@@ -25,8 +25,10 @@ const PrimaryButton = ({ onPress, title, disabled = false, titleStyle = {}, styl
       ]}
       onPress={onPress}
     >
-      {darkMode && loading && <ActivityIndicator size={20} style={{ alignSelf: "center" }} color={Colors.primary} />}
-      <Text style={[{ fontWeight: "500", color: darkMode ? Colors.primary : Colors.dark }, titleStyle]}>{title}</Text>
+      {loading && <ActivityIndicator size={20} style={{ alignSelf: "center" }} color={loaderColor ?? Colors.primary} />}
+      {!loading && <Text style={[{ fontWeight: "500", color: darkMode ? Colors.primary : Colors.dark }]}>{title}</Text>
+      }
+
     </TouchableOpacity>
   );
 };
