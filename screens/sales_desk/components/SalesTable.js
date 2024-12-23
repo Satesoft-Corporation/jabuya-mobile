@@ -5,36 +5,34 @@ import { screenHeight } from "@constants/Constants";
 import { formatNumberWithCommas } from "@utils/Utils";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Icon from "@components/Icon";
-import { useDispatch } from "react-redux";
-import { removeItemFromCart } from "actions/shopActions";
 import { useRef } from "react";
 
-const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = false }) => {
-  const dispatch = useDispatch();
+const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = true, onDelete = () => {}, returned = false }) => {
   const listViewRef = useRef(null);
 
-  const renderHiddenItem = (data) => (
-    <View
-      style={{
-        alignItems: "center",
-        backgroundColor: Colors.light_3,
-        flex: 1,
-        justifyContent: "flex-end",
-        paddingRight: 15,
-        flexDirection: "row",
-        gap: 15,
-      }}
-    >
-      <Icon
-        name="trash-alt"
-        color={Colors.error}
-        size={17}
-        onPress={() => {
-          dispatch(removeItemFromCart(data?.item));
-        }}
-      />
-    </View>
-  );
+  const renderHiddenItem = (data) => {
+    if (data?.item?.status !== "CANCELLED") {
+      return (
+        <View
+          style={{
+            alignItems: "center",
+            backgroundColor: Colors.light_3,
+            flex: 1,
+            justifyContent: "flex-end",
+            paddingRight: 15,
+            flexDirection: "row",
+            gap: 15,
+          }}
+        >
+          {!returned ? (
+            <Icon name={"trash-alt"} color={Colors.error} size={17} onPress={() => onDelete(data)} />
+          ) : (
+            <Icon name={"return-down-back"} size={20} onPress={() => onDelete(data)} groupName={"Ionicons"} />
+          )}
+        </View>
+      );
+    }
+  };
 
   return (
     <View>
@@ -71,7 +69,7 @@ const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = false }) => {
 };
 
 const SaleListItem = ({ data }) => {
-  const { productName, shopProductName, saleUnitName } = data;
+  const { productName, shopProductName, saleUnitName, cancellationReason } = data;
 
   let unitName = saleUnitName ? " - " + saleUnitName : "";
 
@@ -87,13 +85,17 @@ const SaleListItem = ({ data }) => {
         backgroundColor: "#fff",
       }}
     >
-      <Text style={{ flex: 2.5, justifyContent: "center" }} numberOfLines={2}>
+      <Text style={{ flex: 2.5, justifyContent: "center", textDecorationLine: cancellationReason ? "line-through" : "" }} numberOfLines={2}>
         {productName || shopProductName + unitName}
       </Text>
-      <Text style={{ flex: 0.5, textAlign: "center" }}>{data?.quantity}</Text>
+      <Text style={{ flex: 0.5, textAlign: "center", textDecorationLine: cancellationReason ? "line-through" : "" }}>{data?.quantity}</Text>
 
-      <Text style={{ flex: 1, textAlign: "right" }}>{formatNumberWithCommas(data?.unitCost)}</Text>
-      <Text style={{ flex: 1, textAlign: "right", paddingEnd: 10 }}>{formatNumberWithCommas(data?.totalCost)}</Text>
+      <Text style={{ flex: 1, textAlign: "right", textDecorationLine: cancellationReason ? "line-through" : "" }}>
+        {formatNumberWithCommas(data?.unitCost)}
+      </Text>
+      <Text style={{ flex: 1, textAlign: "right", paddingEnd: 10, textDecorationLine: cancellationReason ? "line-through" : "" }}>
+        {formatNumberWithCommas(data?.totalCost)}
+      </Text>
     </View>
   );
 };

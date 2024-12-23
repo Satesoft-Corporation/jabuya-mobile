@@ -11,7 +11,7 @@ import { scale } from "react-native-size-matters";
 import Colors from "@constants/Colors";
 import { userTypes } from "@constants/Constants";
 
-function SaleTxnCard({ data, print, onDelete }) {
+function SaleTxnCard({ data, print, onDelete, onSwipe }) {
   const shops = useSelector(getShops) ?? [];
   const userType = useSelector(getUserType);
 
@@ -97,7 +97,7 @@ function SaleTxnCard({ data, print, onDelete }) {
       {expanded && (
         <View style={{ flex: 1, marginTop: 10 }}>
           <View style={{ marginVertical: 5 }}>
-            <SalesTable sales={lineItems} fixHeight={false} disableSwipe={true} />
+            <SalesTable sales={lineItems} fixHeight={false} disableSwipe={lineItems?.length < 2} onDelete={onSwipe} returned/>
           </View>
           <DataRow key={1} label={"Total"} value={formatNumberWithCommas(totalCost, data?.currency)} style={{ marginTop: 5, marginBottom: 10 }} />
 

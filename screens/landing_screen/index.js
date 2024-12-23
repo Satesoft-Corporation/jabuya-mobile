@@ -142,7 +142,7 @@ const LandingScreen = () => {
     if (prevPinTime !== null) {
       const pintimeDiff = getTimeDifference(new Date(prevPinTime), new Date());
       console.log("lock time", pintimeDiff);
-      if (pintimeDiff.minutes >= 10) {
+      if (pintimeDiff.minutes >= 30) {
         setShowLock(true);
       }
     }
@@ -159,17 +159,17 @@ const LandingScreen = () => {
 
         console.log("login time", logintimeDifferance);
 
-        // if (hasNet === true) {
-        await configureUserData(configStatus === false);
+        if (hasNet === true) {
+          await configureUserData(configStatus === false);
 
-        if (hours >= 13 || days >= 1) {
-          setLoading(true);
-          await getRefreshToken();
-          await configureUserData(true);
+          if (hours >= 13 || days >= 1) {
+            setLoading(true);
+            await getRefreshToken();
+            await configureUserData(true);
+          }
         }
+        await handlePinLockStatus();
       }
-      await handlePinLockStatus();
-      // }
       setLoading(false);
     } catch (e) {
       console.error(e);

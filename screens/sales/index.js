@@ -31,6 +31,7 @@ export default function ViewSales() {
   const [selectedSale, setSelectedSale] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [date, setDate] = useState(new Date());
+  const [selectedLineItem, setSelectedLineItem] = useState(null);
 
   const filterParams = useSelector(getFilterParams);
   const selectedShop = useSelector(getSelectedShop);
@@ -56,6 +57,8 @@ export default function ViewSales() {
     setDaysProfit(0);
     setMessage(null);
     setDate(new Date());
+    setSelectedLineItem(null);
+    setSelectedSale(null);
   };
 
   const getSales = async (params) => {
@@ -108,8 +111,9 @@ export default function ViewSales() {
         selectedSale={selectedSale}
         showMoodal={deleteModal}
         setShowModal={setDeleteModal}
+        selectedLineItem={selectedLineItem}
         onComplete={() => {
-          snackbarRef.current.show("Sale record deleted");
+          snackbarRef.current.show("Details saved");
           clearFields();
           getSales();
         }}
@@ -169,6 +173,11 @@ export default function ViewSales() {
             isShopAttendant={isShopAttendant}
             onDelete={() => {
               setSelectedSale(item);
+              setDeleteModal(true);
+            }}
+            onSwipe={(lineItem) => {
+              console.log(lineItem?.item);
+              setSelectedLineItem(lineItem?.item);
               setDeleteModal(true);
             }}
           />

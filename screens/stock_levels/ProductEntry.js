@@ -38,6 +38,7 @@ const ProductEntry = ({ route }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
   const [remarks, setRemarks] = useState("");
+  const [customName, setCustomName] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [disable, setDisable] = useState(false);
   const [saleUnits, setSaleUnits] = useState([]);
@@ -123,6 +124,7 @@ const ProductEntry = ({ route }) => {
         const defaultUnit = multipleSaleUnits.find((unit) => unit?.saleUnitName === itemToEdit?.saleUnitName);
         setSelectedSaleUnit(defaultUnit);
         setRemarks(itemToEdit?.remarks);
+        setCustomName(itemToEdit?.customName || "");
         setSalesPrice(String(itemToEdit?.salesPrice));
 
         if (itemToEdit?.hasMultipleSaleUnits) {
@@ -190,6 +192,7 @@ const ProductEntry = ({ route }) => {
       remarks: remarks || "",
       hasMultipleSaleUnits: selectedSaleUnits.length > 0,
       multipleSaleUnits: selectedSaleUnits,
+      customName: customName,
     };
 
     let isValidPayload = hasNull(payload) === false && salesPrice.trim() !== "";
@@ -269,20 +272,21 @@ const ProductEntry = ({ route }) => {
               {submitted && !selectedManufacturer && <Text style={styles.errorText}>Manufacturer is required</Text>}
             </View>
 
-            <View>
-              <Text style={styles.inputLabel}>Product</Text>
-              <MyDropDown
-                style={styles.dropDown}
-                disable={disable}
-                data={edit ? [{ ...selectedProduct }] : products}
-                onChange={onProductChange}
-                value={selectedProduct}
-                placeholder="Select product"
-                labelField="displayName"
-                valueField="id"
-              />
-              {submitted && !selectedProduct && <Text style={styles.errorText}>Product is required</Text>}
-            </View>
+            <MyDropDown
+              style={styles.dropDown}
+              disable={disable}
+              label={"Product"}
+              data={edit ? [{ ...selectedProduct }] : products}
+              onChange={onProductChange}
+              value={selectedProduct}
+              placeholder="Select product"
+              labelField="displayName"
+              valueField="id"
+              showError
+              isSubmitted={submitted}
+            />
+
+            <MyInput value={customName} onValueChange={(e) => setCustomName(e)} label="Custom name" />
 
             {saleUnits?.length > 1 && (
               <FlatList
@@ -307,29 +311,22 @@ const ProductEntry = ({ route }) => {
               />
             )}
             <View style={styles.row}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.inputLabel}>Sale unit</Text>
-                <MyDropDown
-                  style={styles.dropDown}
-                  data={saleUnits}
-                  onChange={handleSaleUnitChange}
-                  value={selectedSaleUnit}
-                  placeholder="Select sale unit"
-                  labelField="saleUnitName"
-                  valueField="id"
-                  search={false}
-                />
-                {submitted && !selectedSaleUnit && <Text style={styles.errorText}>Sale unit is required</Text>}
-              </View>
+              <MyDropDown
+                data={saleUnits}
+                label={"Sale unit"}
+                onChange={handleSaleUnitChange}
+                value={selectedSaleUnit}
+                placeholder="Select sale unit"
+                labelField="saleUnitName"
+                valueField="id"
+                search={false}
+                showError
+                isSubmitted={submitted}
+                divStyle={{ flex: 0.5 }}
+              />
 
-              <View style={{ flex: 1 }}>
-                <MyInput
-                  label={<Text style={styles.inputLabel}>Selling price</Text>}
-                  value={salesPrice}
-                  onValueChange={(text) => setSalesPrice(text)}
-                  inputMode="numeric"
-                />
-
+              <View style={{ flex: 0.5 }}>
+                <MyInput label={"Selling price"} value={salesPrice} onValueChange={(text) => setSalesPrice(text)} inputMode="numeric" />
                 {submitted && salesPrice.trim() === "" && <Text style={styles.errorText}>Sales price is required</Text>}
               </View>
             </View>

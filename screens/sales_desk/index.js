@@ -37,6 +37,7 @@ import {
   clearCart,
   makeProductSelection,
   removeHeldSale,
+  removeItemFromCart,
   setShopProducts,
   updateRecievedAmount,
 } from "actions/shopActions";
@@ -152,12 +153,18 @@ function SalesDesk({ navigation }) {
     fetchProducts();
   }, [searchTerm, selectedShop]);
 
-  // useEffect(() => {
-  //   clearEverything();
-  // }, [selectedShop]);
+  useEffect(() => {
+    if (shops?.length > 1) {
+      clearEverything();
+    }
+  }, [selectedShop]);
 
   const handleChange = (value) => {
     setSearchTerm(value);
+  };
+
+  const onDelete = (data) => {
+    dispatch(removeItemFromCart(data?.item));
   };
 
   const makeSelection = (item) => {
@@ -271,7 +278,7 @@ function SalesDesk({ navigation }) {
               padding: 10,
             }}
           >
-            <SalesTable sales={cartItems} />
+            <SalesTable sales={cartItems} disableSwipe={false} onDelete={onDelete} />
           </View>
 
           <View

@@ -77,7 +77,7 @@ const StockEntryCard = ({ data, handleDelete, handleDamage }) => {
         onClick2={toggleExpand}
         deleteIcon
         onDelete={handleDelete}
-        damage
+        //damage
         handleDamage={handleDamage}
       />
     </View>

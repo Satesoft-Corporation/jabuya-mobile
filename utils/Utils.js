@@ -1,6 +1,6 @@
 // eas build -p android --profile preview
 
-export function formatNumberWithCommas(number, symbol = "") {
+export function formatNumberWithCommas(number, symbol) {
   if (number === null || number === undefined || isNaN(number)) {
     return `${symbol}0`;
   }
@@ -10,7 +10,7 @@ export function formatNumberWithCommas(number, symbol = "") {
     maximumFractionDigits: 3,
   });
 
-  return `${symbol} ${formattedNumber}`;
+  return symbol ? `${symbol} ${formattedNumber}` : formattedNumber;
 }
 
 export function formatDate(inputDate, removeTime = false, onlyTime = false) {
