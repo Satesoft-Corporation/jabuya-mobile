@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import { useSelector } from "react-redux";
 import { getSelectedShop, getShopProducts, getShops } from "reducers/selectors";
@@ -8,7 +8,7 @@ import { MyDropDown } from "@components/DropdownComponents";
 import MyInput from "@components/MyInput";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import { convertDateFormat, formatDate } from "@utils/Utils";
-import { screenHeight } from "@constants/Constants";
+import { BaseApiService } from "@utils/BaseApiService";
 
 const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
   const shops = useSelector(getShops) ?? [];
@@ -17,6 +17,9 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
 
   const [filterShop, setFiletrShop] = useState(selectedShop);
   const [filterProduct, setFiletrProduct] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [shopUsers, setShopUsers] = useState([]);
+
   const [filterDate, setFilterDate] = useState(new Date());
 
   const hideModal = () => {
@@ -26,12 +29,10 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
     const datesMatch = formatDate(filterDate, true) === formatDate(new Date(), true);
 
     const searchParameters = {
-      ...(!datesMatch && {
-        startDate: convertDateFormat(filterDate),
-        endDate: convertDateFormat(filterDate, true),
-      }),
+      ...(!datesMatch && { startDate: convertDateFormat(filterDate), endDate: convertDateFormat(filterDate, true) }),
       ...(filterProduct && filterShop && { shopProductId: filterProduct?.id }),
       ...(filterShop && { shopId: filterShop?.id }),
+      ...(selectedUser && { userId: selectedUser?.id }),
     };
 
     if (!datesMatch) {
@@ -41,9 +42,27 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
     hideModal();
   };
 
+  const getShopUsers = async () => {
+    if (selectedShop) {
+      await new BaseApiService(`/shops/${selectedShop?.id}/user-accounts`)
+        .getRequestWithJsonResponse({ offset: 0, limit: 0 })
+        .then((response) => {
+          setShopUsers(response?.records);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  };
+
+  useEffect(() => {
+    getShopUsers();
+  }, [selectedShop]);
+
   const clearFilters = () => {
     setFiletrProduct(null);
     setFilterDate(new Date());
+    setSelectedUser(null);
   };
   return (
     <Modal
@@ -63,6 +82,16 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
             {shops?.length > 1 && (
               <MyDropDown data={shops} labelField={"name"} valueField={"id"} onChange={(e) => setFiletrShop(e)} value={filterShop} label={"Shop"} />
             )}
+
+            <MyDropDown
+              data={shopUsers}
+              labelField={"fullName"}
+              valueField={"id"}
+              onChange={(e) => setSelectedUser(e)}
+              value={selectedUser}
+              label={"Shop user"}
+            />
+
             <MyDropDown
               data={products}
               labelField={"productName"}

@@ -13,7 +13,7 @@ import { printSale } from "@utils/PrintService";
 import { useSelector } from "react-redux";
 import { getFilterParams, getSelectedShop, getUserType } from "reducers/selectors";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
-import { userTypes } from "@constants/Constants";
+import { MAXIMUM_RECORDS_PER_FETCH, userTypes } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
 import DeleteSaleModal from "./components/DeleteSaleModal";
 import Snackbar from "@components/Snackbar";
@@ -25,6 +25,11 @@ export default function ViewSales() {
   const [salesValue, setSalesValue] = useState(0); //total money value sold
   const [daysProfit, setDaysProfit] = useState(0);
   const [daysCapital, setDaysCapital] = useState(0);
+  const [totalRecords, setTotalReords] = useState(0);
+  const [currentParams, setCurrentParams] = useState(null);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [offset, setOffset] = useState(0);
+
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -70,29 +75,35 @@ export default function ViewSales() {
       limit: 0,
       ...filterParams,
       ...(!params && { startDate: getCurrentDay() }),
-      ...(!params?.startDate && !params?.shopProductId && { startDate: getCurrentDay() }),
+      ...(!params?.startDate && !params?.shopProductId && !params?.userId && { startDate: getCurrentDay() }),
       ...(params && params),
     };
 
     if (!searchParameters?.startDate) {
       setDate(null);
     }
+    // console.log(searchParameters);
     const hasNet = await hasInternetConnection();
+
     if (hasNet === false) {
       setMessage("Cannot connect to the internet.");
       setLoading(false);
     } else {
+      setIsFetchingMore(true);
+
       await new BaseApiService(SHOP_SALES_ENDPOINT)
         .getRequestWithJsonResponse(searchParameters)
         .then((response) => {
           if (response.totalItems === 0) {
-            setMessage(`No sales made on this day for ${selectedShop?.name}`);
+            setMessage(`No sale records found.`);
           }
+          setTotalReords(response?.totalItems);
           setDaysProfit(Math.round(response?.totalProfit));
           setDaysCapital(Math.round(response?.totalPurchaseCost));
           setSalesValue(Math.round(response?.totalCost));
           setSales(response?.records);
           setLoading(false);
+          setIsFetchingMore(false);
         })
         .catch((error) => {
           setLoading(false);
@@ -189,6 +200,7 @@ export default function ViewSales() {
         }}
         refreshing={loading}
       />
+
       <Snackbar ref={snackbarRef} />
     </SafeAreaView>
   );

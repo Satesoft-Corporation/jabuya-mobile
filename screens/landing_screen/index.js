@@ -42,7 +42,6 @@ import { addManufacturers, addSuppliers, changeSelectedShop, setClientSales, set
 import { LOGIN_END_POINT } from "@utils/EndPointUtils";
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
-import DamagesForm from "@screens/damages/DamagesForm";
 
 const LandingScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -76,6 +75,7 @@ const LandingScreen = () => {
         await UserSessionUtils.setUserRefreshToken(response.refreshToken);
         dispatch(loginAction(true));
         dispatch(changeUser(response.user));
+        setLoading(false);
         console.log("token refreshed");
       });
     }
@@ -159,15 +159,15 @@ const LandingScreen = () => {
 
         console.log("login time", logintimeDifferance);
 
-        if (hasNet === true) {
-          await configureUserData(configStatus === false);
+        ////if (hasNet === true) {
+        await configureUserData(configStatus === false);
 
-          if (hours >= 13 || days >= 1) {
-            setLoading(true);
-            await getRefreshToken();
-            await configureUserData(true);
-          }
+        if (hours >= 13 || days >= 1) {
+          setLoading(true);
+          await getRefreshToken();
+          //await configureUserData(true);
         }
+        // }
         await handlePinLockStatus();
       }
       setLoading(false);

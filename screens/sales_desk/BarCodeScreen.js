@@ -19,7 +19,7 @@ const BarCodeScreen = ({ navigation, route }) => {
   const makeSelection = (item) => {
     dispatch(makeProductSelection(item));
     setShowModal(true);
-    setScanned(true);
+    setScanned(false);
   };
 
   const handleBarCodeScanned = ({ data }) => {
