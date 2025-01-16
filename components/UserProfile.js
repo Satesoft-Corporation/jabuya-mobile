@@ -7,7 +7,7 @@ import PopUpmenu from "./PopUpMenu";
 import { SETTINGS } from "../navigation/ScreenNames";
 import { scale } from "react-native-size-matters";
 import { useSelector } from "react-redux";
-import { getSelectedShop, getUserData, getUserType } from "reducers/selectors";
+import { getSelectedShop, getUserData, getUserType } from "duqactStore/selectors";
 import Icon from "./Icon";
 
 const UserProfile = ({ renderNtnIcon = true, renderMenu = false, menuItems, showShops, filter = false, setShowFilters }) => {

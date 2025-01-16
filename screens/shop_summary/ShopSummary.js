@@ -9,7 +9,7 @@ import Stripe from "./components/Stripe1";
 import { formatNumberWithCommas } from "../../utils/Utils";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import { useSelector } from "react-redux";
-import { getSelectedShop, getShopOwnerId } from "reducers/selectors";
+import { getSelectedShop, getShopOwnerId } from "duqactStore/selectors";
 
 const ShopSummary = ({ navigation, route }) => {
   const [initialCapital, setInitialCapital] = useState("");

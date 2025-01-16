@@ -21,6 +21,8 @@ const initialState = {
   filterParams: {},
   menuList: [],
   lookUps: [],
+  permissions: [],
+  permissionsPool: [],
 };
 
 const userReduer = (state = initialState, action) => {
@@ -70,7 +72,7 @@ const userReduer = (state = initialState, action) => {
       }
 
       if (state.userType === userTypes.isSuperAdmin) {
-        menuList = [...menuList, { icon: require("../assets/icons/group-solid-24.png"), title: "Leads", target: LEADS }];
+        menuList = [...menuList, { icon: require("assets/icons/group-solid-24.png"), title: "Leads", target: LEADS }];
       }
 
       if (offersDebt === false) {

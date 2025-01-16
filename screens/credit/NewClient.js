@@ -9,7 +9,7 @@ import PrimaryButton from "@components/buttons/PrimaryButton";
 import Snackbar from "@components/Snackbar";
 import { saveShopClients } from "@controllers/OfflineControllers";
 import { useDispatch, useSelector } from "react-redux";
-import { getOfflineParams, getSelectedShop, getShopClients } from "reducers/selectors";
+import { getOfflineParams, getSelectedShop, getShopClients } from "duqactStore/selectors";
 import { setShopClients } from "actions/shopActions";
 
 const NewClient = ({ route }) => {

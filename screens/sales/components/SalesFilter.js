@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import { useSelector } from "react-redux";
-import { getSelectedShop, getShopProducts, getShops } from "reducers/selectors";
+import { getSelectedShop, getShopProducts, getShops } from "duqactStore/selectors";
 import Colors from "@constants/Colors";
 import { MyDropDown } from "@components/DropdownComponents";
 import MyInput from "@components/MyInput";

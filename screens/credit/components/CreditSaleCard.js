@@ -5,7 +5,7 @@ import CardHeader from "@components/card_components/CardHeader";
 import DataColumn from "@components/card_components/DataColumn";
 import { CLIENT_DEBTS } from "@navigation/ScreenNames";
 import CardFooter from "@components/card_components/CardFooter";
-import { getClientSales } from "reducers/selectors";
+import { getClientSales } from "duqactStore/selectors";
 import { useSelector } from "react-redux";
 import { formatNumberWithCommas } from "@utils/Utils";
 

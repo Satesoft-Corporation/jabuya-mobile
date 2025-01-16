@@ -10,7 +10,7 @@ import ModalContent from "@components/ModalContent";
 import Colors from "@constants/Colors";
 import DataRow from "@components/card_components/DataRow";
 import { useDispatch, useSelector } from "react-redux";
-import { getAttendantShopId, getCart, getOfflineParams, getSelectedShop, getShopClients, getUserType } from "reducers/selectors";
+import { getAttendantShopId, getCart, getOfflineParams, getSelectedShop, getShopClients, getUserType } from "duqactStore/selectors";
 import { addOfflineSale, clearCart, setClientSales } from "actions/shopActions";
 import { paymentMethods, userTypes } from "@constants/Constants";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";

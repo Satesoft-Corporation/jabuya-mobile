@@ -6,7 +6,7 @@ import PopUpmenu from "./PopUpMenu";
 import SearchBar from "./SearchBar";
 import { scale } from "react-native-size-matters";
 import { useSelector } from "react-redux";
-import { getSelectedShop } from "reducers/selectors";
+import { getSelectedShop } from "duqactStore/selectors";
 
 const TopHeader = ({
   title = "Details",

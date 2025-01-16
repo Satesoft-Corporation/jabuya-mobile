@@ -7,7 +7,7 @@ import { memo, useCallback, useEffect, useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import LeadCardHeader from "./leadsCardHeader";
 import { useSelector } from "react-redux";
-import { getShops } from "reducers/selectors";
+import { getShops } from "duqactStore/selectors";
 import { useNavigation } from "@react-navigation/native";
 import { LEADS_FORM } from "@navigation/ScreenNames";
 

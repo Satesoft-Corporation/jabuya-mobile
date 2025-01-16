@@ -10,7 +10,7 @@ import Snackbar from "@components/Snackbar";
 import CreditSaleCard from "./components/CreditSaleCard";
 import { CLIENT_FORM } from "@navigation/ScreenNames";
 import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
-import { getClientSales, getOfflineParams, getSelectedShop, getShopClients, getUserType } from "reducers/selectors";
+import { getClientSales, getOfflineParams, getSelectedShop, getShopClients, getUserType } from "duqactStore/selectors";
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { useSelector } from "react-redux";
 import { setClientSales } from "actions/shopActions";

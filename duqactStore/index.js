@@ -4,7 +4,7 @@ import { persistStore, persistReducer } from "redux-persist";
 import thunk from "redux-thunk";
 import logger from "redux-logger";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
-import rootReducer from "reducers";
+import rootReducer from "duqactStore/reducers";
 
 const persistConfig = {
   key: "duqact",
@@ -23,3 +23,8 @@ const duqactStore = createStore(persistedReducer, applyMiddleware(...middleware)
 const persistor = persistStore(duqactStore);
 
 export { duqactStore, persistor };
+
+export const getReducerSize = async () => {
+  const store = await AsyncStorage.getItem("persist:duqact");
+  return new Blob([store]).size;
+};

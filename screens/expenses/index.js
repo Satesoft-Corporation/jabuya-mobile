@@ -9,7 +9,7 @@ import { BaseApiService } from "../../utils/BaseApiService";
 import { EXPENSES_ENDPOINT } from "../../utils/EndPointUtils";
 import ItemHeader from "../sales/components/ItemHeader";
 import VerticalSeparator from "../../components/VerticalSeparator";
-import { getFilterParams, getSelectedShop } from "reducers/selectors";
+import { getFilterParams, getSelectedShop } from "duqactStore/selectors";
 import { useSelector } from "react-redux";
 
 const Expenses = ({}) => {

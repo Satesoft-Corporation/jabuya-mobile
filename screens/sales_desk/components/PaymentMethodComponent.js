@@ -5,7 +5,7 @@ import { paymentMethods } from "@constants/Constants";
 import { MyDropDown } from "@components/DropdownComponents";
 import Colors from "@constants/Colors";
 import ChipButton from "@components/buttons/ChipButton";
-import { getCart, getCollectClientInfo, getOffersDebt, getShopClients } from "reducers/selectors";
+import { getCart, getCollectClientInfo, getOffersDebt, getShopClients } from "duqactStore/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { updateRecievedAmount } from "actions/shopActions";
 import { Switch } from "react-native-paper";

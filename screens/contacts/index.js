@@ -3,7 +3,7 @@ import React from "react";
 import TopHeader from "@components/TopHeader";
 import Colors from "@constants/Colors";
 import { useSelector } from "react-redux";
-import { getShopClients } from "reducers/selectors";
+import { getShopClients } from "duqactStore/selectors";
 import { useState } from "react";
 import Icon from "@components/Icon";
 import { useNavigation } from "@react-navigation/native";

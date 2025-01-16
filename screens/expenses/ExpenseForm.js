@@ -9,7 +9,7 @@ import MyInput from "@components/MyInput";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import Snackbar from "@components/Snackbar";
 import { useDispatch, useSelector } from "react-redux";
-import { getLookUps, getSelectedShop, getShops } from "reducers/selectors";
+import { getLookUps, getSelectedShop, getShops } from "duqactStore/selectors";
 import { changeSelectedShop } from "actions/shopActions";
 
 const ExpenseForm = () => {

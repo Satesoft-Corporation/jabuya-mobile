@@ -5,7 +5,7 @@ import Colors from "@constants/Colors";
 import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
 import { useSelector } from "react-redux";
-import { getIsAdmin, getOffersDebt } from "reducers/selectors";
+import { getIsAdmin, getOffersDebt } from "duqactStore/selectors";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "@components/Icon";
 import { screenWidth } from "@constants/Constants";

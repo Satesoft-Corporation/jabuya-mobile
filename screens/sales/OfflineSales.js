@@ -11,7 +11,7 @@ import { formatNumberWithCommas } from "@utils/Utils";
 import ItemHeader from "./components/ItemHeader";
 import Snackbar from "@components/Snackbar";
 import { useDispatch, useSelector } from "react-redux";
-import { getOffersDebt, getOfflineSales } from "reducers/selectors";
+import { getOffersDebt, getOfflineSales } from "duqactStore/selectors";
 import { BaseApiService } from "@utils/BaseApiService";
 import { removeOfflineSale } from "actions/shopActions";
 import { hasInternetConnection } from "@utils/NetWork";

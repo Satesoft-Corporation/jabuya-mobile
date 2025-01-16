@@ -4,7 +4,7 @@ import MyInput from "@components/MyInput";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart, holdSale } from "actions/shopActions";
-import { getCart } from "reducers/selectors";
+import { getCart } from "duqactStore/selectors";
 import ModalContent from "@components/ModalContent";
 import SalesTable from "./SalesTable";
 import Colors from "@constants/Colors";

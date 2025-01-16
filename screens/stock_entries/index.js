@@ -8,7 +8,7 @@ import StockEntryCard from "./StockEntryCard";
 import Snackbar from "@components/Snackbar";
 import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
 import { STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
-import { getFilterParams, getSelectedShop, getUserType } from "reducers/selectors";
+import { getFilterParams, getSelectedShop, getUserType } from "duqactStore/selectors";
 import { useSelector } from "react-redux";
 import DeleteRecordModal from "@components/DeleteRecordModal";
 import DamagesForm from "@screens/damages/DamagesForm";

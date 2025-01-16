@@ -6,7 +6,7 @@ import Colors from "../constants/Colors";
 import Icon from "./Icon";
 import { StatusBar } from "react-native";
 import { screenHeight } from "../constants/Constants";
-import { getSelectedShop, getShops } from "reducers/selectors";
+import { getSelectedShop, getShops } from "duqactStore/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { changeSelectedShop } from "actions/shopActions";
 

@@ -12,7 +12,7 @@ import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 import { saveExcelSheet } from "@utils/FileSystem";
 import { useDispatch, useSelector } from "react-redux";
-import { getOfflineParams, getSelectedShop, getShopProducts, getUserType } from "reducers/selectors";
+import { getOfflineParams, getSelectedShop, getShopProducts, getUserType } from "duqactStore/selectors";
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { setShopProducts } from "actions/shopActions";
 import StockLevelCard from "./StockLevelCard";

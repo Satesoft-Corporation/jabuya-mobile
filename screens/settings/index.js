@@ -25,7 +25,7 @@ import {
   getUserData,
   getUserPinCode,
   getUserType,
-} from "reducers/selectors";
+} from "duqactStore/selectors";
 import { logOutAction, setApplockTime, setUserPinCode } from "actions/userActions";
 import { ALL_SHOPS_LABEL, APP_VERSION, userTypes } from "@constants/Constants";
 import {

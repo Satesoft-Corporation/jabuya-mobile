@@ -8,7 +8,7 @@ import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import React, { useState } from "react";
 import { View, Text } from "react-native";
 import { useSelector } from "react-redux";
-import { getIsShopAttendant } from "reducers/selectors";
+import { getIsShopAttendant } from "duqactStore/selectors";
 
 const StockEntryCard = ({ data, handleDelete, handleDamage }) => {
   const [expanded, setExpanded] = useState(false);

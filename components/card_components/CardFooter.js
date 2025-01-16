@@ -3,7 +3,7 @@ import React from "react";
 import ChipButton2 from "../buttons/ChipButton2";
 import Icon from "@components/Icon";
 import { useSelector } from "react-redux";
-import { getIsShopAttendant, getUserType } from "reducers/selectors";
+import { getIsShopAttendant, getUserType } from "duqactStore/selectors";
 
 const CardFooter = ({
   label,

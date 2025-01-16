@@ -30,7 +30,7 @@ import {
   getShopProducts,
   getShops,
   getUserType,
-} from "reducers/selectors";
+} from "duqactStore/selectors";
 import {
   addHeldSalesToCart,
   changeSelectedShop,

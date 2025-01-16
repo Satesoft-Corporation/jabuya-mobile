@@ -2,7 +2,7 @@ import { Text, SafeAreaView, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
 import { BaseApiService } from "@utils/BaseApiService";
 import { useSelector } from "react-redux";
-import { getFilterParams, getSelectedShop } from "reducers/selectors";
+import { getFilterParams, getSelectedShop } from "duqactStore/selectors";
 import { STOCK_INFO_ENDPOINT } from "@utils/EndPointUtils";
 import Colors from "@constants/Colors";
 import TopHeader from "@components/TopHeader";

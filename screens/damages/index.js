@@ -7,7 +7,7 @@ import Colors from "@constants/Colors";
 import TopHeader from "@components/TopHeader";
 import Snackbar from "@components/Snackbar";
 import { DAMAGES_ENDPOINT } from "@utils/EndPointUtils";
-import { getFilterParams, getIsShopAttendant, getSelectedShop } from "reducers/selectors";
+import { getFilterParams, getIsShopAttendant, getSelectedShop } from "duqactStore/selectors";
 import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import DamagesCard from "./DamagesCard";

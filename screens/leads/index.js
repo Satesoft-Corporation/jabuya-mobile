@@ -5,7 +5,7 @@ import Colors from "@constants/Colors";
 import TopHeader from "@components/TopHeader";
 import { FlatList } from "react-native";
 import { useSelector } from "react-redux";
-import { getFilterParams } from "reducers/selectors";
+import { getFilterParams } from "duqactStore/selectors";
 import { BaseApiService } from "@utils/BaseApiService";
 import { LEADS_ENDPOINT } from "@utils/EndPointUtils";
 import { hasInternetConnection } from "@utils/NetWork";

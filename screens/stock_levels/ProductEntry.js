@@ -15,7 +15,7 @@ import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native";
 import MyInput from "@components/MyInput";
 import Snackbar from "@components/Snackbar";
-import { getManufactures, getOfflineParams, getSelectedShop, getShopProducts, getShops } from "reducers/selectors";
+import { getManufactures, getOfflineParams, getSelectedShop, getShopProducts, getShops } from "duqactStore/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { changeSelectedShop, setShopProducts } from "actions/shopActions";
 import { useNavigation } from "@react-navigation/native";

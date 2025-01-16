@@ -11,7 +11,7 @@ import SaleTxnCard from "./components/SaleTxnCard";
 import { SHOP_SUMMARY } from "@navigation/ScreenNames";
 import { printSale } from "@utils/PrintService";
 import { useSelector } from "react-redux";
-import { getFilterParams, getSelectedShop, getUserType } from "reducers/selectors";
+import { getFilterParams, getSelectedShop, getUserType } from "duqactStore/selectors";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { MAXIMUM_RECORDS_PER_FETCH, userTypes } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";

@@ -12,7 +12,7 @@ import PrimaryButton from "@components/buttons/PrimaryButton";
 import Snackbar from "@components/Snackbar";
 import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
 import { useDispatch, useSelector } from "react-redux";
-import { getClientSales, getOfflineParams } from "reducers/selectors";
+import { getClientSales, getOfflineParams } from "duqactStore/selectors";
 import { setClientSales } from "actions/shopActions";
 
 const CreditPayment = ({ route }) => {

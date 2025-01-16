@@ -8,7 +8,7 @@ import { MyDropDown } from "@components/DropdownComponents";
 import MyInput from "@components/MyInput";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import { useSelector } from "react-redux";
-import { getLookUps } from "reducers/selectors";
+import { getLookUps } from "duqactStore/selectors";
 
 const DamagesForm = ({ visible, setVisible, stockEntry, saleRecord, onSave }) => {
   const [selectedDamageType, setSelectedDamageType] = useState(damageTypes[0]);

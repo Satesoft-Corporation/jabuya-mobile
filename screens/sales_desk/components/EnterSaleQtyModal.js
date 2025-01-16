@@ -5,7 +5,7 @@ import ChipButton from "@components/buttons/ChipButton";
 import Colors from "@constants/Colors";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import { useDispatch, useSelector } from "react-redux";
-import { getCartSelection } from "reducers/selectors";
+import { getCartSelection } from "duqactStore/selectors";
 import { isValidNumber } from "@utils/Utils";
 import { addItemToCart, makeProductSelection } from "actions/shopActions";
 

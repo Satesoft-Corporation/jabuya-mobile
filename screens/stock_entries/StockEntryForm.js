@@ -13,7 +13,7 @@ import { KeyboardAvoidingView } from "react-native";
 import Loader from "@components/Loader";
 import { packageOptions } from "@constants/Constants";
 import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
-import { getOfflineParams, getSelectedShop, getShopProducts, getShops, getSuppliers } from "reducers/selectors";
+import { getOfflineParams, getSelectedShop, getShopProducts, getShops, getSuppliers } from "duqactStore/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { changeSelectedShop, setShopProducts } from "actions/shopActions";
 import { useNavigation } from "@react-navigation/native";

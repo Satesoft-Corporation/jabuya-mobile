@@ -3,7 +3,7 @@ import React from "react";
 import TopHeader from "@components/TopHeader";
 import { CLIENT_FORM, EXPENSE_FORM, LEADS_FORM, PDT_ENTRY, STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
 import { useSelector } from "react-redux";
-import { getIsAdmin, getOffersDebt } from "reducers/selectors";
+import { getIsAdmin, getOffersDebt } from "duqactStore/selectors";
 import { screenWidth } from "@constants/Constants";
 import Colors from "@constants/Colors";
 import Icon from "@components/Icon";

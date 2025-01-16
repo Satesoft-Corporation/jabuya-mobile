@@ -7,7 +7,7 @@ import Modal from "react-native-modal";
 import ReactNativePinView from "react-native-pin-view";
 import Icon from "@components/Icon";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserPinCode } from "reducers/selectors";
+import { getUserPinCode } from "duqactStore/selectors";
 import { setApplockTime } from "actions/userActions";
 
 const LockScreenModal = ({ showLock = false, hideLock = () => {} }) => {

@@ -34,7 +34,7 @@ import {
   getShopProducts,
   getSuppliers,
   getUserType,
-} from "reducers/selectors";
+} from "duqactStore/selectors";
 import { useDispatch } from "react-redux";
 import { addLookUps, changeUser, loginAction, setIsUserConfigured } from "actions/userActions";
 import { BaseApiService } from "@utils/BaseApiService";
@@ -42,6 +42,8 @@ import { addManufacturers, addSuppliers, changeSelectedShop, setClientSales, set
 import { LOGIN_END_POINT } from "@utils/EndPointUtils";
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
+import { duqactStore, getReducerSize } from "duqactStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LandingScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -101,16 +103,15 @@ const LandingScreen = () => {
       dispatch(changeSelectedShop(shops[0]));
       dispatch(setShops(shops));
 
-      if (offersDebt === true) {
-        const clients = await saveShopClients(offlineParams, prevClients);
-        const clientSales = await saveClientSalesOnDevice(offlineParams, prevClientSales);
-        dispatch(setShopClients(clients));
-        dispatch(setClientSales(clientSales));
-      }
-
       if (userType !== userTypes.isSuperAdmin) {
         const products = await saveShopProductsOnDevice(offlineParams, prevProducts);
         dispatch(setShopProducts(products));
+        if (offersDebt === true) {
+          const clients = await saveShopClients(offlineParams, prevClients);
+          const clientSales = await saveClientSalesOnDevice(offlineParams, prevClientSales);
+          dispatch(setShopClients(clients));
+          dispatch(setClientSales(clientSales));
+        }
       }
 
       if (configStatus === false) {
@@ -179,6 +180,7 @@ const LandingScreen = () => {
 
   useEffect(() => {
     handleLoginSession();
+    getReducerSize();
   }, []);
 
   return (

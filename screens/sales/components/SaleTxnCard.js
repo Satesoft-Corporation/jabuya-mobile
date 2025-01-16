@@ -6,7 +6,7 @@ import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { memo, useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { useSelector } from "react-redux";
-import { getShops, getUserType } from "reducers/selectors";
+import { getShops, getUserType } from "duqactStore/selectors";
 import { scale } from "react-native-size-matters";
 import Colors from "@constants/Colors";
 import { userTypes } from "@constants/Constants";
