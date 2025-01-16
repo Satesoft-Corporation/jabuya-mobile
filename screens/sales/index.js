@@ -11,14 +11,14 @@ import SaleTxnCard from "./components/SaleTxnCard";
 import { SHOP_SUMMARY } from "@navigation/ScreenNames";
 import { printSale } from "@utils/PrintService";
 import { useSelector } from "react-redux";
-import { getFilterParams, getSelectedShop, getUserType } from "duqactStore/selectors";
+import { getFilterParams, getIsShopAttendant, getIsShopOwner, getSelectedShop } from "duqactStore/selectors";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
-import { MAXIMUM_RECORDS_PER_FETCH, userTypes } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
 import DeleteSaleModal from "./components/DeleteSaleModal";
 import Snackbar from "@components/Snackbar";
 import SalesFilter from "./components/SalesFilter";
-import Icon from "@components/Icon";
+import { getCanViewSales, getCanViewShopCapital, getCanViewShopIncome } from "duqactStore/selectors/permissionSelectors";
+import NoAuth from "@screens/Unauthorised";
 
 export default function ViewSales() {
   const [sales, setSales] = useState([]);
@@ -40,10 +40,13 @@ export default function ViewSales() {
 
   const filterParams = useSelector(getFilterParams);
   const selectedShop = useSelector(getSelectedShop);
-  const userType = useSelector(getUserType);
+  const isShopOwner = useSelector(getIsShopOwner);
+  const isShopAttendant = useSelector(getIsShopAttendant);
 
-  const isShopOwner = userType === userTypes.isShopOwner;
-  const isShopAttendant = userType === userTypes.isShopAttendant;
+  const canViewSales = useSelector(getCanViewSales);
+  const canViewIncome = useSelector(getCanViewShopIncome);
+  const canViewCapital = useSelector(getCanViewShopCapital);
+
   const snackbarRef = useRef(null);
 
   const navigation = useNavigation();
@@ -116,6 +119,9 @@ export default function ViewSales() {
     getSales();
   }, [selectedShop]);
 
+  if (!canViewSales) {
+    return <NoAuth />;
+  }
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <DeleteSaleModal
@@ -156,12 +162,16 @@ export default function ViewSales() {
 
             <ItemHeader title="Sales" value={formatNumberWithCommas(salesValue, selectedShop?.currency)} />
 
-            {!isShopAttendant && (
+            {canViewCapital && (
               <>
                 <VerticalSeparator />
 
                 <ItemHeader title="Capital " value={formatNumberWithCommas(daysCapital, selectedShop?.currency)} />
+              </>
+            )}
 
+            {canViewIncome && (
+              <>
                 <VerticalSeparator />
 
                 <ItemHeader title="Income" value={formatNumberWithCommas(daysProfit, selectedShop?.currency)} />

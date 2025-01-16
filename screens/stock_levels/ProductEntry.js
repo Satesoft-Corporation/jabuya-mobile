@@ -21,6 +21,8 @@ import { changeSelectedShop, setShopProducts } from "actions/shopActions";
 import { useNavigation } from "@react-navigation/native";
 import { STOCK_LEVELS } from "@navigation/ScreenNames";
 import { ScrollView } from "react-native";
+import { getCanCreateUpdateMyShopStock } from "duqactStore/selectors/permissionSelectors";
+import NoAuth from "@screens/Unauthorised";
 
 const ProductEntry = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
@@ -28,6 +30,7 @@ const ProductEntry = ({ route }) => {
   const shops = useSelector(getShops);
   const shopProducts = useSelector(getShopProducts);
   const manufacturers = useSelector(getManufactures);
+  const canDoStockCrud = useSelector(getCanCreateUpdateMyShopStock);
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -226,7 +229,9 @@ const ProductEntry = ({ route }) => {
   useEffect(() => {
     populateForm();
   }, []);
-
+  if (!canDoStockCrud) {
+    return <NoAuth />;
+  }
   return (
     <KeyboardAvoidingView enabled={true} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>

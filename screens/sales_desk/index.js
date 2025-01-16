@@ -23,6 +23,8 @@ import {
   getCartSelection,
   getFilterParams,
   getHeldSales,
+  getIsAdmin,
+  getIsShopAttendant,
   getOffersDebt,
   getOfflineParams,
   getSelectedShop,
@@ -43,6 +45,8 @@ import {
 } from "actions/shopActions";
 import Loader from "@components/Loader";
 import HeldSaleModal from "./components/HeldSaleModal";
+import { getCanEnterSales } from "duqactStore/selectors/permissionSelectors";
+import NoAuth from "@screens/Unauthorised";
 
 function SalesDesk({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -62,14 +66,15 @@ function SalesDesk({ navigation }) {
   const offlineParams = useSelector(getOfflineParams);
   const shopProducts = useSelector(getShopProducts);
   const shopClients = useSelector(getShopClients);
-  const userType = useSelector(getUserType);
   const filterParams = useSelector(getFilterParams);
   const shops = useSelector(getShops);
   const selection = useSelector(getCartSelection);
   const heldSales = useSelector(getHeldSales);
   const offersDebt = useSelector(getOffersDebt);
-
+  const isSuperAdmin = useSelector(getIsAdmin);
+  const isShopAttendant = useSelector(getIsShopAttendant);
   const canHoldSales = false;
+  const canEnterSales = useSelector(getCanEnterSales);
 
   const cart = useSelector(getCart);
 
@@ -77,22 +82,9 @@ function SalesDesk({ navigation }) {
 
   const { cartItems, totalCartCost, recievedAmount, totalQty } = cart;
 
-  const isSuperAdmin = userType === userTypes.isSuperAdmin;
-  const isShopAttendant = userType === userTypes.isShopAttendant;
-
   const menuItems = [
-    {
-      name: "Daily sales",
-      onClick: () => navigation.navigate(SALES_REPORTS),
-    },
-    ...(offersDebt === true
-      ? [
-          {
-            name: "Debts",
-            onClick: () => navigation.navigate(CREDIT_SALES),
-          },
-        ]
-      : []),
+    { name: "Daily sales", onClick: () => navigation.navigate(SALES_REPORTS) },
+    ...(offersDebt === true ? [{ name: "Debts", onClick: () => navigation.navigate(CREDIT_SALES) }] : []),
   ];
 
   const fetchProducts = async () => {
@@ -198,6 +190,10 @@ function SalesDesk({ navigation }) {
       snackbarRef.current.show("Product selection is required.");
     }
   };
+
+  if (!canEnterSales) {
+    return <NoAuth />;
+  }
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <Loader loading={loading} />
@@ -295,24 +291,8 @@ function SalesDesk({ navigation }) {
             }}
           >
             <Text style={{ fontWeight: "bold", fontSize: scale(14) }}>Recieved amount</Text>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                maxWidth: screenWidth / 2.5,
-                gap: 10,
-              }}
-            >
-              <Text
-                style={{
-                  alignSelf: "center",
-                  color: Colors.gray,
-                  fontSize: scale(14),
-                  marginEnd: 5,
-                }}
-              >
-                {selectedShop?.currency}
-              </Text>
+            <View style={{ flexDirection: "row", justifyContent: "center", maxWidth: screenWidth / 2.5, gap: 10 }}>
+              <Text style={{ alignSelf: "center", color: Colors.gray, fontSize: scale(14), marginEnd: 5 }}>{selectedShop?.currency}</Text>
               <TextInput
                 textAlign="right"
                 value={recievedAmount}

@@ -11,6 +11,8 @@ import { saveShopClients } from "@controllers/OfflineControllers";
 import { useDispatch, useSelector } from "react-redux";
 import { getOfflineParams, getSelectedShop, getShopClients } from "duqactStore/selectors";
 import { setShopClients } from "actions/shopActions";
+import { getCanAddDebt } from "duqactStore/selectors/permissionSelectors";
+import NoAuth from "@screens/Unauthorised";
 
 const NewClient = ({ route }) => {
   const [firstName, setFirstName] = useState("");
@@ -26,6 +28,7 @@ const NewClient = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
   const offlineParams = useSelector(getOfflineParams);
   const clients = useSelector(getShopClients);
+  const addDebt = useSelector(getCanAddDebt);
 
   const dispatch = useDispatch();
   const snackRef = useRef(null);
@@ -81,6 +84,9 @@ const NewClient = ({ route }) => {
     }
   }, []);
 
+  if (!addDebt) {
+    return <NoAuth />;
+  }
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
       <TopHeader title={route?.params ? "Edit Client" : "New Client"} />

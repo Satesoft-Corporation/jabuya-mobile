@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, FlatList, StyleSheet, Alert } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { StackActions, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
 import ItemHeader from "@screens/sales/components/ItemHeader";
@@ -8,14 +8,15 @@ import VerticalSeparator from "@components/VerticalSeparator";
 import Colors from "@constants/Colors";
 import Snackbar from "@components/Snackbar";
 import CreditSaleCard from "./components/CreditSaleCard";
-import { CLIENT_FORM } from "@navigation/ScreenNames";
 import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
-import { getClientSales, getOfflineParams, getSelectedShop, getShopClients, getUserType } from "duqactStore/selectors";
-import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
+import { getClientSales, getOfflineParams, getSelectedShop, getShopClients } from "duqactStore/selectors";
+import { ALL_SHOPS_LABEL } from "@constants/Constants";
 import { useSelector } from "react-redux";
 import { setClientSales } from "actions/shopActions";
 import { hasInternetConnection } from "@utils/NetWork";
 import { formatNumberWithCommas } from "@utils/Utils";
+import { getCanViewDebts } from "duqactStore/selectors/permissionSelectors";
+import NoAuth from "@screens/Unauthorised";
 
 const CreditSales = () => {
   const navigation = useNavigation();
@@ -31,12 +32,9 @@ const CreditSales = () => {
 
   const offlineParams = useSelector(getOfflineParams);
   const selectedShop = useSelector(getSelectedShop);
-  const userType = useSelector(getUserType);
   const creditSales = useSelector(getClientSales);
   const shopClients = useSelector(getShopClients);
-
-  const isShopAttendant = userType === userTypes.isShopAttendant;
-  const isShopOwner = userType === userTypes.isShopOwner;
+  const viewDebts = useSelector(getCanViewDebts);
 
   const snackbarRef = useRef(null);
 
@@ -84,14 +82,14 @@ const CreditSales = () => {
     fetchClients();
   }, [selectedShop]);
 
-  const menuItems = [
-    ...(isShopOwner === true ? [{ name: "Add debtor", onClick: () => navigation.dispatch(StackActions.replace(CLIENT_FORM)) }] : []),
-  ];
+  if (!viewDebts) {
+    return <NoAuth />;
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark }}>
       <AppStatusBar />
-      <TopHeader title="Debt records" showMenuDots={!isShopAttendant} menuItems={menuItems} showShops />
+      <TopHeader title="Debt records" showShops />
       <View style={{ paddingBottom: 10 }}>
         <View style={styles.debtHeader}>
           <Text style={{ color: Colors.primary, fontSize: 16 }}>Debt summary</Text>

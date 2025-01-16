@@ -1,7 +1,6 @@
 import { View, Text, Image } from "react-native";
 import React, { useRef, useState } from "react";
 import { SafeAreaView } from "react-native";
-import Constants from "expo-constants";
 import { Switch } from "react-native-paper";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import TopHeader from "@components/TopHeader";
@@ -15,6 +14,7 @@ import Icon from "@components/Icon";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getClientSales,
+  getLookUps,
   getManufactures,
   getOfflineParams,
   getOfflineSales,
@@ -26,7 +26,7 @@ import {
   getUserPinCode,
   getUserType,
 } from "duqactStore/selectors";
-import { logOutAction, setApplockTime, setUserPinCode } from "actions/userActions";
+import { addLookUps, logOutAction, setApplockTime, setUserPinCode } from "actions/userActions";
 import { ALL_SHOPS_LABEL, APP_VERSION, userTypes } from "@constants/Constants";
 import {
   saveClientSalesOnDevice,
@@ -65,6 +65,7 @@ const Settings = () => {
   const prevClientSales = useSelector(getClientSales);
   const manufacturers = useSelector(getManufactures);
   const suppliers = useSelector(getSuppliers);
+  const prevLookUps = useSelector(getLookUps);
 
   const snackbarRef = useRef(null);
 
@@ -103,33 +104,25 @@ const Settings = () => {
     }
   };
 
-  const configureUserData = async (refresh = false) => {
+  const configureUserData = async () => {
     try {
       const hasNet = await hasInternetConnection();
 
       if (hasNet === false) {
         snackbarRef.current.show("Cannot connect to the internet.", 5000);
         return;
-      }
-
-      if (refresh === true && !loading) {
+      } else {
         setLoading(true);
         let shops = [];
 
         const shopData = await saveShopDetails(offlineParams, isShopAttendant);
 
+        const lookups = await saveLookUps(prevLookUps);
+
         const offersDebt = shopData?.some((s) => s?.supportsCreditSales === true);
 
         if (shopData?.length > 1) {
-          shops = [
-            {
-              name: ALL_SHOPS_LABEL,
-              id: shopOwnerId,
-              supportsCreditSales: offersDebt,
-              captureClientDetailsOnAllSales: false,
-            },
-            ...shopData,
-          ];
+          shops = [{ name: ALL_SHOPS_LABEL, id: shopOwnerId, supportsCreditSales: offersDebt, captureClientDetailsOnAllSales: false }, ...shopData];
         } else {
           shops = [...shopData];
         }
@@ -137,26 +130,24 @@ const Settings = () => {
         dispatch(changeSelectedShop(shops[0]));
         dispatch(setShops(shops));
 
-        if (offersDebt === true) {
-          const clients = await saveShopClients(offlineParams, prevClients);
-          const clientSales = await saveClientSalesOnDevice(offlineParams, prevClientSales);
-          dispatch(setShopClients(clients));
-          dispatch(setClientSales(clientSales));
-        }
-
-        if (userType !== userTypes.isSuperAdmin) {
-          const products = await saveShopProductsOnDevice(offlineParams, prevProducts);
-          dispatch(setShopProducts(products));
-        }
-
         const newManufactures = await saveManufactures(manufacturers);
 
         const newSuppliers = await saveSuppliers(suppliers);
 
         dispatch(addManufacturers(newManufactures));
         dispatch(addSuppliers(newSuppliers));
-        setLoading(false);
-        return;
+        dispatch(addLookUps(lookups));
+
+        if (userType !== userTypes.isSuperAdmin) {
+          const products = await saveShopProductsOnDevice(offlineParams, prevProducts);
+          dispatch(setShopProducts(products));
+          if (offersDebt === true) {
+            const clients = await saveShopClients(offlineParams, prevClients);
+            const clientSales = await saveClientSalesOnDevice(offlineParams, prevClientSales);
+            dispatch(setShopClients(clients));
+            dispatch(setClientSales(clientSales));
+          }
+        }
       }
     } catch (e) {
       snackbarRef.current.show(e, 5000);
@@ -173,47 +164,14 @@ const Settings = () => {
 
       <TopHeader title="Settings" showShopName={false} />
 
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: Colors.dark,
-          paddingVertical: 10,
-        }}
-      >
+      <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: Colors.dark, paddingVertical: 10 }}>
         <Image
-          source={require("../../assets/images/man_placeholder.jpg")}
-          style={{
-            width: 45,
-            height: 45,
-            resizeMode: "cover",
-            borderRadius: 10,
-            marginStart: 5,
-            borderWidth: 1,
-            borderColor: Colors.dark,
-          }}
+          source={require("assets/images/man_placeholder.jpg")}
+          style={{ width: 45, height: 45, resizeMode: "cover", borderRadius: 10, marginStart: 5, borderWidth: 1, borderColor: Colors.dark }}
         />
-        <View
-          style={{
-            marginHorizontal: 5,
-          }}
-        >
-          <Text
-            style={{
-              fontWeight: 400,
-              color: Colors.primary,
-            }}
-          >
-            {sessionObj?.fullName}
-          </Text>
-          <Text
-            style={{
-              fontWeight: 300,
-              color: Colors.primary,
-            }}
-          >
-            {userType}
-          </Text>
+        <View style={{ marginHorizontal: 5 }}>
+          <Text style={{ fontWeight: 400, color: Colors.primary }}>{sessionObj?.fullName}</Text>
+          <Text style={{ fontWeight: 300, color: Colors.primary }}>{userType}</Text>
         </View>
       </View>
 
@@ -263,25 +221,11 @@ const Settings = () => {
           tintColor={Colors.primary}
           textColor={Colors.primary}
           textStyle={{ fontSize: 17 }}
-          style={[
-            BaseStyle.container,
-            {
-              backgroundColor: Colors.dark,
-              paddingVertical: 7,
-              paddingHorizontal: 7,
-              borderRadius: 8,
-            },
-          ]}
+          style={[BaseStyle.container, { backgroundColor: Colors.dark, paddingVertical: 7, paddingHorizontal: 7, borderRadius: 8 }]}
         />
       </View>
 
-      <View
-        style={{
-          alignSelf: "center",
-          position: "absolute",
-          bottom: 10,
-        }}
-      >
+      <View style={{ alignSelf: "center", position: "absolute", bottom: 10 }}>
         <Text style={{ alignSelf: "center", fontSize: 12 }}>{APP_VERSION} </Text>
       </View>
 

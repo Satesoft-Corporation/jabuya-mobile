@@ -18,12 +18,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { changeSelectedShop, setShopProducts } from "actions/shopActions";
 import { useNavigation } from "@react-navigation/native";
 import { STOCK_ENTRY } from "@navigation/ScreenNames";
+import { getCanCreateUpdateMyShopStock } from "duqactStore/selectors/permissionSelectors";
+import NoAuth from "@screens/Unauthorised";
 
 const StockEntryForm = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
   const offlineParams = useSelector(getOfflineParams);
   const shopProducts = useSelector(getShopProducts);
   const suppliers = useSelector(getSuppliers);
+  const canDoStockCrud = useSelector(getCanCreateUpdateMyShopStock);
 
   const shops = useSelector(getShops);
 
@@ -207,6 +210,9 @@ const StockEntryForm = ({ route }) => {
     getUnitPurchasePrice();
   }, [selectedProduct, purchasePrice, packedPurchasedQuantity, unpackedPurchasedQty]);
 
+  if (!canDoStockCrud) {
+    return <NoAuth />;
+  }
   return (
     <KeyboardAvoidingView
       enabled={true}

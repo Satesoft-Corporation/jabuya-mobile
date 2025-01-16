@@ -8,14 +8,15 @@ import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import React, { useState } from "react";
 import { View, Text } from "react-native";
 import { useSelector } from "react-redux";
-import { getIsShopAttendant } from "duqactStore/selectors";
+import { getCanCreateUpdateMyShopStock, getCanViewShopCapital } from "duqactStore/selectors/permissionSelectors";
 
 const StockEntryCard = ({ data, handleDelete, handleDamage }) => {
   const [expanded, setExpanded] = useState(false);
 
   const navigation = useNavigation();
 
-  const isShopAttendant = useSelector(getIsShopAttendant);
+  const canViewCapital = useSelector(getCanViewShopCapital);
+  const canDoStockCrud = useSelector(getCanCreateUpdateMyShopStock);
 
   const toggleExpand = () => {
     setExpanded(!expanded);
@@ -41,7 +42,7 @@ const StockEntryCard = ({ data, handleDelete, handleDamage }) => {
 
         <DataColumn title={"Qty"} value={purchasedQuantity} key={2} />
 
-        {!isShopAttendant && (
+        {canViewCapital && (
           <>
             <DataColumn title={"Cost"} value={formatNumberWithCommas(Math.round(purchasePrice / purchasedQuantity), data?.currency)} key={3} />
             <DataColumn title={"Amount"} value={formatNumberWithCommas(purchasePrice, data?.currency)} key={4} />
@@ -72,10 +73,10 @@ const StockEntryCard = ({ data, handleDelete, handleDamage }) => {
         restocked
         label={createdByFullName}
         btnTitle2={expanded ? "Hide" : "More"}
-        edit
+        edit={canDoStockCrud}
         onEdit={() => navigation?.navigate(STOCK_ENTRY_FORM, data)}
         onClick2={toggleExpand}
-        deleteIcon
+        deleteIcon={canDoStockCrud}
         onDelete={handleDelete}
         //damage
         handleDamage={handleDamage}

@@ -1,4 +1,5 @@
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
+import { PermissionParams } from "@constants/permissionParams";
 import { CONTACT_BOOK, ENTRIES, LEADS } from "@navigation/ScreenNames";
 import { navList } from "@screens/landing_screen/navList";
 import * as actions from "actions/actionTypes";
@@ -35,7 +36,26 @@ const userReduer = (state = initialState, action) => {
     }
 
     case actions.CHANGE_USER: {
-      const { isShopOwner, isShopAttendant, isSuperAdmin, attendantShopId, shopOwnerId, firstName, lastName } = action.payload ?? {};
+      const { isShopOwner, isShopAttendant, isSuperAdmin, attendantShopId, shopOwnerId, firstName, lastName, roles } = action.payload ?? {};
+
+      const userType =
+        isShopAttendant === true
+          ? userTypes.isShopAttendant
+          : isShopOwner === true
+          ? userTypes.isShopOwner
+          : isSuperAdmin === true
+          ? userTypes.isSuperAdmin
+          : null;
+
+      const formattedPermissions = Object.keys(PermissionParams).reduce((acc, key) => {
+        if (isShopOwner || isSuperAdmin) {
+          acc[key] = true;
+        } else {
+          const matchingPermission = roles.find((perm) => PermissionParams[key] === perm.name);
+          acc[key] = matchingPermission ? true : false;
+        }
+        return acc;
+      }, {});
 
       return {
         ...state,
@@ -52,14 +72,9 @@ const userReduer = (state = initialState, action) => {
         isShopOwner,
         isShopAttendant,
         isSuperAdmin,
-        userType:
-          isShopAttendant === true
-            ? userTypes.isShopAttendant
-            : isShopOwner === true
-            ? userTypes.isShopOwner
-            : isSuperAdmin === true
-            ? userTypes.isSuperAdmin
-            : null,
+        userType: userType,
+        permissions: formattedPermissions,
+        permissionPool: roles,
       };
     }
     case actions.SET_SHOPS: {

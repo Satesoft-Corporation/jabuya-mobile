@@ -6,16 +6,16 @@ import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { memo, useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { useSelector } from "react-redux";
-import { getShops, getUserType } from "duqactStore/selectors";
+import { getShops } from "duqactStore/selectors";
 import { scale } from "react-native-size-matters";
 import Colors from "@constants/Colors";
-import { userTypes } from "@constants/Constants";
+import { getCanDeleteSales, getCanViewShopIncome } from "duqactStore/selectors/permissionSelectors";
 
 function SaleTxnCard({ data, print, onDelete, onSwipe }) {
   const shops = useSelector(getShops) ?? [];
-  const userType = useSelector(getUserType);
+  const canViewIncome = useSelector(getCanViewShopIncome);
 
-  const isShopAttendant = userType === userTypes.isShopAttendant;
+  const canDeleteSales = useSelector(getCanDeleteSales);
 
   const { lineItems, totalCost, amountPaid, balanceGivenOut } = data;
 
@@ -97,7 +97,7 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
       {expanded && (
         <View style={{ flex: 1, marginTop: 10 }}>
           <View style={{ marginVertical: 5 }}>
-            <SalesTable sales={lineItems} fixHeight={false} disableSwipe={lineItems?.length < 1} onDelete={onSwipe} returned/>
+            <SalesTable sales={lineItems} fixHeight={false} disableSwipe={lineItems?.length < 1} onDelete={onSwipe} returned />
           </View>
           <DataRow key={1} label={"Total"} value={formatNumberWithCommas(totalCost, data?.currency)} style={{ marginTop: 5, marginBottom: 10 }} />
 
@@ -110,7 +110,7 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
 
           {balanceGivenOut !== 0 && <DataRow key={4} label={"Balance"} value={formatNumberWithCommas(balanceGivenOut, data?.currency)} />}
 
-          {!isShopAttendant && <DataRow key={5} label={"Income"} value={formatNumberWithCommas(profit, data?.currency)} />}
+          {canViewIncome && <DataRow key={5} label={"Income"} value={formatNumberWithCommas(profit, data?.currency)} />}
 
           {data?.clientName && <DataRow key={6} label={"Client's name"} value={data?.clientName} />}
 
@@ -130,7 +130,7 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
         btnTitle2={expanded ? "Hide" : "More"}
         onPrint={print}
         print
-        deleteIcon
+        deleteIcon={canDeleteSales}
         onDelete={onDelete}
       />
     </View>

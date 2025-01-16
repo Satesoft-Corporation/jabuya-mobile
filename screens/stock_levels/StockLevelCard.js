@@ -7,10 +7,14 @@ import { formatNumberWithCommas } from "@utils/Utils";
 import React, { useState } from "react";
 import { View, Text } from "react-native";
 import CardFooter from "@components/card_components/CardFooter";
+import { getCanCreateUpdateMyShopStock, getCanViewShopCapital } from "duqactStore/selectors/permissionSelectors";
+import { useSelector } from "react-redux";
 
-function StockLevelCard({ data, isShopAttendant }) {
+function StockLevelCard({ data }) {
   const [expanded, setExpanded] = useState(false);
   const navigation = useNavigation();
+  const canViewCapital = useSelector(getCanViewShopCapital);
+  const canDoStockCrud = useSelector(getCanCreateUpdateMyShopStock);
 
   const summary = data?.performanceSummary;
   const toggleExpand = () => {
@@ -42,7 +46,7 @@ function StockLevelCard({ data, isShopAttendant }) {
 
         <DataColumn title={"Stock"} value={Math.round(remainingStock)} />
 
-        {!isShopAttendant && <DataColumn title={"Value"} value={formatNumberWithCommas(remainingStock * data?.salesPrice, data?.currency)} />}
+        {canViewCapital && <DataColumn title={"Value"} value={formatNumberWithCommas(remainingStock * data?.salesPrice, data?.currency)} />}
       </View>
 
       {expanded && (
@@ -70,7 +74,7 @@ function StockLevelCard({ data, isShopAttendant }) {
         label={expanded ? null : data?.createdByFullName}
         listed={!expanded}
         expanded={expanded}
-        edit
+        edit={canDoStockCrud}
         onEdit={() => navigation.navigate(PDT_ENTRY, data)}
       />
     </View>

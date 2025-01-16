@@ -9,14 +9,16 @@ import { getIsAdmin, getOffersDebt } from "duqactStore/selectors";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "@components/Icon";
 import { screenWidth } from "@constants/Constants";
+import { getCanViewSales } from "duqactStore/selectors/permissionSelectors";
 
 const ReportsMenu = () => {
   const offersDebt = useSelector(getOffersDebt);
   const isAdmin = useSelector(getIsAdmin);
   const navigation = useNavigation();
+  const canViewSales = useSelector(getCanViewSales);
 
   const list = [
-    { title: "Daily sales", target: SALES_REPORTS, icon: "sale", group: "MaterialCommunityIcons" },
+    ...(canViewSales ? [{ title: "Daily sales", target: SALES_REPORTS, icon: "sale", group: "MaterialCommunityIcons" }] : []),
     ...(offersDebt ? [{ title: "Debts", target: CREDIT_SALES, icon: "donate" }] : []),
     { title: "Stock purchases", target: STOCK_ENTRY, icon: "inventory", group: "MaterialIcons" },
     { title: "Stock levels", target: STOCK_LEVELS, icon: "production-quantity-limits", group: "MaterialIcons" },

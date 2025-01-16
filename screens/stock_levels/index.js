@@ -145,7 +145,7 @@ const StockLevels = ({ navigation }) => {
         {!isShopAttendant && (
           <>
             <VerticalSeparator />
-            <ItemHeader title="Value " value={formatNumberWithCommas(stock, selectedShop?.currency)}  />
+            <ItemHeader title="Value " value={formatNumberWithCommas(stock, selectedShop?.currency)} />
           </>
         )}
       </View>
@@ -154,7 +154,7 @@ const StockLevels = ({ navigation }) => {
         style={{ marginTop: 5 }}
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
-        renderItem={({ item }) => <StockLevelCard data={item} isShopAttendant={isShopAttendant} />}
+        renderItem={({ item }) => <StockLevelCard data={item} />}
         onRefresh={handleRefresh}
         refreshing={loading}
         ListEmptyComponent={() => (

@@ -8,18 +8,21 @@ import { screenWidth } from "@constants/Constants";
 import Colors from "@constants/Colors";
 import Icon from "@components/Icon";
 import { useNavigation } from "@react-navigation/native";
+import { getCanCreateUpdateMyShopStock } from "duqactStore/selectors/permissionSelectors";
 
 const Entries = () => {
   const offersDebt = useSelector(getOffersDebt);
 
   const isAdmin = useSelector(getIsAdmin);
 
+  const canDoStockCrud = useSelector(getCanCreateUpdateMyShopStock);
+
   const navigation = useNavigation();
 
   const list = [
-    { title: "Add Purchase", target: STOCK_ENTRY_FORM, icon: "store" },
+    ...(canDoStockCrud ? [{ title: "Add Purchase", target: STOCK_ENTRY_FORM, icon: "store" }] : []),
     { title: "Add Expense", target: EXPENSE_FORM, icon: "wallet" },
-    { title: "Add Product", target: PDT_ENTRY, icon: "cart-plus" },
+    ...(canDoStockCrud ? [{ title: "Add Product", target: PDT_ENTRY, icon: "cart-plus" }] : []),
     ...(offersDebt ? [{ title: "Add Client", target: CLIENT_FORM, icon: "hand-holding" }] : []),
     ...(isAdmin ? [{ title: "Add Lead", target: LEADS_FORM, icon: "user-plus" }] : []),
   ];
