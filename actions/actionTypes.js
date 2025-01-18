@@ -1,4 +1,6 @@
 export const LOGIN_ACTION = "LOGIN";
+export const REFRESH_TOKEN = "REFRESH_TOKEN";
+
 export const LOG_OUT = "LOG_OUT";
 export const CHANGE_USER = "CHANGE_USER";
 export const CHANGE_USER_TYPE = "CHANGE_USER_TYPE";

@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, FlatList, StyleSheet } from "react-native";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Colors from "../../constants/Colors";
 import AppStatusBar from "../../components/AppStatusBar";
 import TopHeader from "../../components/TopHeader";
@@ -8,11 +8,49 @@ import Snackbar from "../../components/Snackbar";
 import ItemHeader from "../sales/components/ItemHeader";
 import VerticalSeparator from "../../components/VerticalSeparator";
 import { formatNumberWithCommas } from "@utils/Utils";
+import { BaseApiService } from "@utils/BaseApiService";
+import { CLIENT_SALES_ENDPOINT } from "@utils/EndPointUtils";
 
 const ClientDebts = ({ route }) => {
-  const { client, sales, debt, paid, bal, currency } = route?.params ?? {};
+  const { client, currency } = route?.params ?? {};
+
+  const [sales, setSales] = useState([]);
+
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [debt, setDebt] = useState(0);
+  const [paid, setPaid] = useState(0);
 
   const snackbarRef = useRef(null);
+
+  const getClientSales = async () => {
+    setLoading(true);
+    setError(null);
+    const params = { limit: 1000, clientId: client?.id, offset: 0 };
+
+    await new BaseApiService(CLIENT_SALES_ENDPOINT)
+      .getRequestWithJsonResponse(params)
+      .then((r) => {
+        setSales(r.records);
+        const tPaid = r.records.reduce((a, b) => a + b?.amountRepaid, 0);
+        const tDebt = r.records.reduce((a, b) => a + b?.amountLoaned, 0);
+
+        setPaid(tPaid);
+        setDebt(tDebt);
+        setLoading(false);
+        if (r?.totalItems === 0) {
+          setError("No records found");
+        }
+      })
+      .catch((e) => {
+        setError(e?.message);
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    getClientSales();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark }}>
@@ -44,17 +82,21 @@ const ClientDebts = ({ route }) => {
 
           <VerticalSeparator />
 
-          <ItemHeader title="Balance" value={formatNumberWithCommas(bal, currency)} />
+          <ItemHeader title="Balance" value={formatNumberWithCommas(debt - paid, currency)} />
         </View>
       </View>
 
       <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
+        {error && <Text style={{ textAlign: "center" }}>{error}</Text>}
+
         <FlatList
           style={{ marginTop: 10 }}
           data={sales}
           renderItem={({ item, index }) => {
             return <ClientDebtsCard debt={item} snackbarRef={snackbarRef} currency={currency} />;
           }}
+          refreshing={loading}
+          onRefresh={getClientSales}
           keyExtractor={(item) => item.id.toString()}
         />
         <Snackbar ref={snackbarRef} />

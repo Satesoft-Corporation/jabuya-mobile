@@ -2,7 +2,6 @@ import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import { convertToServerDate, formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
-import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
 import SalesTable from "./SalesTable";
 import PaymentMethodComponent from "./PaymentMethodComponent";
 import PrimaryButton from "@components/buttons/PrimaryButton";
@@ -96,10 +95,6 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
                   clearForm();
                   snackbarRef.current.show("Sale confirmed successfully", 4000);
                   onComplete();
-                  if (onCredit && !isSuperAdmin) {
-                    const c = await saveClientSalesOnDevice(offlineParams, prevClients);
-                    dispatch(setClientSales(c));
-                  }
                 }
               })
               .catch((error) => {

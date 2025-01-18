@@ -12,10 +12,12 @@ import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 import { saveExcelSheet } from "@utils/FileSystem";
 import { useDispatch, useSelector } from "react-redux";
-import { getOfflineParams, getSelectedShop, getShopProducts, getUserType } from "duqactStore/selectors";
+import { getIsAdmin, getOfflineParams, getSelectedShop, getShopProducts, getUserType } from "duqactStore/selectors";
 import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
 import { setShopProducts } from "actions/shopActions";
 import StockLevelCard from "./StockLevelCard";
+import { getCanCreateUpdateMyShopStock, getCanViewShopCapital } from "duqactStore/selectors/permissionSelectors";
+import AdminStock from "./AdminStock";
 
 const StockLevels = ({ navigation }) => {
   const [message, setMessage] = useState(null);
@@ -31,9 +33,11 @@ const StockLevels = ({ navigation }) => {
   const offlineParams = useSelector(getOfflineParams);
   const selectedShop = useSelector(getSelectedShop);
   const shopProducts = useSelector(getShopProducts);
-  const userType = useSelector(getUserType);
 
-  const isShopAttendant = userType === userTypes.isShopAttendant;
+  const canViewCapital = useSelector(getCanViewShopCapital);
+  const canDoStockCrud = useSelector(getCanCreateUpdateMyShopStock);
+  const isAdmin = useSelector(getIsAdmin);
+
   const snackbarRef = useRef(null);
 
   const fetchShopProducts = async () => {
@@ -112,8 +116,11 @@ const StockLevels = ({ navigation }) => {
     }
   };
 
-  const menuItems = [...(!isShopAttendant ? [{ name: "List product", onClick: () => toProductEntry() }] : [])];
+  const menuItems = [{ name: "List product", onClick: () => toProductEntry() }];
 
+  if (isAdmin) {
+    return <AdminStock />;
+  }
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <AppStatusBar />
@@ -123,7 +130,7 @@ const StockLevels = ({ navigation }) => {
         showSearch={true}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        showMenuDots
+        showMenuDots={canDoStockCrud}
         menuItems={menuItems}
         showShops
         onSearch={() => fetchShopProducts()}
@@ -142,7 +149,7 @@ const StockLevels = ({ navigation }) => {
 
         <VerticalSeparator />
         <ItemHeader value={formatNumberWithCommas(pdtValue)} title="Items" />
-        {!isShopAttendant && (
+        {canViewCapital && (
           <>
             <VerticalSeparator />
             <ItemHeader title="Value " value={formatNumberWithCommas(stock, selectedShop?.currency)} />

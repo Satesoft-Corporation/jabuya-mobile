@@ -11,7 +11,6 @@ import Colors from "@constants/Colors";
 import { COMING_SOON } from "@navigation/ScreenNames";
 import LockScreenModal from "@screens/applock/LockScreenModal";
 import {
-  saveClientSalesOnDevice,
   saveLookUps,
   saveManufactures,
   saveShopClients,
@@ -21,29 +20,28 @@ import {
 } from "@controllers/OfflineControllers";
 import { useSelector } from "react-redux";
 import {
-  getClientSales,
   getConfigureStatus,
+  getIsAdmin,
+  getIsShopAttendant,
   getLastApplockTime,
   getLastLoginTime,
   getLookUps,
   getManufactures,
-  getMenuList,
   getOfflineParams,
   getShopClients,
   getShopOwnerId,
   getShopProducts,
   getSuppliers,
-  getUserType,
+  getUsersList,
 } from "duqactStore/selectors";
 import { useDispatch } from "react-redux";
-import { addLookUps, changeUser, loginAction, setIsUserConfigured } from "actions/userActions";
+import { addLookUps, setIsUserConfigured, tokenRefresh } from "actions/userActions";
 import { BaseApiService } from "@utils/BaseApiService";
-import { addManufacturers, addSuppliers, changeSelectedShop, setClientSales, setShopClients, setShopProducts, setShops } from "actions/shopActions";
+import { addManufacturers, addSuppliers, changeSelectedShop, setShopClients, setShopProducts, setShops } from "actions/shopActions";
 import { LOGIN_END_POINT } from "@utils/EndPointUtils";
-import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
+import { ALL_SHOPS_LABEL } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
-import { duqactStore, getReducerSize } from "duqactStore";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getNavList } from "./navList";
 
 const LandingScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -57,40 +55,43 @@ const LandingScreen = () => {
   const prevLoginTime = useSelector(getLastLoginTime);
   const configStatus = useSelector(getConfigureStatus);
   const prevPinTime = useSelector(getLastApplockTime);
-  const userType = useSelector(getUserType);
+  const userList = useSelector(getUsersList);
   const shopOwnerId = useSelector(getShopOwnerId);
   const prevProducts = useSelector(getShopProducts);
   const prevClients = useSelector(getShopClients);
-  const prevClientSales = useSelector(getClientSales);
   const manufacturers = useSelector(getManufactures);
   const suppliers = useSelector(getSuppliers);
   const prevLookUps = useSelector(getLookUps);
+  const isAdmin = useSelector(getIsAdmin);
 
-  const menuList = useSelector(getMenuList);
-  const isShopAttendant = userType === userTypes.isShopAttendant;
+  const isShopAttendant = useSelector(getIsShopAttendant);
+
+  const navList = getNavList(isAdmin);
 
   const getRefreshToken = async () => {
     const loginInfo = await UserSessionUtils.getLoginDetails();
     if (loginInfo) {
-      await new BaseApiService(LOGIN_END_POINT).saveRequestWithJsonResponse(loginInfo, false).then(async (response) => {
-        await UserSessionUtils.setUserAuthToken(response.accessToken);
-        await UserSessionUtils.setUserRefreshToken(response.refreshToken);
-        dispatch(loginAction(true));
-        dispatch(changeUser(response.user));
-        setLoading(false);
-        console.log("token refreshed");
-      });
+      setLoading(true);
+      await new BaseApiService(LOGIN_END_POINT)
+        .saveRequestWithJsonResponse(loginInfo, false)
+        .then(async (response) => {
+          await UserSessionUtils.setUserAuthToken(response.accessToken);
+          await UserSessionUtils.setUserRefreshToken(response.refreshToken);
+          dispatch(tokenRefresh(response.user));
+          setLoading(false);
+          console.log("token refreshed");
+        })
+        .catch((e) => {
+          setLoading(false);
+        });
     }
   };
 
   const configureUserData = async (refresh = false) => {
     if (refresh === true) {
-      setLoading(true);
       let shops = [];
 
       const shopData = await saveShopDetails(offlineParams, isShopAttendant);
-
-      const lookups = await saveLookUps(prevLookUps);
 
       const offersDebt = shopData?.some((s) => s?.supportsCreditSales === true);
 
@@ -103,21 +104,21 @@ const LandingScreen = () => {
       dispatch(changeSelectedShop(shops[0]));
       dispatch(setShops(shops));
 
-      if (userType !== userTypes.isSuperAdmin) {
+      if (isAdmin == false) {
         const products = await saveShopProductsOnDevice(offlineParams, prevProducts);
         dispatch(setShopProducts(products));
         if (offersDebt === true) {
           const clients = await saveShopClients(offlineParams, prevClients);
-          const clientSales = await saveClientSalesOnDevice(offlineParams, prevClientSales);
           dispatch(setShopClients(clients));
-          dispatch(setClientSales(clientSales));
         }
       }
 
-      if (configStatus === false) {
+      if (userList?.length == 0) {
         const newManufactures = await saveManufactures(manufacturers);
 
         const newSuppliers = await saveSuppliers(suppliers);
+
+        const lookups = await saveLookUps(prevLookUps);
 
         dispatch(addManufacturers(newManufactures));
         dispatch(addSuppliers(newSuppliers));
@@ -125,17 +126,6 @@ const LandingScreen = () => {
       }
 
       dispatch(setIsUserConfigured(true));
-    }
-  };
-
-  const handleTabPress = (item) => {
-    if (item.target) {
-      navigation.navigate(item.target);
-      return;
-    }
-    if (!item.target) {
-      navigation.navigate(COMING_SOON, item?.title);
-      return;
     }
   };
 
@@ -164,7 +154,6 @@ const LandingScreen = () => {
         await configureUserData(configStatus === false);
 
         if (hours >= 13 || days >= 1) {
-          setLoading(true);
           await getRefreshToken();
           //await configureUserData(true);
         }
@@ -180,7 +169,6 @@ const LandingScreen = () => {
 
   useEffect(() => {
     handleLoginSession();
-    getReducerSize();
   }, []);
 
   return (
@@ -198,8 +186,8 @@ const LandingScreen = () => {
       >
         <FlatList
           style={{ marginTop: 10 }}
-          data={menuList}
-          renderItem={({ item }) => <MenuIcon icon={item} onPress={() => handleTabPress(item)} />}
+          data={navList}
+          renderItem={({ item }) => <MenuIcon icon={item} onPress={() => navigation.navigate(item?.target)} />}
           keyExtractor={(item) => item.title.toString()}
           numColumns={3}
         />

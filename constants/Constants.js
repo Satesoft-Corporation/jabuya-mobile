@@ -7,6 +7,7 @@ export const packageOptions = [
 ];
 
 export const MAXIMUM_RECORDS_PER_FETCH = 20;
+export const MAXIMUM_CACHEPAGE_SIZE = 200;
 
 export const screenWidth = Dimensions.get("window").width;
 export const screenHeight = Dimensions.get("window").height;
@@ -19,7 +20,7 @@ export const paymentMethods = [
 export const userTypes = {
   isShopOwner: "Shop Owner",
   isShopAttendant: "Shop Attendant",
-  isSuperAdmin: "Super Admin",
+  isSuperAdmin: "System Admin",
 };
 
 export const ALL_SHOPS_LABEL = "All Shops";
@@ -32,7 +33,7 @@ export const subscriptionPaymentMethods = [
   { id: 3, name: "AIRTEL_MONEY" },
   { id: 4, name: "MTN_MOMO" },
   { id: 5, name: "SYSTEM" },
-  { id: 6, name: "BANK" }
+  { id: 6, name: "BANK" },
 ];
 
 export const damageTypes = [
@@ -40,5 +41,5 @@ export const damageTypes = [
   { type: "SALE_TIME", name: "Sale Time" },
   { type: "FACTORY_ERROR", name: "Factory Error" },
   { type: "DELIVERY_ERROR", name: "Deliver Error" },
-  { type: "OTHER", name: "Other" }
+  { type: "OTHER", name: "Other" },
 ];

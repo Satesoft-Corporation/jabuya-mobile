@@ -85,12 +85,11 @@ const StockEntryForm = ({ route }) => {
   const saveStockEntry = async () => {
     setSubmitted(true);
     setLoading(true);
-    let payload;
 
     const isPacked = isPackedProduct && isPackedProduct === true;
     //setting payload basing on item package type
 
-    const constants = {
+    const payload = {
       batchNumber: batchNo,
       expiryDate: convertToServerDate(expiryDate),
       id: 0,
@@ -102,25 +101,11 @@ const StockEntryForm = ({ route }) => {
       supplierId: selectedSupplier?.id,
       remarks: remarks || "",
       purchasePrice: Number(purchasePrice),
+      ...(isPacked && { packedPurchasedQuantity: Number(packedPurchasedQuantity), unpackedPurchase: false }),
+      ...(!isPacked && { unpackedPurchase: true, unpackedPurchasedQuantity: Number(unpackedPurchasedQty) }),
     };
 
-    if (isPacked === true) {
-      payload = {
-        ...constants,
-        packedPurchasedQuantity: Number(packedPurchasedQuantity),
-        unpackedPurchase: false,
-      };
-    }
-
-    if (isPacked === false) {
-      payload = {
-        ...constants,
-        unpackedPurchase: true,
-        unpackedPurchasedQuantity: Number(unpackedPurchasedQty),
-      };
-    }
-
-    let isValidPayload = payload !== undefined && hasNull(payload) === false;
+    const isValidPayload = hasNull(payload) === false;
 
     if (isValidPayload === false) {
       setLoading(false); //removing loader if form is invalid
@@ -152,9 +137,7 @@ const StockEntryForm = ({ route }) => {
 
   const populateForm = () => {
     if (route.params) {
-      const selectedRecord = {
-        ...route.params,
-      };
+      const selectedRecord = { ...route.params };
 
       setLoading(false);
       setEdit(true);

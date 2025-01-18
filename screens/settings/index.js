@@ -2,18 +2,18 @@ import { View, Text, Image } from "react-native";
 import React, { useRef, useState } from "react";
 import { SafeAreaView } from "react-native";
 import { Switch } from "react-native-paper";
-import { UserSessionUtils } from "@utils/UserSessionUtils";
 import TopHeader from "@components/TopHeader";
 import Colors from "@constants/Colors";
 import SettingsBar from "./SettingsBar";
 import { BaseStyle } from "@utils/BaseStyle";
 import DisplayMessage from "@components/Dialogs/DisplayMessage";
-import { LOCK_SETuP, OFFLINE_SALES } from "@navigation/ScreenNames";
-import { useNavigation } from "@react-navigation/native";
+import { LOCK_SETuP, LOGIN, OFFLINE_SALES } from "@navigation/ScreenNames";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 import Icon from "@components/Icon";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getClientSales,
+  getIsAdmin,
+  getIsShopAttendant,
   getLookUps,
   getManufactures,
   getOfflineParams,
@@ -26,10 +26,10 @@ import {
   getUserPinCode,
   getUserType,
 } from "duqactStore/selectors";
-import { addLookUps, logOutAction, setApplockTime, setUserPinCode } from "actions/userActions";
+import { addLookUps, logOutAction, setApplockTime, setIsUserConfigured, setUserPinCode } from "actions/userActions";
 import { ALL_SHOPS_LABEL, APP_VERSION, userTypes } from "@constants/Constants";
 import {
-  saveClientSalesOnDevice,
+  saveLookUps,
   saveManufactures,
   saveShopClients,
   saveShopDetails,
@@ -41,6 +41,7 @@ import Loader from "@components/Loader";
 import { hasInternetConnection } from "@utils/NetWork";
 import Snackbar from "@components/Snackbar";
 import SubscriptionsAlert from "@components/SubscriptionsAlert";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
 const Settings = () => {
   const [showMoodal, setShowModal] = useState(false);
@@ -62,14 +63,14 @@ const Settings = () => {
   const shopOwnerId = useSelector(getShopOwnerId);
   const prevProducts = useSelector(getShopProducts);
   const prevClients = useSelector(getShopClients);
-  const prevClientSales = useSelector(getClientSales);
   const manufacturers = useSelector(getManufactures);
   const suppliers = useSelector(getSuppliers);
   const prevLookUps = useSelector(getLookUps);
+  const isAdmin = useSelector(getIsAdmin);
 
   const snackbarRef = useRef(null);
 
-  const isShopAttendant = userType === userTypes.isShopAttendant;
+  const isShopAttendant = useSelector(getIsShopAttendant);
 
   const onToggleSwitch = async () => {
     if (userPincode === null) {
@@ -84,8 +85,9 @@ const Settings = () => {
     if (pendingSales > 0) {
       navigation.navigate(OFFLINE_SALES);
     } else {
+      await UserSessionUtils.setLoggedIn(false);
       dispatch(logOutAction());
-      await UserSessionUtils.clearLocalStorageAndLogout(navigation);
+      navigation?.dispatch(CommonActions.reset({ index: 0, routes: [{ name: LOGIN }] }));
     }
   };
 
@@ -117,8 +119,6 @@ const Settings = () => {
 
         const shopData = await saveShopDetails(offlineParams, isShopAttendant);
 
-        const lookups = await saveLookUps(prevLookUps);
-
         const offersDebt = shopData?.some((s) => s?.supportsCreditSales === true);
 
         if (shopData?.length > 1) {
@@ -130,24 +130,28 @@ const Settings = () => {
         dispatch(changeSelectedShop(shops[0]));
         dispatch(setShops(shops));
 
+        if (isAdmin == false) {
+          const products = await saveShopProductsOnDevice(offlineParams, prevProducts);
+          dispatch(setShopProducts(products));
+          if (offersDebt === true) {
+            const clients = await saveShopClients(offlineParams, prevClients);
+            dispatch(setShopClients(clients));
+          }
+        }
+
         const newManufactures = await saveManufactures(manufacturers);
 
         const newSuppliers = await saveSuppliers(suppliers);
+
+        const lookups = await saveLookUps(prevLookUps);
 
         dispatch(addManufacturers(newManufactures));
         dispatch(addSuppliers(newSuppliers));
         dispatch(addLookUps(lookups));
 
-        if (userType !== userTypes.isSuperAdmin) {
-          const products = await saveShopProductsOnDevice(offlineParams, prevProducts);
-          dispatch(setShopProducts(products));
-          if (offersDebt === true) {
-            const clients = await saveShopClients(offlineParams, prevClients);
-            const clientSales = await saveClientSalesOnDevice(offlineParams, prevClientSales);
-            dispatch(setShopClients(clients));
-            dispatch(setClientSales(clientSales));
-          }
-        }
+        dispatch(setIsUserConfigured(true));
+
+        setLoading(false);
       }
     } catch (e) {
       snackbarRef.current.show(e, 5000);

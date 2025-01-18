@@ -12,6 +12,14 @@ export class UserSessionUtils {
     return await AsyncStorage.getItem(StorageParams.ACCESS_TOKEN);
   }
 
+  static setFirstTimeInsatll(bool) {
+    return AsyncStorage.setItem("FTI", bool);
+  }
+
+  static getFirstTimeInstall() {
+    return AsyncStorage.getItem("FTI");
+  }
+
   /**
    * This is used to get the user's refresh token.
    *
@@ -26,12 +34,7 @@ export class UserSessionUtils {
   static async clearLocalStorageAndLogout(navigation) {
     // remove all
     await AsyncStorage.clear();
-    navigation?.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: LOGIN }],
-      })
-    );
+    navigation?.dispatch(CommonActions.reset({ index: 0, routes: [{ name: LOGIN }] }));
   }
 
   /**

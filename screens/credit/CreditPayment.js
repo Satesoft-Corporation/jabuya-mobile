@@ -10,19 +10,9 @@ import DataRow from "@components/card_components/DataRow";
 import MyInput from "@components/MyInput";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import Snackbar from "@components/Snackbar";
-import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
-import { useDispatch, useSelector } from "react-redux";
-import { getClientSales, getOfflineParams } from "duqactStore/selectors";
-import { setClientSales } from "actions/shopActions";
 
 const CreditPayment = ({ route }) => {
   const sale = { ...route.params };
-
-  const offlineParams = useSelector(getOfflineParams);
-
-  const creditSales = useSelector(getClientSales);
-
-  const dispatch = useDispatch();
 
   const balance = sale?.amountLoaned - sale?.amountRepaid;
 
@@ -54,9 +44,6 @@ const CreditPayment = ({ route }) => {
       await new BaseApiService(`/credit-sales/${sale?.id}/payments`)
         .saveRequestWithJsonResponse(payLoad, false)
         .then(async (response) => {
-          const newList = await saveClientSalesOnDevice(offlineParams, creditSales);
-
-          dispatch(setClientSales(newList));
           setLoading(false);
           clearForm();
           snackRef.current.show(`Payment saved successfully`, 5000);

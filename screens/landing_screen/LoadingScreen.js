@@ -2,21 +2,27 @@ import { View, Text, SafeAreaView, Image, ActivityIndicator } from "react-native
 import React, { useEffect } from "react";
 import Colors from "@constants/Colors";
 import { scale } from "react-native-size-matters";
-import { StackActions, useNavigation } from "@react-navigation/native";
+import { CommonActions, StackActions, useNavigation } from "@react-navigation/native";
+import { LANDING_SCREEN, LOGIN } from "@navigation/ScreenNames";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
-import { LANDING_SCREEN } from "@navigation/ScreenNames";
 
 const LoadingScreen = () => {
   const navigation = useNavigation();
-
-  const logOut = async () => {
-    await UserSessionUtils.clearLocalStorageAndLogout(navigation);
+  const logOut = () => {
+    navigation?.dispatch(CommonActions.reset({ index: 0, routes: [{ name: LOGIN }] }));
   };
 
   useEffect(() => {
     setTimeout(() => {
-      UserSessionUtils.getUserDetails().then((data) => {
-        if (data) {
+      UserSessionUtils.getFirstTimeInstall().then((val) => {
+        if (!val) {
+          UserSessionUtils.clearLocalStorageAndLogout(navigation);
+          return;
+        }
+      });
+
+      UserSessionUtils.isLoggedIn().then((isLoggedIn) => {
+        if (isLoggedIn == true) {
           navigation.dispatch(StackActions.replace(LANDING_SCREEN));
         } else {
           logOut();
@@ -26,15 +32,7 @@ const LoadingScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingHorizontal: 20,
-        backgroundColor: "#000",
-      }}
-    >
+    <SafeAreaView style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 20, backgroundColor: "#000" }}>
       <Image
         source={require("../../assets/splash.png")}
         style={{

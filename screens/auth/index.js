@@ -45,8 +45,8 @@ export default function Login() {
             await UserSessionUtils.resetPendingSales();
             await UserSessionUtils.setLoginDetails(loginInfo);
 
-            dispatch(loginAction(true));
-            dispatch(changeUser(response.user));
+            dispatch(loginAction(response.user));
+            /// dispatch(changeUser(response.user));
             navigation.dispatch(StackActions.replace(LANDING_SCREEN));
 
             setLoading(false);
@@ -62,8 +62,6 @@ export default function Login() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark, paddingHorizontal: 15, justifyContent: "space-between" }}>
-
-
       <ScrollView contentContainerStyle={{ gap: 10 }}>
         <Image
           source={require("../../assets/icons/yellow_transparent.png")}

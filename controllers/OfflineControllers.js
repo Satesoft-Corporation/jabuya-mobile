@@ -1,3 +1,4 @@
+import { MAXIMUM_CACHEPAGE_SIZE, MAXIMUM_RECORDS_PER_FETCH } from "@constants/Constants";
 import { BaseApiService } from "@utils/BaseApiService";
 import {
   CLIENTS_ENDPOINT,
@@ -62,6 +63,9 @@ export const saveCurrencies = async () => {
 
 export const saveShopProductsOnDevice = async (searchParameters, prev = []) => {
   let pdts = [];
+  const totalRecords = 0;
+  const offSet = 0;
+  const limit = MAXIMUM_CACHEPAGE_SIZE;
 
   console.log("saving pdts offline");
   await new BaseApiService(SHOP_PRODUCTS_ENDPOINT)
@@ -145,55 +149,4 @@ export const saveShopDetails = async (searchParameters, isShopAttendant = false)
 
   // return saved;
   return shopsArray;
-};
-
-export const saveClientSalesOnDevice = async (searchParameters, prev = []) => {
-  let clientSales = [];
-  console.log("Saving credit sales");
-  await new BaseApiService(CLIENT_SALES_ENDPOINT)
-    .getRequestWithJsonResponse(searchParameters)
-    .then(async (response) => {
-      const modified = response?.records?.map((item) => {
-        const {
-          amountLoaned,
-          amountRepaid,
-          balance,
-          changedByFullName,
-          createdByFullName,
-          createdByUsername,
-          currency,
-          dateCreated,
-          id,
-          lineItems,
-          shopClient,
-          serialNumber,
-          sale,
-        } = item;
-
-        return {
-          amountLoaned,
-          amountRepaid,
-          balance: balance || 0,
-          changedByFullName,
-          createdByFullName,
-          createdByUsername,
-          currency,
-          dateCreated,
-          id,
-          lineItems,
-          client_id: shopClient?.id,
-          client_name: shopClient?.fullName,
-          serialNumber,
-          creditSaleId: sale?.id,
-          shopId: sale?.shop?.id,
-        };
-      });
-      clientSales = [...modified];
-    })
-    .catch((error) => {
-      console.log("Unknown Error", error?.message);
-      clientSales = [...prev];
-    });
-
-  return clientSales;
 };

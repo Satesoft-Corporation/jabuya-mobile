@@ -229,6 +229,7 @@ function SalesDesk({ navigation }) {
                 value={selectedShop}
                 search={shops?.length > 4}
                 placeholder="Select a shop"
+                style={{ backgroundColor: Colors.primary }}
               />
             </View>
           )}

@@ -1,5 +1,9 @@
 export const getUserData = (state) => state.userData.user;
 
+export const getUsersList = (state) => state.userData.usersList;
+
+export const getFirstTimeInstall = (state) => state.userData?.firstTimeInstall;
+
 export const getUserType = (state) => state.userData.userType;
 
 export const getIsShopOwner = (state) => state.userData.isShopOwner;
@@ -28,25 +32,23 @@ export const getAttendantShopName = (state) => state.userData.attendantShopName;
 
 export const getShopOwnerId = (state) => state.userData.shopOwnerId;
 
-export const getShops = (state) => state.shop.shops;
+export const getShops = (state) => state.userData.shops;
 
-export const getSelectedShop = (state) => state.shop.selectedShop;
+export const getSelectedShop = (state) => state.userData.selectedShop;
 
-export const getShopProducts = (state) => state.shop.shopProducts;
+export const getShopProducts = (state) => state.userData.shopProducts;
 
-export const getShopClients = (state) => state.shop.clients;
-
-export const getClientSales = (state) => state.shop.clientSales;
+export const getShopClients = (state) => state.userData.clients;
 
 export const getOfflineSales = (state) => state.shop.offlineSales;
 
-export const getCartSelection = (state) => state.shop.cartSelection;
+export const getCartSelection = (state) => state.userData.cartSelection;
 
-export const getCart = (state) => state.shop.cart;
+export const getCart = (state) => state.userData.cart;
 
-export const getOffersDebt = (state) => state.shop.offersDebt;
+export const getOffersDebt = (state) => state.userData.offersDebt;
 
-export const getCollectClientInfo = (state) => state.shop.collectClientInfo;
+export const getCollectClientInfo = (state) => state.userData.collectClientInfo;
 
 export const getMenuList = (state) => state.userData.menuList;
 
@@ -54,6 +56,6 @@ export const getManufactures = (state) => state.shop.manufactures;
 
 export const getSuppliers = (state) => state.shop.suppliers;
 
-export const getHeldSales = (state) => state.shop.heldSales;
+export const getHeldSales = (state) => state.userData.heldSales;
 
-export const getLookUps = (state) => state.userData.lookUps;
+export const getLookUps = (state) => state.shop.lookUps;

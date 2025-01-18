@@ -1,77 +1,36 @@
 import { View, StyleSheet } from "react-native";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import CardHeader from "@components/card_components/CardHeader";
 import DataColumn from "@components/card_components/DataColumn";
 import { CLIENT_DEBTS } from "@navigation/ScreenNames";
 import CardFooter from "@components/card_components/CardFooter";
-import { getClientSales } from "duqactStore/selectors";
-import { useSelector } from "react-redux";
 import { formatNumberWithCommas } from "@utils/Utils";
 
 const CreditSaleCard = ({ client }) => {
   const navigation = useNavigation();
 
-  const [sales, setSales] = useState([]);
-  const [debt, setDebt] = useState(0);
-  const [paid, setPaid] = useState(0);
-  const [bal, setBal] = useState(0);
-
-  const [show, setShow] = useState(false);
-
-  const name = client?.fullName;
-  const mob = client?.phoneNumber;
+  const { fullName, debt, repaidAmount, balance, serialNumber } = client ?? {};
   const currency = client?.shop?.currency?.symbol;
 
-  const creditSales = useSelector(getClientSales);
+  return (
+    <View style={styles.container}>
+      <CardHeader value1={`CSN: ${serialNumber}`} shop={client?.shop?.name} date={client?.dateCreated} />
 
-  const fetchCreditSales = async () => {
-    const list = creditSales?.filter((i) => i?.client_id === client?.id);
+      <View style={styles.content}>
+        <DataColumn title={"Client"} value={fullName} left flex={2} />
 
-    const debt = list.reduce((a, b) => a + b?.amountLoaned, 0);
-    const paid = list.reduce((a, b) => a + b?.amountRepaid, 0);
-    const bal = debt - paid;
-
-    setSales(list);
-    setDebt(debt);
-    setPaid(paid);
-    setBal(bal);
-    setShow(true);
-  };
-
-  useEffect(() => {
-    fetchCreditSales();
-  }, []);
-
-  if (show === true) {
-    return (
-      <View style={styles.container}>
-        <CardHeader value1={`CSN: ${client?.serialNumber}`} shop={client?.shop?.name} date={client?.dateCreated} />
-
-        <View style={styles.content}>
-          <DataColumn title={"Client"} value={name} left flex={2} />
-
-          <DataColumn title={"Debt"} value={formatNumberWithCommas(debt, currency)} />
-          <DataColumn title={"Paid"} value={formatNumberWithCommas(paid, currency)} />
-          <DataColumn title={"Balance"} value={formatNumberWithCommas(bal, currency)} />
-        </View>
-
-        <CardFooter
-          btnTitle2={bal > 0 ? "View" : null}
-          onClick2={() =>
-            navigation.navigate(CLIENT_DEBTS, {
-              client,
-              sales,
-              debt,
-              paid,
-              bal,
-              currency,
-            })
-          }
-        />
+        <DataColumn title={"Debt"} value={formatNumberWithCommas(debt, currency)} />
+        <DataColumn title={"Paid"} value={formatNumberWithCommas(repaidAmount, currency)} />
+        <DataColumn title={"Balance"} value={formatNumberWithCommas(balance, currency)} />
       </View>
-    );
-  }
+
+      <CardFooter
+        btnTitle2={balance > 0 ? "View" : null} //change this line
+        onClick2={() => navigation.navigate(CLIENT_DEBTS, { client, currency })}
+      />
+    </View>
+  );
 };
 
 export default CreditSaleCard;

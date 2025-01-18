@@ -8,11 +8,8 @@ import VerticalSeparator from "@components/VerticalSeparator";
 import Colors from "@constants/Colors";
 import Snackbar from "@components/Snackbar";
 import CreditSaleCard from "./components/CreditSaleCard";
-import { saveClientSalesOnDevice } from "@controllers/OfflineControllers";
-import { getClientSales, getOfflineParams, getSelectedShop, getShopClients } from "duqactStore/selectors";
-import { ALL_SHOPS_LABEL } from "@constants/Constants";
+import { getSelectedShop, getShopClients } from "duqactStore/selectors";
 import { useSelector } from "react-redux";
-import { setClientSales } from "actions/shopActions";
 import { hasInternetConnection } from "@utils/NetWork";
 import { formatNumberWithCommas } from "@utils/Utils";
 import { getCanViewDebts } from "duqactStore/selectors/permissionSelectors";
@@ -30,9 +27,7 @@ const CreditSales = () => {
   const [bal, setBal] = useState(0);
   const [adds, setAdds] = useState(0);
 
-  const offlineParams = useSelector(getOfflineParams);
   const selectedShop = useSelector(getSelectedShop);
-  const creditSales = useSelector(getClientSales);
   const shopClients = useSelector(getShopClients);
   const viewDebts = useSelector(getCanViewDebts);
 
@@ -45,21 +40,18 @@ const CreditSales = () => {
     setDebt(0);
     setPaid(0);
     setAdds(0);
-    setClients(shopClients?.filter((i) => i?.shop?.id === selectedShop?.id));
 
-    let filteredSales = [...creditSales];
+    const list = shopClients?.filter((i) => i?.shop?.id === selectedShop?.id);
 
-    if (selectedShop?.name !== ALL_SHOPS_LABEL) {
-      filteredSales = creditSales.filter((i) => i.shopId === selectedShop?.id);
-    }
+    setClients(list);
 
-    if (creditSales.length === 0) {
+    if (list.length === 0) {
       setMessage("No records found");
       setLoading(false);
       return true;
     }
-    const debt = filteredSales.reduce((a, b) => a + b?.amountLoaned, 0);
-    const paid = filteredSales.reduce((a, b) => a + b?.amountRepaid, 0);
+    const debt = list.reduce((a, b) => a + b?.debt, 0);
+    const paid = list.reduce((a, b) => a + b?.repaidAmount, 0);
     setDebt(debt);
     setPaid(paid);
     setBal(debt - paid);
@@ -71,8 +63,7 @@ const CreditSales = () => {
 
     if (hasNet === true) {
       setLoading(true);
-      const clientSales = await saveClientSalesOnDevice(offlineParams, creditSales);
-      dispatch(setClientSales(clientSales));
+
       fetchClients();
     } else {
       Alert.alert("Cannot connect to the internet");
