@@ -18,16 +18,14 @@ import {
   getManufactures,
   getOfflineParams,
   getOfflineSales,
-  getShopClients,
   getShopOwnerId,
-  getShopProducts,
   getSuppliers,
   getUserData,
   getUserPinCode,
   getUserType,
 } from "duqactStore/selectors";
 import { addLookUps, logOutAction, setApplockTime, setIsUserConfigured, setUserPinCode } from "actions/userActions";
-import { ALL_SHOPS_LABEL, APP_VERSION, userTypes } from "@constants/Constants";
+import { ALL_SHOPS_LABEL, APP_VERSION } from "@constants/Constants";
 import {
   saveLookUps,
   saveManufactures,
@@ -42,6 +40,8 @@ import { hasInternetConnection } from "@utils/NetWork";
 import Snackbar from "@components/Snackbar";
 import SubscriptionsAlert from "@components/SubscriptionsAlert";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import StorageParams from "@constants/StorageParams";
 
 const Settings = () => {
   const [showMoodal, setShowModal] = useState(false);
@@ -61,8 +61,6 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   const offlineParams = useSelector(getOfflineParams);
   const shopOwnerId = useSelector(getShopOwnerId);
-  const prevProducts = useSelector(getShopProducts);
-  const prevClients = useSelector(getShopClients);
   const manufacturers = useSelector(getManufactures);
   const suppliers = useSelector(getSuppliers);
   const prevLookUps = useSelector(getLookUps);
@@ -86,6 +84,7 @@ const Settings = () => {
       navigation.navigate(OFFLINE_SALES);
     } else {
       await UserSessionUtils.setLoggedIn(false);
+      await AsyncStorage.removeItem(StorageParams.USER_DETAILS_JSON);
       dispatch(logOutAction());
       navigation?.dispatch(CommonActions.reset({ index: 0, routes: [{ name: LOGIN }] }));
     }
@@ -131,27 +130,31 @@ const Settings = () => {
         dispatch(setShops(shops));
 
         if (isAdmin == false) {
-          const products = await saveShopProductsOnDevice(offlineParams, prevProducts);
-          dispatch(setShopProducts(products));
+          await saveShopProductsOnDevice(offlineParams);
           if (offersDebt === true) {
-            const clients = await saveShopClients(offlineParams, prevClients);
-            dispatch(setShopClients(clients));
+            await saveShopClients(offlineParams);
           }
         }
 
-        const newManufactures = await saveManufactures(manufacturers);
+        if (manufacturers?.length == 0) {
+          const newManufactures = await saveManufactures(manufacturers);
+          dispatch(addManufacturers(newManufactures));
+        }
 
-        const newSuppliers = await saveSuppliers(suppliers);
-
-        const lookups = await saveLookUps(prevLookUps);
-
-        dispatch(addManufacturers(newManufactures));
-        dispatch(addSuppliers(newSuppliers));
-        dispatch(addLookUps(lookups));
+        if (suppliers?.length == 0) {
+          const newSuppliers = await saveSuppliers(suppliers);
+          dispatch(addSuppliers(newSuppliers));
+        }
+        if (prevLookUps?.length == 0) {
+          const lookups = await saveLookUps(prevLookUps);
+          dispatch(addLookUps(lookups));
+        }
 
         dispatch(setIsUserConfigured(true));
 
         setLoading(false);
+        snackbarRef.current.show('Data synced', 5000);
+
       }
     } catch (e) {
       snackbarRef.current.show(e, 5000);
@@ -175,7 +178,7 @@ const Settings = () => {
         />
         <View style={{ marginHorizontal: 5 }}>
           <Text style={{ fontWeight: 400, color: Colors.primary }}>{sessionObj?.fullName}</Text>
-          <Text style={{ fontWeight: 300, color: Colors.primary }}>{userType}</Text>
+          <Text style={{ fontWeight: 300, color: Colors.primary }}>{userType || ""}</Text>
         </View>
       </View>
 
@@ -192,7 +195,7 @@ const Settings = () => {
 
             <SettingsBar
               icon={<Icon name={"cloud-sync-outline"} groupName="MaterialCommunityIcons" size={20} />}
-              onPress={() => configureUserData(true)}
+              onPress={() => configureUserData()}
               text="Sync data"
             />
 

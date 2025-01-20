@@ -1,26 +1,33 @@
 import { View, Text, SafeAreaView, FlatList, Linking, Pressable } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import TopHeader from "@components/TopHeader";
 import Colors from "@constants/Colors";
-import { useSelector } from "react-redux";
-import { getShopClients } from "duqactStore/selectors";
 import { useState } from "react";
 import Icon from "@components/Icon";
 import { useNavigation } from "@react-navigation/native";
 import { CONTACT_DETAILS } from "@navigation/ScreenNames";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
 const ContactBook = () => {
-  const clients = useSelector(getShopClients);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filtered, setFiltered] = useState(clients);
+  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
 
-  const filterClients = (searchParam = "") => {
+  const filterClients = async (searchParam = "") => {
+    const clients = await UserSessionUtils.getShopClients();
+
     const list = clients?.filter((item) => item?.fullName?.toLowerCase()?.includes(searchParam.toLowerCase().trim()));
     setFiltered(list);
     setLoading(false);
+    if (list?.length == 0) {
+      setMessage("No records found");
+    }
   };
 
+  useEffect(() => {
+    filterClients();
+  }, []);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <TopHeader
@@ -34,6 +41,7 @@ const ContactBook = () => {
         onSearch={() => {}}
       />
       <View style={{ flex: 1, paddingHorizontal: 5 }}>
+        {message && <Text style={{ textAlign: "center" }}>{message}</Text>}
         <FlatList
           data={filtered}
           showsVerticalScrollIndicator={false}
@@ -43,7 +51,6 @@ const ContactBook = () => {
             filterClients();
           }}
           refreshing={loading}
-          ListEmptyComponent={<Text style={{ textAlign: "center" }}>No clients found</Text>}
         />
       </View>
     </SafeAreaView>

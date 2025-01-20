@@ -182,11 +182,16 @@ export class UserSessionUtils {
   }
 
   static async setShopProducts(productList) {
-    await AsyncStorage.setItem(StorageParams.SHOP_PRODUCTS, JSON.stringify(productList));
+    const user = await this.getUserDetails();
+    const key = "pdts" + user?.username;
+    await AsyncStorage.setItem(key, JSON.stringify(productList));
   }
 
   static async getShopProducts(shopId = null) {
-    let productList = await AsyncStorage.getItem(StorageParams.SHOP_PRODUCTS);
+    const user = await this.getUserDetails();
+    const key = "pdts" + user?.username;
+
+    const productList = await AsyncStorage.getItem(key);
     if (shopId !== null) {
       let newList = [...JSON.parse(productList)];
       let filtered = newList.filter((item) => item.shopId === shopId);
@@ -263,12 +268,19 @@ export class UserSessionUtils {
   }
 
   static async setShopClients(clients) {
-    let data = JSON.stringify(clients);
-    await AsyncStorage.setItem(StorageParams.SHOP_CLIENTS, data);
+    const user = await this.getUserDetails();
+    const key = "clts" + user?.username;
+
+    const data = JSON.stringify(clients);
+    await AsyncStorage.setItem(key, data);
   }
 
   static async getShopClients(shopId = null, withNumber = false) {
-    let list = await AsyncStorage.getItem(StorageParams.SHOP_CLIENTS);
+
+    const user = await this.getUserDetails();
+    const key = "clts" + user?.username;
+    
+    const list = await AsyncStorage.getItem(key);
 
     if (shopId !== null) {
       let newList = [...JSON.parse(list)];

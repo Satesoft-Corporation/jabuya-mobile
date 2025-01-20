@@ -15,9 +15,9 @@ import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native";
 import MyInput from "@components/MyInput";
 import Snackbar from "@components/Snackbar";
-import { getManufactures, getOfflineParams, getSelectedShop, getShopProducts, getShops } from "duqactStore/selectors";
+import { getManufactures, getOfflineParams, getSelectedShop, getShops } from "duqactStore/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { changeSelectedShop, setShopProducts } from "actions/shopActions";
+import { changeSelectedShop } from "actions/shopActions";
 import { useNavigation } from "@react-navigation/native";
 import { STOCK_LEVELS } from "@navigation/ScreenNames";
 import { ScrollView } from "react-native";
@@ -28,7 +28,6 @@ const ProductEntry = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
   const offlineParams = useSelector(getOfflineParams);
   const shops = useSelector(getShops);
-  const shopProducts = useSelector(getShopProducts);
   const manufacturers = useSelector(getManufactures);
   const canDoStockCrud = useSelector(getCanCreateUpdateMyShopStock);
 
@@ -207,8 +206,7 @@ const ProductEntry = ({ route }) => {
       await new BaseApiService(SHOP_PRODUCTS_ENDPOINT)
         .saveRequestWithJsonResponse(payload, false)
         .then(async (response) => {
-          const newList = await saveShopProductsOnDevice(offlineParams, shopProducts);
-          dispatch(setShopProducts(newList));
+          await saveShopProductsOnDevice(offlineParams);
           setLoading(false);
           setSubmitted(false);
           clearForm();

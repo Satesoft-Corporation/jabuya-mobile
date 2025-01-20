@@ -9,11 +9,12 @@ import ModalContent from "@components/ModalContent";
 import Colors from "@constants/Colors";
 import DataRow from "@components/card_components/DataRow";
 import { useDispatch, useSelector } from "react-redux";
-import { getAttendantShopId, getCart, getOfflineParams, getSelectedShop, getShopClients, getUserType } from "duqactStore/selectors";
-import { addOfflineSale, clearCart, setClientSales } from "actions/shopActions";
-import { paymentMethods, userTypes } from "@constants/Constants";
+import { getAttendantShopId, getCart, getIsShopAttendant, getOfflineParams, getSelectedShop } from "duqactStore/selectors";
+import { addOfflineSale, clearCart } from "actions/shopActions";
+import { paymentMethods } from "@constants/Constants";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { hasInternetConnection } from "@utils/NetWork";
+import { saveShopClients } from "@controllers/OfflineControllers";
 
 const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoading }) => {
   const dispatch = useDispatch();
@@ -21,12 +22,8 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
   const cart = useSelector(getCart);
   const offlineParams = useSelector(getOfflineParams);
   const attendantShopId = useSelector(getAttendantShopId);
-  const prevClients = useSelector(getShopClients);
 
-  const userType = useSelector(getUserType);
-
-  const isShopAttendant = userType === userTypes.isShopAttendant;
-  const isSuperAdmin = userType === userTypes.isSuperAdmin;
+  const isShopAttendant = useSelector(getIsShopAttendant);
 
   const clearEverything = () => dispatch(clearCart());
 
@@ -93,7 +90,14 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
                   setVisible(false);
                   clearEverything();
                   clearForm();
-                  snackbarRef.current.show("Sale confirmed successfully", 4000);
+
+                  if (onCredit) {
+                    setTimeout(async () => {
+                      await saveShopClients(offlineParams);
+                    }, 10000);
+                  }
+
+                  snackbarRef?.current.show("Sale confirmed successfully", 4000);
                   onComplete();
                 }
               })

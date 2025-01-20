@@ -25,6 +25,10 @@ const persistor = persistStore(duqactStore);
 export { duqactStore, persistor };
 
 export const getReducerSize = async () => {
-  const store = await AsyncStorage.getItem("persist:duqact");
-  return new Blob([store]).size;
+  const store = await AsyncStorage.getItem("cltsakellocatherine3o@gmail.com");
+  const sizeInBytes = new Blob([store]).size;
+
+  const sizeInMB = sizeInBytes / (1024 * 1024);
+  console.log(`Size of value for key ${sizeInMB.toFixed(2)} MB`);
+  return sizeInMB;
 };

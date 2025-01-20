@@ -13,18 +13,18 @@ import { KeyboardAvoidingView } from "react-native";
 import Loader from "@components/Loader";
 import { packageOptions } from "@constants/Constants";
 import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
-import { getOfflineParams, getSelectedShop, getShopProducts, getShops, getSuppliers } from "duqactStore/selectors";
+import { getOfflineParams, getSelectedShop, getShops, getSuppliers } from "duqactStore/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { changeSelectedShop, setShopProducts } from "actions/shopActions";
 import { useNavigation } from "@react-navigation/native";
 import { STOCK_ENTRY } from "@navigation/ScreenNames";
 import { getCanCreateUpdateMyShopStock } from "duqactStore/selectors/permissionSelectors";
 import NoAuth from "@screens/Unauthorised";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
 const StockEntryForm = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
   const offlineParams = useSelector(getOfflineParams);
-  const shopProducts = useSelector(getShopProducts);
   const suppliers = useSelector(getSuppliers);
   const canDoStockCrud = useSelector(getCanCreateUpdateMyShopStock);
 
@@ -51,6 +51,8 @@ const StockEntryForm = ({ route }) => {
   const snackBarRef = useRef(null);
 
   const fetchProducts = async () => {
+    const shopProducts = await UserSessionUtils.getShopProducts();
+
     setIsPackedProduct(null);
     setSelectedProduct(null);
 
@@ -120,12 +122,11 @@ const StockEntryForm = ({ route }) => {
           if (!edit) {
             clearForm();
           }
-          const newList = await saveShopProductsOnDevice(offlineParams, shopProducts);
 
-          dispatch(setShopProducts(newList));
           setSubmitted(false);
           setLoading(false);
           snackBarRef.current.show("Stock entry saved successfully", 6000);
+          setTimeout(() => saveShopProductsOnDevice(offlineParams), 5000);
         })
         .catch((error) => {
           snackBarRef.current.show(error?.message, 5000);
@@ -323,7 +324,6 @@ const StockEntryForm = ({ route }) => {
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
               <MyInput label=" Batch no." value={batchNo} onValueChange={(text) => setBatchNo(text)} />
-              {submitted && batchNo === "" && <Text style={styles.errorText}>Batch number is required</Text>}
             </View>
 
             <View style={{ flex: 1 }}>

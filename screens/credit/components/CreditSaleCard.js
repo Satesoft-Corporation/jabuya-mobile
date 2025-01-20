@@ -11,7 +11,7 @@ const CreditSaleCard = ({ client }) => {
   const navigation = useNavigation();
 
   const { fullName, debt, repaidAmount, balance, serialNumber } = client ?? {};
-  const currency = client?.shop?.currency?.symbol;
+  const currency = client?.currency;
 
   return (
     <View style={styles.container}>

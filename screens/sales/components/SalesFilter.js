@@ -2,23 +2,24 @@ import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import { useSelector } from "react-redux";
-import { getSelectedShop, getShopProducts, getShops } from "duqactStore/selectors";
+import { getSelectedShop, getShops } from "duqactStore/selectors";
 import Colors from "@constants/Colors";
 import { MyDropDown } from "@components/DropdownComponents";
 import MyInput from "@components/MyInput";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import { convertDateFormat, formatDate } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
 const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
   const shops = useSelector(getShops) ?? [];
-  const products = useSelector(getShopProducts) ?? [];
   const selectedShop = useSelector(getSelectedShop);
 
   const [filterShop, setFiletrShop] = useState(selectedShop);
   const [filterProduct, setFiletrProduct] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [shopUsers, setShopUsers] = useState([]);
+  const [products, setProducts] = useState([]);
 
   const [filterDate, setFilterDate] = useState(new Date());
 
@@ -54,9 +55,13 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
         });
     }
   };
-
+  const loadProducts = async () => {
+    const data = await UserSessionUtils.getShopProducts();
+    setProducts(data);
+  };
   useEffect(() => {
     getShopUsers();
+    loadProducts();
   }, [selectedShop]);
 
   const clearFilters = () => {

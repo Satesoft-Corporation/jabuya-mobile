@@ -9,8 +9,7 @@ import PrimaryButton from "@components/buttons/PrimaryButton";
 import Snackbar from "@components/Snackbar";
 import { saveShopClients } from "@controllers/OfflineControllers";
 import { useDispatch, useSelector } from "react-redux";
-import { getOfflineParams, getSelectedShop, getShopClients } from "duqactStore/selectors";
-import { setShopClients } from "actions/shopActions";
+import { getOfflineParams, getSelectedShop } from "duqactStore/selectors";
 import { getCanAddDebt } from "duqactStore/selectors/permissionSelectors";
 import NoAuth from "@screens/Unauthorised";
 
@@ -27,7 +26,6 @@ const NewClient = ({ route }) => {
 
   const selectedShop = useSelector(getSelectedShop);
   const offlineParams = useSelector(getOfflineParams);
-  const clients = useSelector(getShopClients);
   const addDebt = useSelector(getCanAddDebt);
 
   const dispatch = useDispatch();
@@ -66,8 +64,8 @@ const NewClient = ({ route }) => {
     await new BaseApiService("/clients-controller")
       .postRequestWithJsonResponse(payload)
       .then(async (response) => {
-        const list = await saveShopClients(offlineParams, clients);
-        dispatch(setShopClients(list));
+        const list = await saveShopClients(offlineParams);
+        //dispatch(setShopClients(list));
         setLoading(false);
         snackRef.current.show("Client details saved successfully.", 8000);
       })

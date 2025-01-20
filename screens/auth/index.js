@@ -16,8 +16,8 @@ import { changeUser, loginAction } from "actions/userActions";
 import { screenWidth } from "@constants/Constants";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("akellocatherine3o@gmail.com");
+  const [password, setPassword] = useState("256702703828");
   const [loading, setLoading] = useState(false);
   const [showMoodal, setShowModal] = useState(false);
   const [message, setMessage] = useState(null);
@@ -35,7 +35,9 @@ export default function Login() {
       await new BaseApiService(LOGIN_END_POINT)
         .saveRequestWithJsonResponse(loginInfo, false)
         .then(async (response) => {
-          if (response?.accessToken) {
+          const doCheck = async () => {
+            const user = await UserSessionUtils.getUserDetails();
+
             await UserSessionUtils.setLoggedIn(true);
             await UserSessionUtils.setUserDetails(response.user);
             await UserSessionUtils.setUserAuthToken(response.accessToken);
@@ -45,11 +47,17 @@ export default function Login() {
             await UserSessionUtils.resetPendingSales();
             await UserSessionUtils.setLoginDetails(loginInfo);
 
-            dispatch(loginAction(response.user));
-            /// dispatch(changeUser(response.user));
-            navigation.dispatch(StackActions.replace(LANDING_SCREEN));
+            if (user) {
+              dispatch(loginAction(response.user));
+              navigation.dispatch(StackActions.replace(LANDING_SCREEN));
+              setLoading(false);
+            } else {
+              doCheck();
+            }
+          };
 
-            setLoading(false);
+          if (response?.accessToken) {
+            doCheck();
           }
         })
         .catch((error) => {

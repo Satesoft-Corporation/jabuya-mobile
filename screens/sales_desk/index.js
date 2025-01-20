@@ -28,8 +28,6 @@ import {
   getOffersDebt,
   getOfflineParams,
   getSelectedShop,
-  getShopClients,
-  getShopProducts,
   getShops,
   getUserType,
 } from "duqactStore/selectors";
@@ -47,6 +45,7 @@ import Loader from "@components/Loader";
 import HeldSaleModal from "./components/HeldSaleModal";
 import { getCanEnterSales } from "duqactStore/selectors/permissionSelectors";
 import NoAuth from "@screens/Unauthorised";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
 function SalesDesk({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -64,8 +63,6 @@ function SalesDesk({ navigation }) {
 
   const selectedShop = useSelector(getSelectedShop);
   const offlineParams = useSelector(getOfflineParams);
-  const shopProducts = useSelector(getShopProducts);
-  const shopClients = useSelector(getShopClients);
   const filterParams = useSelector(getFilterParams);
   const shops = useSelector(getShops);
   const selection = useSelector(getCartSelection);
@@ -88,13 +85,16 @@ function SalesDesk({ navigation }) {
   ];
 
   const fetchProducts = async () => {
+    const shopClients = await UserSessionUtils.getShopClients();
+    const shopProducts = await UserSessionUtils.getShopProducts();
+
     if (isSuperAdmin) {
       await fetchProductsFromServer();
       return;
     } else {
       const pdtList = shopProducts.filter((p) => p.shopId === selectedShop?.id);
 
-      const clist = shopClients.filter((i) => i?.shop?.id === selectedShop?.id);
+      const clist = shopClients.filter((i) => i?.shopId === selectedShop?.id);
 
       const inStock = pdtList
         ?.filter((pdt) => pdt?.performanceSummary)
@@ -135,8 +135,7 @@ function SalesDesk({ navigation }) {
     }
     if (isSuperAdmin === false) {
       setTimeout(async () => {
-        const pdts = await saveShopProductsOnDevice(offlineParams, shopProducts);
-        dispatch(setShopProducts(pdts));
+        const pdts = await saveShopProductsOnDevice(offlineParams, []);
       }, 10000);
     }
   };

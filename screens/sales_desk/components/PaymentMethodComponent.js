@@ -5,10 +5,11 @@ import { paymentMethods } from "@constants/Constants";
 import { MyDropDown } from "@components/DropdownComponents";
 import Colors from "@constants/Colors";
 import ChipButton from "@components/buttons/ChipButton";
-import { getCart, getCollectClientInfo, getOffersDebt, getShopClients } from "duqactStore/selectors";
+import { getCart, getCollectClientInfo, getOffersDebt } from "duqactStore/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { updateRecievedAmount } from "actions/shopActions";
 import { Switch } from "react-native-paper";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
 const PaymentMethodComponent = ({
   soldOnDate,
@@ -27,10 +28,11 @@ const PaymentMethodComponent = ({
 }) => {
   const offersDebt = useSelector(getOffersDebt);
   const collectInfo = useSelector(getCollectClientInfo);
-  const clients = useSelector(getShopClients) ?? [];
   const cart = useSelector(getCart);
 
   const [existingClient, setExistingClient] = useState(false);
+
+  const [clients, setClients] = useState([]);
 
   const onToggleSwitch = () => {
     setClientName("");
@@ -56,11 +58,20 @@ const PaymentMethodComponent = ({
     }
   };
 
+  const getClients = async () => {
+    const shopClients = await UserSessionUtils.getShopClients();
+    setClients(shopClients);
+  };
+
   useEffect(() => {
     if (recievedAmount < totalCartCost) {
       setAmountPaid(String(recievedAmount));
     }
   }, [visible]);
+
+  useEffect(() => {
+    getClients();
+  }, []);
 
   return (
     <View style={{ marginTop: 10 }}>

@@ -110,6 +110,10 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
 
           {balanceGivenOut !== 0 && <DataRow key={4} label={"Balance"} value={formatNumberWithCommas(balanceGivenOut, data?.currency)} />}
 
+          {data?.debtBalance > 0 && (
+            <DataRow key={6} label={"Outstanding balance"} value={formatNumberWithCommas(data?.debtBalance, data?.currency)} />
+          )}
+
           {canViewIncome && <DataRow key={5} label={"Income"} value={formatNumberWithCommas(profit, data?.currency)} />}
 
           {data?.clientName && <DataRow key={6} label={"Client's name"} value={data?.clientName} />}

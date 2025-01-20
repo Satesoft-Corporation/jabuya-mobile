@@ -36,10 +36,6 @@ export const getShops = (state) => state.userData.shops;
 
 export const getSelectedShop = (state) => state.userData.selectedShop;
 
-export const getShopProducts = (state) => state.userData.shopProducts;
-
-export const getShopClients = (state) => state.userData.clients;
-
 export const getOfflineSales = (state) => state.shop.offlineSales;
 
 export const getCartSelection = (state) => state.userData.cartSelection;

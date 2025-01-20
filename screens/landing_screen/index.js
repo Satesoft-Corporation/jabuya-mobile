@@ -28,9 +28,7 @@ import {
   getLookUps,
   getManufactures,
   getOfflineParams,
-  getShopClients,
   getShopOwnerId,
-  getShopProducts,
   getSuppliers,
   getUsersList,
 } from "duqactStore/selectors";
@@ -42,6 +40,8 @@ import { LOGIN_END_POINT } from "@utils/EndPointUtils";
 import { ALL_SHOPS_LABEL } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
 import { getNavList } from "./navList";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getReducerSize } from "duqactStore";
 
 const LandingScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -57,8 +57,6 @@ const LandingScreen = () => {
   const prevPinTime = useSelector(getLastApplockTime);
   const userList = useSelector(getUsersList);
   const shopOwnerId = useSelector(getShopOwnerId);
-  const prevProducts = useSelector(getShopProducts);
-  const prevClients = useSelector(getShopClients);
   const manufacturers = useSelector(getManufactures);
   const suppliers = useSelector(getSuppliers);
   const prevLookUps = useSelector(getLookUps);
@@ -105,11 +103,9 @@ const LandingScreen = () => {
       dispatch(setShops(shops));
 
       if (isAdmin == false) {
-        const products = await saveShopProductsOnDevice(offlineParams, prevProducts);
-        dispatch(setShopProducts(products));
+        await saveShopProductsOnDevice(offlineParams);
         if (offersDebt === true) {
-          const clients = await saveShopClients(offlineParams, prevClients);
-          dispatch(setShopClients(clients));
+          await saveShopClients(offlineParams);
         }
       }
 
@@ -155,7 +151,6 @@ const LandingScreen = () => {
 
         if (hours >= 13 || days >= 1) {
           await getRefreshToken();
-          //await configureUserData(true);
         }
         // }
         await handlePinLockStatus();
@@ -168,6 +163,7 @@ const LandingScreen = () => {
   };
 
   useEffect(() => {
+    //AsyncStorage.clear()
     handleLoginSession();
   }, []);
 

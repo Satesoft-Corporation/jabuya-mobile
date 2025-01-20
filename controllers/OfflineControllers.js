@@ -2,7 +2,6 @@ import { MAXIMUM_CACHEPAGE_SIZE, MAXIMUM_RECORDS_PER_FETCH } from "@constants/Co
 import { BaseApiService } from "@utils/BaseApiService";
 import {
   CLIENTS_ENDPOINT,
-  CLIENT_SALES_ENDPOINT,
   CURRENCIES_ENDPOINT,
   LOOK_UPS_ENDPOINT,
   MANUFACTURERS_ENDPOINT,
@@ -83,21 +82,36 @@ export const saveShopProductsOnDevice = async (searchParameters, prev = []) => {
   return pdts;
 };
 
-export const saveShopClients = async (searchParameters, prev = []) => {
-  let clients = [];
-
+export const saveShopClients = async (searchParameters) => {
+  console.log("saving clients");
   await new BaseApiService(CLIENTS_ENDPOINT)
     .getRequestWithJsonResponse(searchParameters)
     .then(async (response) => {
-      await UserSessionUtils.setShopClients(response.records);
-      clients = [...response.records];
+      const sorted = response.records
+        ?.map((i) => {
+          const currency = i?.shop?.currency?.symbol;
+          const shopId = i?.shop?.id;
+
+          const newData = { ...i, currency: currency, shopId: shopId };
+          delete newData?.shop;
+          return newData;
+        })
+        ?.sort((a, b) => {
+          if (a?.fullName < b?.fullName) {
+            return -1;
+          }
+          if (a?.fullName > b?.fullName) {
+            return 1;
+          }
+          return 0;
+        });
+
+      await UserSessionUtils.setShopClients(sorted);
+      console.log("clients saved");
     })
     .catch((error) => {
       console.log("Unknown Error", error?.message);
-      clients = [...prev];
     });
-
-  return clients;
 };
 
 export const saveLookUps = async (prev = []) => {
@@ -122,7 +136,6 @@ export const saveShopDetails = async (searchParameters, isShopAttendant = false)
 
   const apiUrl = isShopAttendant === false ? SHOP_ENDPOINT : `${SHOP_ENDPOINT}/${searchParameters?.shopId}`;
 
-  console.log(isShopAttendant);
   await new BaseApiService(apiUrl)
     .getRequestWithJsonResponse(searchParameters)
     .then(async (response) => {
@@ -141,6 +154,8 @@ export const saveShopDetails = async (searchParameters, isShopAttendant = false)
         const currency = currencyList?.find((cur) => cur?.id === response?.data?.currencyId);
 
         shopsArray = [{ ...response?.data, currency: currency?.symbol || "" }];
+
+        console.log("shops saved");
       }
     })
     .catch(async (error) => {

@@ -28,10 +28,7 @@ const initialState = {
 
   shops: [],
   selectedShop: null,
-  shopProducts: [],
   offlineSales: [],
-  clients: [],
-  clientSales: [],
   heldSales: [],
 
   cart: { cartItems: [], totalCartCost: 0, recievedAmount: 0, totalQty: 0 },
@@ -253,10 +250,6 @@ const userReduer = (state = initialState, action) => {
       return { ...state, shops: action.payload };
     }
 
-    case actions.SET_SHOP_PRODUCTS: {
-      return { ...state, shopProducts: action.payload };
-    }
-
     case actions.CHANGE_SELECTED_SHOP: {
       const allShops = action.payload.name === ALL_SHOPS_LABEL;
 
@@ -291,19 +284,6 @@ const userReduer = (state = initialState, action) => {
 
     case actions.ADD_CLIENT_SALES: {
       return { ...state, clientSales: action.payload };
-    }
-
-    case actions.ADD_SHOP_CLIENTS: {
-      const sorted = action?.payload?.sort((a, b) => {
-        if (a?.fullName < b?.fullName) {
-          return -1;
-        }
-        if (a?.fullName > b?.fullName) {
-          return 1;
-        }
-        return 0;
-      });
-      return { ...state, clients: sorted };
     }
 
     case actions.ADD_HELD_TXN: {

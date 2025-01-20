@@ -12,6 +12,7 @@ import { getFilterParams, getSelectedShop, getUserType } from "duqactStore/selec
 import { useSelector } from "react-redux";
 import DeleteRecordModal from "@components/DeleteRecordModal";
 import DamagesForm from "@screens/damages/DamagesForm";
+import { getCanCreateUpdateMyShopStock } from "duqactStore/selectors/permissionSelectors";
 
 const StockEntries = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
@@ -94,6 +95,7 @@ const StockEntries = ({ navigation }) => {
   }, [selectedShop]);
 
   const menuItems = [{ name: "Add purchase", onClick: () => navigation.navigate(STOCK_ENTRY_FORM) }];
+  const canDoStockCrud = useSelector(getCanCreateUpdateMyShopStock);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
@@ -104,7 +106,7 @@ const StockEntries = ({ navigation }) => {
         setSearchTerm={setSearchTerm}
         onSearch={onSearch}
         disabled={disable}
-        showMenuDots={userType !== userTypes.isShopAttendant}
+        showMenuDots={canDoStockCrud}
         menuItems={menuItems}
         showShops
       />

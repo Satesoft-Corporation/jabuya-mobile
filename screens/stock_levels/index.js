@@ -8,16 +8,15 @@ import ItemHeader from "@screens/sales/components/ItemHeader";
 import VerticalSeparator from "@components/VerticalSeparator";
 import Snackbar from "@components/Snackbar";
 import TopHeader from "@components/TopHeader";
-import { formatDate, formatNumberWithCommas } from "@utils/Utils";
+import { formatNumberWithCommas } from "@utils/Utils";
 import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
-import { saveExcelSheet } from "@utils/FileSystem";
-import { useDispatch, useSelector } from "react-redux";
-import { getIsAdmin, getOfflineParams, getSelectedShop, getShopProducts, getUserType } from "duqactStore/selectors";
-import { ALL_SHOPS_LABEL, userTypes } from "@constants/Constants";
-import { setShopProducts } from "actions/shopActions";
+import { useSelector } from "react-redux";
+import { getIsAdmin, getOfflineParams, getSelectedShop } from "duqactStore/selectors";
+import { ALL_SHOPS_LABEL } from "@constants/Constants";
 import StockLevelCard from "./StockLevelCard";
 import { getCanCreateUpdateMyShopStock, getCanViewShopCapital } from "duqactStore/selectors/permissionSelectors";
 import AdminStock from "./AdminStock";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
 const StockLevels = ({ navigation }) => {
   const [message, setMessage] = useState(null);
@@ -28,11 +27,8 @@ const StockLevels = ({ navigation }) => {
   const [stock, setStock] = useState(0);
   const [pdtValue, setPdtValue] = useState(0);
 
-  const dispatch = useDispatch();
-
   const offlineParams = useSelector(getOfflineParams);
   const selectedShop = useSelector(getSelectedShop);
-  const shopProducts = useSelector(getShopProducts);
 
   const canViewCapital = useSelector(getCanViewShopCapital);
   const canDoStockCrud = useSelector(getCanCreateUpdateMyShopStock);
@@ -42,9 +38,11 @@ const StockLevels = ({ navigation }) => {
 
   const fetchShopProducts = async () => {
     try {
+      const shopProducts = await UserSessionUtils.getShopProducts();
+
       setLoading(true);
 
-      let pdtList = shopProducts.filter((p) => p.shopId === selectedShop?.id);
+      let pdtList = shopProducts?.filter((p) => p.shopId === selectedShop?.id);
 
       if (selectedShop?.name === ALL_SHOPS_LABEL) {
         pdtList = [...shopProducts];
@@ -93,14 +91,14 @@ const StockLevels = ({ navigation }) => {
     } catch (error) {
       setMessage("Error fetching stock records");
       setLoading(false);
+      console.log(error);
     }
   };
 
   const handleRefresh = async () => {
     setSearchTerm("");
     setLoading(true);
-    const products = await saveShopProductsOnDevice(offlineParams, shopProducts);
-    dispatch(setShopProducts(products));
+    await saveShopProductsOnDevice(offlineParams);
     fetchShopProducts();
   };
 

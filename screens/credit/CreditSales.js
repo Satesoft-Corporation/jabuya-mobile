@@ -8,12 +8,14 @@ import VerticalSeparator from "@components/VerticalSeparator";
 import Colors from "@constants/Colors";
 import Snackbar from "@components/Snackbar";
 import CreditSaleCard from "./components/CreditSaleCard";
-import { getSelectedShop, getShopClients } from "duqactStore/selectors";
+import { getSelectedShop } from "duqactStore/selectors";
 import { useSelector } from "react-redux";
 import { hasInternetConnection } from "@utils/NetWork";
 import { formatNumberWithCommas } from "@utils/Utils";
 import { getCanViewDebts } from "duqactStore/selectors/permissionSelectors";
 import NoAuth from "@screens/Unauthorised";
+import { CLIENT_FORM } from "@navigation/ScreenNames";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
 const CreditSales = () => {
   const navigation = useNavigation();
@@ -25,10 +27,8 @@ const CreditSales = () => {
   const [debt, setDebt] = useState(0);
   const [paid, setPaid] = useState(0);
   const [bal, setBal] = useState(0);
-  const [adds, setAdds] = useState(0);
 
   const selectedShop = useSelector(getSelectedShop);
-  const shopClients = useSelector(getShopClients);
   const viewDebts = useSelector(getCanViewDebts);
 
   const snackbarRef = useRef(null);
@@ -39,10 +39,9 @@ const CreditSales = () => {
     setBal(0);
     setDebt(0);
     setPaid(0);
-    setAdds(0);
+    const shopClients = await UserSessionUtils.getShopClients();
 
-    const list = shopClients?.filter((i) => i?.shop?.id === selectedShop?.id);
-
+    const list = shopClients?.filter((i) => i?.shopId === selectedShop?.id);
     setClients(list);
 
     if (list.length === 0) {
@@ -50,8 +49,8 @@ const CreditSales = () => {
       setLoading(false);
       return true;
     }
-    const debt = list.reduce((a, b) => a + b?.debt, 0);
-    const paid = list.reduce((a, b) => a + b?.repaidAmount, 0);
+    const debt = list.reduce((a, b) => a + b?.debt || 0, 0);
+    const paid = list.reduce((a, b) => a + b?.repaidAmount || 0, 0);
     setDebt(debt);
     setPaid(paid);
     setBal(debt - paid);
@@ -80,7 +79,7 @@ const CreditSales = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark }}>
       <AppStatusBar />
-      <TopHeader title="Debt records" showShops />
+      <TopHeader title="Debt records" showShops menuItems={[{ name: "Add debtor", onClick: () => navigation.navigate(CLIENT_FORM) }]} showMenuDots />
       <View style={{ paddingBottom: 10 }}>
         <View style={styles.debtHeader}>
           <Text style={{ color: Colors.primary, fontSize: 16 }}>Debt summary</Text>
