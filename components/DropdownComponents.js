@@ -85,6 +85,7 @@ export const MyDropDown = ({
   showError = false,
   isSubmitted,
   divStyle = {},
+  renderItem = null,
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -116,6 +117,7 @@ export const MyDropDown = ({
           setIsFocus(false);
           onChange(item);
         }}
+        renderItem={renderItem ? (item) => renderItem(item) : null}
       />
       {isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>}
     </View>

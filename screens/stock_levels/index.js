@@ -17,6 +17,7 @@ import StockLevelCard from "./StockLevelCard";
 import { getCanCreateUpdateMyShopStock, getCanViewShopCapital } from "duqactStore/selectors/permissionSelectors";
 import AdminStock from "./AdminStock";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
+import { hasInternetConnection } from "@utils/NetWork";
 
 const StockLevels = ({ navigation }) => {
   const [message, setMessage] = useState(null);
@@ -87,7 +88,7 @@ const StockLevels = ({ navigation }) => {
         setMessage(`No results found for ${searchTerm}`);
       }
 
-      setTimeout(() => setLoading(false), 2000);
+      setLoading(false);
     } catch (error) {
       setMessage("Error fetching stock records");
       setLoading(false);
@@ -96,10 +97,21 @@ const StockLevels = ({ navigation }) => {
   };
 
   const handleRefresh = async () => {
-    setSearchTerm("");
-    setLoading(true);
-    await saveShopProductsOnDevice(offlineParams);
-    fetchShopProducts();
+    try {
+      const hasNet = await hasInternetConnection();
+      if (hasNet === true) {
+        setSearchTerm("");
+        setLoading(true);
+        await saveShopProductsOnDevice(offlineParams);
+        await fetchShopProducts();
+        snackbarRef.current.show("Data synced", 5000);
+      } else {
+        snackbarRef.current.show("Cannot connect to the internet");
+      }
+    } catch (e) {
+      setLoading(false);
+      snackbarRef.current.show("Unexpected error");
+    }
   };
 
   useEffect(() => {
@@ -114,7 +126,10 @@ const StockLevels = ({ navigation }) => {
     }
   };
 
-  const menuItems = [{ name: "List product", onClick: () => toProductEntry() }];
+  const menuItems = [
+    { name: "List product", onClick: () => toProductEntry() },
+    { name: "Sync", onClick: () => handleRefresh() },
+  ];
 
   if (isAdmin) {
     return <AdminStock />;
@@ -160,7 +175,7 @@ const StockLevels = ({ navigation }) => {
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
         renderItem={({ item }) => <StockLevelCard data={item} />}
-        onRefresh={handleRefresh}
+        onRefresh={() => {}}
         refreshing={loading}
         ListEmptyComponent={() => (
           <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

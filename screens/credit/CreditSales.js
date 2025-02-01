@@ -8,7 +8,7 @@ import VerticalSeparator from "@components/VerticalSeparator";
 import Colors from "@constants/Colors";
 import Snackbar from "@components/Snackbar";
 import CreditSaleCard from "./components/CreditSaleCard";
-import { getSelectedShop } from "duqactStore/selectors";
+import { getOfflineParams, getSelectedShop } from "duqactStore/selectors";
 import { useSelector } from "react-redux";
 import { hasInternetConnection } from "@utils/NetWork";
 import { formatNumberWithCommas } from "@utils/Utils";
@@ -16,6 +16,7 @@ import { getCanViewDebts } from "duqactStore/selectors/permissionSelectors";
 import NoAuth from "@screens/Unauthorised";
 import { CLIENT_FORM } from "@navigation/ScreenNames";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
+import { saveShopClients } from "@controllers/OfflineControllers";
 
 const CreditSales = () => {
   const navigation = useNavigation();
@@ -30,6 +31,7 @@ const CreditSales = () => {
 
   const selectedShop = useSelector(getSelectedShop);
   const viewDebts = useSelector(getCanViewDebts);
+  const offlineParams = useSelector(getOfflineParams);
 
   const snackbarRef = useRef(null);
 
@@ -58,16 +60,23 @@ const CreditSales = () => {
   };
 
   const handleRefresh = async () => {
-    const hasNet = await hasInternetConnection();
+    try {
+      const hasNet = await hasInternetConnection();
 
-    if (hasNet === true) {
-      setLoading(true);
-
-      fetchClients();
-    } else {
-      Alert.alert("Cannot connect to the internet");
+      if (hasNet === true) {
+        setLoading(true);
+        await saveShopClients(offlineParams);
+        await fetchClients();
+        snackbarRef.current.show("Data synced", 5000);
+      } else {
+        snackbarRef.current.show("Cannot connect to the internet");
+      }
+    } catch (e) {
+      setLoading(false);
+      snackbarRef.current.show("Unexpected error");
     }
   };
+
   useEffect(() => {
     fetchClients();
   }, [selectedShop]);
@@ -79,7 +88,15 @@ const CreditSales = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark }}>
       <AppStatusBar />
-      <TopHeader title="Debt records" showShops menuItems={[{ name: "Add debtor", onClick: () => navigation.navigate(CLIENT_FORM) }]} showMenuDots />
+      <TopHeader
+        title="Debt records"
+        showShops
+        menuItems={[
+          { name: "Add debtor", onClick: () => navigation.navigate(CLIENT_FORM) },
+          { name: "Sync", onClick: () => handleRefresh() },
+        ]}
+        showMenuDots
+      />
       <View style={{ paddingBottom: 10 }}>
         <View style={styles.debtHeader}>
           <Text style={{ color: Colors.primary, fontSize: 16 }}>Debt summary</Text>

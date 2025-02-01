@@ -23,6 +23,7 @@ import { STOCK_LEVELS } from "@navigation/ScreenNames";
 import { ScrollView } from "react-native";
 import { getCanCreateUpdateMyShopStock } from "duqactStore/selectors/permissionSelectors";
 import NoAuth from "@screens/Unauthorised";
+import Icon from "@components/Icon";
 
 const ProductEntry = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
@@ -224,9 +225,24 @@ const ProductEntry = ({ route }) => {
     }
   };
 
+  const renderItem = (item) => {
+    return (
+      <View style={{ flexDirection: "row", gap: 10, paddingHorizontal: 10, paddingVertical: 5, alignItems: "center" }}>
+        <Icon name="user" />
+
+        <View>
+          <Text>{item?.displayName}</Text>
+          <Text>By: {item?.manufacturerName}</Text>
+          <Text>Barcode: {item?.barcode}</Text>
+        </View>
+      </View>
+    );
+  };
+
   useEffect(() => {
     populateForm();
   }, []);
+
   if (!canDoStockCrud) {
     return <NoAuth />;
   }
@@ -287,6 +303,7 @@ const ProductEntry = ({ route }) => {
               valueField="id"
               showError
               isSubmitted={submitted}
+              renderItem={renderItem}
             />
 
             <MyInput value={customName} onValueChange={(e) => setCustomName(e)} label="Custom name" />

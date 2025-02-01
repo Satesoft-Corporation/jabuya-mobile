@@ -8,7 +8,7 @@ import Loader from "@components/Loader";
 import UserProfile from "@components/UserProfile";
 import { MenuIcon } from "@components/MenuIcon";
 import Colors from "@constants/Colors";
-import { COMING_SOON } from "@navigation/ScreenNames";
+import { COMING_SOON, SETTINGS } from "@navigation/ScreenNames";
 import LockScreenModal from "@screens/applock/LockScreenModal";
 import {
   saveLookUps,
@@ -170,16 +170,11 @@ const LandingScreen = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <Loader loading={loading} />
-      <UserProfile renderNtnIcon={false} showShops />
+      <UserProfile renderMenu renderNtnIcon={false} showShops menuItems={[{ name: "More", onClick: () => navigation.navigate(SETTINGS) }]} />
 
       <LockScreenModal showLock={showLock} hideLock={() => setShowLock(false)} />
 
-      <View
-        style={{
-          paddingHorizontal: 10,
-          marginTop: 10,
-        }}
-      >
+      <View style={{ paddingHorizontal: 10, marginTop: 10 }}>
         <FlatList
           style={{ marginTop: 10 }}
           data={navList}

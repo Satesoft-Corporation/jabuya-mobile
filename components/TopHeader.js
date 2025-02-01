@@ -7,6 +7,7 @@ import SearchBar from "./SearchBar";
 import { scale } from "react-native-size-matters";
 import { useSelector } from "react-redux";
 import { getSelectedShop } from "duqactStore/selectors";
+import Icon from "./Icon";
 
 const TopHeader = ({
   title = "Details",
@@ -30,93 +31,34 @@ const TopHeader = ({
   return (
     <View style={{ backgroundColor: "#000" }}>
       <View style={{ paddingHorizontal: 10, backgroundColor: Colors.dark }}>
-        <View
-          style={{
-            height: 40,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
+        <View style={{ height: 40, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Image
                 source={require("../assets/icons/icons8-chevron-left-30.png")}
-                style={{
-                  height: 30,
-                  width: 20,
-                  resizeMode: "contain",
-                }}
+                style={{ height: 30, width: 20, resizeMode: "contain" }}
                 tintColor={Colors.primary}
               />
             </TouchableOpacity>
 
-            <Text
-              style={{
-                color: Colors.primary,
-                fontSize: scale(17),
-                marginStart: 10,
-              }}
-            >
-              {title}
-            </Text>
+            <Text style={{ color: Colors.primary, fontSize: scale(17), marginStart: 10 }}>{title}</Text>
           </View>
 
-          <View
-            style={{
-              alignItems: "center",
-              minWidth: 30,
-              justifyContent: "flex-end",
-              flexDirection: "row",
-              gap: 10,
-            }}
-          >
-            {showSearch && (
-              <TouchableOpacity onPress={toggleSearch}>
-                <Image
-                  source={require("../assets/icons/ic_search_gray.png")}
-                  style={{
-                    height: 30,
-                    width: 20,
-                    resizeMode: "contain",
-                  }}
-                  tintColor={Colors.primary}
-                />
-              </TouchableOpacity>
-            )}
+          <View style={{ alignItems: "center", minWidth: 30, justifyContent: "flex-end", flexDirection: "row", gap: 10 }}>
+            {showSearch && <Icon name="search" color={Colors.primary} size={20} />}
 
             {showMenuDots && <PopUpmenu menuItems={menuItems} showShops={showShops} />}
           </View>
         </View>
 
         {showShopName && selectedShop && (
-          <Text
-            style={{
-              color: Colors.primary,
-              fontSize: scale(13),
-              paddingBottom: 8,
-              marginStart: 30,
-              marginTop: -10,
-            }}
-          >
-            {selectedShop?.name}
-          </Text>
+          <Text style={{ color: Colors.primary, fontSize: scale(13), paddingBottom: 8, marginStart: 30, marginTop: -10 }}>{selectedShop?.name}</Text>
         )}
       </View>
 
       {showBar && (
         <SearchBar
-          style={{
-            borderWidth: 1,
-            borderColor: Colors.gray,
-            marginBottom: 5,
-          }}
+          style={{ borderWidth: 1, borderColor: Colors.gray, marginBottom: 5 }}
           value={searchTerm}
           onChangeText={setSearchTerm}
           onSearch={onSearch}
