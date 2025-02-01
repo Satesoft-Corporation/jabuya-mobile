@@ -1,8 +1,11 @@
 // eas build -p android --profile preview
 
 export function formatNumberWithCommas(number, symbol) {
-  if (number === null || number === undefined || isNaN(number)) {
-    return `${symbol}0`;
+  if (isNaN(number)) {
+    if (symbol) {
+      return `${symbol}0`;
+    }
+    return 0;
   }
 
   const formattedNumber = Number(number).toLocaleString(undefined, {
