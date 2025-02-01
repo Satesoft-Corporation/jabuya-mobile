@@ -10,8 +10,9 @@ import { PDT_ENTRY } from "@navigation/ScreenNames";
 import { getFilterParams, getSelectedShop, getUserType } from "duqactStore/selectors";
 import { useSelector } from "react-redux";
 import StockLevelCard from "./StockLevelCard";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 
-const AdminStock = ({ navigation }) => {
+const AdminStock = () => {
   const [stockEntries, setStockEntries] = useState([]);
   const [stockEntryRecords, setStockEntryRecords] = useState(0);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -20,7 +21,8 @@ const AdminStock = ({ navigation }) => {
   const [offset, setOffset] = useState(0);
   const [disable, setDisable] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const navigation = useNavigation();
+  const isFocused = useIsFocused();
   const snackbarRef = useRef(null);
 
   const filterParams = useSelector(getFilterParams);
@@ -28,42 +30,44 @@ const AdminStock = ({ navigation }) => {
   const userType = useSelector(getUserType);
 
   const fetchStockEntries = async (offsetToUse = 0) => {
-    try {
-      setMessage(null);
-      setLoading(true);
+    if (isFocused) {
+      try {
+        setMessage(null);
+        setLoading(true);
 
-      const searchParameters = {
-        limit: MAXIMUM_RECORDS_PER_FETCH,
-        ...filterParams,
-        offset: offsetToUse,
-        ...(searchTerm && searchTerm.trim() !== "" && { searchTerm: searchTerm }),
-      };
+        const searchParameters = {
+          limit: MAXIMUM_RECORDS_PER_FETCH,
+          ...filterParams,
+          offset: offsetToUse,
+          ...(searchTerm && searchTerm.trim() !== "" && { searchTerm: searchTerm }),
+        };
 
-      setIsFetchingMore(true);
+        setIsFetchingMore(true);
 
-      const response = await new BaseApiService(SHOP_PRODUCTS_ENDPOINT).getRequestWithJsonResponse(searchParameters);
+        const response = await new BaseApiService(SHOP_PRODUCTS_ENDPOINT).getRequestWithJsonResponse(searchParameters);
 
-      if (offsetToUse === 0) {
-        setStockEntries(response.records);
-      } else {
-        setStockEntries((prev) => [...prev, ...response?.records]);
+        if (offsetToUse === 0) {
+          setStockEntries(response.records);
+        } else {
+          setStockEntries((prev) => [...prev, ...response?.records]);
+        }
+        setStockEntryRecords(response?.totalItems);
+        setDisable(false);
+
+        if (response?.totalItems === 0) {
+          setMessage("No records found");
+        }
+
+        if (response.totalItems === 0 && searchTerm !== "") {
+          setMessage(`No results found for ${searchTerm}`);
+        }
+        setIsFetchingMore(false);
+        setLoading(false);
+      } catch (error) {
+        setDisable(false);
+        setMessage("Error! " + error?.message);
+        setLoading(false);
       }
-      setStockEntryRecords(response?.totalItems);
-      setDisable(false);
-
-      if (response?.totalItems === 0) {
-        setMessage("No records found");
-      }
-
-      if (response.totalItems === 0 && searchTerm !== "") {
-        setMessage(`No results found for ${searchTerm}`);
-      }
-      setIsFetchingMore(false);
-      setLoading(false);
-    } catch (error) {
-      setDisable(false);
-      setMessage("Error! " + error?.message);
-      setLoading(false);
     }
   };
 

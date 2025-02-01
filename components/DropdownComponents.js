@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, TouchableOpacity, Image, Dimensions, Text } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Image, Dimensions, Text, ActivityIndicator } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../constants/Colors";
+import Icon from "./Icon";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -86,16 +87,24 @@ export const MyDropDown = ({
   isSubmitted,
   divStyle = {},
   renderItem = null,
+  onChangeText = () => {},
+  required = false,
+  loading = false,
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
   return (
     <View style={[{ width: "100%" }, divStyle]}>
-      {label && <Text style={{ fontSize: 15, marginBottom: 5 }}>{label}</Text>}
+      {label && (
+        <Text style={{ fontSize: 15, marginBottom: 5 }}>
+          {label}
+          {required && <Text style={{ color: Colors.error }}>*</Text>}
+        </Text>
+      )}
       <Dropdown
         disable={disable}
         style={[
-          { height: 40, borderColor: Colors.dark, borderWidth: 0.5, borderRadius: 5, paddingHorizontal: 13, width: "100%" },
+          { height: 40, borderColor: Colors.dark, borderWidth: 0.5, borderRadius: 5, paddingHorizontal: 13, width: "100%", flex: 1 },
           isFocus && { borderColor: Colors.primary },
           style,
         ]}
@@ -104,20 +113,22 @@ export const MyDropDown = ({
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
         data={data}
-        maxHeight={screenHeight / 2}
+        maxHeight={screenHeight / 1.5}
         labelField={labelField}
         valueField={valueField}
         placeholder={"Select item"}
-        searchPlaceholder="Search..."
+        searchPlaceholder="Type here to search..."
         value={value}
-        search={data?.length > 6}
+        search={true}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
           setIsFocus(false);
           onChange(item);
         }}
+        onChangeText={(text) => onChangeText(text)}
         renderItem={renderItem ? (item) => renderItem(item) : null}
+        renderRightIcon={() => (loading ? <ActivityIndicator color={"#000"} /> : <Icon name="angle-down" groupName="FontAwesome" />)}
       />
       {isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>}
     </View>

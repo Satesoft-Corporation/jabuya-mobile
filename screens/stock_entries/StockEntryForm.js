@@ -84,6 +84,12 @@ const StockEntryForm = ({ route }) => {
     setSubmitted(false);
   };
 
+  const handleSync = async () => {
+    setLoading(true);
+    await saveShopProductsOnDevice(offlineParams);
+    setLoading(false);
+  };
+
   const saveStockEntry = async () => {
     setSubmitted(true);
     setLoading(true);
@@ -126,7 +132,7 @@ const StockEntryForm = ({ route }) => {
           setSubmitted(false);
           setLoading(false);
           snackBarRef.current.show("Stock entry saved successfully", 6000);
-          setTimeout(() => saveShopProductsOnDevice(offlineParams), 5000);
+          setTimeout(() => handleSync(), 5000);
         })
         .catch((error) => {
           snackBarRef.current.show(error?.message, 5000);
@@ -204,7 +210,13 @@ const StockEntryForm = ({ route }) => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <TopHeader title="Stock purchase" showMenuDots menuItems={[{ name: "Stock Purchases", onClick: () => navigation.navigate(STOCK_ENTRY) }]} />
+        <TopHeader
+          title="Stock purchase"
+          showMenuDots
+          menuItems={[{ name: "Stock Purchases", onClick: () => navigation.navigate(STOCK_ENTRY) }]}
+          sync
+          onSync={handleSync}
+        />
         <Loader loading={loading} />
         <ScrollView
           contentContainerStyle={{ gap: 8, paddingBottom: 30 }}

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Duqact",
     "slug": "duqact",
-    "version": "1.4.7",
+    "version": "1.4.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -30,7 +30,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.byaffe.duqact",
-      "versionCode": 32
+      "versionCode": 33
     },
     "web": {
       "favicon": "./assets/favicon.png"

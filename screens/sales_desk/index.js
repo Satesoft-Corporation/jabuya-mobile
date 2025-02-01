@@ -13,7 +13,7 @@ import SalesTable from "./components/SalesTable";
 import Snackbar from "@components/Snackbar";
 import DataRow from "@components/card_components/DataRow";
 import { scale } from "react-native-size-matters";
-import { ALL_SHOPS_LABEL, screenWidth, userTypes } from "@constants/Constants";
+import { ALL_SHOPS_LABEL, screenWidth } from "@constants/Constants";
 import { SHOP_PRODUCTS_ENDPOINT } from "@utils/EndPointUtils";
 import { BaseApiService } from "@utils/BaseApiService";
 import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
@@ -29,7 +29,6 @@ import {
   getOfflineParams,
   getSelectedShop,
   getShops,
-  getUserType,
 } from "duqactStore/selectors";
 import {
   addHeldSalesToCart,
@@ -46,6 +45,7 @@ import HeldSaleModal from "./components/HeldSaleModal";
 import { getCanEnterSales } from "duqactStore/selectors/permissionSelectors";
 import NoAuth from "@screens/Unauthorised";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
+import { hasInternetConnection } from "@utils/NetWork";
 
 function SalesDesk({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -78,6 +78,26 @@ function SalesDesk({ navigation }) {
   const clearEverything = () => dispatch(clearCart());
 
   const { cartItems, totalCartCost, recievedAmount, totalQty } = cart;
+
+  const handleRefresh = async () => {
+    try {
+      const hasNet = await hasInternetConnection();
+      if (hasNet === true) {
+        setSearchTerm("");
+        setLoading(true);
+        await saveShopProductsOnDevice(offlineParams);
+        await fetchProducts();
+        setLoading(false);
+        snackbarRef.current.show("Data synced", 5000);
+      } else {
+        setLoading(false);
+        snackbarRef.current.show("Cannot connect to the internet");
+      }
+    } catch (e) {
+      setLoading(false);
+      snackbarRef.current.show("Unexpected error");
+    }
+  };
 
   const menuItems = [
     { name: "Daily sales", onClick: () => navigation.navigate(SALES_REPORTS) },
@@ -215,7 +235,7 @@ function SalesDesk({ navigation }) {
           paddingBottom: 5,
         }}
       >
-        <UserProfile renderMenu renderNtnIcon={false} menuItems={menuItems} />
+        <UserProfile renderMenu renderNtnIcon={false} menuItems={menuItems} sync onSync={handleRefresh} />
 
         <View style={{ marginTop: 15, gap: 5 }}>
           {!isShopAttendant && shops?.length > 1 && (

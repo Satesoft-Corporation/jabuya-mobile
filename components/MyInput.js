@@ -24,14 +24,13 @@ const MyInput = ({
   darkMode = false,
   showError = false,
   isSubmitted,
+  required = false,
   ...props
 }) => {
   const [visible, setVisible] = useState(false);
   const [viewPassword, setViewPassword] = useState(isPassword);
 
-
-  const togglePassword = (e) => setViewPassword(!viewPassword)
-
+  const togglePassword = (e) => setViewPassword(!viewPassword);
 
   const onChange = (event, selectedDate) => {
     setVisible(false);
@@ -45,10 +44,11 @@ const MyInput = ({
           style={{
             paddingHorizontal: 4,
             color: darkMode ? Colors.primary : Colors.dark,
-            marginBottom: 5
+            marginBottom: 5,
           }}
         >
           {label}
+          {required && <Text style={{ color: Colors.error }}>*</Text>}
         </Text>
       )}
       <Pressable
@@ -85,10 +85,15 @@ const MyInput = ({
           }}
           {...props}
         />
-        {
-          isPassword && <Icon size={18} name={viewPassword ? "eye" : "eye-off"} groupName="Feather" onPress={togglePassword} color={darkMode ? Colors.primary : ''} />
-
-        }
+        {isPassword && (
+          <Icon
+            size={18}
+            name={viewPassword ? "eye" : "eye-off"}
+            groupName="Feather"
+            onPress={togglePassword}
+            color={darkMode ? Colors.primary : ""}
+          />
+        )}
         {isDateInput && (
           <>
             <TouchableOpacity onPress={() => setVisible(true)}>
@@ -108,10 +113,7 @@ const MyInput = ({
           </>
         )}
       </Pressable>
-      {
-        isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>
-
-      }
+      {isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>}
     </View>
   );
 };

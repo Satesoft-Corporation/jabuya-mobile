@@ -19,6 +19,8 @@ const TopHeader = ({
   showMenuDots = false,
   menuItems,
   showShops = false,
+  sync = false,
+  onSync = () => {},
 }) => {
   const [showBar, setShowBar] = useState(false);
   const selectedShop = useSelector(getSelectedShop);
@@ -45,6 +47,8 @@ const TopHeader = ({
           </View>
 
           <View style={{ alignItems: "center", minWidth: 30, justifyContent: "flex-end", flexDirection: "row", gap: 10 }}>
+            {sync && <Icon name="sync" color={Colors.primary} size={18} onPress={onSync} />}
+
             {showSearch && <Icon name="search" color={Colors.primary} size={20} />}
 
             {showMenuDots && <PopUpmenu menuItems={menuItems} showShops={showShops} />}

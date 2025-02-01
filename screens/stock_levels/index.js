@@ -18,8 +18,9 @@ import { getCanCreateUpdateMyShopStock, getCanViewShopCapital } from "duqactStor
 import AdminStock from "./AdminStock";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import { hasInternetConnection } from "@utils/NetWork";
+import { useNavigation } from "@react-navigation/native";
 
-const StockLevels = ({ navigation }) => {
+const StockLevels = () => {
   const [message, setMessage] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [stockLevels, setStockLevels] = useState([]);
@@ -34,7 +35,7 @@ const StockLevels = ({ navigation }) => {
   const canViewCapital = useSelector(getCanViewShopCapital);
   const canDoStockCrud = useSelector(getCanCreateUpdateMyShopStock);
   const isAdmin = useSelector(getIsAdmin);
-
+  const navigation = useNavigation();
   const snackbarRef = useRef(null);
 
   const fetchShopProducts = async () => {
@@ -175,7 +176,7 @@ const StockLevels = ({ navigation }) => {
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
         renderItem={({ item }) => <StockLevelCard data={item} />}
-        onRefresh={() => {}}
+        onRefresh={() => fetchShopProducts()}
         refreshing={loading}
         ListEmptyComponent={() => (
           <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

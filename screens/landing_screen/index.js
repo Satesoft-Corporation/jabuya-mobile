@@ -170,7 +170,7 @@ const LandingScreen = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <Loader loading={loading} />
-      <UserProfile renderMenu renderNtnIcon={false} showShops menuItems={[{ name: "More", onClick: () => navigation.navigate(SETTINGS) }]} />
+      <UserProfile home />
 
       <LockScreenModal showLock={showLock} hideLock={() => setShowLock(false)} />
 

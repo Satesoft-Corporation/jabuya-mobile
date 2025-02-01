@@ -1,5 +1,8 @@
 // eas build -p android --profile preview
 
+export const isNotEmpty = (anyObject) => {
+  return anyObject !== undefined && anyObject !== null;
+};
 export function formatNumberWithCommas(number, symbol) {
   if (isNaN(number)) {
     if (symbol) {
