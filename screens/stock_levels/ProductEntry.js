@@ -38,6 +38,7 @@ const ProductEntry = ({ route }) => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [pdtLoadng, setPdtLoading] = useState(false);
   const [remarks, setRemarks] = useState("");
   const [customName, setCustomName] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -54,18 +55,18 @@ const ProductEntry = ({ route }) => {
   const fetchProducts = async () => {
     if (!route.params) {
       if (searchTerm?.length >= 3) {
-        setLoading(true);
+        setPdtLoading(true);
         const searchParameters = { offset: 0, limit: 20, ...(searchTerm && { searchTerm: searchTerm.trim() }) };
         await new BaseApiService("/products")
           .getRequestWithJsonResponse(searchParameters)
           .then(async (response) => {
             setProducts(response.records);
             setDisable(false);
-            setLoading(false);
+            setPdtLoading(false);
           })
           .catch((error) => {
             setDisable(false);
-            setLoading(false);
+            setPdtLoading(false);
             snackBarRef.current.show("Falied to fetch products, try again");
           });
       }
@@ -235,6 +236,7 @@ const ProductEntry = ({ route }) => {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
       <TopHeader title="List product" showMenuDots menuItems={[{ name: "Products", onClick: () => navigation.navigate(STOCK_LEVELS) }]} />
 
+      <Loader loading={loading} />
       <ScrollView contentContainerStyle={{ justifyContent: "space-between", paddingBottom: 30, gap: 20 }} style={{ paddingHorizontal: 10 }}>
         <View style={{ gap: 8 }}>
           <Text style={styles.headerText}>Enter product details</Text>
@@ -274,7 +276,7 @@ const ProductEntry = ({ route }) => {
             required
             isSubmitted={submitted}
             renderItem={renderItem}
-            loading={loading}
+            loading={pdtLoadng}
             onChangeText={(t) => {
               if (t && t !== "") {
                 setSearchTerm(t);
