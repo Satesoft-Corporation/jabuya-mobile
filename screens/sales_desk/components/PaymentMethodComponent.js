@@ -140,6 +140,8 @@ const PaymentMethodComponent = ({
         )}
 
         <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 10, marginTop: 5 }}>
+          <SoldOnDateComponent />
+
           <MyInput
             label={selectedPaymentMethod?.id === 0 ? "Recieved amount" : "Amount paid"}
             value={selectedPaymentMethod?.id === 0 ? String(recievedAmount) : amountPaid}
@@ -148,8 +150,6 @@ const PaymentMethodComponent = ({
             inputMode="numeric"
             style={{ flex: 0.5 }}
           />
-
-          <SoldOnDateComponent />
         </View>
       </View>
     </View>

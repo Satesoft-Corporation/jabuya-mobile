@@ -209,15 +209,17 @@ const ProductEntry = ({ route }) => {
 
   const renderItem = (item) => {
     return (
-      <View style={{ flexDirection: "row", gap: 10, paddingHorizontal: 10, paddingVertical: 10, alignItems: "center" }}>
+      <View style={{ flexDirection: "row", gap: 10, paddingHorizontal: 10, paddingVertical: 10, alignItems: "center", width: "92%" }}>
         {isNotEmpty(item?.imageUrl) ? (
           <Image source={{ uri: item?.imageUrl }} style={{ width: 70, height: 40 }} />
         ) : (
           <Icon name="file-image" groupName="FontAwesome6" size={25} color={Colors.gray} style={{ paddingHorizontal: 10 }} />
         )}
         <View>
-          <Text style={{ fontWeight: "bold" }}>{item?.displayName}</Text>
-          <Text>By: {item?.manufacturerName}</Text>
+          <Text style={{ fontWeight: "bold" }} numberOfLines={2}>
+            {item?.displayName}
+          </Text>
+          <Text numberOfLines={2}>By: {item?.manufacturerName}</Text>
           {item?.barcode && <Text>Barcode: {item?.barcode}</Text>}
         </View>
       </View>
@@ -274,6 +276,7 @@ const ProductEntry = ({ route }) => {
             valueField="id"
             showError
             required
+            forceSearch
             isSubmitted={submitted}
             renderItem={renderItem}
             loading={pdtLoadng}

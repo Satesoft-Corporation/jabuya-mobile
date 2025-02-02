@@ -39,7 +39,7 @@ const UserProfile = ({ home = false, renderMenu = false, menuItems, showShops, f
         {sync && <Icon name="sync" color={Colors.primary} size={17} onPress={onSync} />}
 
         {home && (
-          <Icon groupName="Entypo" name="dots-three-vertical" size={20} color={Colors.primary} onPress={() => navigation.navigate(SETTINGS)} />
+          <Icon groupName="Feather" name="settings" size={20} color={Colors.primary} onPress={() => navigation.navigate(SETTINGS)} />
         )}
         {renderMenu && <PopUpmenu menuItems={menuItems} showShops={showShops} />}
       </View>

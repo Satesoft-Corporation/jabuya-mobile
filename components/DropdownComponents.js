@@ -90,6 +90,8 @@ export const MyDropDown = ({
   onChangeText = () => {},
   required = false,
   loading = false,
+  forceSearch = false,
+  placeholder,
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -104,7 +106,7 @@ export const MyDropDown = ({
       <Dropdown
         disable={disable}
         style={[
-          { height: 40, borderColor: Colors.dark, borderWidth: 0.5, borderRadius: 5, paddingHorizontal: 13, width: "100%", flex: 1 },
+          { height: 40, borderColor: Colors.dark, borderWidth: 0.5, borderRadius: 5, paddingHorizontal: 13, width: "100%" },
           isFocus && { borderColor: Colors.primary },
           style,
         ]}
@@ -116,10 +118,10 @@ export const MyDropDown = ({
         maxHeight={screenHeight / 1.5}
         labelField={labelField}
         valueField={valueField}
-        placeholder={"Select item"}
+        placeholder={placeholder ?? "Select item"}
         searchPlaceholder="Type here to search..."
         value={value}
-        search={true}
+        search={forceSearch ? true : data?.length > 6}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
