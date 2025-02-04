@@ -31,7 +31,7 @@ const initialState = {
   offlineSales: [],
   heldSales: [],
 
-  cart: { cartItems: [], totalCartCost: 0, recievedAmount: 0, totalQty: 0 },
+  cart: { cartItems: [], totalCartCost: 0, recievedAmount: "", totalQty: 0 },
   cartSelection: null,
   offersDebt: false,
   collectClientInfo: false,
@@ -191,6 +191,29 @@ const userReduer = (state = initialState, action) => {
       }
     }
 
+    case actions.EDIT_CART_ITEM: {
+      const { productName, quantity, totalCost } = action.payload;
+
+      const { cartItems, totalCartCost, totalQty } = state.cart;
+
+      const exists = cartItems.find((item) => item.productName === productName);
+
+      if (exists) {
+        const newCartCost = totalCartCost + totalCost - exists?.totalCost;
+        const newCartQty = totalQty + quantity - exists?.quantity;
+
+        return {
+          ...state,
+          cart: {
+            cartItems: cartItems.map((item) => (item.productName === productName ? { ...action.payload } : item)),
+            totalCartCost: newCartCost,
+            totalQty: newCartQty,
+            recievedAmount: state.cart.recievedAmount,
+          },
+        };
+      }
+    }
+
     case actions.REMOVE_FROM_CART: {
       const { productName } = action.payload;
 
@@ -301,7 +324,7 @@ const userReduer = (state = initialState, action) => {
       const newCost = items?.reduce((a, b) => a + b?.totalCost, 0);
       const newQty = items?.reduce((a, b) => a + b?.quantity, 0);
 
-      return { ...state, cart: { cartItems: items, totalCartCost: newCost, totalQty: newQty, recievedAmount: 0 } };
+      return { ...state, cart: { cartItems: items, totalCartCost: newCost, totalQty: newQty, recievedAmount: "" } };
     }
 
     default:

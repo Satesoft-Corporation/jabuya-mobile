@@ -7,7 +7,7 @@ import { SwipeListView } from "react-native-swipe-list-view";
 import Icon from "@components/Icon";
 import { useRef } from "react";
 
-const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = true, onDelete = () => {}, returned = false }) => {
+const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = true, onDelete = () => {}, returned = false, editItem }) => {
   const listViewRef = useRef(null);
 
   const renderHiddenItem = (data) => {
@@ -25,7 +25,10 @@ const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = true, onDelet
           }}
         >
           {!returned ? (
-            <Icon name={"trash-alt"} color={Colors.error} size={17} onPress={() => onDelete(data)} />
+            <>
+              <Icon name={"edit"} color={Colors.green} size={17} onPress={() => editItem(data?.item)} />
+              <Icon name={"trash-alt"} color={Colors.error} size={17} onPress={() => onDelete(data)} />
+            </>
           ) : (
             <Icon name={"return-down-back"} size={20} onPress={() => onDelete(data)} groupName={"Ionicons"} />
           )}
@@ -59,7 +62,7 @@ const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = true, onDelet
           data={sales}
           renderItem={(data, rowMap) => <SaleListItem data={data.item} key={data?.index} />}
           renderHiddenItem={renderHiddenItem}
-          rightOpenValue={-50}
+          rightOpenValue={-75}
           disableRightSwipe
           disableLeftSwipe={disableSwipe}
         />

@@ -20,8 +20,14 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [shopUsers, setShopUsers] = useState([]);
   const [products, setProducts] = useState([]);
-
+  const [clients, setClients] = useState([]);
   const [filterDate, setFilterDate] = useState(new Date());
+  const [selectedClient, setSelectedClient] = useState(null);
+
+  const getClients = async () => {
+    const shopClients = await UserSessionUtils.getShopClients();
+    setClients(shopClients);
+  };
 
   const hideModal = () => {
     setShowFilters(false);
@@ -34,6 +40,7 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
       ...(filterProduct && filterShop && { shopProductId: filterProduct?.id }),
       ...(filterShop && { shopId: filterShop?.id }),
       ...(selectedUser && { userId: selectedUser?.id }),
+      ...(selectedClient && { clientId: selectedClient?.id }),
     };
 
     if (!datesMatch) {
@@ -62,12 +69,14 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
   useEffect(() => {
     getShopUsers();
     loadProducts();
+    getClients();
   }, [selectedShop]);
 
   const clearFilters = () => {
     setFiletrProduct(null);
     setFilterDate(new Date());
     setSelectedUser(null);
+    setSelectedClient(null);
   };
   return (
     <Modal
@@ -88,14 +97,28 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
               <MyDropDown data={shops} labelField={"name"} valueField={"id"} onChange={(e) => setFiletrShop(e)} value={filterShop} label={"Shop"} />
             )}
 
-            <MyDropDown
-              data={shopUsers}
-              labelField={"fullName"}
-              valueField={"id"}
-              onChange={(e) => setSelectedUser(e)}
-              value={selectedUser}
-              label={"Shop user"}
-            />
+            {shopUsers?.length > 1 && (
+              <MyDropDown
+                data={shopUsers}
+                labelField={"fullName"}
+                valueField={"id"}
+                onChange={(e) => setSelectedUser(e)}
+                value={selectedUser}
+                label={"Shop user"}
+              />
+            )}
+
+            {clients?.length > 0 && (
+              <MyDropDown
+                style={{ backgroundColor: Colors.light, borderColor: Colors.dark, marginTop: 5 }}
+                data={clients}
+                onChange={(e) => setSelectedClient(e)}
+                value={selectedClient}
+                placeholder="Select client"
+                labelField="fullName"
+                valueField="id"
+              />
+            )}
 
             <MyDropDown
               data={products}

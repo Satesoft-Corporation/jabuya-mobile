@@ -30,7 +30,7 @@ const PaymentMethodComponent = ({
   const collectInfo = useSelector(getCollectClientInfo);
   const cart = useSelector(getCart);
 
-  const [existingClient, setExistingClient] = useState(false);
+  const [existingClient, setExistingClient] = useState(true);
 
   const [clients, setClients] = useState([]);
 

@@ -69,6 +69,13 @@ export const addItemToCart = (item) => {
   };
 };
 
+export const editCartItem = (item) => {
+  return {
+    type: actionTypes.EDIT_CART_ITEM,
+    payload: item,
+  };
+};
+
 export const removeItemFromCart = (item) => {
   return {
     type: actionTypes.REMOVE_FROM_CART,

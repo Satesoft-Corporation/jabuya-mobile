@@ -7,9 +7,9 @@ import PrimaryButton from "@components/buttons/PrimaryButton";
 import { useDispatch, useSelector } from "react-redux";
 import { getCartSelection } from "duqactStore/selectors";
 import { isValidNumber } from "@utils/Utils";
-import { addItemToCart, makeProductSelection } from "actions/shopActions";
+import { addItemToCart, editCartItem, makeProductSelection } from "actions/shopActions";
 
-export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
+export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit, setItemToEdit }) {
   const selection = useSelector(getCartSelection);
 
   const dispatch = useDispatch();
@@ -23,11 +23,21 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
   const [unitSalesPrice, setUnitSalesPrice] = useState(""); //price for a sale unit
   const [saleUnit, setSaleUnit] = useState(null); //selected if multiple
 
+  useEffect(() => {
+    if (itemToEdit) {
+      console.log(itemToEdit);
+      setQuantity(String(itemToEdit?.quantity));
+      setUnitCost(String(itemToEdit?.unitCost));
+      setSaleUnit({});
+    }
+  }, [itemToEdit]);
+
   const hide = () => {
     dispatch(makeProductSelection(null));
     setUnitCost("");
     setQuantity("");
     setShowModal(false);
+    setItemToEdit(null);
   };
 
   const onChipPress = (item) => {
@@ -88,6 +98,20 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
         dispatch(addItemToCart(readyItem));
         hide();
       }
+    }
+
+    if (itemToEdit) {
+      if (quantity >= 1 && unitCost >= itemToEdit?.unitCost) {
+        const readyItem = {
+          ...itemToEdit,
+          quantity: Number(quantity),
+          totalCost: Math.round(Number(unitCost) * Number(quantity)),
+          unitCost: Number(unitCost),
+        };
+
+        dispatch(editCartItem(readyItem));
+        hide();
+      }
     } else {
       setSubmitted(true);
     }
@@ -106,11 +130,13 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
   }, [selection]);
 
   return (
-    <ModalContent visible={showMoodal} style={{ padding: 30 }}>
+    <ModalContent visible={showMoodal} style={{ padding: 20 }}>
       <View style={{ paddingHorizontal: 5 }}>
         <View style={{ marginTop: 10, marginBottom: 5 }}>
-          <Text style={{ fontWeight: "600", fontSize: 20, marginBottom: 5 }}>Successfull</Text>
-          <Text>{selection?.productName} has been selected.</Text>
+          <Text style={{ fontWeight: "600", fontSize: 20, marginBottom: 5 }}>{itemToEdit ? "Edit" : "Successfull"}</Text>
+          <Text>
+            {selection?.productName || itemToEdit?.productName} {!itemToEdit && "has been selected."}
+          </Text>
 
           {!saleUnit && (
             <View style={{ marginTop: 10 }}>

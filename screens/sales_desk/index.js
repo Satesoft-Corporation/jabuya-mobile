@@ -57,6 +57,8 @@ function SalesDesk({ navigation }) {
   const [holdSaleModal, setHoldSaleModal] = useState(false);
   const [selectedHeldSale, setSelectedHeldSale] = useState(null);
 
+  const [itemToEdit, setItemToEdit] = useState(null);
+
   const snackbarRef = useRef(null);
 
   const dispatch = useDispatch();
@@ -178,6 +180,11 @@ function SalesDesk({ navigation }) {
     dispatch(removeItemFromCart(data?.item));
   };
 
+  const editItem = (data) => {
+    setItemToEdit(data);
+    setShowModal(true);
+  };
+
   const makeSelection = (item) => {
     setSelectedHeldSale(null);
     dispatch(makeProductSelection(item));
@@ -225,7 +232,7 @@ function SalesDesk({ navigation }) {
         setLoading={setLoading}
       />
 
-      <EnterSaleQtyModal showMoodal={showMoodal} setShowModal={setShowModal} />
+      <EnterSaleQtyModal showMoodal={showMoodal} setShowModal={setShowModal} itemToEdit={itemToEdit} setItemToEdit={setItemToEdit} />
 
       <HeldSaleModal visible={holdSaleModal} setVisible={setHoldSaleModal} />
 
@@ -294,7 +301,7 @@ function SalesDesk({ navigation }) {
               padding: 10,
             }}
           >
-            <SalesTable sales={cartItems} disableSwipe={false} onDelete={onDelete} />
+            <SalesTable sales={cartItems} disableSwipe={false} onDelete={onDelete} editItem={editItem} />
           </View>
 
           <View
@@ -353,7 +360,7 @@ function SalesDesk({ navigation }) {
               padding: 10,
             }}
           >
-            <DataRow label={"Balance"} value={formatNumberWithCommas(recievedAmount - totalCartCost)} currency={selectedShop?.currency} />
+            <DataRow label={"Balance"} value={formatNumberWithCommas(Number(recievedAmount) - totalCartCost)} currency={selectedShop?.currency} />
           </View>
 
           <View style={{ marginBottom: 20, gap: 5 }}>

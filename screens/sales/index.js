@@ -78,14 +78,14 @@ export default function ViewSales() {
       limit: 0,
       ...filterParams,
       ...(!params && { startDate: getCurrentDay() }),
-      ...(!params?.startDate && !params?.shopProductId && !params?.userId && { startDate: getCurrentDay() }),
+      ...(!params?.startDate && !params?.shopProductId && !params?.userId && !params?.clientId && { startDate: getCurrentDay() }),
       ...(params && params),
     };
 
     if (!searchParameters?.startDate) {
       setDate(null);
     }
-    // console.log(searchParameters);
+    //console.log(searchParameters);
     const hasNet = await hasInternetConnection();
 
     if (hasNet === false) {
