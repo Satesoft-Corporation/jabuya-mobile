@@ -69,19 +69,19 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
       {!expanded && (
         <View style={{ gap: 2 }}>
           <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <Text style={{ fontWeight: 600 }}>Items</Text>
+            <Text>Items</Text>
 
             {data?.clientName && (
-              <Text style={{ fontWeight: "600" }}>
+              <Text>
                 Client:{" "}
-                <Text style={{ fontWeight: "500" }}>
+                <Text style={{ fontWeight: "600" }}>
                   {data?.clientName} {data?.clientPhoneNumber}
                 </Text>
               </Text>
             )}
           </View>
-          <Text numberOfLines={2} style={{ fontWeight: "500" }}>
-            {data?.name}
+          <Text numberOfLines={2} style={{ fontWeight: 600 }}>
+            {data?.name?.trim()}
           </Text>
         </View>
       )}

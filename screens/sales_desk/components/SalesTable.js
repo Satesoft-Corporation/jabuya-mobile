@@ -89,7 +89,7 @@ const SaleListItem = ({ data }) => {
       }}
     >
       <Text style={{ flex: 2.5, justifyContent: "center", textDecorationLine: cancellationReason ? "line-through" : "" }} numberOfLines={2}>
-        {productName || shopProductName + unitName}
+        {productName?.trim() || shopProductName?.trim() + unitName}
       </Text>
       <Text style={{ flex: 0.5, textAlign: "center", textDecorationLine: cancellationReason ? "line-through" : "" }}>{data?.quantity}</Text>
 
