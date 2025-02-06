@@ -37,7 +37,9 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
     setUnitCost("");
     setQuantity("");
     setShowModal(false);
-    setItemToEdit(null);
+    if (itemToEdit) {
+      setItemToEdit(null);
+    }
   };
 
   const onChipPress = (item) => {

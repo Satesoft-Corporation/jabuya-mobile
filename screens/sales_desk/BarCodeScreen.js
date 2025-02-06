@@ -11,6 +11,7 @@ const BarCodeScreen = ({ navigation, route }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [showMoodal, setShowModal] = useState(false);
   const [scanned, setScanned] = useState(false);
+  const [itemToEdit, setItemToEdit] = useState(null);
 
   const { products } = route?.params;
 
@@ -37,7 +38,6 @@ const BarCodeScreen = ({ navigation, route }) => {
     console.log("scanning");
     if (products) {
       const item = products.find((item) => item.barcode === barcode);
-      console.log(item, "ghgggh", products);
       if (!item) {
         Alert.alert("Cannot find product in your shop", "", [
           {
@@ -63,9 +63,14 @@ const BarCodeScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <EnterSaleQtyModal showMoodal={showMoodal} setShowModal={setShowModal} />
+      <EnterSaleQtyModal showMoodal={showMoodal} setShowModal={setShowModal} itemToEdit={itemToEdit} setItemToEdit={(d) => setItemToEdit(d)} />
 
-      <BarCodeScanner height={screenHeight} width={screenWidth} onBarCodeScanned={scanned ? undefined : handleBarCodeScanned} style={{ marginTop: -20 }} />
+      <BarCodeScanner
+        height={screenHeight}
+        width={screenWidth}
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={{ marginTop: -20 }}
+      />
       <View style={styles.overlay}>
         <View style={styles.unfocusedContainer}></View>
         <View style={{ flexDirection: "row" }}>
