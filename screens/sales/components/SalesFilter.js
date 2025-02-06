@@ -105,6 +105,7 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
                 onChange={(e) => setSelectedUser(e)}
                 value={selectedUser}
                 label={"Shop user"}
+                placeholder="Select shop user"
               />
             )}
 
@@ -117,6 +118,7 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
                 placeholder="Select client"
                 labelField="fullName"
                 valueField="id"
+                label={"Client"}
               />
             )}
 

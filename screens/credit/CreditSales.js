@@ -28,6 +28,7 @@ const CreditSales = () => {
   const [debt, setDebt] = useState(0);
   const [paid, setPaid] = useState(0);
   const [bal, setBal] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const selectedShop = useSelector(getSelectedShop);
   const viewDebts = useSelector(getCanViewDebts);
@@ -43,7 +44,10 @@ const CreditSales = () => {
     setPaid(0);
     const shopClients = await UserSessionUtils.getShopClients();
 
-    const list = shopClients?.filter((i) => i?.shopId === selectedShop?.id);
+    const list = shopClients
+      ?.filter((i) => i?.shopId === selectedShop?.id)
+      ?.filter((item) => item?.fullName?.toLowerCase()?.includes(searchTerm.toLowerCase().trim()));
+
     setClients(list);
 
     if (list.length === 0) {
@@ -96,6 +100,10 @@ const CreditSales = () => {
           { name: "Sync", onClick: () => handleRefresh() },
         ]}
         showMenuDots
+        showSearch
+        searchTerm={searchTerm}
+        setSearchTerm={(e) => setSearchTerm(e)}
+        onSearch={() => fetchClients()}
       />
       <View style={{ paddingBottom: 10 }}>
         <View style={styles.debtHeader}>

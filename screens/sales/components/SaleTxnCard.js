@@ -10,6 +10,7 @@ import { getShops } from "duqactStore/selectors";
 import { scale } from "react-native-size-matters";
 import Colors from "@constants/Colors";
 import { getCanDeleteSales, getCanViewShopIncome } from "duqactStore/selectors/permissionSelectors";
+import ChipButton2 from "@components/buttons/ChipButton2";
 
 function SaleTxnCard({ data, print, onDelete, onSwipe }) {
   const shops = useSelector(getShops) ?? [];
@@ -39,10 +40,14 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
 
   const serialNumber = () => {
     return (
-      <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: !expanded ? 10 : 0 }}>
-        <Text style={{ fontSize: scale(12) }}>SN: {data?.serialNumber}</Text>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: !expanded ? 10 : 0, alignItems: "center" }}>
+        <View>
+          <Text style={{ fontSize: scale(12) }}>SN: {data?.serialNumber}</Text>
 
-        <Text style={{ fontSize: scale(12), color: Colors.gray, alignSelf: "flex-end" }}>{formatDate(data?.dateCreated)}</Text>
+          <Text style={{ fontSize: scale(12), color: Colors.gray, alignSelf: "flex-end" }}>{formatDate(data?.dateCreated)}</Text>
+        </View>
+
+        <ChipButton2 title={3} darkMode={false} />
       </View>
     );
   };
@@ -68,9 +73,9 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
             <Text style={{ fontWeight: 600 }}>Items</Text>
 
             {data?.clientName && (
-              <Text>
+              <Text style={{ fontWeight: "600" }}>
                 Client:{" "}
-                <Text style={{ fontWeight: "600" }}>
+                <Text style={{ fontWeight: "500" }}>
                   {data?.clientName} {data?.clientPhoneNumber}
                 </Text>
               </Text>
@@ -116,7 +121,7 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
 
           {canViewIncome && <DataRow key={5} label={"Income"} value={formatNumberWithCommas(profit, data?.currency)} />}
 
-          {data?.clientName && <DataRow key={6} label={"Client's name"} value={data?.clientName} />}
+          {data?.clientName && <DataRow key={63} label={"Client's name"} value={data?.clientName} />}
 
           {data?.clientPhoneNumber && <DataRow key={7} label={"Client's mobile"} value={data?.clientPhoneNumber} />}
         </View>
