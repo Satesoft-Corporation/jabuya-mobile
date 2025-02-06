@@ -46,8 +46,7 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
 
           <Text style={{ fontSize: scale(12), color: Colors.gray, alignSelf: "flex-end" }}>{formatDate(data?.dateCreated)}</Text>
         </View>
-
-        <ChipButton2 title={3} darkMode={false} />
+        {data?.attendantDailyReceiptCount && <ChipButton2 title={data?.attendantDailyReceiptCount} darkMode={false} />}
       </View>
     );
   };

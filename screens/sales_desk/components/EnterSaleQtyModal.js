@@ -9,7 +9,7 @@ import { getCartSelection } from "duqactStore/selectors";
 import { isValidNumber } from "@utils/Utils";
 import { addItemToCart, editCartItem, makeProductSelection } from "actions/shopActions";
 
-export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit, setItemToEdit }) {
+export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit, setItemToEdit = () => {} }) {
   const selection = useSelector(getCartSelection);
 
   const dispatch = useDispatch();
