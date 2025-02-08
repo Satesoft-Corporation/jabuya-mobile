@@ -31,3 +31,4 @@ export const LEADS = "Leads";
 export const LEADS_FORM = "Leads_form";
 export const DAMAGES = "damages";
 export const CONTACT_DETAILS = "contact_details";
+export const CHECK_OUT = "check_out";

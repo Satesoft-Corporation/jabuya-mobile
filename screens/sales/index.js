@@ -37,6 +37,7 @@ export default function ViewSales() {
   const [showFilters, setShowFilters] = useState(false);
   const [date, setDate] = useState(new Date());
   const [selectedLineItem, setSelectedLineItem] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const filterParams = useSelector(getFilterParams);
   const selectedShop = useSelector(getSelectedShop);
@@ -65,6 +66,7 @@ export default function ViewSales() {
     setDaysProfit(0);
     setMessage(null);
     setDate(new Date());
+    setEndDate(null);
     setSelectedLineItem(null);
     setSelectedSale(null);
   };
@@ -75,17 +77,20 @@ export default function ViewSales() {
 
     const searchParameters = {
       offset: 0,
-      limit: 0,
+      limit: 200,
       ...filterParams,
       ...(!params && { startDate: getCurrentDay() }),
-      ...(!params?.startDate && !params?.shopProductId && !params?.userId && !params?.clientId && { startDate: getCurrentDay() }),
+      ...(!params?.startDate && !params?.shopProductId && !params?.userId && !params?.clientId && !params?.endDate && { startDate: getCurrentDay() }),
       ...(params && params),
     };
 
-    if (!searchParameters?.startDate) {
-      setDate(null);
+    if (searchParameters?.startDate) {
+      setDate(searchParameters?.startDate);
     }
-    //console.log(searchParameters);
+
+    if (searchParameters?.endDate) {
+      setEndDate(searchParameters?.endDate);
+    }
     const hasNet = await hasInternetConnection();
 
     if (hasNet === false) {
@@ -152,7 +157,11 @@ export default function ViewSales() {
             <View style={{ gap: 2 }}>
               <Text style={{ color: Colors.primary, fontSize: 16, fontWeight: 600 }}>Sales summary</Text>
             </View>
-            {date && <Text style={{ color: Colors.primary, fontSize: 13, fontWeight: 600 }}>{formatDate(date, true)}</Text>}
+            {date && (
+              <Text style={{ color: Colors.primary, fontSize: 13, fontWeight: 600 }} onPress={() => setShowFilters(true)}>
+                {formatDate(date, true)} {endDate && `to ${formatDate(endDate, true)}`}
+              </Text>
+            )}
           </View>
 
           <View style={{ flexDirection: "row", marginTop: 15, justifyContent: "space-between", paddingHorizontal: 12 }}>

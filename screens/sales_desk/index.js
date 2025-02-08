@@ -236,12 +236,7 @@ function SalesDesk({ navigation }) {
 
       <HeldSaleModal visible={holdSaleModal} setVisible={setHoldSaleModal} />
 
-      <View
-        style={{
-          backgroundColor: "#000",
-          paddingBottom: 5,
-        }}
-      >
+      <View style={{ backgroundColor: "#000", paddingBottom: 5 }}>
         <UserProfile renderMenu renderNtnIcon={false} menuItems={menuItems} sync onSync={handleRefresh} />
 
         <View style={{ marginTop: 15, gap: 5 }}>
@@ -290,13 +285,7 @@ function SalesDesk({ navigation }) {
 
       <ScrollView style={{ backgroundColor: Colors.light_2, flex: 1 }} showsVerticalScrollIndicator={false}>
         <View style={{ paddingHorizontal: 10, marginTop: 7, gap: 10 }}>
-          <View
-            style={{
-              backgroundColor: Colors.light,
-              borderRadius: 5,
-              padding: 10,
-            }}
-          >
+          <View style={{ backgroundColor: Colors.light, borderRadius: 5, padding: 10 }}>
             <SalesTable sales={cartItems} disableSwipe={false} onDelete={onDelete} editItem={editItem} />
           </View>
 
@@ -323,24 +312,13 @@ function SalesDesk({ navigation }) {
                 onChangeText={(text) => {
                   dispatch(updateRecievedAmount(text));
                 }}
-                style={{
-                  backgroundColor: Colors.light,
-                  borderRadius: 5,
-                  fontSize: scale(15),
-                  marginEnd: 5,
-                }}
+                style={{ backgroundColor: Colors.light, borderRadius: 5, fontSize: scale(15), marginEnd: 5 }}
                 placeholder="Enter amount"
               />
             </View>
           </View>
 
-          <View
-            style={{
-              backgroundColor: Colors.light,
-              borderRadius: 5,
-              padding: 10,
-            }}
-          >
+          <View style={{ backgroundColor: Colors.light, borderRadius: 5, padding: 10 }}>
             <DataRow
               label={`Sold ${totalQty > 1 ? `${totalQty} items` : totalQty === 1 ? `${totalQty} item` : ""}`}
               value={formatNumberWithCommas(totalCartCost)}
@@ -349,24 +327,12 @@ function SalesDesk({ navigation }) {
             />
           </View>
 
-          <View
-            style={{
-              backgroundColor: Colors.light,
-              borderRadius: 5,
-              padding: 10,
-            }}
-          >
+          <View style={{ backgroundColor: Colors.light, borderRadius: 5, padding: 10 }}>
             <DataRow label={"Balance"} value={formatNumberWithCommas(Number(recievedAmount) - totalCartCost)} currency={selectedShop?.currency} />
           </View>
 
           <View style={{ marginBottom: 20, gap: 5 }}>
-            <View
-              style={{
-                marginTop: 8,
-                flexDirection: "row",
-                gap: 5,
-              }}
-            >
+            <View style={{ marginTop: 8, flexDirection: "row", gap: 5 }}>
               <View style={{ flex: 0.3 }}>
                 <PrimaryButton
                   title={"Clear"}

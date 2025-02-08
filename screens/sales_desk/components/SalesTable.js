@@ -56,7 +56,7 @@ const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = true, onDelet
 
         <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>Amount</Text>
       </View>
-      <ScrollView style={fixHeight ? { height: screenHeight / 3 } : { maxHeight: screenHeight }}>
+      <ScrollView style={fixHeight ? { height: screenHeight / 3.5 } : { maxHeight: screenHeight }}>
         <SwipeListView
           ref={listViewRef}
           data={sales}

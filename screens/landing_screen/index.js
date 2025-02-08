@@ -8,7 +8,6 @@ import Loader from "@components/Loader";
 import UserProfile from "@components/UserProfile";
 import { MenuIcon } from "@components/MenuIcon";
 import Colors from "@constants/Colors";
-import { COMING_SOON, SETTINGS } from "@navigation/ScreenNames";
 import LockScreenModal from "@screens/applock/LockScreenModal";
 import {
   saveLookUps,
@@ -35,13 +34,11 @@ import {
 import { useDispatch } from "react-redux";
 import { addLookUps, setIsUserConfigured, tokenRefresh } from "actions/userActions";
 import { BaseApiService } from "@utils/BaseApiService";
-import { addManufacturers, addSuppliers, changeSelectedShop, setShopClients, setShopProducts, setShops } from "actions/shopActions";
+import { addManufacturers, addSuppliers, changeSelectedShop, setShops } from "actions/shopActions";
 import { LOGIN_END_POINT } from "@utils/EndPointUtils";
 import { ALL_SHOPS_LABEL } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
 import { getNavList } from "./navList";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getReducerSize } from "duqactStore";
 
 const LandingScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -146,13 +143,13 @@ const LandingScreen = () => {
 
         console.log("login time", logintimeDifferance);
 
-        ////if (hasNet === true) {
-        await configureUserData(configStatus === false);
+        //if (hasNet === true) {
+          await configureUserData(configStatus === false);
 
-        if (hours >= 13 || days >= 1) {
-          await getRefreshToken();
-        }
-        // }
+          if (hours >= 20 || days >= 1) {
+            await getRefreshToken();
+          }
+        //}
         await handlePinLockStatus();
       }
       setLoading(false);
@@ -163,7 +160,6 @@ const LandingScreen = () => {
   };
 
   useEffect(() => {
-    //AsyncStorage.clear()
     handleLoginSession();
   }, []);
 

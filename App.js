@@ -35,6 +35,8 @@ import ProductEntry from "@screens/stock_levels/ProductEntry";
 import Damages from "@screens/damages";
 import ContactBook from "@screens/contacts";
 import ContactDetails from "@screens/contacts/ContactDetails";
+import { navigatorRef } from "./navigation";
+import CheckOut from "@screens/sales_desk/CheckOut";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -42,7 +44,7 @@ export default function App() {
   return (
     <Provider store={duqactStore}>
       <MenuProvider>
-        <NavigationContainer>
+        <NavigationContainer ref={navigatorRef}>
           <AppStatusBar />
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name={"Loading"} component={LoadingScreen} />
@@ -74,6 +76,7 @@ export default function App() {
             <Stack.Screen name={s.LEADS_FORM} component={LeadsForm} />
             <Stack.Screen name={s.DAMAGES} component={Damages} />
             <Stack.Screen name={s.CONTACT_DETAILS} component={ContactDetails} />
+            <Stack.Screen name={s.CHECK_OUT} component={CheckOut} />
           </Stack.Navigator>
         </NavigationContainer>
       </MenuProvider>

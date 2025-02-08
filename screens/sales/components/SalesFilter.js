@@ -11,7 +11,7 @@ import { convertDateFormat, formatDate } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 
-const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
+const SalesFilter = ({ showFilters, setShowFilters, getSales }) => {
   const shops = useSelector(getShops) ?? [];
   const selectedShop = useSelector(getSelectedShop);
 
@@ -21,8 +21,10 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
   const [shopUsers, setShopUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [clients, setClients] = useState([]);
-  const [filterDate, setFilterDate] = useState(new Date());
   const [selectedClient, setSelectedClient] = useState(null);
+
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
 
   const getClients = async () => {
     const shopClients = await UserSessionUtils.getShopClients();
@@ -32,20 +34,18 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
   const hideModal = () => {
     setShowFilters(false);
   };
+
   const applyFilter = () => {
-    const datesMatch = formatDate(filterDate, true) === formatDate(new Date(), true);
+    const startDateMatch = formatDate(startDate, true) === formatDate(new Date(), true);
 
     const searchParameters = {
-      ...(!datesMatch && { startDate: convertDateFormat(filterDate), endDate: convertDateFormat(filterDate, true) }),
+      ...(!startDateMatch && { startDate: convertDateFormat(startDate), endDate: convertDateFormat(endDate) }),
       ...(filterProduct && filterShop && { shopProductId: filterProduct?.id }),
       ...(filterShop && { shopId: filterShop?.id }),
       ...(selectedUser && { userId: selectedUser?.id }),
       ...(selectedClient && { clientId: selectedClient?.id }),
     };
 
-    if (!datesMatch) {
-      setDate(filterDate);
-    }
     getSales(searchParameters);
     hideModal();
   };
@@ -74,7 +74,8 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
 
   const clearFilters = () => {
     setFiletrProduct(null);
-    setFilterDate(new Date());
+    setStartDate(new Date());
+    setEndDate(new Date());
     setSelectedUser(null);
     setSelectedClient(null);
   };
@@ -92,7 +93,28 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
         <View style={{ paddingBottom: 15 }}>
           <Text style={{ fontSize: 18, textAlign: "center" }}>Filter Sales</Text>
 
-          <View style={{ gap: 10 }}>
+          <View style={{ gap: 10, marginTop: 10 }}>
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <MyInput
+                placeholder={"From date"}
+                isDateInput
+                label="From date"
+                dateValue={startDate}
+                maximumDate
+                onDateChange={(date) => setStartDate(date)}
+                style={{ flex: 0.5 }}
+              />
+              <MyInput
+                style={{ flex: 0.5 }}
+                placeholder={"To date"}
+                isDateInput
+                label="To date"
+                dateValue={endDate}
+                maximumDate
+                onDateChange={(date) => setEndDate(date)}
+              />
+            </View>
+
             {shops?.length > 1 && (
               <MyDropDown data={shops} labelField={"name"} valueField={"id"} onChange={(e) => setFiletrShop(e)} value={filterShop} label={"Shop"} />
             )}
@@ -129,15 +151,6 @@ const SalesFilter = ({ showFilters, setShowFilters, getSales, setDate }) => {
               onChange={(e) => setFiletrProduct(e)}
               value={filterProduct}
               label={"Product"}
-            />
-
-            <MyInput
-              placeholder={"Select a date"}
-              isDateInput
-              label="Date"
-              dateValue={filterDate}
-              maximumDate
-              onDateChange={(date) => setFilterDate(date)}
             />
           </View>
         </View>

@@ -3,12 +3,31 @@ import { StyleSheet, View, TouchableOpacity, Image, Dimensions, Text, ActivityIn
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../constants/Colors";
 import Icon from "./Icon";
+import { formatNumberWithCommas, isNotEmpty } from "@utils/Utils";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
 export const SalesDropdownComponent = ({ products, handleChange, makeSelection, setScanned, value, disable }) => {
   const [isFocus, setIsFocus] = useState(false);
+
+  const renderItem = (item) => {
+    return (
+      <View style={{ flexDirection: "row", gap: 10, paddingHorizontal: 10, paddingVertical: 10, alignItems: "center", width: "92%" }}>
+        {isNotEmpty(item?.imageUrl) ? (
+          <Image source={{ uri: item?.imageUrl }} style={{ width: 70, height: 40 }} />
+        ) : (
+          <Icon name="file-image" groupName="FontAwesome6" size={25} color={Colors.gray} style={{ paddingHorizontal: 10 }} />
+        )}
+        <View>
+          <Text style={{ fontWeight: "bold" }} numberOfLines={2}>
+            {item?.productName?.trim()}
+          </Text>
+          <Text numberOfLines={2}>Price: {formatNumberWithCommas(item?.salesPrice, item?.currency)}</Text>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -27,7 +46,7 @@ export const SalesDropdownComponent = ({ products, handleChange, makeSelection, 
         iconStyle={styles.iconStyle}
         data={products}
         search
-        maxHeight={screenHeight / 2}
+        maxHeight={screenHeight / 1.5}
         labelField="productName"
         valueField="productName"
         placeholder={!isFocus ? "Select product" : "..."}
@@ -41,6 +60,7 @@ export const SalesDropdownComponent = ({ products, handleChange, makeSelection, 
         }}
         onChangeText={(text) => handleChange(text)}
         disable={disable}
+        renderItem={renderItem}
       />
       <View style={{ flexDirection: "row" }}>
         <TouchableOpacity
@@ -92,6 +112,7 @@ export const MyDropDown = ({
   loading = false,
   forceSearch = false,
   placeholder,
+  searchPlaceholder,
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -119,7 +140,7 @@ export const MyDropDown = ({
         labelField={labelField}
         valueField={valueField}
         placeholder={placeholder ?? "Select item"}
-        searchPlaceholder="Type here to search..."
+        searchPlaceholder={searchPlaceholder || "Type here to search..."}
         value={value}
         search={forceSearch ? true : data?.length > 6}
         onFocus={() => setIsFocus(true)}
@@ -130,7 +151,7 @@ export const MyDropDown = ({
         }}
         onChangeText={(text) => onChangeText(text)}
         renderItem={renderItem ? (item) => renderItem(item) : null}
-        renderRightIcon={() => (loading ? <ActivityIndicator color={"#000"} /> : <Icon name="angle-down" groupName="FontAwesome" />)}
+        renderRightIcon={() => (loading == true ? <ActivityIndicator color={"#000"} /> : <Icon name="angle-down" groupName="FontAwesome" />)}
       />
       {isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>}
     </View>

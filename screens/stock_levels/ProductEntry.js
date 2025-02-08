@@ -24,6 +24,11 @@ import { ScrollView } from "react-native";
 import { getCanCreateUpdateMyShopStock } from "duqactStore/selectors/permissionSelectors";
 import NoAuth from "@screens/Unauthorised";
 import Icon from "@components/Icon";
+import NewPdtModal from "./NewPdtModal";
+import CheckBox from "@components/CheckBox";
+import { packageOptions } from "@constants/Constants";
+import SuccessDialog from "@components/SuccessDialog";
+import BarCodeScan from "./BarCodeScan";
 
 const ProductEntry = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
@@ -42,11 +47,20 @@ const ProductEntry = ({ route }) => {
   const [remarks, setRemarks] = useState("");
   const [customName, setCustomName] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [disable, setDisable] = useState(false);
   const [saleUnits, setSaleUnits] = useState([]);
   const [selectedSaleUnit, setSelectedSaleUnit] = useState(null);
   const [selectedSaleUnits, setSelectedSaleUnits] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [quickPdt, setQuickPdt] = useState(false);
+  const [stockCheck, setStockCheck] = useState(false);
+  const [sModal, setSModal] = useState(false);
+
+  const [isPackedProduct, setIsPackedProduct] = useState(packageOptions[1].type);
+  const [packedPurchasedQuantity, setPackedPurchasedQuantity] = useState("");
+  const [purchasePrice, setPurchasePrice] = useState("");
+  const [unpackedPurchasedQty, setUnpackedPurchasedQty] = useState("");
+  const [showbarcodeReader, setShowBarcodeReader] = useState(false);
+  const [scannedCode, setScannedCode] = useState("");
 
   const [salesPrice, setSalesPrice] = useState("");
 
@@ -61,11 +75,9 @@ const ProductEntry = ({ route }) => {
           .getRequestWithJsonResponse(searchParameters)
           .then(async (response) => {
             setProducts(response.records);
-            setDisable(false);
             setPdtLoading(false);
           })
           .catch((error) => {
-            setDisable(false);
             setPdtLoading(false);
             snackBarRef.current.show("Falied to fetch products, try again");
           });
@@ -105,12 +117,13 @@ const ProductEntry = ({ route }) => {
     const { multipleSaleUnits } = e;
 
     setSelectedProduct(e);
-
     const itemToEdit = route?.params;
 
     if (multipleSaleUnits) {
       setSaleUnits(multipleSaleUnits);
-
+      if (multipleSaleUnits?.length === 1) {
+        setSelectedSaleUnit(multipleSaleUnits[0]);
+      }
       if (itemToEdit) {
         const defaultUnit = multipleSaleUnits.find((unit) => unit?.saleUnitName === itemToEdit?.saleUnitName);
         setSelectedSaleUnit(defaultUnit);
@@ -121,12 +134,12 @@ const ProductEntry = ({ route }) => {
         if (itemToEdit?.hasMultipleSaleUnits) {
           setSelectedSaleUnits(itemToEdit?.multipleSaleUnits);
         }
-      } else {
-        setSelectedSaleUnit(multipleSaleUnits?.find((item) => item?.saleUnitId === 2205));
       }
     } else {
-      setSaleUnits([]);
+      const whole = { saleUnitName: "Whole", id: 2205, saleUnitId: 2205 };
+      setSaleUnits([whole]);
       setSelectedSaleUnits([]);
+      setSelectedSaleUnit(whole);
     }
   };
 
@@ -138,6 +151,10 @@ const ProductEntry = ({ route }) => {
     setSalesPrice("");
     setSelectedSaleUnits([]);
     setSaleUnits([]);
+    setStockCheck(false);
+    setPackedPurchasedQuantity("");
+    setPurchasePrice("");
+    setSModal(false);
   };
 
   const populateForm = () => {
@@ -167,7 +184,7 @@ const ProductEntry = ({ route }) => {
     setSubmitted(true);
     setLoading(true);
 
-    let payload = {
+    const payload = {
       id: route.params?.id || 0,
       manufacturerId: selectedProduct?.manufacturerId,
       shopId: edit ? route?.params?.shopId : selectedShop?.id,
@@ -178,10 +195,16 @@ const ProductEntry = ({ route }) => {
       hasMultipleSaleUnits: selectedSaleUnits.length > 0,
       multipleSaleUnits: selectedSaleUnits,
       customName: customName,
+      hasInitialStock: stockCheck,
+      ...(stockCheck && {
+        stock_unpackedPurchase: isPackedProduct === false,
+        stock_purchasePrice: Number(purchasePrice),
+        ...(isPackedProduct && { stock_packedPurchasedQuantity: Number(packedPurchasedQuantity) }),
+        ...(!isPackedProduct && { stock_unpackedPurchasedQuantity: Number(unpackedPurchasedQty) }),
+      }),
     };
 
-    let isValidPayload = hasNull(payload) === false && salesPrice.trim() !== "";
-
+    const isValidPayload = hasNull(payload) === false && salesPrice.trim() !== "";
     if (isValidPayload === false) {
       setLoading(false); //removing loader if form is invalid
     }
@@ -192,17 +215,12 @@ const ProductEntry = ({ route }) => {
           await saveShopProductsOnDevice(offlineParams);
           setLoading(false);
           setSubmitted(false);
-          //clearForm();
-
-          snackBarRef.current.show("Product saved successfully", 9000);
-
-          setDisable(false);
+          setSModal(true);
         })
         .catch((error) => {
-          snackBarRef.current.show(error?.message, 5000);
+          snackBarRef.current.show(error?.message, 10000);
           setSubmitted(false);
           setLoading(false);
-          setDisable(false);
         });
     }
   };
@@ -231,6 +249,17 @@ const ProductEntry = ({ route }) => {
     fetchProducts();
   }, [searchTerm]);
 
+  if (showbarcodeReader) {
+    return (
+      <BarCodeScan
+        getData={(data) => {
+          setScannedCode(data);
+          setShowBarcodeReader(false);
+        }}
+      />
+    );
+  }
+
   if (!canDoStockCrud) {
     return <NoAuth />;
   }
@@ -239,6 +268,20 @@ const ProductEntry = ({ route }) => {
       <TopHeader title="List product" showMenuDots menuItems={[{ name: "Products", onClick: () => navigation.navigate(STOCK_LEVELS) }]} />
 
       <Loader loading={loading} />
+
+      <SuccessDialog hide={() => clearForm()} visible={sModal} />
+
+      <NewPdtModal
+        visible={quickPdt}
+        setVisible={setQuickPdt}
+        setProduct={(e) => {
+          setProducts([{ ...e }]);
+          onProductChange(e);
+        }}
+        setShowBarcodeReader={setShowBarcodeReader}
+        scannedCode={scannedCode}
+      />
+
       <ScrollView contentContainerStyle={{ justifyContent: "space-between", paddingBottom: 30, gap: 20 }} style={{ paddingHorizontal: 10 }}>
         <View style={{ gap: 8 }}>
           <Text style={styles.headerText}>Enter product details</Text>
@@ -264,29 +307,40 @@ const ProductEntry = ({ route }) => {
             </View>
           )}
 
-          <MyDropDown
-            style={styles.dropDown}
-            disable={disable}
-            label={"Product"}
-            data={edit ? [{ ...selectedProduct }] : products}
-            onChange={onProductChange}
-            value={selectedProduct}
-            placeholder="Select product"
-            labelField="displayName"
-            valueField="id"
-            showError
-            required
-            forceSearch
-            isSubmitted={submitted}
-            renderItem={renderItem}
-            loading={pdtLoadng}
-            onChangeText={(t) => {
-              if (t && t !== "") {
-                setSearchTerm(t);
-              }
-            }}
-          />
+          <View style={{ gap: 5 }}>
+            <MyDropDown
+              style={styles.dropDown}
+              disable={edit}
+              label={"Product"}
+              data={edit ? [{ ...selectedProduct }] : products}
+              searchPlaceholder={"Search by name, barcode..."}
+              onChange={onProductChange}
+              value={selectedProduct}
+              placeholder="Select product"
+              labelField="displayName"
+              valueField="id"
+              showError
+              required
+              forceSearch
+              isSubmitted={submitted}
+              renderItem={renderItem}
+              loading={pdtLoadng}
+              onChangeText={(t) => {
+                if (t && t !== "") {
+                  setSearchTerm(t);
+                }
+              }}
+            />
 
+            {!edit && !selectedProduct && (
+              <Text>
+                Not seeing what youre looking for?{" "}
+                <Text onPress={() => setQuickPdt(true)} style={{ textDecorationLine: "underline", color: "#03a5fc" }}>
+                  Add new product
+                </Text>
+              </Text>
+            )}
+          </View>
           <MyInput value={customName} onValueChange={(e) => setCustomName(e)} label="Custom name" />
 
           {saleUnits?.length > 1 && (
@@ -349,10 +403,59 @@ const ProductEntry = ({ route }) => {
           })}
 
           <MyInput label="Remarks" value={remarks} onValueChange={(text) => setRemarks(text)} multiline />
+          {selectedProduct && !edit && <CheckBox label="Add initial stock" isChecked={stockCheck} onPress={() => setStockCheck(!stockCheck)} />}
+
+          {stockCheck && (
+            <>
+              <MyDropDown
+                label={"Package type"}
+                style={styles.dropDown}
+                search={false}
+                data={packageOptions}
+                value={isPackedProduct}
+                onChange={(e) => {
+                  setIsPackedProduct(e.type);
+                }}
+                placeholder="Select package type"
+                labelField="value"
+                valueField="type"
+              />
+
+              {isPackedProduct !== null && (
+                <View style={styles.row}>
+                  <MyInput
+                    style={{ flex: 0.5 }}
+                    label={isPackedProduct === true ? `Total quantity (${selectedProduct?.packageUnitName || ""})` : "Total quantity(unpacked)"}
+                    value={isPackedProduct === true ? packedPurchasedQuantity : unpackedPurchasedQty}
+                    cursorColor={Colors.dark}
+                    onValueChange={(text) => {
+                      isPackedProduct === true ? setPackedPurchasedQuantity(text) : setUnpackedPurchasedQty(text);
+                    }}
+                    inputMode="numeric"
+                    required
+                    showError
+                    isSubmitted={submitted}
+                  />
+
+                  <MyInput
+                    style={{ flex: 0.5 }}
+                    label={`Total purchase amount`}
+                    value={purchasePrice}
+                    cursorColor={Colors.dark}
+                    onValueChange={(text) => setPurchasePrice(text)}
+                    inputMode="numeric"
+                    required
+                    showError
+                    isSubmitted={submitted}
+                  />
+                </View>
+              )}
+            </>
+          )}
         </View>
         <View style={styles.bottomContent}>
           <PrimaryButton darkMode={false} title={"Clear"} onPress={clearForm} style={{ flex: 0.5 }} />
-          <PrimaryButton darkMode title={"Save"} onPress={saveProduct} disabled={disable} style={{ flex: 0.5 }} />
+          <PrimaryButton darkMode title={"Save"} onPress={saveProduct} loading={loading} style={{ flex: 0.5 }} />
         </View>
       </ScrollView>
 

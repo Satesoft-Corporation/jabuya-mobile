@@ -1,11 +1,8 @@
-import { View, Text } from "react-native";
+import { View, Text, SafeAreaView, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { convertToServerDate, formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { BaseApiService } from "@utils/BaseApiService";
-import SalesTable from "./SalesTable";
-import PaymentMethodComponent from "./PaymentMethodComponent";
 import PrimaryButton from "@components/buttons/PrimaryButton";
-import ModalContent from "@components/ModalContent";
 import Colors from "@constants/Colors";
 import DataRow from "@components/card_components/DataRow";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,8 +12,11 @@ import { paymentMethods } from "@constants/Constants";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { hasInternetConnection } from "@utils/NetWork";
 import { saveShopClients } from "@controllers/OfflineControllers";
+import TopHeader from "@components/TopHeader";
+import SalesTable from "./components/SalesTable";
+import PaymentMethodComponent from "./components/PaymentMethodComponent";
 
-const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoading }) => {
+const CheckOut = () => {
   const dispatch = useDispatch();
   const selectedShop = useSelector(getSelectedShop);
   const cart = useSelector(getCart);
@@ -37,6 +37,7 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
   const [clientName, setClientName] = useState("");
   const [clientNumber, setClientNumber] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const clearForm = () => {
     setAmountPaid("");
@@ -87,7 +88,6 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
               .then(async (response) => {
                 if (response.status === "Success") {
                   setLoading(false);
-                  setVisible(false);
                   clearEverything();
                   clearForm();
 
@@ -98,7 +98,6 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
                   }
 
                   snackbarRef?.current.show("Sale confirmed successfully", 4000);
-                  onComplete();
                 }
               })
               .catch((error) => {
@@ -116,7 +115,6 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
           setError(`Failed to confirm sale!,${error?.message}`);
         });
     } else {
-      setVisible(false);
       dispatch(addOfflineSale(payLoad));
       setTimeout(() => setLoading(false), 1000);
       clearEverything();
@@ -164,72 +162,73 @@ const ConfirmSaleModal = ({ setVisible, snackbarRef, visible, onComplete, setLoa
 
   useEffect(() => {
     setSelectedPaymentMethod(recievedAmount < totalCartCost ? paymentMethods[1] : paymentMethods[0]);
-  }, [visible]);
-
+  }, []);
   return (
-    <ModalContent visible={visible} style={{ padding: 10 }}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <Text style={{ marginTop: 10, fontWeight: "bold", fontSize: 18, marginBottom: 12, marginStart: 1 }}>Confirm sale</Text>
-      </View>
-
-      {serverError && (
-        <View style={{ marginVertical: 3 }}>
-          <Text numberOfLines={4} style={{ color: Colors.error, fontWeight: 500 }}>
-            {serverError}
-          </Text>
+    <SafeAreaView style={{ flex: 1, paddingHorizontal: 10 }}>
+      <TopHeader title="Confirm purchase" />
+      <ScrollView>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text style={{ marginTop: 10, fontWeight: "bold", fontSize: 18, marginBottom: 12, marginStart: 1 }}>Confirm sale</Text>
         </View>
-      )}
 
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <Text style={{ fontSize: 12, color: Colors.gray, alignSelf: "flex-end" }}>{formatDate(new Date())}</Text>
-      </View>
+        {serverError && (
+          <View style={{ marginVertical: 3 }}>
+            <Text numberOfLines={4} style={{ color: Colors.error, fontWeight: 500 }}>
+              {serverError}
+            </Text>
+          </View>
+        )}
 
-      <SalesTable sales={cartItems}  disableSwipe />
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: 12, color: Colors.gray, alignSelf: "flex-end" }}>{formatDate(new Date())}</Text>
+        </View>
 
-      <DataRow label={"Recieved"} value={formatNumberWithCommas(recievedAmount)} currency={selectedShop?.currency} />
+        <SalesTable sales={cartItems} disableSwipe />
 
-      <DataRow
-        label={`Sold ${totalQty > 1 ? `${totalQty} items` : `${totalQty} item`}`}
-        value={formatNumberWithCommas(totalCartCost)}
-        currency={selectedShop?.currency}
-      />
+        <DataRow label={"Recieved"} value={formatNumberWithCommas(recievedAmount)} currency={selectedShop?.currency} />
 
-      <DataRow label={"Balance"} value={formatNumberWithCommas(recievedAmount - totalCartCost)} currency={selectedShop?.currency} />
-
-      <PaymentMethodComponent
-        submitted={submitted}
-        soldOnDate={soldOnDate}
-        setSoldOnDate={setSoldOnDate}
-        amountPaid={amountPaid}
-        setAmountPaid={setAmountPaid}
-        selectedClient={selectedClient}
-        setSelectedClient={setSelectedClient}
-        visible={visible}
-        clientName={clientName}
-        clientNumber={clientNumber}
-        setClientName={setClientName}
-        setClientNumber={setClientNumber}
-        selectedPaymentMethod={selectedPaymentMethod}
-        setSelectedPaymentMethod={setSelectedPaymentMethod}
-      />
-
-      <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, gap: 10, marginBottom: 10 }}>
-        <PrimaryButton
-          title={"Cancel"}
-          style={{ flex: 0.5 }}
-          onPress={() => {
-            setLoading(false);
-            setVisible();
-            setError(null);
-            setSelectedClient(null);
-            setAmountPaid(null);
-            setSelectedPaymentMethod(null);
-          }}
+        <DataRow
+          label={`Sold ${totalQty > 1 ? `${totalQty} items` : `${totalQty} item`}`}
+          value={formatNumberWithCommas(totalCartCost)}
+          currency={selectedShop?.currency}
         />
-        <PrimaryButton title={"Save"} onPress={validate} style={{ flex: 0.5 }} darkMode />
-      </View>
-    </ModalContent>
+
+        <DataRow label={"Balance"} value={formatNumberWithCommas(recievedAmount - totalCartCost)} currency={selectedShop?.currency} />
+
+        <PaymentMethodComponent
+          submitted={submitted}
+          soldOnDate={soldOnDate}
+          setSoldOnDate={setSoldOnDate}
+          amountPaid={amountPaid}
+          setAmountPaid={setAmountPaid}
+          selectedClient={selectedClient}
+          setSelectedClient={setSelectedClient}
+          visible={visible}
+          clientName={clientName}
+          clientNumber={clientNumber}
+          setClientName={setClientName}
+          setClientNumber={setClientNumber}
+          selectedPaymentMethod={selectedPaymentMethod}
+          setSelectedPaymentMethod={setSelectedPaymentMethod}
+        />
+
+        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, gap: 10, marginBottom: 10 }}>
+          <PrimaryButton
+            title={"Cancel"}
+            style={{ flex: 0.5 }}
+            onPress={() => {
+              setLoading(false);
+              setError(null);
+              setSelectedClient(null);
+              setAmountPaid(null);
+              setSelectedPaymentMethod(null);
+            }}
+          />
+          <PrimaryButton title={"Save"} onPress={validate} style={{ flex: 0.5 }} darkMode />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
-export default ConfirmSaleModal;
+export default CheckOut;
