@@ -18,7 +18,6 @@ const PaymentMethodComponent = ({
   setAmountPaid,
   selectedClient,
   setSelectedClient,
-  visible,
   clientName,
   setClientName,
   clientNumber,
@@ -67,7 +66,7 @@ const PaymentMethodComponent = ({
     if (recievedAmount < totalCartCost) {
       setAmountPaid(String(recievedAmount));
     }
-  }, [visible]);
+  }, []);
 
   useEffect(() => {
     getClients();

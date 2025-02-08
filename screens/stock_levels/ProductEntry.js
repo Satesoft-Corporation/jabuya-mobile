@@ -269,7 +269,14 @@ const ProductEntry = ({ route }) => {
 
       <Loader loading={loading} />
 
-      <SuccessDialog hide={() => clearForm()} visible={sModal} />
+      <SuccessDialog
+        hide={() => clearForm()}
+        visible={sModal}
+        text={"Product information has been saved successfully"}
+        onAgree={() => navigation.navigate(STOCK_LEVELS)}
+        agreeText="View products"
+        cancelText={"Add new product"}
+      />
 
       <NewPdtModal
         visible={quickPdt}

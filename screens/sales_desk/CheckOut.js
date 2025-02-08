@@ -6,15 +6,19 @@ import PrimaryButton from "@components/buttons/PrimaryButton";
 import Colors from "@constants/Colors";
 import DataRow from "@components/card_components/DataRow";
 import { useDispatch, useSelector } from "react-redux";
-import { getAttendantShopId, getCart, getIsShopAttendant, getOfflineParams, getSelectedShop } from "duqactStore/selectors";
+import { getAttendantShopId, getCart, getIsAdmin, getIsShopAttendant, getOfflineParams, getSelectedShop } from "duqactStore/selectors";
 import { addOfflineSale, clearCart } from "actions/shopActions";
 import { paymentMethods } from "@constants/Constants";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { hasInternetConnection } from "@utils/NetWork";
-import { saveShopClients } from "@controllers/OfflineControllers";
+import { saveShopClients, saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 import TopHeader from "@components/TopHeader";
 import SalesTable from "./components/SalesTable";
 import PaymentMethodComponent from "./components/PaymentMethodComponent";
+import Loader from "@components/Loader";
+import SuccessDialog from "@components/SuccessDialog";
+import { StackActions, useNavigation } from "@react-navigation/native";
+import { SALES_REPORTS } from "@navigation/ScreenNames";
 
 const CheckOut = () => {
   const dispatch = useDispatch();
@@ -38,6 +42,9 @@ const CheckOut = () => {
   const [clientNumber, setClientNumber] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const isSuperAdmin = useSelector(getIsAdmin);
 
   const clearForm = () => {
     setAmountPaid("");
@@ -90,14 +97,18 @@ const CheckOut = () => {
                   setLoading(false);
                   clearEverything();
                   clearForm();
+                  setSuccess(true);
+                  if (isSuperAdmin === false) {
+                    setTimeout(async () => {
+                      await saveShopProductsOnDevice(offlineParams);
+                    }, 10000);
+                  }
 
                   if (onCredit) {
                     setTimeout(async () => {
                       await saveShopClients(offlineParams);
                     }, 10000);
                   }
-
-                  snackbarRef?.current.show("Sale confirmed successfully", 4000);
                 }
               })
               .catch((error) => {
@@ -119,7 +130,7 @@ const CheckOut = () => {
       setTimeout(() => setLoading(false), 1000);
       clearEverything();
       clearForm();
-      snackbarRef.current.show("Sale record will be saved when online.", 4000);
+      setSuccess(true);
     }
   };
 
@@ -163,10 +174,23 @@ const CheckOut = () => {
   useEffect(() => {
     setSelectedPaymentMethod(recievedAmount < totalCartCost ? paymentMethods[1] : paymentMethods[0]);
   }, []);
+
+  const navigation = useNavigation();
   return (
-    <SafeAreaView style={{ flex: 1, paddingHorizontal: 10 }}>
-      <TopHeader title="Confirm purchase" />
-      <ScrollView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
+      <Loader loading={loading} />
+
+      <SuccessDialog
+        text={"Sale confirmed successfully"}
+        onAgree={() => navigation.dispatch(StackActions.replace(SALES_REPORTS))}
+        agreeText="View sales"
+        cancelText={"Add new Sale"}
+        hide={() => navigation.goBack()}
+        visible={success}
+      />
+
+      <TopHeader title="Confirm sale" />
+      <ScrollView style={{ paddingHorizontal: 10 }} contentContainerStyle={{ paddingBottom: 30 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <Text style={{ marginTop: 10, fontWeight: "bold", fontSize: 18, marginBottom: 12, marginStart: 1 }}>Confirm sale</Text>
         </View>
@@ -203,7 +227,6 @@ const CheckOut = () => {
           setAmountPaid={setAmountPaid}
           selectedClient={selectedClient}
           setSelectedClient={setSelectedClient}
-          visible={visible}
           clientName={clientName}
           clientNumber={clientNumber}
           setClientName={setClientName}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, TextInput, ScrollView, SafeAreaView, Alert } from "react-native";
 import { useRef } from "react";
-import { BARCODE_SCREEN, CREDIT_SALES, SALES_REPORTS } from "@navigation/ScreenNames";
+import { BARCODE_SCREEN, CHECK_OUT, CREDIT_SALES, SALES_REPORTS } from "@navigation/ScreenNames";
 import Colors from "@constants/Colors";
 import ConfirmSaleModal from "./components/ConfirmSaleModal";
 import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
@@ -150,18 +150,6 @@ function SalesDesk({ navigation }) {
     }
   };
 
-  const onComplete = async () => {
-    setLoading(false);
-    if (selectedHeldSale) {
-      dispatch(removeHeldSale(selectedHeldSale?.clientName));
-    }
-    if (isSuperAdmin === false) {
-      setTimeout(async () => {
-        const pdts = await saveShopProductsOnDevice(offlineParams, []);
-      }, 10000);
-    }
-  };
-
   useEffect(() => {
     fetchProducts();
   }, [searchTerm, selectedShop]);
@@ -194,7 +182,7 @@ function SalesDesk({ navigation }) {
   const handleSubmit = () => {
     if (cartItems.length > 0) {
       if (offersDebt === true) {
-        setShowConfirmed(true);
+        navigation.navigate(CHECK_OUT);
         return;
       } else {
         if (isNaN(recievedAmount)) {
@@ -210,7 +198,7 @@ function SalesDesk({ navigation }) {
           return;
         }
 
-        setShowConfirmed(true);
+        navigation.navigate(CHECK_OUT);
       }
     } else {
       snackbarRef.current.show("Product selection is required.");
@@ -223,14 +211,6 @@ function SalesDesk({ navigation }) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <Loader loading={loading} />
-      <ConfirmSaleModal
-        visible={showConfirmed}
-        setVisible={() => setShowConfirmed(false)}
-        snackbarRef={snackbarRef}
-        clients={clients}
-        onComplete={onComplete}
-        setLoading={setLoading}
-      />
 
       <EnterSaleQtyModal showMoodal={showMoodal} setShowModal={setShowModal} itemToEdit={itemToEdit} setItemToEdit={setItemToEdit} />
 
