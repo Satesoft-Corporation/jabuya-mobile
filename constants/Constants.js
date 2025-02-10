@@ -25,7 +25,9 @@ export const userTypes = {
 
 export const ALL_SHOPS_LABEL = "All Shops";
 
-export const APP_VERSION = `v ${Constants.expoConfig.version}`;
+//export const APP_VERSION = `v ${Constants.expoConfig.version}`;
+
+export const APP_VERSION = `v ${Constants.expoConfig.version} beta`;
 
 export const subscriptionPaymentMethods = [
   { id: 1, name: "CASH" },

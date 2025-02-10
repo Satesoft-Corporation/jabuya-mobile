@@ -37,6 +37,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
     setUnitCost("");
     setQuantity("");
     setShowModal(false);
+    setSubmitted(false);
     if (itemToEdit) {
       setItemToEdit(null);
     }
@@ -137,10 +138,10 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
         <View style={{ marginTop: 10, marginBottom: 5 }}>
           <Text style={{ fontWeight: "600", fontSize: 20, marginBottom: 5 }}>{itemToEdit ? "Edit" : "Successfull"}</Text>
           <Text>
-            {selection?.productName || itemToEdit?.productName} {!itemToEdit && "has been selected."}
+            {selection?.productName?.trim() || itemToEdit?.productName} {!itemToEdit && "has been selected."}
           </Text>
 
-          {!saleUnit && (
+          {saleUnits?.length > 1 && (
             <View style={{ marginTop: 10 }}>
               <Text style={{ fontWeight: "600" }}>Select sale unit</Text>
 
@@ -161,7 +162,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
           )}
         </View>
 
-        {saleUnit && (
+        {
           <View>
             <Text style={{ fontWeight: "600", fontSize: 13, marginTop: 10, marginLeft: 4 }}>Quantity</Text>
             <TextInput
@@ -204,7 +205,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
             />
             {errors?.lessPriceError && <Text style={{ fontSize: 12, color: Colors.error }}>{errors?.lessPriceError}</Text>}
           </View>
-        )}
+        }
 
         <View style={{ flexDirection: "row", marginTop: 40, marginBottom: 10, gap: 5 }}>
           <PrimaryButton
@@ -215,7 +216,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
               dispatch(makeProductSelection(null));
             }}
           />
-          {saleUnit && <PrimaryButton title={"Confirm"} darkMode onPress={handlePress} style={{ flex: 0.5 }} />}
+          {<PrimaryButton title={"Confirm"} darkMode onPress={handlePress} style={{ flex: 0.5 }} />}
         </View>
       </View>
     </ModalContent>

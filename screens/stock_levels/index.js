@@ -50,7 +50,7 @@ const StockLevels = () => {
         pdtList = [...shopProducts];
       }
 
-      pdtList = pdtList?.filter((item) => item?.productName?.toLowerCase()?.includes(searchTerm.toLowerCase()));
+      pdtList = pdtList?.filter((item) => item?.productName?.toLowerCase()?.includes(searchTerm.toLowerCase()?.trim()));
 
       setStockLevels(pdtList);
 

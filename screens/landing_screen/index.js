@@ -26,6 +26,7 @@ import {
   getLastLoginTime,
   getLookUps,
   getManufactures,
+  getOffersDebt,
   getOfflineParams,
   getShopOwnerId,
   getSuppliers,
@@ -39,6 +40,19 @@ import { LOGIN_END_POINT } from "@utils/EndPointUtils";
 import { ALL_SHOPS_LABEL } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
 import { getNavList } from "./navList";
+import {
+  CONTACT_BOOK,
+  CREDIT_SALES,
+  ENTRIES,
+  EXPENSES,
+  LEADS,
+  REPORTS_MENU,
+  SALES_DESK,
+  SALES_REPORTS,
+  STOCK_ENTRY,
+  STOCK_LEVELS,
+} from "@navigation/ScreenNames";
+import { getCanViewSales } from "duqactStore/selectors/permissionSelectors";
 
 const LandingScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -58,10 +72,25 @@ const LandingScreen = () => {
   const suppliers = useSelector(getSuppliers);
   const prevLookUps = useSelector(getLookUps);
   const isAdmin = useSelector(getIsAdmin);
+  const canViewSales = useSelector(getCanViewSales);
 
+  const offersDebt = useSelector(getOffersDebt);
   const isShopAttendant = useSelector(getIsShopAttendant);
 
-  const navList = getNavList(isAdmin);
+  const navList = [
+    // landing screen icons
+    { icon: require("assets/icons/icons8-cash-register-50.png"), title: "Sales Desk", target: SALES_DESK },
+    ...(canViewSales ? [{ icon: require("assets/icons/5499402.png"), title: "Daily sales", target: SALES_REPORTS }] : []),
+    ...(offersDebt ? [{ icon: require("assets/icons/icons8-cash-50.png"), title: "Debts", target: CREDIT_SALES }] : []),
+
+    { icon: require("assets/icons/stock_purc.jpg"), title: "Stock purchases", target: STOCK_ENTRY },
+    { icon: require("assets/icons/icons8-box-501.png"), title: "Stock levels", target: STOCK_LEVELS },
+    { icon: require("assets/icons/income.png"), title: "Expenses", target: EXPENSES },
+
+    { icon: require("assets/icons/entries.png"), title: "Entries", target: ENTRIES },
+    { icon: require("assets/icons/icons8-contact-book-64.png"), title: "Contacts", target: CONTACT_BOOK },
+    ...(isAdmin ? [{ icon: require("assets/icons/group-solid-24.png"), title: "Leads", target: LEADS }] : []),
+  ];
 
   const getRefreshToken = async () => {
     const loginInfo = await UserSessionUtils.getLoginDetails();
@@ -144,11 +173,11 @@ const LandingScreen = () => {
         console.log("login time", logintimeDifferance);
 
         //if (hasNet === true) {
-          await configureUserData(configStatus === false);
+        await configureUserData(configStatus === false);
 
-          if (hours >= 20 || days >= 1) {
-            await getRefreshToken();
-          }
+        if (hours >= 20 || days >= 1) {
+          await getRefreshToken();
+        }
         //}
         await handlePinLockStatus();
       }

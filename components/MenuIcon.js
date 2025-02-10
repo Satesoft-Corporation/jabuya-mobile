@@ -17,9 +17,10 @@ export function MenuIcon({ icon, containerStyle, onPress, iconStyle, titleStyle 
         elevation: 2,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
-        padding: 5,
         width: 200,
         justifyContent: "center",
+        paddingVertical: 10,
+        gap: 10,
       }}
       onPress={onPress}
     >
@@ -27,41 +28,15 @@ export function MenuIcon({ icon, containerStyle, onPress, iconStyle, titleStyle 
         key={icon.id}
         style={[
           {
-            height: 55,
-            width: 55,
             justifyContent: "center",
             alignItems: "center",
             borderRadius: 10,
           },
-          containerStyle,
         ]}
       >
-        <Image
-          source={icon.icon}
-          tintColor={Colors.dark}
-          style={[
-            {
-              width: 35,
-              height: 35,
-            },
-            iconStyle,
-          ]}
-        />
+        <Image source={icon.icon} tintColor={Colors.dark} style={[{ width: 35, height: 35 }]} />
       </View>
-      <Text
-        style={[
-          {
-            color: Colors.dark,
-            fontSize: scale(14),
-            margin: 10,
-            fontWeight: "500",
-            textAlign: "center",
-          },
-          titleStyle,
-        ]}
-      >
-        {icon.title}
-      </Text>
+      <Text style={[{ color: Colors.dark, fontSize: scale(14), fontWeight: "500", textAlign: "center" }]}>{icon.title}</Text>
     </TouchableOpacity>
   );
 }
