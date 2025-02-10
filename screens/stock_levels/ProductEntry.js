@@ -155,6 +155,7 @@ const ProductEntry = ({ route }) => {
     setPackedPurchasedQuantity("");
     setPurchasePrice("");
     setSModal(false);
+    setCustomName("");
   };
 
   const populateForm = () => {
