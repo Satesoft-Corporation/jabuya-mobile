@@ -38,7 +38,7 @@ const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = true, onDelet
   };
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <View
         style={{
           flexDirection: "row",
@@ -56,7 +56,7 @@ const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = true, onDelet
 
         <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>Amount</Text>
       </View>
-      <ScrollView style={fixHeight ? { height: screenHeight / 4 } : { maxHeight: screenHeight }}>
+      <ScrollView style={{}}>
         <SwipeListView
           ref={listViewRef}
           data={sales}

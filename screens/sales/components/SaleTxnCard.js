@@ -11,11 +11,14 @@ import { scale } from "react-native-size-matters";
 import Colors from "@constants/Colors";
 import { getCanDeleteSales, getCanViewShopIncome } from "duqactStore/selectors/permissionSelectors";
 import ChipButton2 from "@components/buttons/ChipButton2";
+import { useNavigation } from "@react-navigation/native";
+import { CREDIT_PAYMENTS } from "@navigation/ScreenNames";
 
 function SaleTxnCard({ data, print, onDelete, onSwipe }) {
   const shops = useSelector(getShops) ?? [];
   const canViewIncome = useSelector(getCanViewShopIncome);
 
+  const navigation = useNavigation();
   const canDeleteSales = useSelector(getCanDeleteSales);
 
   const { lineItems, totalCost, amountPaid, balanceGivenOut } = data;
@@ -140,6 +143,8 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
         print
         deleteIcon={canDeleteSales}
         onDelete={onDelete}
+        // debt={balanceGivenOut < 0}
+        // onPayClick={() => navigation.navigate(CREDIT_PAYMENTS, data)}
       />
     </View>
   );

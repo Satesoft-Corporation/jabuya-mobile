@@ -13,7 +13,7 @@ import SalesTable from "./components/SalesTable";
 import Snackbar from "@components/Snackbar";
 import DataRow from "@components/card_components/DataRow";
 import { scale } from "react-native-size-matters";
-import { ALL_SHOPS_LABEL, screenWidth } from "@constants/Constants";
+import { ALL_SHOPS_LABEL, screenHeight, screenWidth } from "@constants/Constants";
 import { SHOP_PRODUCTS_ENDPOINT } from "@utils/EndPointUtils";
 import { BaseApiService } from "@utils/BaseApiService";
 import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
@@ -265,7 +265,7 @@ function SalesDesk({ navigation }) {
 
       <ScrollView style={{ backgroundColor: Colors.light_2, flex: 1 }} showsVerticalScrollIndicator={false}>
         <View style={{ paddingHorizontal: 10, marginTop: 7, gap: 10 }}>
-          <View style={{ backgroundColor: Colors.light, borderRadius: 5, padding: 10 }}>
+          <View style={{ backgroundColor: Colors.light, borderRadius: 5, padding: 10, height: screenHeight / 2.5 }}>
             <SalesTable sales={cartItems} disableSwipe={false} onDelete={onDelete} editItem={editItem} />
           </View>
 

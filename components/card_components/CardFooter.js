@@ -13,6 +13,7 @@ const CardFooter = ({
   onPrint,
   onEdit,
   handleDamage,
+  onPayClick,
   renderLeft = () => {},
   restocked = false,
   entered = false,
@@ -23,6 +24,8 @@ const CardFooter = ({
   print = false,
   edit = false,
   damage = false,
+  debt = false,
+
   expanded,
 }) => {
   return (
@@ -41,6 +44,8 @@ const CardFooter = ({
       <View style={{ flexDirection: "row", gap: 10, alignSelf: "flex-end", alignItems: "center" }}>
         {expanded == true && (
           <>
+            {debt && <ChipButton2 title={"Pay"} onPress={onPayClick} darkMode={false} />}
+
             {deleteIcon === true && <Icon name="trash" borderd onPress={onDelete} size={13} />}
             {edit === true && <Icon name="pen" size={13} borderd onPress={onEdit} />}
             {damage === true && <Icon name="broken-image" groupName="MaterialIcons" size={16} borderd onPress={handleDamage} />}

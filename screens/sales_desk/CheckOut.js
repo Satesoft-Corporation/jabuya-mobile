@@ -8,7 +8,7 @@ import DataRow from "@components/card_components/DataRow";
 import { useDispatch, useSelector } from "react-redux";
 import { getAttendantShopId, getCart, getIsAdmin, getIsShopAttendant, getOfflineParams, getSelectedShop } from "duqactStore/selectors";
 import { addOfflineSale, clearCart } from "actions/shopActions";
-import { paymentMethods } from "@constants/Constants";
+import { paymentMethods, screenHeight } from "@constants/Constants";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { hasInternetConnection } from "@utils/NetWork";
 import { saveShopClients, saveShopProductsOnDevice } from "@controllers/OfflineControllers";
@@ -190,7 +190,7 @@ const CheckOut = () => {
       />
 
       <TopHeader title="Confirm sale" />
-      <ScrollView style={{ paddingHorizontal: 10 }} contentContainerStyle={{ paddingBottom: 30 }}>
+      <ScrollView style={{ paddingHorizontal: 10 }} showsVerticalScrollIndicator={false}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <Text style={{ marginTop: 10, fontWeight: "bold", fontSize: 18, marginBottom: 12, marginStart: 1 }}>Confirm sale</Text>
         </View>
@@ -207,7 +207,9 @@ const CheckOut = () => {
           <Text style={{ fontSize: 12, color: Colors.gray, alignSelf: "flex-end" }}>{formatDate(new Date())}</Text>
         </View>
 
-        <SalesTable sales={cartItems} disableSwipe />
+        <View style={{ height: screenHeight / 3 }}>
+          <SalesTable sales={cartItems} disableSwipe />
+        </View>
 
         <DataRow label={"Recieved"} value={formatNumberWithCommas(recievedAmount)} currency={selectedShop?.currency} />
 

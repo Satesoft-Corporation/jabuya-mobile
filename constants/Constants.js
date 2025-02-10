@@ -17,17 +17,11 @@ export const paymentMethods = [
   { name: "Debt", id: 1 },
 ];
 
-export const userTypes = {
-  isShopOwner: "Shop Owner",
-  isShopAttendant: "Shop Attendant",
-  isSuperAdmin: "System Admin",
-};
+export const userTypes = { isShopOwner: "Shop Owner", isShopAttendant: "Shop Attendant", isSuperAdmin: "System Admin" };
 
 export const ALL_SHOPS_LABEL = "All Shops";
 
-//export const APP_VERSION = `v ${Constants.expoConfig.version}`;
-
-export const APP_VERSION = `v ${Constants.expoConfig.version} beta`;
+export const APP_VERSION = `v ${Constants.expoConfig.version}`;
 
 export const subscriptionPaymentMethods = [
   { id: 1, name: "CASH" },

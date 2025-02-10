@@ -10,9 +10,12 @@ import DataRow from "@components/card_components/DataRow";
 import MyInput from "@components/MyInput";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import Snackbar from "@components/Snackbar";
+import { useRoute } from "@react-navigation/native";
 
-const CreditPayment = ({ route }) => {
-  const sale = { ...route.params };
+const CreditPayment = () => {
+  const route = useRoute();
+
+  const sale = route.params;
 
   const balance = sale?.amountLoaned - sale?.amountRepaid;
 
@@ -29,9 +32,9 @@ const CreditPayment = ({ route }) => {
   };
 
   const savePayment = async () => {
-    let payLoad = {
+    const payLoad = {
       id: 0,
-      creditSaleId: sale?.creditSaleId,
+      creditSaleId: sale?.id,
       amount: Number(amount),
       paymentDate: convertToServerDate(paymentDate),
     };
@@ -65,17 +68,17 @@ const CreditPayment = ({ route }) => {
       }}
     >
       <AppStatusBar />
-      <TopHeader title={`Credit payment for ${sale?.client_name}`} />
+      <TopHeader title={`Credit payment for ${sale?.sale?.client?.fullName}`} />
       <Loader loading={loading} />
       <View style={{ marginVertical: 10, paddingHorizontal: 10, justifyContent: "space-between", flex: 1 }}>
         <View style={{ gap: 10 }}>
           <View style={{ gap: 5, marginBottom: 5 }}>
             <Text style={{ marginTop: 10, fontSize: 16, fontWeight: 600 }}>Credit Payment</Text>
-            <DataRow label={"Balance "} currency={sale?.currency} value={balance} />
+            <DataRow label={"Balance "} value={formatNumberWithCommas(balance, sale?.currency)} />
           </View>
 
           <View style={{ flexDirection: "row", gap: 10 }}>
-            <MyInput label="Client name" value={sale?.client_name} style={{ flex: 1 }} editable={false} />
+            <MyInput label="Client name" value={sale?.sale?.client?.fullName} style={{ flex: 1 }} editable={false} />
             <MyInput label="Id number" value={sale?.serialNumber} style={{ flex: 1 }} editable={false} />
           </View>
 
