@@ -104,7 +104,7 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
       {expanded && (
         <View style={{ flex: 1, marginTop: 10 }}>
           <View style={{ marginVertical: 5 }}>
-            <SalesTable sales={lineItems} fixHeight={false} disableSwipe={lineItems?.length < 1} onDelete={onSwipe} returned />
+            <SalesTable sales={lineItems} disableSwipe={lineItems?.length < 1} onDelete={onSwipe} returned />
           </View>
           <DataRow key={1} label={"Total"} value={formatNumberWithCommas(totalCost, data?.currency)} style={{ marginTop: 5, marginBottom: 10 }} />
 

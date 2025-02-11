@@ -56,17 +56,15 @@ const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = true, onDelet
 
         <Text style={{ flex: 1, textAlign: "right", fontWeight: 600 }}>Amount</Text>
       </View>
-      <ScrollView style={{}}>
-        <SwipeListView
-          ref={listViewRef}
-          data={sales}
-          renderItem={(data, rowMap) => <SaleListItem data={data.item} key={data?.index} />}
-          renderHiddenItem={renderHiddenItem}
-          rightOpenValue={-75}
-          disableRightSwipe
-          disableLeftSwipe={disableSwipe}
-        />
-      </ScrollView>
+      <SwipeListView
+        ref={listViewRef}
+        data={sales}
+        renderItem={(data, rowMap) => <SaleListItem data={data.item} key={data?.index} />}
+        renderHiddenItem={renderHiddenItem}
+        rightOpenValue={-75}
+        disableRightSwipe
+        disableLeftSwipe={disableSwipe}
+      />
     </View>
   );
 };

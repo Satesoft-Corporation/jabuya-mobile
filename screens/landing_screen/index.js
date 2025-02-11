@@ -1,4 +1,4 @@
-import { View, SafeAreaView } from "react-native";
+import { View, SafeAreaView, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import { FlatList } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -28,6 +28,7 @@ import {
   getManufactures,
   getOffersDebt,
   getOfflineParams,
+  getOfflineSales,
   getShopOwnerId,
   getSuppliers,
   getUsersList,
@@ -39,14 +40,13 @@ import { addManufacturers, addSuppliers, changeSelectedShop, setShops } from "ac
 import { LOGIN_END_POINT } from "@utils/EndPointUtils";
 import { ALL_SHOPS_LABEL } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
-import { getNavList } from "./navList";
 import {
   CONTACT_BOOK,
   CREDIT_SALES,
   ENTRIES,
   EXPENSES,
   LEADS,
-  REPORTS_MENU,
+  OFFLINE_SALES,
   SALES_DESK,
   SALES_REPORTS,
   STOCK_ENTRY,
@@ -77,11 +77,14 @@ const LandingScreen = () => {
   const offersDebt = useSelector(getOffersDebt);
   const isShopAttendant = useSelector(getIsShopAttendant);
 
+  const pendingSales = useSelector(getOfflineSales);
+
   const navList = [
     // landing screen icons
     { icon: require("assets/icons/icons8-cash-register-50.png"), title: "Sales Desk", target: SALES_DESK },
     ...(canViewSales ? [{ icon: require("assets/icons/5499402.png"), title: "Daily sales", target: SALES_REPORTS }] : []),
     ...(offersDebt ? [{ icon: require("assets/icons/icons8-cash-50.png"), title: "Debts", target: CREDIT_SALES }] : []),
+    ...(pendingSales?.length > 0 ? [{ icon: require("assets/icons/icons8-offline-48.png"), title: "Offline sales", target: OFFLINE_SALES }] : []),
 
     { icon: require("assets/icons/stock_purc.jpg"), title: "Stock purchases", target: STOCK_ENTRY },
     { icon: require("assets/icons/icons8-box-501.png"), title: "Stock levels", target: STOCK_LEVELS },
@@ -198,7 +201,6 @@ const LandingScreen = () => {
       <UserProfile home />
 
       <LockScreenModal showLock={showLock} hideLock={() => setShowLock(false)} />
-
       <View style={{ paddingHorizontal: 10, marginTop: 10 }}>
         <FlatList
           style={{ marginTop: 10 }}

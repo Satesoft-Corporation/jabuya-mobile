@@ -16,6 +16,7 @@ import { BaseApiService } from "@utils/BaseApiService";
 import { removeOfflineSale } from "actions/shopActions";
 import { hasInternetConnection } from "@utils/NetWork";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
+import { screenHeight } from "@constants/Constants";
 
 const OfflineSales = () => {
   const [sales, setSales] = useState([]);
@@ -129,13 +130,7 @@ const OfflineSales = () => {
       {sales?.length > 0 && (
         <>
           <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingHorizontal: 12,
-              backgroundColor: "#000",
-              paddingVertical: 10,
-            }}
+            style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 12, backgroundColor: "#000", paddingVertical: 10 }}
           >
             <ItemHeader value={formatNumberWithCommas(qty)} title="Qty" />
 
@@ -156,23 +151,11 @@ const OfflineSales = () => {
             )}
           </View>
 
-          <View
-            style={{
-              flexDirection: "row",
-              marginTop: 10,
-              paddingHorizontal: 10,
-            }}
-          >
+          <View style={{ flexDirection: "row", marginTop: 10, paddingHorizontal: 10 }}>
             <PrimaryButton title={"Save Sales"} onPress={handleSave} />
           </View>
 
-          <View
-            style={{
-              marginTop: 10,
-              paddingHorizontal: 10,
-              gap: 5,
-            }}
-          >
+          <View style={{ marginTop: 10, paddingHorizontal: 10, gap: 5 }}>
             {savingErrors?.map((e, i) => (
               <Text key={i} style={{ color: Colors.error }}>
                 {e}
@@ -184,6 +167,7 @@ const OfflineSales = () => {
 
       <FlatList
         containerStyle={{ padding: 5 }}
+        contentContainerStyle={{ paddingBottom: 20 }}
         showsHorizontalScrollIndicator={false}
         refreshing={loading}
         onRefresh={getOfflineSale}
@@ -216,40 +200,16 @@ const RemoveSaleModal = ({ visible = false, data, ...props }) => {
 
   return (
     <ModalContent visible={visible} style={{ padding: 10 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text
-          style={{
-            marginTop: 10,
-            fontWeight: "bold",
-            fontSize: 18,
-            marginBottom: 12,
-            marginStart: 1,
-          }}
-        >
-          Confirm, remove sale record
-        </Text>
+      <Text style={{ marginTop: 10, fontWeight: "bold", fontSize: 18, marginBottom: 12, marginStart: 1 }}>Confirm, remove sale record</Text>
+
+      <View style={{ height: screenHeight / 4.5 }}>
+        <SalesTable sales={data?.lineItems} />
       </View>
-
-      <SalesTable sales={data?.lineItems} fixHeight={false} />
-
       <TxnCashSummary data={data} />
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 20,
-          gap: 10,
-          marginBottom: 5,
-        }}
-      >
-        <PrimaryButton title={"Cancel"} onPress={props?.hide} />
-        <PrimaryButton darkMode title={"Remove"} onPress={removeSale} />
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, gap: 10, marginBottom: 5 }}>
+        <PrimaryButton title={"Cancel"} onPress={props?.hide} style={{ flex: 0.5 }} />
+        <PrimaryButton darkMode title={"Remove"} onPress={removeSale} style={{ flex: 0.5 }} />
       </View>
     </ModalContent>
   );

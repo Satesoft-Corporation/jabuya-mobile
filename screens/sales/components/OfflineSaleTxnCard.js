@@ -55,17 +55,16 @@ export const TxnCashSummary = ({ data, shop }) => {
 
   return (
     <View>
-      <DataRow key={1} label={"Total"} value={formatNumberWithCommas(totalCost)} currency={currency} />
+      <DataRow key={1} label={"Total"} value={formatNumberWithCommas(totalCost, currency)} />
 
-      <DataRow key={2} label={"Recieved"} value={formatNumberWithCommas(amountPaid)} currency={currency} />
+      <DataRow key={2} label={"Recieved"} value={formatNumberWithCommas(amountPaid, currency)} />
       <DataRow
         key={3}
         label={`Purchased ${itemCount > 1 ? `${itemCount} items` : `${itemCount} item`}`}
-        value={formatNumberWithCommas(totalCost)}
-        currency={currency}
+        value={formatNumberWithCommas(totalCost, currency)}
       />
 
-      <DataRow key={4} label={"Balance"} value={amountPaid - totalCost} currency={currency} />
+      <DataRow key={4} label={"Balance"} value={formatNumberWithCommas(amountPaid - totalCost, currency)} />
     </View>
   );
 };

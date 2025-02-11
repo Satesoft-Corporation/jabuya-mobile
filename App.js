@@ -18,7 +18,6 @@ import ClientDebts from "@screens/credit/ClientDebts";
 import SalesDesk from "@screens/sales_desk";
 import * as s from "@navigation/ScreenNames";
 import Login from "@screens/auth";
-import ReportsMenu from "@screens/reports";
 import ComingSoon from "@screens/coming_soon";
 import Entries from "@screens/entries";
 import AppStatusBar from "@components/AppStatusBar";
@@ -68,7 +67,6 @@ export default function App() {
             <Stack.Screen name={s.EXPENSE_FORM} component={ExpenseForm} />
             <Stack.Screen name={s.OFFLINE_SALES} component={OfflineSales} />
             <Stack.Screen name={s.CLIENT_DEBTS} component={ClientDebts} />
-            <Stack.Screen name={s.REPORTS_MENU} component={ReportsMenu} />
             <Stack.Screen name={s.COMING_SOON} component={ComingSoon} />
             <Stack.Screen name={s.ENTRIES} component={Entries} />
             <Stack.Screen name={s.SALES_BY_PDT} component={SalesByProduct} />

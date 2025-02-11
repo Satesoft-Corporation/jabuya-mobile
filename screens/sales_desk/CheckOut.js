@@ -18,7 +18,7 @@ import PaymentMethodComponent from "./components/PaymentMethodComponent";
 import Loader from "@components/Loader";
 import SuccessDialog from "@components/SuccessDialog";
 import { StackActions, useNavigation } from "@react-navigation/native";
-import { SALES_REPORTS } from "@navigation/ScreenNames";
+import { OFFLINE_SALES, SALES_REPORTS } from "@navigation/ScreenNames";
 
 const CheckOut = () => {
   const dispatch = useDispatch();
@@ -43,6 +43,8 @@ const CheckOut = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const [offline, setOffline] = useState(false);
 
   const isSuperAdmin = useSelector(getIsAdmin);
 
@@ -126,11 +128,12 @@ const CheckOut = () => {
           setError(`Failed to confirm sale!,${error?.message}`);
         });
     } else {
+      setOffline(true);
+      setLoading(false);
       dispatch(addOfflineSale(payLoad));
-      setTimeout(() => setLoading(false), 1000);
+      setSuccess(true);
       clearEverything();
       clearForm();
-      setSuccess(true);
     }
   };
 
@@ -181,9 +184,9 @@ const CheckOut = () => {
       <Loader loading={loading} />
 
       <SuccessDialog
-        text={"Sale confirmed successfully"}
-        onAgree={() => navigation.dispatch(StackActions.replace(SALES_REPORTS))}
-        agreeText="View sales"
+        text={offline ? "Sale saved offline" : "Sale confirmed successfully"}
+        onAgree={() => navigation.dispatch(StackActions.replace(offline ? OFFLINE_SALES : SALES_REPORTS))}
+        agreeText={offline ? "Offline sales" : "View sales"}
         cancelText={"Add new Sale"}
         hide={() => navigation.goBack()}
         visible={success}
