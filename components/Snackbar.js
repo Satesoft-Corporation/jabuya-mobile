@@ -12,10 +12,7 @@ class Snackbar extends Component {
     };
   }
 
-  show(
-    SnackBarInsideMsgHolder = "Default SnackBar Message...",
-    duration = 4000
-  ) {
+  show(SnackBarInsideMsgHolder = "Default SnackBar Message...", duration = 4000) {
     if (this.ShowSnackBar === false) {
       this.setState({
         SnackBarInsideMsgHolder: SnackBarInsideMsgHolder,
@@ -49,12 +46,7 @@ class Snackbar extends Component {
 
   render() {
     return (
-      <Animated.View
-        style={[
-          { transform: [{ translateY: this.animatedValue }] },
-          styles.SnackBarContainter,
-        ]}
-      >
+      <Animated.View style={[{ transform: [{ translateY: this.animatedValue }] }, styles.SnackBarContainter]}>
         <Text numberOfLines={3} style={styles.SnackBarMessage}>
           {this.state.SnackBarInsideMsgHolder}
         </Text>

@@ -1,41 +1,47 @@
 import { Text } from "react-native";
-import ModalContent from "../ModalContent";
 import { View } from "react-native";
-import PrimaryButton from "../buttons/PrimaryButton";
+import ChipButton2 from "@components/buttons/ChipButton2";
+import Modal from "react-native-modal";
+import Colors from "@constants/Colors";
 
-export default function DisplayMessage({
-  message,
-  onAgree,
-  showModal,
-  agreeText = "OK",
-  canCancel = false,
-  setShowModal,
-}) {
+export default function DisplayMessage({ message, onAgree, showModal, agreeText, canCancel = false, setShowModal }) {
+  const hideModal = () => {
+    setShowModal(false);
+  };
+
   return (
-    <ModalContent visible={showModal} style={{ padding: 20 }}>
-      <Text style={{ textAlign: "center", paddingVertical: 10 }}>
-        {message}
-      </Text>
+    <Modal
+      isVisible={showModal}
+      style={{
+        padding: 10,
+      }}
+      onBackButtonPress={hideModal}
+      animationIn={"fadeIn"}
+      animationOut={"fadeOut"}
+      animationOutTiming={0.1}
+    >
       <View
         style={{
-          flexDirection: "row",
+          borderRadius: 5,
+          padding: 15,
+          backgroundColor: Colors.light,
+          gap: 10,
         }}
       >
-        {canCancel && (
-          <PrimaryButton
-            title={"Cancel"}
-            onPress={() => setShowModal(false)}
-            darkMode={false}
-            style={{ margin: 10, height: 35 }}
-          />
-        )}
+        <Text style={{ textAlign: "center", fontSize: 16 }}>{message}</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 10,
+            alignSelf: "flex-end",
+            marginTop: 10,
+          }}
+        >
+          {canCancel && <ChipButton2 title={"Cancel"} onPress={hideModal} darkMode={false} />}
 
-        <PrimaryButton
-          title={agreeText}
-          onPress={() => onAgree()}
-          style={{ margin: 10, height: 35 }}
-        />
+          {agreeText && <ChipButton2 title={agreeText} onPress={() => onAgree()} />}
+        </View>
       </View>
-    </ModalContent>
+    </Modal>
   );
 }

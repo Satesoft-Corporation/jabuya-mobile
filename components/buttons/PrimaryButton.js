@@ -1,16 +1,8 @@
-import { Text, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
 import React from "react";
-import Colors from "../../constants/Colors";
+import Colors from "@constants/Colors";
 
-const PrimaryButton = ({
-  onPress,
-  title,
-  disabled = false,
-  titleStyle = {},
-  style,
-  darkMode = true,
-  width,
-}) => {
+const PrimaryButton = ({ onPress, title, disabled = false, loaderColor, style, darkMode = false, loading, round = false }) => {
   return (
     <TouchableOpacity
       activeOpacity={0.7}
@@ -20,29 +12,23 @@ const PrimaryButton = ({
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: darkMode ? Colors.dark : Colors.light,
-          borderRadius: 5,
+          borderRadius: round ? 20 : 5,
           borderWidth: darkMode ? 0 : 1,
           borderColor: Colors.dark,
-          height: 40,
+          height: 35,
           minWidth: 100,
-          width,
-          flex: 1,
+          width: "100%",
+          flexDirection: "row",
+          gap: 5,
         },
         style,
       ]}
       onPress={onPress}
     >
-      <Text
-        style={[
-          {
-            fontWeight: "bold",
-            color: darkMode ? Colors.primary : Colors.dark,
-          },
-          titleStyle,
-        ]}
-      >
-        {title}
-      </Text>
+      {loading && <ActivityIndicator size={20} style={{ alignSelf: "center" }} color={loaderColor ?? Colors.primary} />}
+      {!loading && <Text style={[{ fontWeight: "500", color: darkMode ? Colors.primary : Colors.dark }]}>{title}</Text>
+      }
+
     </TouchableOpacity>
   );
 };

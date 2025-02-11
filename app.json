@@ -2,7 +2,7 @@
   "expo": {
     "name": "Duqact",
     "slug": "duqact",
-    "version": "1.4.1",
+    "version": "1.4.7",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -12,12 +12,9 @@
       "backgroundColor": "#ffffff"
     },
     "plugins": [
-      [
-        "expo-local-authentication",
-        {
-          "faceIDPermission": "Allow Duqact to use device biometrics."
-        }
-      ]
+      ["expo-location", { "locationAlwaysAndWhenInUsePermission": "Allow Duqact to use your location." }],
+      ["expo-local-authentication", { "faceIDPermission": "Allow Duqact to access device biometrics." }],
+      ["expo-barcode-scanner", { "cameraPermission": "Allow Duqact to access camera." }]
     ],
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -25,12 +22,15 @@
       "bundleIdentifier": "com.byaffe.duqact"
     },
     "android": {
+      "targetSdkVersion": 14,
+      "minSdkVersion": 21,
+      "compileSdkVersion": 14,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.byaffe.duqact",
-      "versionCode": 25
+      "versionCode": 32
     },
     "web": {
       "favicon": "./assets/favicon.png"

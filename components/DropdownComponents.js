@@ -1,25 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-} from "react-native";
+import { StyleSheet, View, TouchableOpacity, Image, Dimensions, Text } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import Colors from "../constants/Colors";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
-export const SalesDropdownComponent = ({
-  products,
-  handleChange,
-  makeSelection,
-  setScanned,
-  value,
-  disable,
-}) => {
+export const SalesDropdownComponent = ({ products, handleChange, makeSelection, setScanned, value, disable }) => {
   const [isFocus, setIsFocus] = useState(false);
 
   return (
@@ -76,9 +63,9 @@ export const SalesDropdownComponent = ({
             style={{
               width: 35,
               height: 30,
-              tintColor: Colors.primary,
               alignSelf: "center",
             }}
+            tintColor={Colors.primary}
           />
         </TouchableOpacity>
       </View>
@@ -93,26 +80,21 @@ export const MyDropDown = ({
   labelField,
   valueField,
   value,
-  placeholder = "Select item",
+  label,
   disable = false,
-  search = true,
+  showError = false,
+  isSubmitted,
+  divStyle = {},
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
   return (
-    <View style={{ marginBottom: 1 }}>
+    <View style={[{ width: "100%" }, divStyle]}>
+      {label && <Text style={{ fontSize: 15, marginBottom: 5 }}>{label}</Text>}
       <Dropdown
         disable={disable}
         style={[
-          {
-            height: 40,
-            borderColor: Colors.dark,
-            borderWidth: 0.5,
-            borderRadius: 5,
-            paddingHorizontal: 13,
-            backgroundColor: Colors.primary,
-            width: "100%",
-          },
+          { height: 40, borderColor: Colors.dark, borderWidth: 0.5, borderRadius: 5, paddingHorizontal: 13, width: "100%" },
           isFocus && { borderColor: Colors.primary },
           style,
         ]}
@@ -124,10 +106,10 @@ export const MyDropDown = ({
         maxHeight={screenHeight / 2}
         labelField={labelField}
         valueField={valueField}
-        placeholder={!isFocus ? placeholder : "..."}
+        placeholder={"Select item"}
         searchPlaceholder="Search..."
         value={value}
-        search={search}
+        search={data?.length > 6}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
@@ -135,18 +117,14 @@ export const MyDropDown = ({
           onChange(item);
         }}
       />
+      {isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>}
     </View>
   );
 };
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 8,
-    flexDirection: "row",
-    justifyContent: "center",
-    paddingHorizontal: 8,
-  },
+  container: { marginTop: 8, flexDirection: "row", justifyContent: "center", paddingHorizontal: 8 },
   dropdown: {
-    height: 40,
+    height: 35,
     borderColor: Colors.primary,
     borderWidth: 0.5,
     borderRadius: 5,
@@ -156,9 +134,7 @@ const styles = StyleSheet.create({
     width: "80%",
     alignSelf: "center",
   },
-  icon: {
-    marginRight: 5,
-  },
+  icon: { marginRight: 5 },
 
   label: {
     position: "absolute",
@@ -169,18 +145,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     fontSize: 14,
   },
-  placeholderStyle: {
-    fontSize: 15,
-  },
-  selectedTextStyle: {
-    fontSize: 15,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
+  placeholderStyle: { fontSize: 15 },
+  selectedTextStyle: { fontSize: 15 },
+  iconStyle: { width: 20, height: 20 },
+  inputSearchStyle: { height: 40, fontSize: 16 },
 });

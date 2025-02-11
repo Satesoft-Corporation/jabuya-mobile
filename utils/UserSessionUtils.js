@@ -12,6 +12,14 @@ export class UserSessionUtils {
     return await AsyncStorage.getItem(StorageParams.ACCESS_TOKEN);
   }
 
+  static setFirstTimeInsatll(bool) {
+    return AsyncStorage.setItem("FTI", bool);
+  }
+
+  static getFirstTimeInstall() {
+    return AsyncStorage.getItem("FTI");
+  }
+
   /**
    * This is used to get the user's refresh token.
    *
@@ -26,12 +34,7 @@ export class UserSessionUtils {
   static async clearLocalStorageAndLogout(navigation) {
     // remove all
     await AsyncStorage.clear();
-    navigation?.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: LOGIN }],
-      })
-    );
+    navigation?.dispatch(CommonActions.reset({ index: 0, routes: [{ name: LOGIN }] }));
   }
 
   /**
@@ -49,10 +52,7 @@ export class UserSessionUtils {
    * @param bearerToken
    */
   static async setFullSessionObject(fullObject) {
-    await AsyncStorage.setItem(
-      StorageParams.FULL_LOGIN_DETAILS_JSON,
-      JSON.stringify(fullObject)
-    );
+    await AsyncStorage.setItem(StorageParams.FULL_LOGIN_DETAILS_JSON, JSON.stringify(fullObject));
   }
 
   /**
@@ -61,9 +61,7 @@ export class UserSessionUtils {
    * @param bearerToken
    */
   static async getFullSessionObject() {
-    const value = await AsyncStorage.getItem(
-      StorageParams.FULL_LOGIN_DETAILS_JSON
-    );
+    const value = await AsyncStorage.getItem(StorageParams.FULL_LOGIN_DETAILS_JSON);
     return JSON.parse(value);
   }
   /**
@@ -81,10 +79,7 @@ export class UserSessionUtils {
    * @param userDetails
    */
   static async setUserDetails(userDetails) {
-    await AsyncStorage.setItem(
-      StorageParams.USER_DETAILS_JSON,
-      JSON.stringify(userDetails)
-    );
+    await AsyncStorage.setItem(StorageParams.USER_DETAILS_JSON, JSON.stringify(userDetails));
   }
 
   /**
@@ -125,23 +120,6 @@ export class UserSessionUtils {
   }
 
   /**
-   * This method is used to get the attendant shopId
-   * @returns shopId
-   */
-  static async getShopId() {
-    let id = await AsyncStorage.getItem(StorageParams.SHOP_ID);
-    return Number(id);
-  }
-
-  /**
-   * This method is used to set the attendant shopId
-   * @param {id} id
-   */
-  static async setShopid(id) {
-    await AsyncStorage.setItem(StorageParams.SHOP_ID, id);
-  }
-
-  /**
    * This method is used to set the number shops for a shop owner
    * @param {count} count
    */
@@ -171,8 +149,19 @@ export class UserSessionUtils {
    * @returns shopcount
    */
   static async getShops() {
+    let currencyList = await this.getCurrencies();
     let shops = await AsyncStorage.getItem(StorageParams.SHOPS);
-    return JSON.parse(shops);
+    let parsed = JSON.parse(shops);
+
+    let finalList = parsed?.map((item) => {
+      const currency = currencyList?.find((cur) => cur?.id === item?.currencyId);
+
+      return {
+        ...item,
+        currency: currency?.symbol || "",
+      };
+    });
+    return finalList;
   }
 
   /**
@@ -193,14 +182,16 @@ export class UserSessionUtils {
   }
 
   static async setShopProducts(productList) {
-    await AsyncStorage.setItem(
-      StorageParams.SHOP_PRODUCTS,
-      JSON.stringify(productList)
-    );
+    const user = await this.getUserDetails();
+    const key = "pdts" + user?.username;
+    await AsyncStorage.setItem(key, JSON.stringify(productList));
   }
 
   static async getShopProducts(shopId = null) {
-    let productList = await AsyncStorage.getItem(StorageParams.SHOP_PRODUCTS);
+    const user = await this.getUserDetails();
+    const key = "pdts" + user?.username;
+
+    const productList = await AsyncStorage.getItem(key);
     if (shopId !== null) {
       let newList = [...JSON.parse(productList)];
       let filtered = newList.filter((item) => item.shopId === shopId);
@@ -226,22 +217,20 @@ export class UserSessionUtils {
   static async addPendingSale(salePayLoad) {
     let pendingSales = await this.getPendingSales();
 
-    await AsyncStorage.setItem(
-      StorageParams.PENDING_SALES,
-      JSON.stringify([...pendingSales, salePayLoad])
-    );
+    await AsyncStorage.setItem(StorageParams.PENDING_SALES, JSON.stringify([...pendingSales, salePayLoad]));
   }
 
   static async removePendingSale(index) {
     let pendingSales = await this.getPendingSales();
     pendingSales.splice(index, 1); // Removes the sale record at the specified index
 
-    await AsyncStorage.setItem(
-      StorageParams.PENDING_SALES,
-      JSON.stringify([...pendingSales])
-    );
+    await AsyncStorage.setItem(StorageParams.PENDING_SALES, JSON.stringify([...pendingSales]));
   }
 
+  /**
+   *
+   * @returns returns a list of sales made offline
+   */
   static async getPendingSales() {
     let list = await AsyncStorage.getItem(StorageParams.PENDING_SALES);
     return list ? JSON.parse(list) : [];
@@ -266,7 +255,11 @@ export class UserSessionUtils {
   }
 
   static async setPinLoginTime(time) {
-    await AsyncStorage.setItem(StorageParams.PIN_LOGIN, time);
+    if (time === null) {
+      await AsyncStorage.removeItem(StorageParams.PIN_LOGIN);
+    } else {
+      await AsyncStorage.setItem(StorageParams.PIN_LOGIN, time);
+    }
   }
 
   static async getPinLoginTime() {
@@ -275,12 +268,19 @@ export class UserSessionUtils {
   }
 
   static async setShopClients(clients) {
-    let data = JSON.stringify(clients);
-    await AsyncStorage.setItem(StorageParams.SHOP_CLIENTS, data);
+    const user = await this.getUserDetails();
+    const key = "clts" + user?.username;
+
+    const data = JSON.stringify(clients);
+    await AsyncStorage.setItem(key, data);
   }
 
   static async getShopClients(shopId = null, withNumber = false) {
-    let list = await AsyncStorage.getItem(StorageParams.SHOP_CLIENTS);
+
+    const user = await this.getUserDetails();
+    const key = "clts" + user?.username;
+    
+    const list = await AsyncStorage.getItem(key);
 
     if (shopId !== null) {
       let newList = [...JSON.parse(list)];
@@ -300,10 +300,7 @@ export class UserSessionUtils {
   }
 
   static async setLoginDetails(data) {
-    await AsyncStorage.setItem(
-      StorageParams.LOGIN_DETAILS,
-      JSON.stringify(data)
-    );
+    await AsyncStorage.setItem(StorageParams.LOGIN_DETAILS, JSON.stringify(data));
   }
 
   static async getLoginDetails() {
@@ -311,10 +308,63 @@ export class UserSessionUtils {
 
     return JSON.parse(data);
   }
-}
 
-/**
- * git commands and origin,clon, add,comit,push,fetch,pull,PR
- *
- *
- */
+  //
+
+  /**
+   * sets time when The app was last opened
+   * @param {*} time
+   */
+  static async setLastOpenTime(time) {
+    await AsyncStorage.setItem("@last_usage_time", time);
+  }
+
+  /**
+   * returns the time when the app was last used
+   * @returns
+   */
+  static async getLastOpenTime() {
+    const time = await AsyncStorage.getItem("@last_usage_time");
+    return time ? new Date(time) : null;
+  }
+
+  /**
+   * saves currencies locally
+   * @param {*} currencies
+   */
+  static async setCurrencies(currencies) {
+    const data = JSON.stringify(currencies);
+    await AsyncStorage.setItem(StorageParams.CURRENCIES, data);
+  }
+
+  /**
+   * returns the list of currencies saved locally
+   * @returns
+   */
+  static async getCurrencies(currencyId = null) {
+    const list = await AsyncStorage.getItem(StorageParams.CURRENCIES);
+
+    if (currencyId !== null) {
+      let newList = [...JSON.parse(list)];
+      let filtered = newList.filter((item) => item?.id === currencyId);
+      return filtered;
+    } else {
+      return list ? JSON.parse(list) : [];
+    }
+  }
+
+  static async setClientSales(list) {
+    await AsyncStorage.setItem(StorageParams.CLIENT_SALES, JSON.stringify(list));
+  }
+
+  static async getClientSales(client_id = null) {
+    let creditList = await AsyncStorage.getItem(StorageParams.CLIENT_SALES);
+    if (client_id !== null) {
+      const list = [...JSON.parse(creditList)];
+      let filtered = list.filter((sale) => sale?.client_id === client_id);
+      return filtered;
+    } else {
+      return creditList ? [...JSON.parse(creditList)] : [];
+    }
+  }
+}

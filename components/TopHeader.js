@@ -1,10 +1,12 @@
-import React, { memo, useContext, useState } from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import Colors from "../constants/Colors";
-import SearchBar from "./SearchBar";
-import { UserContext } from "../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
+import Colors from "@constants/Colors";
 import PopUpmenu from "./PopUpMenu";
+import SearchBar from "./SearchBar";
+import { scale } from "react-native-size-matters";
+import { useSelector } from "react-redux";
+import { getSelectedShop } from "duqactStore/selectors";
 
 const TopHeader = ({
   title = "Details",
@@ -18,7 +20,7 @@ const TopHeader = ({
   showShops = false,
 }) => {
   const [showBar, setShowBar] = useState(false);
-  const { selectedShop } = useContext(UserContext);
+  const selectedShop = useSelector(getSelectedShop);
 
   const navigation = useNavigation();
   const toggleSearch = () => {
@@ -50,15 +52,15 @@ const TopHeader = ({
                   height: 30,
                   width: 20,
                   resizeMode: "contain",
-                  tintColor: Colors.primary,
                 }}
+                tintColor={Colors.primary}
               />
             </TouchableOpacity>
 
             <Text
               style={{
                 color: Colors.primary,
-                fontSize: 18,
+                fontSize: scale(17),
                 marginStart: 10,
               }}
             >
@@ -83,15 +85,13 @@ const TopHeader = ({
                     height: 30,
                     width: 20,
                     resizeMode: "contain",
-                    tintColor: Colors.primary,
                   }}
+                  tintColor={Colors.primary}
                 />
               </TouchableOpacity>
             )}
 
-            {showMenuDots && (
-              <PopUpmenu menuItems={menuItems} showShops={showShops} />
-            )}
+            {showMenuDots && <PopUpmenu menuItems={menuItems} showShops={showShops} />}
           </View>
         </View>
 
@@ -99,7 +99,7 @@ const TopHeader = ({
           <Text
             style={{
               color: Colors.primary,
-              fontSize: 13,
+              fontSize: scale(13),
               paddingBottom: 8,
               marginStart: 30,
               marginTop: -10,
@@ -126,4 +126,4 @@ const TopHeader = ({
   );
 };
 
-export default memo(TopHeader);
+export default TopHeader;

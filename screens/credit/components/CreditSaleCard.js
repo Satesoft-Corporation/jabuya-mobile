@@ -1,105 +1,39 @@
 import { View, StyleSheet } from "react-native";
-import React, { memo, useEffect, useState } from "react";
-import CardHeader from "../../../components/card_components/CardHeader";
-import { formatDate } from "../../../utils/Utils";
+import React from "react";
 import { useNavigation } from "@react-navigation/native";
-import DataColumn from "../../../components/card_components/DataColumn";
-import { BaseApiService } from "../../../utils/BaseApiService";
-import CardFooter2 from "../../../components/card_components/CardFooter2";
-import { CLIENT_DEBTS } from "../../../navigation/ScreenNames";
+import CardHeader from "@components/card_components/CardHeader";
+import DataColumn from "@components/card_components/DataColumn";
+import { CLIENT_DEBTS } from "@navigation/ScreenNames";
+import CardFooter from "@components/card_components/CardFooter";
+import { formatNumberWithCommas } from "@utils/Utils";
 
-const CreditSaleListItem = ({
-  client,
-  appendDebtValue,
-  appendBalValue,
-  appendPaidValue,
-}) => {
+const CreditSaleCard = ({ client }) => {
   const navigation = useNavigation();
 
-  const [sales, setSales] = useState([]);
-  const [debt, setDebt] = useState(0);
-  const [paid, setPaid] = useState(0);
-  const [bal, setBal] = useState(0);
+  const { fullName, debt, repaidAmount, balance, serialNumber } = client ?? {};
+  const currency = client?.currency;
 
-  const [show, setShow] = useState(false);
+  return (
+    <View style={styles.container}>
+      <CardHeader value1={`CSN: ${serialNumber}`} shop={client?.shop?.name} date={client?.dateCreated} />
 
-  const name = client?.fullName;
-  const mob = client?.phoneNumber;
+      <View style={styles.content}>
+        <DataColumn title={"Client"} value={fullName} left flex={2} />
 
-  const fetchCreditSales = async () => {
-    let searchParameters = {
-      limit: 0,
-      offset: 0,
-      clientId: client?.id,
-    };
-
-    new BaseApiService("/credit-sales")
-      .getRequestWithJsonResponse(searchParameters)
-      .then((response) => {
-        setSales(response?.records);
-        const debt = response.records.reduce((a, b) => a + b?.amountLoaned, 0);
-        const paid = response.records.reduce((a, b) => a + b?.amountRepaid, 0);
-        const bal = debt - paid;
-
-        setDebt(debt);
-        setPaid(paid);
-        setBal(bal);
-        appendDebtValue(debt);
-        appendBalValue(bal);
-        appendPaidValue(paid);
-        setShow(true);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  useEffect(() => {
-    fetchCreditSales();
-  }, []);
-
-  if (show === true) {
-    return (
-      <View style={styles.container}>
-        <CardHeader
-          value1={`CSN: ${client?.serialNumber}`}
-          shop={client?.shop?.name}
-          date={client?.dateCreated}
-        />
-
-        <View style={styles.content}>
-          <DataColumn
-            title={"Client"}
-            value={name}
-            left
-            flex={2}
-            value2={`${mob}`}
-          />
-
-          <DataColumn title={"Debt"} value={debt} isCurrency />
-          <DataColumn title={"Paid"} value={paid} isCurrency />
-          <DataColumn title={"Balance"} value={bal} isCurrency end />
-        </View>
-
-        <CardFooter2
-          renderBtn={bal > 0}
-          btnTitle="More"
-          onBtnPress={() =>
-            navigation.navigate(CLIENT_DEBTS, {
-              client,
-              sales,
-              debt,
-              paid,
-              bal,
-            })
-          }
-        />
+        <DataColumn title={"Debt"} value={formatNumberWithCommas(debt, currency)} />
+        <DataColumn title={"Paid"} value={formatNumberWithCommas(repaidAmount, currency)} />
+        <DataColumn title={"Balance"} value={formatNumberWithCommas(balance, currency)} />
       </View>
-    );
-  }
+
+      <CardFooter
+        btnTitle2={balance > 0 ? "View" : null} //change this line
+        onClick2={() => navigation.navigate(CLIENT_DEBTS, { client, currency })}
+      />
+    </View>
+  );
 };
 
-export default memo(CreditSaleListItem);
+export default CreditSaleCard;
 
 const styles = StyleSheet.create({
   container: {

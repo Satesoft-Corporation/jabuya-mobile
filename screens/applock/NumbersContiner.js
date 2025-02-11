@@ -64,8 +64,7 @@ const NumbersContiner = ({ onPress, fpAuth, showFpIcon = false }) => {
               }}
             >
               {!isNum && item === true ? (
-                hasFP &&
-                showFpIcon && <Icon name="fingerprint" color="#fff" size={30} />
+                hasFP && showFpIcon && <Icon name="fingerprint" color="#fff" size={30} />
               ) : (
                 <Text
                   style={{

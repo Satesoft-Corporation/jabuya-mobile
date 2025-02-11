@@ -1,20 +1,15 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  SafeAreaView,
-} from "react-native";
+import { View, Text, TouchableOpacity, Image, SafeAreaView } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { BaseApiService } from "../../utils/BaseApiService";
 import AppStatusBar from "../../components/AppStatusBar";
 import Colors from "../../constants/Colors";
 import Loader from "../../components/Loader";
 import UserProfile from "../../components/UserProfile";
-import { UserContext } from "../../context/UserContext";
 import Stripe from "./components/Stripe1";
 import { formatNumberWithCommas } from "../../utils/Utils";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
+import { useSelector } from "react-redux";
+import { getSelectedShop, getShopOwnerId } from "duqactStore/selectors";
 
 const ShopSummary = ({ navigation, route }) => {
   const [initialCapital, setInitialCapital] = useState("");
@@ -23,9 +18,8 @@ const ShopSummary = ({ navigation, route }) => {
   const [totalSalesValue, setTotalSalesValue] = useState(null); //cash at hand
   const [financialRecords, setFinancialRecords] = useState(null);
 
-  const { userParams } = useContext(UserContext);
-
-  const { shopOwnerId } = userParams;
+  const selectedShop = useSelector(getSelectedShop);
+  const shopOwnerId = useSelector(getShopOwnerId);
 
   const fetchShopProducts = async () => {
     let products = await UserSessionUtils.getShopProducts();
@@ -133,15 +127,13 @@ const ShopSummary = ({ navigation, route }) => {
             >
               Investment
             </Text>
-            <Text
-              style={{ fontSize: 15, color: Colors.primary, fontWeight: 600 }}
-            >
+            <Text style={{ fontSize: 15, color: Colors.primary, fontWeight: 600 }}>
               <Text
                 style={{
                   fontSize: 10,
                 }}
               >
-                UGX
+                {selectedShop?.currency}
               </Text>{" "}
               {formatNumberWithCommas(initialCapital)}
             </Text>
@@ -165,9 +157,7 @@ const ShopSummary = ({ navigation, route }) => {
             >
               Shops
             </Text>
-            <Text style={{ color: Colors.primary, alignSelf: "flex-end" }}>
-              01
-            </Text>
+            <Text style={{ color: Colors.primary, alignSelf: "flex-end" }}>01</Text>
           </View>
 
           <TouchableOpacity
@@ -221,9 +211,9 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.dark,
                 marginEnd: 10,
               }}
+              tintColor={Colors.dark}
             />
 
             <View>
@@ -264,9 +254,9 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.dark,
                 marginEnd: 10,
               }}
+              tintColor={Colors.dark}
             />
 
             <View>
@@ -318,9 +308,9 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.dark,
                 marginEnd: 10,
               }}
+              tintColor={Colors.dark}
             />
 
             <View>
@@ -361,9 +351,9 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.dark,
                 marginEnd: 10,
               }}
+              tintColor={Colors.dark}
             />
 
             <View>
@@ -406,24 +396,18 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.dark,
                 marginEnd: 10,
               }}
+              tintColor={Colors.dark}
             />
             <View>
-              <Text style={{ fontWeight: 400, fontSize: 16 }}>
-                Gross income
-              </Text>
-              <Text style={{ fontWeight: 300, fontSize: 10 }}>
-                Before expenses
-              </Text>
+              <Text style={{ fontWeight: 400, fontSize: 16 }}>Gross income</Text>
+              <Text style={{ fontWeight: 300, fontSize: 10 }}>Before expenses</Text>
             </View>
           </View>
 
           <View>
-            <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>
-              {formatNumberWithCommas(financialRecords?.grossProfit)}
-            </Text>
+            <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>{formatNumberWithCommas(financialRecords?.grossProfit)}</Text>
           </View>
         </View>
 
@@ -444,22 +428,18 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.dark,
                 marginEnd: 10,
               }}
+              tintColor={Colors.dark}
             />
             <View>
               <Text style={{ fontWeight: 400, fontSize: 16 }}>Expenses</Text>
-              <Text style={{ fontWeight: 300, fontSize: 10 }}>
-                Monthly total
-              </Text>
+              <Text style={{ fontWeight: 300, fontSize: 10 }}>Monthly total</Text>
             </View>
           </View>
 
           <View>
-            <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>
-              {formatNumberWithCommas(financialRecords?.expenses)}
-            </Text>
+            <Text style={{ fontWeight: 500, fontSize: 20, marginEnd: 10 }}>{formatNumberWithCommas(financialRecords?.expenses)}</Text>
           </View>
         </View>
 
@@ -480,21 +460,13 @@ const ShopSummary = ({ navigation, route }) => {
               style={{
                 width: 40,
                 height: 40,
-                tintColor: Colors.primary,
                 marginEnd: 10,
               }}
+              tintColor={Colors.primary}
             />
             <View>
-              <Text
-                style={{ fontWeight: 400, color: Colors.primary, fontSize: 16 }}
-              >
-                Net profit
-              </Text>
-              <Text
-                style={{ fontWeight: 300, fontSize: 10, color: Colors.primary }}
-              >
-                After expenses
-              </Text>
+              <Text style={{ fontWeight: 400, color: Colors.primary, fontSize: 16 }}>Net profit</Text>
+              <Text style={{ fontWeight: 300, fontSize: 10, color: Colors.primary }}>After expenses</Text>
             </View>
           </View>
 

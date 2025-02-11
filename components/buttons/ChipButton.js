@@ -2,12 +2,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import Colors from "../../constants/Colors";
 
-const ChipButton = ({
-  title,
-  onPress,
-  isSelected = false,
-  darkMode = false,
-}) => {
+const ChipButton = ({ title, onPress, isSelected = false, darkMode = false }) => {
   return (
     <TouchableOpacity
       onPress={onPress}

@@ -1,97 +1,127 @@
 import { Text, View, FlatList, TextInput } from "react-native";
-import React, { useContext, useState } from "react";
-import { SaleEntryContext } from "../../../context/SaleEntryContext";
-import ModalContent from "../../../components/ModalContent";
-import ChipButton from "../../../components/buttons/ChipButton";
-import PrimaryButton from "../../../components/buttons/PrimaryButton";
-import Colors from "../../../constants/Colors";
+import React, { useEffect, useState } from "react";
+import ModalContent from "@components/ModalContent";
+import ChipButton from "@components/buttons/ChipButton";
+import Colors from "@constants/Colors";
+import PrimaryButton from "@components/buttons/PrimaryButton";
+import { useDispatch, useSelector } from "react-redux";
+import { getCartSelection } from "duqactStore/selectors";
+import { isValidNumber } from "@utils/Utils";
+import { addItemToCart, makeProductSelection } from "actions/shopActions";
 
-export default function EnterSaleQtyModal() {
+export default function EnterSaleQtyModal({ showMoodal, setShowModal }) {
+  const selection = useSelector(getCartSelection);
+
+  const dispatch = useDispatch();
+
+  const { selectedSaleUnit, saleUnits, salesPrice } = selection ?? {};
+
   const [submitted, setSubmitted] = useState(false);
+  const [quantity, setQuantity] = useState("");
+  const [errors, setErrors] = useState(0);
+  const [unitCost, setUnitCost] = useState("");
+  const [unitSalesPrice, setUnitSalesPrice] = useState(""); //price for a sale unit
+  const [saleUnit, setSaleUnit] = useState(null); //selected if multiple
 
-  const {
-    selection,
-    setSelection,
-    setSelectedSaleUnit,
-    selectedSaleUnit,
-    setUnitCost,
-    setScanned,
-    saveSelection,
-    setQuantity,
-    quantity,
-    setErrors,
-    errors,
-    unitCost,
-    showMoodal,
-    setShowModal,
-    onChipPress,
-    saleUnits,
-    setInitialUnitCost,
-  } = useContext(SaleEntryContext);
+  const hide = () => {
+    dispatch(makeProductSelection(null));
+    setUnitCost("");
+    setQuantity("");
+    setShowModal(false);
+  };
+
+  const onChipPress = (item) => {
+    setSaleUnit(item);
+    setUnitCost(String(item?.unitPrice));
+    setUnitSalesPrice(item?.unitPrice);
+  };
 
   const handlePress = () => {
-    if (selectedSaleUnit) {
-      saveSelection();
-      setSubmitted(false);
+    if (saleUnit) {
+      const parsedQuantity = Number(quantity);
+      const itemUnitCost = Number(unitCost);
+
+      const cost = Math.round(itemUnitCost * parsedQuantity);
+
+      const isValidQuantity = isValidNumber(parsedQuantity) && parsedQuantity > 0;
+
+      const isValidCost = isValidNumber(itemUnitCost) && itemUnitCost >= unitSalesPrice;
+
+      if (itemUnitCost < unitSalesPrice) {
+        setErrors((prevErrors) => {
+          return { ...prevErrors, lessPriceError: `Unit cost for ${selection.productName} should be greater than ${unitSalesPrice}` };
+        });
+      }
+
+      if (!isValidNumber(itemUnitCost)) {
+        setErrors((prevErrors) => {
+          return { ...prevErrors, lessPriceError: "Invalid input for unit cost" };
+        });
+      }
+
+      if (parsedQuantity === 0) {
+        setErrors((prevErrors) => {
+          return { ...prevErrors, qtyZeroError: "Quantity should be greater than 0" };
+        });
+      }
+
+      if (!isValidNumber(parsedQuantity)) {
+        setErrors((prevErrors) => {
+          return { ...prevErrors, qtyZeroError: "Invalid quantity input" };
+        });
+      }
+
+      if (isValidQuantity && isValidCost) {
+        const { productSaleUnitName } = saleUnit;
+        const name = productSaleUnitName !== "Whole" ? " - " + productSaleUnitName : "";
+
+        const readyItem = {
+          id: selection.id,
+          productName: selection?.productName + name,
+          shopProductId: selection.id,
+          quantity: parsedQuantity, // Use the parsed quantity
+          totalCost: cost,
+          unitCost: Number(unitCost),
+          saleUnitId: saleUnit?.id || null,
+        };
+
+        dispatch(addItemToCart(readyItem));
+        hide();
+      }
     } else {
       setSubmitted(true);
     }
   };
 
   const renderFooter = () => {
-    if (submitted && !selectedSaleUnit) {
-      return (
-        <Text
-          style={{
-            fontSize: 12,
-            color: Colors.error,
-          }}
-        >
-          Sale unit is required
-        </Text>
-      );
+    if (submitted && !saleUnit) {
+      return <Text style={{ fontSize: 12, color: Colors.error }}>Sale unit is required</Text>;
     }
   };
+
+  useEffect(() => {
+    setUnitCost(String(salesPrice));
+    setSaleUnit(selectedSaleUnit);
+    setUnitSalesPrice(salesPrice);
+  }, [selection]);
 
   return (
     <ModalContent visible={showMoodal} style={{ padding: 30 }}>
       <View style={{ paddingHorizontal: 5 }}>
-        <View
-          style={{
-            marginTop: 10,
-            marginBottom: 5,
-          }}
-        >
-          <Text
-            style={{
-              fontWeight: "600",
-              fontSize: 20,
-              marginBottom: 5,
-            }}
-          >
-            Successfull
-          </Text>
-          <Text>{selection && selection.productName} has been selected.</Text>
+        <View style={{ marginTop: 10, marginBottom: 5 }}>
+          <Text style={{ fontWeight: "600", fontSize: 20, marginBottom: 5 }}>Successfull</Text>
+          <Text>{selection?.productName} has been selected.</Text>
 
-          {!selectedSaleUnit && (
+          {!saleUnit && (
             <View style={{ marginTop: 10 }}>
-              <Text
-                style={{
-                  fontWeight: "600",
-                }}
-              >
-                Select sale unit
-              </Text>
+              <Text style={{ fontWeight: "600" }}>Select sale unit</Text>
 
               <FlatList
                 data={saleUnits}
                 renderItem={({ item }) => (
                   <ChipButton
                     title={item?.productSaleUnitName}
-                    isSelected={
-                      selectedSaleUnit?.productSaleUnitName ===
-                      item?.productSaleUnitName
-                    }
+                    isSelected={saleUnit?.productSaleUnitName === item?.productSaleUnitName}
                     onPress={() => onChipPress(item)}
                   />
                 )}
@@ -103,18 +133,9 @@ export default function EnterSaleQtyModal() {
           )}
         </View>
 
-        {selectedSaleUnit && (
+        {saleUnit && (
           <View>
-            <Text
-              style={{
-                fontWeight: "600",
-                fontSize: 13,
-                marginTop: 10,
-                marginLeft: 4,
-              }}
-            >
-              Quantity
-            </Text>
+            <Text style={{ fontWeight: "600", fontSize: 13, marginTop: 10, marginLeft: 4 }}>Quantity</Text>
             <TextInput
               onFocus={() => setErrors(null)}
               onBlur={() => setErrors(null)}
@@ -131,34 +152,13 @@ export default function EnterSaleQtyModal() {
                 borderRadius: 5,
                 padding: 6,
                 borderWidth: 1,
-                borderColor: errors?.qtyZeroError
-                  ? Colors.error
-                  : "transparent",
+                borderColor: errors?.qtyZeroError ? Colors.error : "transparent",
                 fontSize: 18,
                 paddingEnd: 10,
               }}
             />
-            {errors?.qtyZeroError && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: Colors.error,
-                }}
-              >
-                {errors?.qtyZeroError}
-              </Text>
-            )}
-            <Text
-              style={{
-                fontWeight: "600",
-                fontSize: 13,
-                marginTop: 10,
-                marginBottom: 5,
-                marginLeft: 4,
-              }}
-            >
-              Unit cost
-            </Text>
+            {errors?.qtyZeroError && <Text style={{ fontSize: 12, color: Colors.error }}>{errors?.qtyZeroError}</Text>}
+            <Text style={{ fontWeight: "600", fontSize: 13, marginTop: 10, marginBottom: 5, marginLeft: 4 }}>Unit cost</Text>
             <TextInput
               textAlign="right"
               value={unitCost}
@@ -169,52 +169,25 @@ export default function EnterSaleQtyModal() {
                 backgroundColor: Colors.light_3,
                 borderRadius: 5,
                 padding: 6,
-                borderColor: errors?.lessPriceError
-                  ? Colors.error
-                  : "transparent",
+                borderColor: errors?.lessPriceError ? Colors.error : "transparent",
                 fontSize: 18,
                 paddingEnd: 10,
               }}
             />
-            {errors?.lessPriceError && (
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: Colors.error,
-                }}
-              >
-                {errors?.lessPriceError}
-              </Text>
-            )}
+            {errors?.lessPriceError && <Text style={{ fontSize: 12, color: Colors.error }}>{errors?.lessPriceError}</Text>}
           </View>
         )}
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 40,
-            marginBottom: 10,
-            gap: 5,
-          }}
-        >
+        <View style={{ flexDirection: "row", marginTop: 40, marginBottom: 10, gap: 5 }}>
           <PrimaryButton
-            darkMode={false}
+            style={{ flex: saleUnit ? 0.5 : 1 }}
             title={"Cancel"}
             onPress={() => {
               setShowModal(false);
-              setErrors({});
-              setSelection(null);
-              setScanned(false);
-              setSelectedSaleUnit(null);
-              setSubmitted(false);
-              setUnitCost("");
-              setInitialUnitCost(null);
+              dispatch(makeProductSelection(null));
             }}
           />
-          {selectedSaleUnit && (
-            <PrimaryButton title={"Confirm"} onPress={handlePress} />
-          )}
+          {saleUnit && <PrimaryButton title={"Confirm"} darkMode onPress={handlePress} style={{ flex: 0.5 }} />}
         </View>
       </View>
     </ModalContent>

@@ -1,20 +1,23 @@
+import CardFooter from "@components/card_components/CardFooter";
+import DataColumn from "@components/card_components/DataColumn";
+import DataRow from "@components/card_components/DataRow";
+import SalesTable from "@screens/sales_desk/components/SalesTable";
+import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import { memo, useCallback, useEffect, useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
-import {
-  extractTime,
-  formatDate,
-  formatNumberWithCommas,
-} from "../../../utils/Utils";
-import CardHeader from "../../../components/card_components/CardHeader";
-import SalesTable from "../../sales_desk/components/SalesTable";
-import DataRow from "../../../components/card_components/DataRow";
-import CardFooter2 from "../../../components/card_components/CardFooter2";
-import DataColumn from "../../../components/card_components/DataColumn";
+import { Text, View } from "react-native";
+import { useSelector } from "react-redux";
+import { getShops } from "duqactStore/selectors";
+import { scale } from "react-native-size-matters";
+import Colors from "@constants/Colors";
+import { getCanDeleteSales, getCanViewShopIncome } from "duqactStore/selectors/permissionSelectors";
 
-function SaleTxnCard({ data }) {
-  // sales report item card
+function SaleTxnCard({ data, print, onDelete, onSwipe }) {
+  const shops = useSelector(getShops) ?? [];
+  const canViewIncome = useSelector(getCanViewShopIncome);
 
-  const { lineItems, totalCost, amountPaid, balanceGivenOut, shopName } = data;
+  const canDeleteSales = useSelector(getCanDeleteSales);
+
+  const { lineItems, totalCost, amountPaid, balanceGivenOut } = data;
 
   const [expanded, setExpanded] = useState(false);
   const [itemCount, setItemCount] = useState(0);
@@ -34,162 +37,108 @@ function SaleTxnCard({ data }) {
     }
   }, [data]);
 
-  const servedBy = () => (
-    <Text style={styles.footerText1}>
-      Served by:{" "}
-      <Text style={styles.footerText2}>{data?.createdByFullName}</Text>
-    </Text>
-  );
+  const serialNumber = () => {
+    return (
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: !expanded ? 10 : 0 }}>
+        <Text style={{ fontSize: scale(12) }}>SN: {data?.serialNumber}</Text>
 
+        <Text style={{ fontSize: scale(12), color: Colors.gray, alignSelf: "flex-end" }}>{formatDate(data?.dateCreated)}</Text>
+      </View>
+    );
+  };
   return (
     <View
-      style={[styles.container, { borderWidth: balanceGivenOut < 0 ? 1 : 0 }]}
+      style={{
+        flex: 1,
+        marginTop: 10,
+        marginHorizontal: 10,
+        borderRadius: 3,
+        backgroundColor: "white",
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        borderWidth: balanceGivenOut < 0 ? 1 : 0,
+        gap: 8,
+      }}
     >
-      <CardHeader
-        value1={`SN: ${data?.serialNumber}`}
-        date={data?.dateCreated}
-        shop={data?.shopName}
-      />
+      {expanded && serialNumber()}
+
+      {!expanded && (
+        <View style={{ gap: 2 }}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <Text style={{ fontWeight: 600 }}>Items</Text>
+
+            {data?.clientName && (
+              <Text>
+                Client:{" "}
+                <Text style={{ fontWeight: "600" }}>
+                  {data?.clientName} {data?.clientPhoneNumber}
+                </Text>
+              </Text>
+            )}
+          </View>
+          <Text numberOfLines={2} style={{ fontWeight: "500" }}>
+            {data?.name}
+          </Text>
+        </View>
+      )}
 
       {!expanded && (
         <>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              margin: 10,
-            }}
-          >
-            <DataColumn title={"Items"} value={itemCount} flex={0} />
+          <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
+            <DataColumn title={"Qty"} value={itemCount} />
 
-            <DataColumn
-              title={"Recieved"}
-              value={amountPaid}
-              isCurrency
-              flex={0}
-            />
+            <DataColumn title={"Recieved"} value={formatNumberWithCommas(amountPaid, data?.currency)} />
 
-            <DataColumn
-              title={"Amount"}
-              value={totalCost}
-              isCurrency
-              flex={0}
-            />
-            <DataColumn
-              title={"Balance"}
-              value={balanceGivenOut}
-              flex={0}
-              isCurrency
-              end
-            />
-            {/* <DataColumn
-              title={"Income"}
-              value={profit}
-              isCurrency
-              end
-              flex={0}
-            /> */}
+            <DataColumn title={"Amount"} value={formatNumberWithCommas(totalCost, data?.currency)} />
+            <DataColumn title={"Balance"} value={formatNumberWithCommas(balanceGivenOut, data?.currency)} />
           </View>
-          <CardFooter2
-            onBtnPress={toggleExpand}
-            btnTitle="More"
-            label={servedBy()}
-          />
         </>
       )}
       {expanded && (
         <View style={{ flex: 1, marginTop: 10 }}>
-          <SalesTable sales={lineItems} fixHeight={false} />
-          <DataRow
-            key={1}
-            label={"Total"}
-            value={formatNumberWithCommas(totalCost)}
-            labelTextStyle={styles.label}
-            style={{ marginTop: 5, marginBottom: 10 }}
-            valueTextStyle={styles.value}
-            showCurrency
-          />
+          <View style={{ marginVertical: 5 }}>
+            <SalesTable sales={lineItems} fixHeight={false} disableSwipe={lineItems?.length < 1} onDelete={onSwipe} returned />
+          </View>
+          <DataRow key={1} label={"Total"} value={formatNumberWithCommas(totalCost, data?.currency)} style={{ marginTop: 5, marginBottom: 10 }} />
+
+          <DataRow key={2} label={"Recieved"} value={formatNumberWithCommas(amountPaid, data?.currency)} />
 
           <DataRow
-            key={2}
-            label={"Recieved"}
-            value={formatNumberWithCommas(amountPaid)}
-            labelTextStyle={styles.label}
-            valueTextStyle={styles.value}
-            showCurrency
-          />
-          <DataRow
-            key={3}
-            label={`Purchased ${
-              itemCount > 1 ? `${itemCount} items` : `${itemCount} item`
-            }`}
-            value={formatNumberWithCommas(totalCost)}
-            labelTextStyle={styles.label}
-            valueTextStyle={styles.value}
-            showCurrency
+            label={`Purchased ${itemCount > 1 ? `${itemCount} items` : `${itemCount} item`}`}
+            value={formatNumberWithCommas(totalCost, data?.currency)}
           />
 
-          <DataRow
-            key={4}
-            label={"Balance"}
-            value={balanceGivenOut}
-            labelTextStyle={styles.label}
-            valueTextStyle={styles.value}
-            showCurrency
-          />
-          <DataRow
-            key={5}
-            label={"Income"}
-            value={formatNumberWithCommas(profit)}
-            labelTextStyle={styles.label}
-            valueTextStyle={styles.value}
-            showCurrency
-          />
+          {balanceGivenOut !== 0 && <DataRow key={4} label={"Balance"} value={formatNumberWithCommas(balanceGivenOut, data?.currency)} />}
 
-          {balanceGivenOut < 0 && (
-            <DataRow
-              key={6}
-              label={"Client's mobile"}
-              value={data?.clientPhoneNumber}
-              labelTextStyle={styles.label}
-              valueTextStyle={styles.value}
-            />
+          {data?.debtBalance > 0 && (
+            <DataRow key={6} label={"Outstanding balance"} value={formatNumberWithCommas(data?.debtBalance, data?.currency)} />
           )}
 
-          <CardFooter2
-            onBtnPress={toggleExpand}
-            btnTitle="Hide"
-            label={servedBy(false)}
-            style={{ marginTop: 15 }}
-          />
+          {canViewIncome && <DataRow key={5} label={"Income"} value={formatNumberWithCommas(profit, data?.currency)} />}
+
+          {data?.clientName && <DataRow key={6} label={"Client's name"} value={data?.clientName} />}
+
+          {data?.clientPhoneNumber && <DataRow key={7} label={"Client's mobile"} value={data?.clientPhoneNumber} />}
         </View>
       )}
+
+      {shops?.length > 1 && <Text>{data?.shopName}</Text>}
+
+      {!expanded && serialNumber()}
+
+      <CardFooter
+        expanded={expanded}
+        onClick2={toggleExpand}
+        label={data?.createdByFullName}
+        served
+        btnTitle2={expanded ? "Hide" : "More"}
+        onPrint={print}
+        print
+        deleteIcon={canDeleteSales}
+        onDelete={onDelete}
+      />
     </View>
   );
 }
 
 export default memo(SaleTxnCard);
-const styles = StyleSheet.create({
-  label: {
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  value: { fontWeight: "600", fontSize: 14 },
-  footerText1: {
-    fontWeight: "600",
-    fontSize: 12,
-  },
-  footerText2: {
-    fontWeight: "300",
-    fontSize: 12,
-  },
-  container: {
-    flex: 1,
-    marginTop: 10,
-    marginHorizontal: 10,
-    borderRadius: 3,
-    backgroundColor: "white",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-  },
-});

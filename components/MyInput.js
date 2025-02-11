@@ -1,4 +1,4 @@
-import { View, Text, TextInput } from "react-native";
+import { View, Text, TextInput, Pressable } from "react-native";
 import React, { memo, useState } from "react";
 import Colors from "../constants/Colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -18,11 +18,20 @@ const MyInput = ({
   multiline = false,
   value,
   dateValue = new Date(),
+  maximumDate = false,
+  minimumDate = false,
   onDateChange,
   darkMode = false,
-  boldLabel = false,
+  showError = false,
+  isSubmitted,
+  ...props
 }) => {
   const [visible, setVisible] = useState(false);
+  const [viewPassword, setViewPassword] = useState(isPassword);
+
+
+  const togglePassword = (e) => setViewPassword(!viewPassword)
+
 
   const onChange = (event, selectedDate) => {
     setVisible(false);
@@ -30,21 +39,25 @@ const MyInput = ({
   };
 
   return (
-    <View style={[{ gap: 5 }, style]}>
+    <View style={[{}, style]}>
       {label !== "" && (
         <Text
           style={{
             paddingHorizontal: 4,
             color: darkMode ? Colors.primary : Colors.dark,
-            fontWeight: boldLabel ? 600 : 400,
+            marginBottom: 5
           }}
         >
           {label}
         </Text>
       )}
-      <View
+      <Pressable
+        onPress={() => {
+          if (isDateInput) {
+            setVisible(true);
+          }
+        }}
         style={{
-          height: 40,
           alignItems: "center",
           flexDirection: "row",
           backgroundColor: darkMode ? Colors.dark : Colors.light,
@@ -53,13 +66,13 @@ const MyInput = ({
           borderWidth: 0.6,
           borderColor: darkMode ? Colors.primary : Colors.dark,
           paddingHorizontal: 10,
-          justifyContent:'space-between'
+          justifyContent: "space-between",
         }}
       >
         <TextInput
           value={isDateInput ? toReadableDate(dateValue) : value}
           onChangeText={onValueChange}
-          secureTextEntry={isPassword}
+          secureTextEntry={viewPassword}
           inputMode={inputMode}
           cursorColor={darkMode ? Colors.primary : Colors.dark}
           editable={isDateInput ? false : editable}
@@ -70,8 +83,12 @@ const MyInput = ({
             textAlign: inputMode === "numeric" ? "right" : "left",
             flex: 1,
           }}
+          {...props}
         />
+        {
+          isPassword && <Icon size={18} name={viewPassword ? "eye" : "eye-off"} groupName="Feather" onPress={togglePassword} color={darkMode ? Colors.primary : ''} />
 
+        }
         {isDateInput && (
           <>
             <TouchableOpacity onPress={() => setVisible(true)}>
@@ -83,13 +100,20 @@ const MyInput = ({
                 value={dateValue}
                 mode={"date"}
                 onChange={onChange}
+                style={{ fontSize: 10 }}
+                maximumDate={maximumDate ? new Date() : null}
+                minimumDate={minimumDate ? new Date() : null}
               />
             )}
           </>
         )}
-      </View>
+      </Pressable>
+      {
+        isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>
+
+      }
     </View>
   );
 };
 
-export default memo(MyInput);
+export default MyInput;

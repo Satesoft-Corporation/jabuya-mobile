@@ -1,27 +1,27 @@
 import { Text, FlatList } from "react-native";
 import React, { useCallback, useContext } from "react";
-import {
-  Menu,
-  MenuOptions,
-  MenuOption,
-  MenuTrigger,
-} from "react-native-popup-menu";
+import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
 
 import Colors from "../constants/Colors";
 import Icon from "./Icon";
 import { StatusBar } from "react-native";
 import { screenHeight } from "../constants/Constants";
-import { UserContext } from "../context/UserContext";
+import { getSelectedShop, getShops } from "duqactStore/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import { changeSelectedShop } from "actions/shopActions";
 
 const PopUpmenu = ({ menuItems = [], showShops = false }) => {
-  const { setSelectedShop, shops, selectedShop } = useContext(UserContext);
+  const dispatch = useDispatch();
+
+  const selectedShop = useSelector(getSelectedShop);
+  const shops = useSelector(getShops);
 
   const modifiedShopList =
     showShops && shops?.length > 1
       ? shops?.map((shop) => {
           return {
             ...shop,
-            onClick: () => setSelectedShop(shop),
+            onClick: () => dispatch(changeSelectedShop(shop)),
             bold: shop?.id === selectedShop?.id,
           };
         })
@@ -29,7 +29,7 @@ const PopUpmenu = ({ menuItems = [], showShops = false }) => {
 
   const renderItem = useCallback(
     ({ item, i }) => (
-      <MenuOption key={i} onSelect={() => item?.onClick()}>
+      <MenuOption key={i} onSelect={() => item?.onClick()} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <Text
           style={{
             paddingVertical: 5,
@@ -40,6 +40,7 @@ const PopUpmenu = ({ menuItems = [], showShops = false }) => {
         >
           {item?.name}
         </Text>
+        {item?.share && <Icon name="share-alt" size={14} />}
       </MenuOption>
     ),
     [menuItems]
@@ -55,12 +56,7 @@ const PopUpmenu = ({ menuItems = [], showShops = false }) => {
           justifyContent: "center",
         }}
       >
-        <Icon
-          groupName="Entypo"
-          name="dots-three-vertical"
-          size={20}
-          color={Colors.primary}
-        />
+        <Icon groupName="Entypo" name="dots-three-vertical" size={20} color={Colors.primary} />
       </MenuTrigger>
       <MenuOptions
         optionsContainerStyle={{
@@ -71,11 +67,7 @@ const PopUpmenu = ({ menuItems = [], showShops = false }) => {
           maxHeight: screenHeight / 1.5,
         }}
       >
-        <FlatList
-          data={[...menuItems, ...modifiedShopList]}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.name.toString()}
-        />
+        <FlatList data={[...menuItems, ...modifiedShopList]} renderItem={renderItem} keyExtractor={(item) => item.name.toString()} />
       </MenuOptions>
     </Menu>
   );

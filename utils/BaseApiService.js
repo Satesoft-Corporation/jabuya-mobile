@@ -31,13 +31,10 @@ export class BaseApiService {
       Version_code: Constants.expoConfig.version,
       Platform_type: Platform.OS,
     };
-    return await fetch(
-      this.apiEndpoint + "?" + new URLSearchParams(queryParameters),
-      {
-        method: "GET",
-        headers: headers,
-      }
-    );
+    return await fetch(this.apiEndpoint + "?" + new URLSearchParams(queryParameters), {
+      method: "GET",
+      headers: headers,
+    });
   }
 
   /**
@@ -93,28 +90,18 @@ export class BaseApiService {
    * @returns
    */
   async postRequestWithJsonResponse(requestBody) {
-    return this.postRequest(requestBody)
-      .then((response) =>
-        //{
-        response.json()
-      )
-      .then((responseData) => {
-        if (responseData?.status == 200) {
-          return responseData;
-        } else if (
-          responseData?.status == 400 ||
-          responseData?.status == 403 ||
-          responseData?.status == 500
-        ) {
-          let data = responseData;
-          let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
-          throw new TypeError(errorMessage);
-        } else if (responseData?.status == 401) {
-          UserSessionUtils.clearLocalStorageAndLogout();
-        } else {
-          throw new TypeError(INTERNAL_SERVER_ERROR);
-        }
-      });
+    const response = await this.postRequest(requestBody);
+    if (response.ok) {
+      return response.json();
+    } else if (response.status === 400 || response.status === 403 || response.status === 500) {
+      let data = await response.json();
+      let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
+      throw new TypeError(errorMessage);
+    } else if (response.status === 401) {
+      UserSessionUtils.clearLocalStorageAndLogout();
+    } else {
+      throw new TypeError(INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**
@@ -161,17 +148,45 @@ export class BaseApiService {
    * @returns
    */
   async saveRequestWithJsonResponse(requestBody, update) {
-    const response =
-      update && update === true
-        ? await this.putRequest(requestBody)
-        : await this.postRequest(requestBody);
+    const response = update && update === true ? await this.putRequest(requestBody) : await this.postRequest(requestBody);
     if (response.ok) {
       return response.json();
-    } else if (
-      response.status === 400 ||
-      response.status === 403 ||
-      response.status === 500
-    ) {
+    } else if (response.status === 400 || response.status === 403 || response.status === 500) {
+      let data = await response.json();
+      let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
+      throw new TypeError(errorMessage);
+    } else if (response.status === 401) {
+      UserSessionUtils.clearLocalStorageAndLogout();
+    } else {
+      throw new TypeError(INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async deleteRequest(requestBody) {
+    let token = await UserSessionUtils.getBearerToken();
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    };
+    return fetch(this.apiEndpoint, {
+      method: "DELETE",
+      headers: headers,
+      body: requestBody !== null ? JSON.stringify(requestBody) : "",
+    });
+  }
+
+  /**
+   * This method is used to make a POST/PUT  API request to the provided constructor endpoint.
+   * This returns a JSON response or redirects to the login screen if a 401 is detected.
+   *
+   * @param requestBody
+   * @returns
+   */
+  async deleteRequestWithJsonResponse(requestBody) {
+    const response = await this.deleteRequest(requestBody);
+    if (response.ok) {
+      return response.json();
+    } else if (response.status === 400 || response.status === 403 || response.status === 500) {
       let data = await response.json();
       let errorMessage = data?.message ?? INTERNAL_SERVER_ERROR;
       throw new TypeError(errorMessage);
