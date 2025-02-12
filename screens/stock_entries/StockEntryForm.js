@@ -16,13 +16,13 @@ import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
 import { getOfflineParams, getSelectedShop, getShops, getSuppliers } from "duqactStore/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { changeSelectedShop, setShopProducts } from "actions/shopActions";
-import { useNavigation } from "@react-navigation/native";
-import { STOCK_ENTRY } from "@navigation/ScreenNames";
+import { StackActions, useNavigation, useRoute } from "@react-navigation/native";
 import { getCanCreateUpdateMyShopStock } from "duqactStore/selectors/permissionSelectors";
 import NoAuth from "@screens/Unauthorised";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
+import SuccessDialog from "@components/SuccessDialog";
 
-const StockEntryForm = ({ route }) => {
+const StockEntryForm = () => {
   const selectedShop = useSelector(getSelectedShop);
   const offlineParams = useSelector(getOfflineParams);
   const suppliers = useSelector(getSuppliers);
@@ -32,13 +32,14 @@ const StockEntryForm = ({ route }) => {
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const route = useRoute();
 
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedSupplier, setSelectedSupplier] = useState(suppliers?.find((i) => i?.companyOrBusinessName?.toLowerCase() === "unknown"));
   const [expiryDate, setExpiryDate] = useState(new Date());
   const [isPackedProduct, setIsPackedProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [batchNo, setBatchNo] = useState("");
   const [purchaseDate, setPurchaseDate] = useState(new Date());
   const [packedPurchasedQuantity, setPackedPurchasedQuantity] = useState("");
@@ -47,6 +48,7 @@ const StockEntryForm = ({ route }) => {
   const [unpackedPurchasedQty, setUnpackedPurchasedQty] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [edit, setEdit] = useState(false);
+  const [sModal, setSModal] = useState(false);
 
   const snackBarRef = useRef(null);
 
@@ -82,14 +84,22 @@ const StockEntryForm = ({ route }) => {
     setRemarks("");
     setUnpackedPurchasedQty(null);
     setSubmitted(false);
+    setSModal(false);
   };
 
   const handleSync = async () => {
-    setLoading(true);
     await saveShopProductsOnDevice(offlineParams);
     setLoading(false);
   };
 
+  const handleHide = () => {
+    if (edit || route?.params?.stock === true) {
+      navigation.goBack();
+      return;
+    }
+
+    clearForm();
+  };
   const saveStockEntry = async () => {
     setSubmitted(true);
     setLoading(true);
@@ -125,14 +135,10 @@ const StockEntryForm = ({ route }) => {
       await new BaseApiService(apiUrl)
         .saveRequestWithJsonResponse(payload, edit)
         .then(async (response) => {
-          if (!edit) {
-            clearForm();
-          }
-
           setSubmitted(false);
           setLoading(false);
-          snackBarRef.current.show("Stock entry saved successfully", 6000);
-          setTimeout(() => handleSync(), 5000);
+          setSModal(true);
+          setTimeout(() => handleSync(), 3000);
         })
         .catch((error) => {
           snackBarRef.current.show(error?.message, 5000);
@@ -143,38 +149,47 @@ const StockEntryForm = ({ route }) => {
   };
 
   const populateForm = () => {
-    if (route.params) {
-      const selectedRecord = { ...route.params };
+    if (route?.params) {
+      if (route?.params?.stock == true) {
+        console.log(route.params);
 
-      setLoading(false);
-      setEdit(true);
+        const product = route.params.product;
 
-      setSelectedProduct({
-        productName: selectedRecord?.productName,
-        id: selectedRecord?.id,
-        productId: selectedRecord?.productId,
-        packageUnitName: selectedRecord?.formattedQuantity.split(" ")[1],
-        manufacturerId: selectedRecord?.manufacturerId,
-        packageQuantity: selectedRecord?.purchasedQuantity,
-        shopId: selectedRecord?.shopId,
-        currency: selectedRecord?.currency,
-      });
+        setLoading(false);
+        setProducts([product]);
 
-      setIsPackedProduct(!selectedRecord?.unpackedPurchase);
+        setSelectedProduct(product);
+        setIsPackedProduct(true);
+      } else {
+        const selectedRecord = { ...route.params };
 
-      setExpiryDate(new Date(selectedRecord?.expiryDate));
+        setLoading(false);
+        setEdit(true);
 
-      setSelectedSupplier({
-        companyOrBusinessName: selectedRecord?.supplierName,
-        id: selectedRecord?.supplierId,
-      });
+        setSelectedProduct({
+          productName: selectedRecord?.productName,
+          id: selectedRecord?.id,
+          productId: selectedRecord?.productId,
+          packageUnitName: selectedRecord?.formattedQuantity.split(" ")[1],
+          manufacturerId: selectedRecord?.manufacturerId,
+          packageQuantity: selectedRecord?.purchasedQuantity,
+          shopId: selectedRecord?.shopId,
+          currency: selectedRecord?.currency,
+        });
 
-      setPurchaseDate(new Date(selectedRecord?.stockedOnDate));
-      setPurchasePrice(String(selectedRecord.purchasePrice));
-      setUnpackedPurchasedQty(String(selectedRecord?.unpackedQuantity));
-      setPackedPurchasedQuantity(String(selectedRecord?.packedQuantity));
-      setBatchNo(selectedRecord?.batchNumber);
-      setRemarks(selectedRecord?.remarks);
+        setIsPackedProduct(!selectedRecord?.unpackedPurchase);
+
+        setExpiryDate(new Date(selectedRecord?.expiryDate));
+
+        setSelectedSupplier({ companyOrBusinessName: selectedRecord?.supplierName, id: selectedRecord?.supplierId });
+
+        setPurchaseDate(new Date(selectedRecord?.stockedOnDate));
+        setPurchasePrice(String(selectedRecord.purchasePrice));
+        setUnpackedPurchasedQty(String(selectedRecord?.unpackedQuantity));
+        setPackedPurchasedQuantity(String(selectedRecord?.packedQuantity));
+        setBatchNo(selectedRecord?.batchNumber);
+        setRemarks(selectedRecord?.remarks);
+      }
     } else {
       fetchProducts();
     }
@@ -196,10 +211,6 @@ const StockEntryForm = ({ route }) => {
     populateForm();
   }, [selectedShop]);
 
-  useEffect(() => {
-    getUnitPurchasePrice();
-  }, [selectedProduct, purchasePrice, packedPurchasedQuantity, unpackedPurchasedQty]);
-
   if (!canDoStockCrud) {
     return <NoAuth />;
   }
@@ -213,17 +224,24 @@ const StockEntryForm = ({ route }) => {
         <TopHeader
           title="Stock purchase"
           showMenuDots
-          menuItems={[{ name: "Stock Purchases", onClick: () => navigation.navigate(STOCK_ENTRY) }]}
           sync
-          onSync={handleSync}
+          onSync={() => {
+            setLoading(true);
+            handleSync();
+          }}
         />
         <Loader loading={loading} />
-        <ScrollView
-          contentContainerStyle={{ gap: 8, paddingBottom: 30 }}
-          style={{
-            paddingHorizontal: 10,
-          }}
-        >
+
+        <SuccessDialog
+          hide={handleHide}
+          visible={sModal}
+          text={"Stock information has been saved successfully"}
+          onAgree={() => navigation.dispatch(StackActions.replace(STOCK_LEVELS))}
+          agreeText="View stock"
+          cancelText={edit || route?.params?.stock === true ? "Cancel" : "Add new stock"}
+        />
+
+        <ScrollView contentContainerStyle={{ gap: 8, paddingBottom: 30 }} style={{ paddingHorizontal: 10 }}>
           <Text style={styles.headerText}>{edit ? "Edit" : "Enter"} stock detail</Text>
 
           {!edit && shops?.length > 1 && (
@@ -231,10 +249,7 @@ const StockEntryForm = ({ route }) => {
               <Text>Shop</Text>
               <MyDropDown
                 search={false}
-                style={{
-                  backgroundColor: Colors.light,
-                  borderColor: Colors.dark,
-                }}
+                style={{ backgroundColor: Colors.light, borderColor: Colors.dark }}
                 data={shops?.filter((shop) => !shop?.name?.includes("All"))}
                 value={selectedShop}
                 onChange={(e) => {

@@ -60,26 +60,17 @@ export const saveCurrencies = async () => {
   return currencies;
 };
 
-export const saveShopProductsOnDevice = async (searchParameters, prev = []) => {
-  let pdts = [];
-  const totalRecords = 0;
-  const offSet = 0;
-  const limit = MAXIMUM_CACHEPAGE_SIZE;
-
+export const saveShopProductsOnDevice = async (searchParameters) => {
   console.log("saving pdts offline");
   await new BaseApiService(SHOP_PRODUCTS_ENDPOINT)
     .getRequestWithJsonResponse(searchParameters)
     .then(async (response) => {
-      pdts = [...response.records];
       await UserSessionUtils.setShopProducts(response.records); //to keep updating the list locally
       console.log("products saved");
     })
     .catch((error) => {
       console.log("Unknown Error", error?.message);
-      pdts = [...prev];
     });
-
-  return pdts;
 };
 
 export const saveShopClients = async (searchParameters) => {
@@ -92,7 +83,7 @@ export const saveShopClients = async (searchParameters) => {
           const currency = i?.shop?.currency?.symbol;
           const shopId = i?.shop?.id;
 
-          const newData = { ...i, currency: currency, shopId: shopId };
+          const newData = { ...i, currency: currency, shopId: shopId, displayName: `${i?.fullName} ${i?.phoneNumber}` };
           delete newData?.shop;
           return newData;
         })

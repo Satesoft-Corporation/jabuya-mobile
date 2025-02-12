@@ -1,7 +1,7 @@
 import CardHeader from "@components/card_components/CardHeader";
 import DataColumn from "@components/card_components/DataColumn";
 import DataRow from "@components/card_components/DataRow";
-import { PDT_ENTRY } from "@navigation/ScreenNames";
+import { PDT_ENTRY, STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
 import { formatNumberWithCommas } from "@utils/Utils";
 import React, { useState } from "react";
@@ -76,6 +76,8 @@ function StockLevelCard({ data }) {
         expanded={expanded}
         edit={canDoStockCrud}
         onEdit={() => navigation.navigate(PDT_ENTRY, data)}
+        onStock={() => navigation.navigate(STOCK_ENTRY_FORM, { stock: true, product: data })}
+        stock
       />
     </View>
   );

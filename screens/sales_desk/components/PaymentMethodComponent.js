@@ -119,7 +119,7 @@ const PaymentMethodComponent = ({
                 onChange={(e) => setSelectedClient(e)}
                 value={selectedClient}
                 placeholder="Select client"
-                labelField="fullName"
+                labelField={"displayName"}
                 valueField="id"
               />
             )}
@@ -133,7 +133,7 @@ const PaymentMethodComponent = ({
             onChange={(e) => setSelectedClient(e)}
             value={selectedClient}
             placeholder="Select client"
-            labelField="fullName"
+            labelField={"displayName"}
             valueField="id"
           />
         )}

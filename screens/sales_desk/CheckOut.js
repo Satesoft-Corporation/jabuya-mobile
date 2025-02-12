@@ -245,11 +245,7 @@ const CheckOut = () => {
             title={"Cancel"}
             style={{ flex: 0.5 }}
             onPress={() => {
-              setLoading(false);
-              setError(null);
-              setSelectedClient(null);
-              setAmountPaid(null);
-              setSelectedPaymentMethod(null);
+              navigation.goBack();
             }}
           />
           <PrimaryButton title={"Save"} onPress={validate} style={{ flex: 0.5 }} darkMode />

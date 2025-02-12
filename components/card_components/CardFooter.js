@@ -14,6 +14,7 @@ const CardFooter = ({
   onEdit,
   handleDamage,
   onPayClick,
+  onStock,
   renderLeft = () => {},
   restocked = false,
   entered = false,
@@ -25,7 +26,7 @@ const CardFooter = ({
   edit = false,
   damage = false,
   debt = false,
-
+  stock = false,
   expanded,
 }) => {
   return (
@@ -45,6 +46,8 @@ const CardFooter = ({
         {expanded == true && (
           <>
             {debt && <ChipButton2 title={"Pay"} onPress={onPayClick} darkMode={false} />}
+
+            {stock === true && <Icon name="box" borderd groupName="Feather" onPress={onStock} size={20} />}
 
             {deleteIcon === true && <Icon name="trash" borderd onPress={onDelete} size={13} />}
             {edit === true && <Icon name="pen" size={13} borderd onPress={onEdit} />}
