@@ -56,7 +56,7 @@ const ClientDebtsCard = ({ debt, currency }) => {
           btnTitle2={expanded ? "Hide" : "More"}
           btnTitle1={showPay ? "Pay" : null}
           onClick1={() => {
-            navigation?.navigate(CREDIT_PAYMENTS, debt);
+            navigation?.navigate(CREDIT_PAYMENTS, { ...debt, idType: "CreditSaleId" });
           }}
           onClick2={toggleExpand}
           darkMode={!expanded}

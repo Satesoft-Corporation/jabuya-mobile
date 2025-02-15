@@ -144,7 +144,7 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
         deleteIcon={canDeleteSales}
         onDelete={onDelete}
         debt={balanceGivenOut < 0}
-        onPayClick={() => navigation.navigate(CREDIT_PAYMENTS, data)}
+        onPayClick={() => navigation.navigate(CREDIT_PAYMENTS, { ...data, idType: "SaleId" })}
       />
     </View>
   );

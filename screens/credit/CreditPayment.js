@@ -11,6 +11,9 @@ import PrimaryButton from "@components/buttons/PrimaryButton";
 import Snackbar from "@components/Snackbar";
 import { useRoute } from "@react-navigation/native";
 import { CLIENT_SALES_ENDPOINT } from "@utils/EndPointUtils";
+import { saveShopClients } from "@controllers/OfflineControllers";
+import { useSelector } from "react-redux";
+import { getOfflineParams } from "duqactStore/selectors";
 
 const CreditPayment = () => {
   const route = useRoute();
@@ -20,7 +23,7 @@ const CreditPayment = () => {
   const sale = route.params;
 
   console.log(sale);
-
+  const offlineParams = useSelector(getOfflineParams);
   useEffect(() => {
     if (route?.params) {
       if (route.params?.attendantDailyReceiptCount) {
@@ -47,7 +50,7 @@ const CreditPayment = () => {
 
     const payLoad = {
       id: 0,
-      creditSaleId: record?.id,
+      // creditSaleId: record?.id,
       amount: Number(amount),
       paymentDate: convertToServerDate(paymentDate),
     };
@@ -57,11 +60,12 @@ const CreditPayment = () => {
     if (isValidSubmision) {
       setLoading(true);
 
-      await new BaseApiService(`/credit-sales/${sale?.id}/payments`)
-        .saveRequestWithJsonResponse(payLoad, false)
+      await new BaseApiService(`/credit-sales/${record?.id}/${record?.idType}/pay`)
+        .postRequestWithJsonResponse(payLoad)
         .then(async (response) => {
           setLoading(false);
           clearForm();
+          await saveShopClients(offlineParams);
           snackRef.current.show(`Payment saved successfully`, 10000);
         })
         .catch((error) => {
@@ -69,18 +73,9 @@ const CreditPayment = () => {
           snackRef.current.show(error?.message, 6000);
         });
     } else {
-      snackRef.current.show(`Enter valid amount, amount should not exceed ${sale?.currency}${formatNumberWithCommas(balance)}`, 5000);
+      snackRef.current.show(`Enter valid amount, amount should not exceed ${record?.currency}${formatNumberWithCommas(balance)}`, 5000);
     }
   };
-
-  useEffect(() => {
-    if (record) {
-      new BaseApiService(`${CLIENT_SALES_ENDPOINT}/${record?.id}`)
-        .getRequestWithJsonResponse()
-        .then((r) => console.log(r))
-        .catch((e) => console.log(e));
-    }
-  }, [record]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
