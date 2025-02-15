@@ -15,7 +15,7 @@ import { packageOptions } from "@constants/Constants";
 import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
 import { getOfflineParams, getSelectedShop, getShops, getSuppliers } from "duqactStore/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { changeSelectedShop, setShopProducts } from "actions/shopActions";
+import { changeSelectedShop } from "actions/shopActions";
 import { StackActions, useNavigation, useRoute } from "@react-navigation/native";
 import { getCanCreateUpdateMyShopStock } from "duqactStore/selectors/permissionSelectors";
 import NoAuth from "@screens/Unauthorised";

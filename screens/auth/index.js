@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Image, Text, View, SafeAreaView } from "react-native";
-import Constants from "expo-constants";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import { BaseApiService } from "@utils/BaseApiService";
 import { LOGIN_END_POINT } from "@utils/EndPointUtils";
@@ -12,8 +11,8 @@ import DisplayMessage from "@components/Dialogs/DisplayMessage";
 import { LANDING_SCREEN } from "@navigation/ScreenNames";
 import { ScrollView } from "react-native";
 import { useDispatch } from "react-redux";
-import { changeUser, loginAction } from "actions/userActions";
-import { screenWidth } from "@constants/Constants";
+import { loginAction } from "actions/userActions";
+import { APP_VERSION, screenWidth } from "@constants/Constants";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -111,7 +110,7 @@ export default function Login() {
           <Text style={{ color: Colors.primary }}>Satesoft</Text>
         </View>
       </ScrollView>
-      <Text style={{ color: Colors.primary, alignSelf: "center", fontSize: 14, paddingBottom: 30 }}>v {Constants.expoConfig.version}</Text>
+      <Text style={{ color: Colors.primary, alignSelf: "center", fontSize: 14, paddingBottom: 30 }}>{APP_VERSION}</Text>
       <DisplayMessage showModal={showMoodal} message={message} onAgree={() => setShowModal(false)} agreeText="OK" />
     </SafeAreaView>
   );
