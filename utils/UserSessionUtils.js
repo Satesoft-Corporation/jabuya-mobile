@@ -3,6 +3,7 @@ import StorageParams from "../constants/StorageParams";
 import { CommonActions } from "@react-navigation/native";
 import { LOGIN } from "../navigation/ScreenNames";
 import { navigatorRef } from "@navigation/index";
+import { APP_VERSION } from "@constants/Constants";
 export class UserSessionUtils {
   /**
    * This is used to get the user's bearer token.
@@ -14,11 +15,11 @@ export class UserSessionUtils {
   }
 
   static setFirstTimeInsatll(bool) {
-    return AsyncStorage.setItem("FTI", bool);
+    return AsyncStorage.setItem(APP_VERSION, bool);
   }
 
   static getFirstTimeInstall() {
-    return AsyncStorage.getItem("FTI");
+    return AsyncStorage.getItem(APP_VERSION);
   }
 
   /**

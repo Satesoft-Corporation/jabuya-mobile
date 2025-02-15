@@ -5,6 +5,7 @@ import { scale } from "react-native-size-matters";
 import { CommonActions, StackActions, useNavigation } from "@react-navigation/native";
 import { LANDING_SCREEN, LOGIN } from "@navigation/ScreenNames";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoadingScreen = () => {
   const navigation = useNavigation();
@@ -12,22 +13,31 @@ const LoadingScreen = () => {
     navigation?.dispatch(CommonActions.reset({ index: 0, routes: [{ name: LOGIN }] }));
   };
 
+  const doLoginCheck = async () => {
+    const isLoggedIn = await UserSessionUtils.isLoggedIn();
+    console.log(isLoggedIn);
+
+    if (isLoggedIn == true) {
+      navigation.dispatch(StackActions.replace(LANDING_SCREEN));
+    } else {
+      logOut();
+    }
+  };
+
+  const doFTICheck = async () => {
+    const val = await UserSessionUtils.getFirstTimeInstall();
+    console.log(val);
+    if (val) {
+      doLoginCheck();
+    } else {
+      AsyncStorage.clear();
+      UserSessionUtils.clearLocalStorageAndLogout(navigation);
+      return;
+    }
+  };
   useEffect(() => {
     setTimeout(() => {
-      UserSessionUtils.getFirstTimeInstall().then((val) => {
-        if (!val) {
-          UserSessionUtils.clearLocalStorageAndLogout(navigation);
-          return;
-        }
-      });
-
-      UserSessionUtils.isLoggedIn().then((isLoggedIn) => {
-        if (isLoggedIn == true) {
-          navigation.dispatch(StackActions.replace(LANDING_SCREEN));
-        } else {
-          logOut();
-        }
-      });
+      doFTICheck();
     }, 3000);
   }, []);
 
