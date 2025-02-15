@@ -97,7 +97,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
           totalCost: cost,
           unitCost: Number(unitCost),
           saleUnitId: saleUnit?.id || null,
-          index: cart?.cartItems?.length,
+          positionIndex: cart?.cartItems?.length,
         };
 
         dispatch(addItemToCart(readyItem));

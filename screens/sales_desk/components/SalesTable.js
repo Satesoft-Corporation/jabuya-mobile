@@ -1,13 +1,12 @@
 import { View, Text, ScrollView } from "react-native";
 import React from "react";
 import Colors from "@constants/Colors";
-import { screenHeight } from "@constants/Constants";
 import { formatNumberWithCommas } from "@utils/Utils";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Icon from "@components/Icon";
 import { useRef } from "react";
 
-const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = true, onDelete = () => {}, returned = false, editItem }) => {
+const SalesTable = ({ sales = [], disableSwipe = true, onDelete = () => {}, returned = false, editItem }) => {
   const listViewRef = useRef(null);
 
   const renderHiddenItem = (data) => {
@@ -64,6 +63,7 @@ const SalesTable = ({ sales = [], fixHeight = true, disableSwipe = true, onDelet
         rightOpenValue={-75}
         disableRightSwipe
         disableLeftSwipe={disableSwipe}
+        showsVerticalScrollIndicator
       />
     </View>
   );

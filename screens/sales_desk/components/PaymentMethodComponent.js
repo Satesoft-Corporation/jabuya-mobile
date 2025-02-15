@@ -121,6 +121,7 @@ const PaymentMethodComponent = ({
                 placeholder="Select client"
                 labelField={"displayName"}
                 valueField="id"
+                modal
               />
             )}
           </View>
@@ -135,6 +136,7 @@ const PaymentMethodComponent = ({
             placeholder="Select client"
             labelField={"displayName"}
             valueField="id"
+            modal
           />
         )}
 

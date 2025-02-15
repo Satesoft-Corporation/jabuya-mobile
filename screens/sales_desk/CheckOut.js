@@ -74,7 +74,6 @@ const CheckOut = () => {
       ...(!onCredit && clientNumber && { clientPhoneNumber: clientNumber }),
       ...(!onCredit && clientName && { clientName: clientName }),
     };
-
     setLoading(true);
 
     const hasNet = await hasInternetConnection();

@@ -113,6 +113,7 @@ export const MyDropDown = ({
   forceSearch = false,
   placeholder,
   searchPlaceholder,
+  modal = false,
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -152,6 +153,7 @@ export const MyDropDown = ({
         onChangeText={(text) => onChangeText(text)}
         renderItem={renderItem ? (item) => renderItem(item) : null}
         renderRightIcon={() => (loading == true ? <ActivityIndicator color={"#000"} /> : <Icon name="angle-down" groupName="FontAwesome" />)}
+        mode={modal ? "modal" : "default"}
       />
       {isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>}
     </View>
