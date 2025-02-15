@@ -33,3 +33,5 @@ export const DAMAGES_ENDPOINT = "/damages";
 export const LOOK_UPS_ENDPOINT = "/lookups/lookup-values";
 
 export const QUICK_POST_ENDPOINT = "/products/quick-post";
+
+export const CREDIT_SALE_PAYMENTS = "/credit-sales/payments";

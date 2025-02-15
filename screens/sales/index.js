@@ -12,7 +12,7 @@ import { SHOP_SUMMARY } from "@navigation/ScreenNames";
 import { printSale } from "@utils/PrintService";
 import { useSelector } from "react-redux";
 import { getFilterParams, getIsShopAttendant, getIsShopOwner, getSelectedShop } from "duqactStore/selectors";
-import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
+import { CREDIT_SALE_PAYMENTS, SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { hasInternetConnection } from "@utils/NetWork";
 import DeleteSaleModal from "./components/DeleteSaleModal";
 import Snackbar from "@components/Snackbar";
@@ -38,6 +38,7 @@ export default function ViewSales() {
   const [date, setDate] = useState(new Date());
   const [selectedLineItem, setSelectedLineItem] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [payments, setPayments] = useState([]);
 
   const filterParams = useSelector(getFilterParams);
   const selectedShop = useSelector(getSelectedShop);
@@ -71,13 +72,25 @@ export default function ViewSales() {
     setSelectedSale(null);
   };
 
+  const getDebtPayments = async (params) => {
+    await new BaseApiService(CREDIT_SALE_PAYMENTS)
+      .getRequestWithJsonResponse(params)
+      .then((response) => {
+        setPayments(response?.records);
+      })
+      .catch((error) => {
+        setLoading(false);
+        setMessage("Cannot get sales!", error?.message);
+      });
+  };
+
   const getSales = async (params) => {
     setLoading(true);
     setMessage(null);
 
     const searchParameters = {
       offset: 0,
-      limit: 200,
+      limit: 100,
       ...filterParams,
       ...(!params && { startDate: getCurrentDay() }),
       ...(!params?.startDate && !params?.shopProductId && !params?.userId && !params?.clientId && !params?.endDate && { startDate: getCurrentDay() }),
@@ -98,6 +111,8 @@ export default function ViewSales() {
       setLoading(false);
     } else {
       setIsFetchingMore(true);
+
+      // await getDebtPayments(searchParameters);
 
       await new BaseApiService(SHOP_SALES_ENDPOINT)
         .getRequestWithJsonResponse(searchParameters)
@@ -193,7 +208,7 @@ export default function ViewSales() {
       <FlatList
         containerStyle={{ padding: 5 }}
         showsHorizontalScrollIndicator={false}
-        data={sales}
+        data={[...sales, ...payments].sort((a, b) => b.id - a.id)}
         keyExtractor={(item) => item?.id?.toString()}
         renderItem={({ item, i }) => (
           <SaleTxnCard

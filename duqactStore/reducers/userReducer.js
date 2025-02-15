@@ -242,16 +242,13 @@ const userReduer = (state = initialState, action) => {
         let newSelection = { ...action.payload };
 
         const { multipleSaleUnits, saleUnitName, salesPrice } = action.payload;
-        const defUnit = {
-          productSaleUnitName: saleUnitName,
-          unitPrice: salesPrice,
-        };
+        const defUnit = { productSaleUnitName: saleUnitName, unitPrice: salesPrice };
+        newSelection.selectedSaleUnit = defUnit;
 
         if (multipleSaleUnits) {
           newSelection.saleUnits = [defUnit, ...multipleSaleUnits];
         } else {
           newSelection.saleUnits = [{ ...defUnit }];
-          newSelection.selectedSaleUnit = defUnit;
           newSelection.salesPrice = salesPrice;
         }
 

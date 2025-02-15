@@ -53,6 +53,11 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
       </View>
     );
   };
+
+  // if (data?.creditSale) {
+  //   return <Text>Debt for {data?.creditSale?.shopClient?.fullName}</Text>;
+  // }
+
   return (
     <View
       style={{
@@ -150,4 +155,4 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
   );
 }
 
-export default memo(SaleTxnCard);
+export default SaleTxnCard;
