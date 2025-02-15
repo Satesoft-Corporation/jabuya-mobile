@@ -5,12 +5,13 @@ import ChipButton from "@components/buttons/ChipButton";
 import Colors from "@constants/Colors";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import { useDispatch, useSelector } from "react-redux";
-import { getCartSelection } from "duqactStore/selectors";
+import { getCart, getCartSelection } from "duqactStore/selectors";
 import { isValidNumber } from "@utils/Utils";
 import { addItemToCart, editCartItem, makeProductSelection } from "actions/shopActions";
 
 export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit, setItemToEdit = () => {} }) {
   const selection = useSelector(getCartSelection);
+  const cart = useSelector(getCart);
 
   const dispatch = useDispatch();
 
@@ -96,6 +97,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
           totalCost: cost,
           unitCost: Number(unitCost),
           saleUnitId: saleUnit?.id || null,
+          index: cart?.cartItems?.length,
         };
 
         dispatch(addItemToCart(readyItem));
