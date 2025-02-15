@@ -15,7 +15,6 @@ import {
   getIsAdmin,
   getIsShopAttendant,
   getLookUps,
-  getManufactures,
   getOfflineParams,
   getOfflineSales,
   getShopOwnerId,
@@ -26,15 +25,8 @@ import {
 } from "duqactStore/selectors";
 import { addLookUps, logOutAction, setApplockTime, setIsUserConfigured, setUserPinCode } from "actions/userActions";
 import { ALL_SHOPS_LABEL, APP_VERSION } from "@constants/Constants";
-import {
-  saveLookUps,
-  saveManufactures,
-  saveShopClients,
-  saveShopDetails,
-  saveShopProductsOnDevice,
-  saveSuppliers,
-} from "@controllers/OfflineControllers";
-import { addManufacturers, addSuppliers, changeSelectedShop, setClientSales, setShopClients, setShopProducts, setShops } from "actions/shopActions";
+import { saveLookUps, saveShopClients, saveShopDetails, saveShopProductsOnDevice, saveSuppliers } from "@controllers/OfflineControllers";
+import { addSuppliers, changeSelectedShop, setShops } from "actions/shopActions";
 import Loader from "@components/Loader";
 import { hasInternetConnection } from "@utils/NetWork";
 import Snackbar from "@components/Snackbar";
@@ -61,7 +53,6 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   const offlineParams = useSelector(getOfflineParams);
   const shopOwnerId = useSelector(getShopOwnerId);
-  const manufacturers = useSelector(getManufactures);
   const suppliers = useSelector(getSuppliers);
   const prevLookUps = useSelector(getLookUps);
   const isAdmin = useSelector(getIsAdmin);
@@ -136,25 +127,16 @@ const Settings = () => {
           }
         }
 
-        if (manufacturers?.length == 0) {
-          const newManufactures = await saveManufactures(manufacturers);
-          dispatch(addManufacturers(newManufactures));
-        }
-
         if (suppliers?.length == 0) {
           const newSuppliers = await saveSuppliers(suppliers);
           dispatch(addSuppliers(newSuppliers));
         }
-        if (prevLookUps?.length == 0) {
-          const lookups = await saveLookUps(prevLookUps);
-          dispatch(addLookUps(lookups));
-        }
-
+        const lookups = await saveLookUps(prevLookUps);
+        dispatch(addLookUps(lookups));
         dispatch(setIsUserConfigured(true));
 
         setLoading(false);
-        snackbarRef.current.show('Data synced', 5000);
-
+        snackbarRef.current.show("Data synced", 5000);
       }
     } catch (e) {
       snackbarRef.current.show(e, 5000);

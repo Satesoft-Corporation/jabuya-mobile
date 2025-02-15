@@ -48,8 +48,6 @@ export const getCollectClientInfo = (state) => state.userData.collectClientInfo;
 
 export const getMenuList = (state) => state.userData.menuList;
 
-export const getManufactures = (state) => state.shop.manufactures;
-
 export const getSuppliers = (state) => state.shop.suppliers;
 
 export const getHeldSales = (state) => state.userData.heldSales;

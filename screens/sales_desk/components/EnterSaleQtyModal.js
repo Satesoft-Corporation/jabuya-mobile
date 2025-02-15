@@ -5,8 +5,8 @@ import ChipButton from "@components/buttons/ChipButton";
 import Colors from "@constants/Colors";
 import PrimaryButton from "@components/buttons/PrimaryButton";
 import { useDispatch, useSelector } from "react-redux";
-import { getCart, getCartSelection } from "duqactStore/selectors";
-import { isValidNumber } from "@utils/Utils";
+import { getCart, getCartSelection, getLookUps } from "duqactStore/selectors";
+import { getUnitAbv, isValidNumber } from "@utils/Utils";
 import { addItemToCart, editCartItem, makeProductSelection } from "actions/shopActions";
 
 export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit, setItemToEdit = () => {} }) {
@@ -14,6 +14,9 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
   const cart = useSelector(getCart);
 
   const dispatch = useDispatch();
+  const lookUps = useSelector(getLookUps);
+
+  const unitList = lookUps?.filter((i) => i.type === "SALE_UNITS");
 
   const { selectedSaleUnit, saleUnits, salesPrice } = selection ?? {};
 
@@ -87,7 +90,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
 
       if (isValidQuantity && isValidCost) {
         const { productSaleUnitName } = saleUnit;
-        const name = productSaleUnitName !== "Whole" ? " - " + productSaleUnitName : "";
+        const name = productSaleUnitName !== "Whole" ? getUnitAbv(unitList, productSaleUnitName) : "";
 
         const readyItem = {
           id: selection.id,

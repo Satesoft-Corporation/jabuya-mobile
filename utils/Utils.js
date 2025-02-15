@@ -188,3 +188,12 @@ export function datesAreEqual(d1, d2) {
   // Compare the year, month, and day components
   return year1 === year2 && month1 === month2 && day1 === day2;
 }
+
+export const getUnitAbv = (unitList, unitName) => {
+  if (unitList && unitName) {
+    const abv = unitList?.find((i) => i?.value === unitName)?.abbreviation;
+    return abv ? ` - ${abv}` : ` - ${unitName}`;
+  }
+
+  return "";
+};

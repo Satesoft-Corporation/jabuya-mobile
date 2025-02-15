@@ -32,7 +32,7 @@ const ExpenseForm = () => {
     setRemarks("");
   };
   const fetchCategories = async () => {
-    setCategories(lookups?.filter((item) => item.typeId === 5));
+    setCategories(lookups?.filter((item) => item.type === "EXPENSE_CATEGORIES"));
   };
 
   const saveExpense = () => {

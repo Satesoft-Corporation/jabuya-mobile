@@ -11,7 +11,6 @@ import Colors from "@constants/Colors";
 import LockScreenModal from "@screens/applock/LockScreenModal";
 import {
   saveLookUps,
-  saveManufactures,
   saveShopClients,
   saveShopDetails,
   saveShopProductsOnDevice,
@@ -25,7 +24,6 @@ import {
   getLastApplockTime,
   getLastLoginTime,
   getLookUps,
-  getManufactures,
   getOffersDebt,
   getOfflineParams,
   getOfflineSales,
@@ -36,7 +34,7 @@ import {
 import { useDispatch } from "react-redux";
 import { addLookUps, setIsUserConfigured, tokenRefresh } from "actions/userActions";
 import { BaseApiService } from "@utils/BaseApiService";
-import { addManufacturers, addSuppliers, changeSelectedShop, setShops } from "actions/shopActions";
+import { addSuppliers, changeSelectedShop, setShops } from "actions/shopActions";
 import { LOGIN_END_POINT } from "@utils/EndPointUtils";
 import { ALL_SHOPS_LABEL } from "@constants/Constants";
 import { hasInternetConnection } from "@utils/NetWork";
@@ -68,7 +66,6 @@ const LandingScreen = () => {
   const prevPinTime = useSelector(getLastApplockTime);
   const userList = useSelector(getUsersList);
   const shopOwnerId = useSelector(getShopOwnerId);
-  const manufacturers = useSelector(getManufactures);
   const suppliers = useSelector(getSuppliers);
   const prevLookUps = useSelector(getLookUps);
   const isAdmin = useSelector(getIsAdmin);
@@ -139,13 +136,10 @@ const LandingScreen = () => {
       }
 
       if (userList?.length == 0) {
-        const newManufactures = await saveManufactures(manufacturers);
-
         const newSuppliers = await saveSuppliers(suppliers);
 
         const lookups = await saveLookUps(prevLookUps);
 
-        dispatch(addManufacturers(newManufactures));
         dispatch(addSuppliers(newSuppliers));
         dispatch(addLookUps(lookups));
       }

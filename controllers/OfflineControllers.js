@@ -11,21 +11,6 @@ import {
 } from "@utils/EndPointUtils";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 
-export const saveManufactures = async (prev = []) => {
-  let manufacturers = [];
-  await new BaseApiService(MANUFACTURERS_ENDPOINT)
-    .getRequestWithJsonResponse({ limit: 0, offset: 0 })
-    .then((response) => {
-      manufacturers = [...response?.records];
-    })
-    .catch((error) => {
-      console.error(error, "manufacturers");
-      manufacturers = [...prev];
-    });
-
-  return manufacturers;
-};
-
 export const saveSuppliers = async (prev = []) => {
   let suppliers = [];
   await new BaseApiService(SUPPLIERS_ENDPOINT)

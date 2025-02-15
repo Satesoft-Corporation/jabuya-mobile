@@ -2,7 +2,6 @@ import * as actions from "actions/actionTypes";
 
 const initialState = {
   offlineSales: [],
-  manufactures: [],
   suppliers: [],
   lookUps: [],
 };
@@ -17,10 +16,6 @@ const shopReducer = (state = initialState, action) => {
       let pendingSales = state.offlineSales;
       pendingSales.splice(action.payload, 1); // Removes the sale record at the specified index
       return { ...state, offlineSales: pendingSales };
-    }
-
-    case actions.ADD_MANUFACTURERS: {
-      return { ...state, manufactures: action.payload };
     }
 
     case actions.ADD_SUPPLIERS: {

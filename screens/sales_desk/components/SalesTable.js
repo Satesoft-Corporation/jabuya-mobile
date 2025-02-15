@@ -1,10 +1,12 @@
 import { View, Text, ScrollView } from "react-native";
 import React from "react";
 import Colors from "@constants/Colors";
-import { formatNumberWithCommas } from "@utils/Utils";
+import { formatNumberWithCommas, getUnitAbv } from "@utils/Utils";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Icon from "@components/Icon";
 import { useRef } from "react";
+import { useSelector } from "react-redux";
+import { getLookUps } from "duqactStore/selectors";
 
 const SalesTable = ({ sales = [], disableSwipe = true, onDelete = () => {}, returned = false, editItem }) => {
   const listViewRef = useRef(null);
@@ -70,9 +72,13 @@ const SalesTable = ({ sales = [], disableSwipe = true, onDelete = () => {}, retu
 };
 
 const SaleListItem = ({ data }) => {
+  const lookUps = useSelector(getLookUps);
+
+  const unitList = lookUps?.filter((i) => i.type === "SALE_UNITS");
+
   const { productName, shopProductName, saleUnitName, cancellationReason } = data;
 
-  let unitName = saleUnitName ? " - " + saleUnitName : "";
+  let unitName = saleUnitName ? getUnitAbv(unitList, saleUnitName) : "";
 
   return (
     <View
