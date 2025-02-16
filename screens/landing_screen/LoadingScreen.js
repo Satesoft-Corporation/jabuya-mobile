@@ -6,16 +6,19 @@ import { CommonActions, StackActions, useNavigation } from "@react-navigation/na
 import { LANDING_SCREEN, LOGIN } from "@navigation/ScreenNames";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { logOutAction } from "actions/userActions";
 
 const LoadingScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const logOut = () => {
     navigation?.dispatch(CommonActions.reset({ index: 0, routes: [{ name: LOGIN }] }));
+    dispatch(logOutAction());
   };
 
   const doLoginCheck = async () => {
     const isLoggedIn = await UserSessionUtils.isLoggedIn();
-    console.log(isLoggedIn);
 
     if (isLoggedIn == true) {
       navigation.dispatch(StackActions.replace(LANDING_SCREEN));
@@ -26,12 +29,12 @@ const LoadingScreen = () => {
 
   const doFTICheck = async () => {
     const val = await UserSessionUtils.getFirstTimeInstall();
-    console.log(val);
     if (val) {
       doLoginCheck();
     } else {
       AsyncStorage.clear();
       UserSessionUtils.clearLocalStorageAndLogout(navigation);
+      dispatch(logOutAction());
       return;
     }
   };

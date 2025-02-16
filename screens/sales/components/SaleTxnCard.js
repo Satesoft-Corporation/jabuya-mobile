@@ -54,9 +54,36 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
     );
   };
 
-  // if (data?.creditSale) {
-  //   return <Text>Debt for {data?.creditSale?.shopClient?.fullName}</Text>;
-  // }
+  if (data?.creditSale) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          marginTop: 10,
+          marginHorizontal: 10,
+          borderRadius: 3,
+          backgroundColor: "white",
+          paddingVertical: 10,
+          paddingHorizontal: 10,
+          gap: 5,
+        }}
+      >
+        <View>
+          <Text>Debt payment for {data?.creditSale?.shopClient?.fullName}</Text>
+
+          <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
+            <Text>Amount</Text>
+
+            <Text style={{ fontWeight: "600" }}>{formatNumberWithCommas(data?.amount, data?.currency)}</Text>
+          </View>
+
+          {serialNumber()}
+        </View>
+
+        <CardFooter label={data?.createdByFullName} paid />
+      </View>
+    );
+  }
 
   return (
     <View

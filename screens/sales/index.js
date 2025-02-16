@@ -112,7 +112,7 @@ export default function ViewSales() {
     } else {
       setIsFetchingMore(true);
 
-      // await getDebtPayments(searchParameters);
+       await getDebtPayments(searchParameters);
 
       await new BaseApiService(SHOP_SALES_ENDPOINT)
         .getRequestWithJsonResponse(searchParameters)

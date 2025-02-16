@@ -20,6 +20,7 @@ const CardFooter = ({
   entered = false,
   listed = false,
   served = false,
+  paid = false,
   cleared = false,
   deleteIcon = false,
   print = false,
@@ -39,6 +40,8 @@ const CardFooter = ({
           {listed === true && "Listed by: "}
           {served === true && "Served by: "}
           {cleared === true && "Cleared by: "}
+          {paid === true && "Paid by: "}
+
           {label && <Text style={{ fontWeight: 600 }}>{label}</Text>}
         </Text>
       </View>
