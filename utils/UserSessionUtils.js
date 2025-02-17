@@ -14,8 +14,8 @@ export class UserSessionUtils {
     return await AsyncStorage.getItem(StorageParams.ACCESS_TOKEN);
   }
 
-  static setFirstTimeInsatll(bool) {
-    return AsyncStorage.setItem(APP_VERSION, bool);
+  static setFirstTimeInsatll() {
+    return AsyncStorage.setItem(APP_VERSION, APP_VERSION);
   }
 
   static getFirstTimeInstall() {

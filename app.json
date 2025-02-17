@@ -14,7 +14,15 @@
     "plugins": [
       ["expo-location", { "locationAlwaysAndWhenInUsePermission": "Allow Duqact to use your location." }],
       ["expo-local-authentication", { "faceIDPermission": "Allow Duqact to access device biometrics." }],
-      ["expo-barcode-scanner", { "cameraPermission": "Allow Duqact to access camera." }]
+      ["expo-barcode-scanner", { "cameraPermission": "Allow Duqact to access camera." }],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#ffffff",
+          "defaultChannel": "default"
+        }
+      ]
     ],
     "assetBundlePatterns": ["**/*"],
     "ios": {

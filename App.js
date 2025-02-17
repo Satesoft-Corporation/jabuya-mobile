@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { MenuProvider } from "react-native-popup-menu";
@@ -36,10 +36,50 @@ import ContactBook from "@screens/contacts";
 import ContactDetails from "@screens/contacts/ContactDetails";
 import { navigatorRef } from "./navigation";
 import CheckOut from "@screens/sales_desk/CheckOut";
+import NotTest from "NotTest";
+import * as Notifications from "expo-notifications";
+import * as Haptics from "expo-haptics"; // For vibration feedback
 
 export default function App() {
   const Stack = createNativeStackNavigator();
 
+  useEffect(() => {
+    // Request notification permissions
+    const requestPermissions = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permission for notifications is required!");
+      }
+    };
+
+    requestPermissions();
+
+    const notClick = Notifications.addNotificationResponseReceivedListener((response) => {
+      const { screen } = response.notification.request.content.data;
+      if (screen) {
+        navigatorRef?.navigate(screen);
+      }
+    });
+
+    const subscription = Notifications.addNotificationReceivedListener((notification) => {
+      console.log("Notification received:");
+
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    });
+
+    return () => {
+      subscription.remove();
+      notClick.remove();
+    };
+  }, []);
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
   return (
     <Provider store={duqactStore}>
       <MenuProvider>

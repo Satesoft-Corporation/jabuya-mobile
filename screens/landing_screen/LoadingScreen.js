@@ -8,6 +8,7 @@ import { UserSessionUtils } from "@utils/UserSessionUtils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 import { logOutAction } from "actions/userActions";
+import { APP_VERSION } from "@constants/Constants";
 
 const LoadingScreen = () => {
   const navigation = useNavigation();
@@ -29,10 +30,9 @@ const LoadingScreen = () => {
 
   const doFTICheck = async () => {
     const val = await UserSessionUtils.getFirstTimeInstall();
-    if (val) {
+    if (val == APP_VERSION) {
       doLoginCheck();
     } else {
-      AsyncStorage.clear();
       UserSessionUtils.clearLocalStorageAndLogout(navigation);
       dispatch(logOutAction());
       return;

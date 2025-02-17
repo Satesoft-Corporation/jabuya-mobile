@@ -86,7 +86,7 @@ const userReduer = (state = initialState, action) => {
         return acc;
       }, {});
 
-      UserSessionUtils.setFirstTimeInsatll("false");
+      UserSessionUtils.setFirstTimeInsatll();
       if (existingUser) {
         return {
           ...state,

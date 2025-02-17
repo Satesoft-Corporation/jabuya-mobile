@@ -1,4 +1,5 @@
-// eas build -p android --profile preview
+import { LANDING_SCREEN } from "@navigation/ScreenNames";
+import * as Notifications from "expo-notifications";
 
 export const isNotEmpty = (anyObject) => {
   return anyObject !== undefined && anyObject !== null;
@@ -196,4 +197,15 @@ export const getUnitAbv = (unitList, unitName) => {
   }
 
   return "";
+};
+
+export const sendLocalNotification = async (title = "Hello!", body = "", targetSreen = LANDING_SCREEN) => {
+  try {
+    await Notifications.scheduleNotificationAsync({
+      content: { title: title, body: body, sound: "default", data: { screen: targetSreen } },
+      trigger: null,
+    });
+  } catch (e) {
+    console.warn(e);
+  }
 };
