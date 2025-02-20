@@ -2,7 +2,7 @@
   "expo": {
     "name": "Duqact",
     "slug": "duqact",
-    "version": "1.5.0",
+    "version": "1.5.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -12,8 +12,14 @@
       "backgroundColor": "#ffffff"
     },
     "plugins": [
-      ["expo-location", { "locationAlwaysAndWhenInUsePermission": "Allow Duqact to use your location." }],
-      ["expo-local-authentication", { "faceIDPermission": "Allow Duqact to access device biometrics." }],
+      [
+        "expo-location",
+        { "locationAlwaysAndWhenInUsePermission": "Allow Duqact to use your location." }
+      ],
+      [
+        "expo-local-authentication",
+        { "faceIDPermission": "Allow Duqact to access device biometrics." }
+      ],
       ["expo-barcode-scanner", { "cameraPermission": "Allow Duqact to access camera." }],
       [
         "expo-notifications",
@@ -38,7 +44,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.byaffe.duqact",
-      "versionCode": 37
+      "versionCode": 38
     },
     "web": {
       "favicon": "./assets/favicon.png"
