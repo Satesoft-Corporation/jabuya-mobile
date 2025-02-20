@@ -3,7 +3,6 @@ import { Text, View, TextInput, ScrollView, SafeAreaView, Alert } from "react-na
 import { useRef } from "react";
 import { BARCODE_SCREEN, CHECK_OUT, CREDIT_SALES, SALES_REPORTS } from "@navigation/ScreenNames";
 import Colors from "@constants/Colors";
-import ConfirmSaleModal from "./components/ConfirmSaleModal";
 import EnterSaleQtyModal from "./components/EnterSaleQtyModal";
 import UserProfile from "@components/UserProfile";
 import { MyDropDown, SalesDropdownComponent } from "@components/DropdownComponents";

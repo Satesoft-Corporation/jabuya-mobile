@@ -29,6 +29,7 @@ import CheckBox from "@components/CheckBox";
 import { packageOptions } from "@constants/Constants";
 import SuccessDialog from "@components/SuccessDialog";
 import BarCodeScan from "./BarCodeScan";
+import { UserSessionUtils } from "@utils/UserSessionUtils";
 
 const ProductEntry = ({ route }) => {
   const selectedShop = useSelector(getSelectedShop);
@@ -62,9 +63,22 @@ const ProductEntry = ({ route }) => {
   const [showbarcodeReader, setShowBarcodeReader] = useState(false);
   const [scannedCode, setScannedCode] = useState("");
 
+  const [selectedMixPdts, setSelectedMixPdt] = useState([]);
+  const [mixPdtsPool, setMixpdtsPool] = useState([]);
+  const [mixPdts, setMixPdts] = useState([]);
+  const [allowMix, setAllowMix] = useState(false);
+
   const [salesPrice, setSalesPrice] = useState("");
 
   const snackBarRef = useRef(null);
+
+  const fillMixPdtPool = async () => {
+    if (selectedProduct) {
+      const userProducts = await UserSessionUtils.getShopProducts();
+      const list = userProducts?.filter((p) => p?.manufacturerId === selectedProduct?.manufacturerId);
+      setMixpdtsPool(list);
+    }
+  };
 
   const fetchProducts = async () => {
     if (!route.params) {
@@ -156,6 +170,8 @@ const ProductEntry = ({ route }) => {
     setPurchasePrice("");
     setSModal(false);
     setCustomName("");
+    setAllowMix(false);
+    setMixPdts([]);
   };
 
   const populateForm = () => {
@@ -164,6 +180,10 @@ const ProductEntry = ({ route }) => {
       setLoading(true);
       const record = { ...route.params };
       fetchProductDetails(record?.productId);
+      if (route.params?.mixProducts) {
+        setAllowMix(true);
+        setMixPdts(route.params?.mixProducts?.map((i) => i?.id));
+      }
     }
   };
 
@@ -203,9 +223,11 @@ const ProductEntry = ({ route }) => {
         ...(isPackedProduct && { stock_packedPurchasedQuantity: Number(packedPurchasedQuantity) }),
         ...(!isPackedProduct && { stock_unpackedPurchasedQuantity: Number(unpackedPurchasedQty) }),
       }),
+      mixProductIds: mixPdts,
     };
 
     const isValidPayload = hasNull(payload) === false && salesPrice.trim() !== "";
+
     if (isValidPayload === false) {
       setLoading(false); //removing loader if form is invalid
     }
@@ -249,6 +271,10 @@ const ProductEntry = ({ route }) => {
     populateForm();
     fetchProducts();
   }, [searchTerm]);
+
+  useEffect(() => {
+    fillMixPdtPool();
+  }, [allowMix, selectedProduct]);
 
   if (showbarcodeReader) {
     return (
@@ -369,7 +395,7 @@ const ProductEntry = ({ route }) => {
                 />
               )}
               keyExtractor={(item) => item.saleUnitName.toString()}
-              numColumns={3}
+              numColumns={4}
             />
           )}
           <View style={styles.row}>
@@ -410,6 +436,32 @@ const ProductEntry = ({ route }) => {
             );
           })}
 
+          {saleUnits?.length > 1 && (
+            <>
+              <View style={{ marginVertical: 5 }}>
+                <CheckBox label="Allow mix" isChecked={allowMix} onPress={() => setAllowMix(!allowMix)} />
+              </View>
+
+              {allowMix && (
+                <>
+                  <MyDropDown
+                    label={`Products to mix with ${selectedProduct?.name}`}
+                    data={mixPdtsPool}
+                    mutliSelect
+                    onChange={(item) => {
+                      setMixPdts(item);
+                    }}
+                    value={mixPdts}
+                    placeholder={mixPdts?.length > 1 ? `${mixPdts?.length} item${mixPdts?.length > 1 ? "s" : ""} selected` : "Select products to mix"}
+                    labelField="productName"
+                    valueField="id"
+                    modal
+                    searchField="productName"
+                  />
+                </>
+              )}
+            </>
+          )}
           <MyInput label="Remarks" value={remarks} onValueChange={(text) => setRemarks(text)} multiline />
           {selectedProduct && !edit && <CheckBox label="Add initial stock" isChecked={stockCheck} onPress={() => setStockCheck(!stockCheck)} />}
 

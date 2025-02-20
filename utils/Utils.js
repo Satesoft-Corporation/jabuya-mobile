@@ -193,7 +193,7 @@ export function datesAreEqual(d1, d2) {
 export const getUnitAbv = (unitList, unitName) => {
   if (unitList && unitName) {
     const abv = unitList?.find((i) => i?.value === unitName)?.abbreviation;
-    return abv ? ` - ${abv}` : ` - ${unitName}`;
+    return abv ? `${abv}` : `${unitName}`;
   }
 
   return "";

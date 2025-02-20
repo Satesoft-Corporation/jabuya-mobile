@@ -1,4 +1,4 @@
-import { Text, View, FlatList, TextInput } from "react-native";
+import { Text, View, FlatList, TextInput, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import ModalContent from "@components/ModalContent";
 import ChipButton from "@components/buttons/ChipButton";
@@ -8,6 +8,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCart, getCartSelection, getLookUps } from "duqactStore/selectors";
 import { getUnitAbv, isValidNumber } from "@utils/Utils";
 import { addItemToCart, editCartItem, makeProductSelection } from "actions/shopActions";
+import MyInput from "@components/MyInput";
+import CheckBox from "@components/CheckBox";
+import { MyDropDown } from "@components/DropdownComponents";
 
 export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit, setItemToEdit = () => {} }) {
   const selection = useSelector(getCartSelection);
@@ -15,13 +18,16 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
 
   const dispatch = useDispatch();
   const lookUps = useSelector(getLookUps);
+  const [mixed, setMixed] = useState(false);
+
+  const [selectedMixPdts, setSelectedMixPdts] = useState([]);
 
   const unitList = lookUps?.filter((i) => i.type === "SALE_UNITS");
 
   const { selectedSaleUnit, saleUnits, salesPrice } = selection ?? {};
 
   const [submitted, setSubmitted] = useState(false);
-  const [quantity, setQuantity] = useState("");
+  const [quantity, setQuantity] = useState("1");
   const [errors, setErrors] = useState(0);
   const [unitCost, setUnitCost] = useState("");
   const [unitSalesPrice, setUnitSalesPrice] = useState(""); //price for a sale unit
@@ -42,6 +48,8 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
     setQuantity("");
     setShowModal(false);
     setSubmitted(false);
+    setMixed(false);
+    setSelectedMixPdts([]);
     if (itemToEdit) {
       setItemToEdit(null);
     }
@@ -90,17 +98,21 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
 
       if (isValidQuantity && isValidCost) {
         const { productSaleUnitName } = saleUnit;
-        const name = productSaleUnitName !== "Whole" ? getUnitAbv(unitList, productSaleUnitName) : "";
+        const name = productSaleUnitName !== "Whole" ? ` -${getUnitAbv(unitList, productSaleUnitName)}` : "";
+        const mixture = mixed ? " Mixed" : "";
 
         const readyItem = {
           id: selection.id,
-          productName: selection?.productName + name,
+          productName: selection?.productName + name + mixture,
           shopProductId: selection.id,
           quantity: parsedQuantity, // Use the parsed quantity
           totalCost: cost,
           unitCost: Number(unitCost),
           saleUnitId: saleUnit?.id || null,
           positionIndex: cart?.cartItems?.length,
+          isMixed: mixed,
+          numberOfProductsToMix: selectedMixPdts?.length,
+          productIdsToMix: selectedMixPdts,
         };
 
         dispatch(addItemToCart(readyItem));
@@ -138,92 +150,122 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
   }, [selection]);
 
   return (
-    <ModalContent visible={showMoodal} style={{ padding: 20 }}>
-      <View style={{ paddingHorizontal: 5 }}>
-        <View style={{ marginTop: 10, marginBottom: 5 }}>
-          <Text style={{ fontWeight: "600", fontSize: 20, marginBottom: 5 }}>{itemToEdit ? "Edit" : "Successfull"}</Text>
-          <Text>
-            {selection?.productName?.trim() || itemToEdit?.productName} {!itemToEdit && "has been selected."}
-          </Text>
+    <ModalContent visible={showMoodal} style={{ padding: 10 }}>
+      <ScrollView style={{ paddingHorizontal: 5 }} showsVerticalScrollIndicator={false}>
+        <View style={{ marginTop: 10, marginBottom: 5, gap: 10 }}>
+          <View>
+            <Text style={{ fontWeight: "600", fontSize: 20, marginBottom: 5 }}>{itemToEdit ? "Edit" : "Successfull"}</Text>
+            <Text>
+              {selection?.productName?.trim() || itemToEdit?.productName} {!itemToEdit && "has been selected."}
+            </Text>
 
-          {saleUnits?.length > 1 && (
-            <View style={{ marginTop: 10 }}>
-              <Text style={{ fontWeight: "600" }}>Select sale unit</Text>
+            {saleUnits?.length > 1 && (
+              <View style={{ marginTop: 10 }}>
+                <Text style={{ fontWeight: "600" }}>Select sale unit</Text>
 
-              <FlatList
-                data={saleUnits}
-                renderItem={({ item }) => (
-                  <ChipButton
-                    title={item?.productSaleUnitName}
-                    isSelected={saleUnit?.productSaleUnitName === item?.productSaleUnitName}
-                    onPress={() => onChipPress(item)}
-                  />
-                )}
-                keyExtractor={(item) => item.productSaleUnitName.toString()}
-                numColumns={3}
-                ListFooterComponent={renderFooter}
-              />
-            </View>
+                <FlatList
+                  data={saleUnits}
+                  renderItem={({ item }) => (
+                    <ChipButton
+                      title={getUnitAbv(unitList, item?.productSaleUnitName)}
+                      isSelected={saleUnit?.productSaleUnitName === item?.productSaleUnitName}
+                      onPress={() => onChipPress(item)}
+                    />
+                  )}
+                  keyExtractor={(item) => item.productSaleUnitName.toString()}
+                  numColumns={3}
+                  ListFooterComponent={renderFooter}
+                />
+              </View>
+            )}
+          </View>
+
+          {selection?.mixProducts && (
+            <CheckBox
+              label="Mix"
+              isChecked={mixed}
+              onPress={() => {
+                setMixed(!mixed);
+                setSelectedMixPdts([]);
+              }}
+            />
+          )}
+
+          {mixed && (
+            <MyDropDown
+              label={`Products to mix with ${selection?.productName?.trim()}`}
+              data={selection?.mixProducts?.filter((i) => i?.remainingStock >= 1)}
+              mutliSelect
+              onChange={(item) => {
+                setSelectedMixPdts(item);
+              }}
+              value={selectedMixPdts}
+              placeholder={
+                selectedMixPdts?.length > 1
+                  ? `${selectedMixPdts?.length} item${selectedMixPdts?.length > 1 ? "s" : ""} selected`
+                  : "Select products to mix"
+              }
+              labelField="productName"
+              valueField="id"
+              modal
+            />
           )}
         </View>
 
         {
-          <View>
-            <Text style={{ fontWeight: "600", fontSize: 13, marginTop: 10, marginLeft: 4 }}>Quantity</Text>
-            <TextInput
-              onFocus={() => setErrors(null)}
-              onBlur={() => setErrors(null)}
-              textAlign="right"
-              inputMode="numeric"
-              value={quantity}
-              onChangeText={(text) => setQuantity(text)}
-              maxLength={3}
-              cursorColor={Colors.dark}
-              autoFocus
-              style={{
-                marginTop: 5,
-                backgroundColor: Colors.light_3,
-                borderRadius: 5,
-                padding: 6,
-                borderWidth: 1,
-                borderColor: errors?.qtyZeroError ? Colors.error : "transparent",
-                fontSize: 18,
-                paddingEnd: 10,
-              }}
-            />
-            {errors?.qtyZeroError && <Text style={{ fontSize: 12, color: Colors.error }}>{errors?.qtyZeroError}</Text>}
-            <Text style={{ fontWeight: "600", fontSize: 13, marginTop: 10, marginBottom: 5, marginLeft: 4 }}>Unit cost</Text>
-            <TextInput
-              textAlign="right"
-              value={unitCost}
-              inputMode="numeric"
-              cursorColor={Colors.dark}
-              onChangeText={(e) => setUnitCost(e)}
-              style={{
-                backgroundColor: Colors.light_3,
-                borderRadius: 5,
-                padding: 6,
-                borderColor: errors?.lessPriceError ? Colors.error : "transparent",
-                fontSize: 18,
-                paddingEnd: 10,
-              }}
-            />
-            {errors?.lessPriceError && <Text style={{ fontSize: 12, color: Colors.error }}>{errors?.lessPriceError}</Text>}
+          <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 10 }}>
+            <View style={{ flex: 0.5 }}>
+              <Text style={{ fontWeight: "600", fontSize: 13, marginTop: 10, marginLeft: 4 }}>Quantity</Text>
+              <TextInput
+                onFocus={() => setErrors(null)}
+                onBlur={() => setErrors(null)}
+                textAlign="right"
+                inputMode="numeric"
+                value={quantity}
+                onChangeText={(text) => setQuantity(text)}
+                maxLength={3}
+                cursorColor={Colors.dark}
+                style={{
+                  marginTop: 5,
+                  backgroundColor: Colors.light_3,
+                  borderRadius: 5,
+                  padding: 6,
+                  borderWidth: 1,
+                  borderColor: errors?.qtyZeroError ? Colors.error : "transparent",
+                  fontSize: 18,
+                  paddingEnd: 10,
+                }}
+              />
+              {errors?.qtyZeroError && <Text style={{ fontSize: 12, color: Colors.error }}>{errors?.qtyZeroError}</Text>}
+            </View>
+
+            <View style={{ flex: 0.5 }}>
+              <Text style={{ fontWeight: "600", fontSize: 13, marginTop: 10, marginBottom: 5, marginLeft: 4 }}>Unit cost</Text>
+              <TextInput
+                textAlign="right"
+                value={unitCost}
+                inputMode="numeric"
+                cursorColor={Colors.dark}
+                onChangeText={(e) => setUnitCost(e)}
+                style={{
+                  backgroundColor: Colors.light_3,
+                  borderRadius: 5,
+                  padding: 6,
+                  borderColor: errors?.lessPriceError ? Colors.error : "transparent",
+                  fontSize: 18,
+                  paddingEnd: 10,
+                }}
+              />
+              {errors?.lessPriceError && <Text style={{ fontSize: 12, color: Colors.error }}>{errors?.lessPriceError}</Text>}
+            </View>
           </View>
         }
 
         <View style={{ flexDirection: "row", marginTop: 40, marginBottom: 10, gap: 5 }}>
-          <PrimaryButton
-            style={{ flex: saleUnit ? 0.5 : 1 }}
-            title={"Cancel"}
-            onPress={() => {
-              setShowModal(false);
-              dispatch(makeProductSelection(null));
-            }}
-          />
+          <PrimaryButton style={{ flex: saleUnit ? 0.5 : 1 }} title={"Cancel"} onPress={() => hide()} />
           {<PrimaryButton title={"Confirm"} darkMode onPress={handlePress} style={{ flex: 0.5 }} />}
         </View>
-      </View>
+      </ScrollView>
     </ModalContent>
   );
 }

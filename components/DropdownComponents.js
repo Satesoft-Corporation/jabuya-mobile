@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, TouchableOpacity, Image, Dimensions, Text, ActivityIndicator } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
+import { Dropdown, MultiSelect } from "react-native-element-dropdown";
 import Colors from "../constants/Colors";
 import Icon from "./Icon";
 import { formatNumberWithCommas, isNotEmpty } from "@utils/Utils";
@@ -114,9 +114,48 @@ export const MyDropDown = ({
   placeholder,
   searchPlaceholder,
   modal = false,
+  mutliSelect = false,
+  ...otherProps
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
+  const props = {
+    disable,
+    style: [
+      {
+        height: 40,
+        borderColor: Colors.dark,
+        borderWidth: 0.5,
+        borderRadius: 5,
+        paddingHorizontal: 13,
+        width: "100%",
+      },
+      isFocus && { borderColor: Colors.primary },
+      style,
+    ],
+    placeholderStyle: styles.placeholderStyle,
+    selectedTextStyle: styles.selectedTextStyle,
+    inputSearchStyle: styles.inputSearchStyle,
+    iconStyle: styles.iconStyle,
+    data,
+    maxHeight: 600, // Adjust based on screen size
+    labelField,
+    valueField,
+    placeholder: placeholder ?? "Select item",
+    searchPlaceholder: searchPlaceholder || "Type here to search...",
+    value,
+    search: forceSearch ? true : data?.length > 6,
+    onFocus: () => setIsFocus(true),
+    onBlur: () => setIsFocus(false),
+    onChange: (item) => {
+      setIsFocus(false);
+      onChange(item);
+    },
+    onChangeText: (text) => onChangeText(text),
+    renderItem: renderItem ? (item) => renderItem(item) : null,
+    renderRightIcon: () => (loading ? <ActivityIndicator color={"#000"} /> : <Icon name="angle-down" size={20} color={"#000"} />),
+    mode: modal ? "modal" : "default",
+  };
   return (
     <View style={[{ width: "100%" }, divStyle]}>
       {label && (
@@ -125,40 +164,14 @@ export const MyDropDown = ({
           {required && <Text style={{ color: Colors.error }}>*</Text>}
         </Text>
       )}
-      <Dropdown
-        disable={disable}
-        style={[
-          { height: 40, borderColor: Colors.dark, borderWidth: 0.5, borderRadius: 5, paddingHorizontal: 13, width: "100%" },
-          isFocus && { borderColor: Colors.primary },
-          style,
-        ]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={data}
-        maxHeight={screenHeight / 1.5}
-        labelField={labelField}
-        valueField={valueField}
-        placeholder={placeholder ?? "Select item"}
-        searchPlaceholder={searchPlaceholder || "Type here to search..."}
-        value={value}
-        search={forceSearch ? true : data?.length > 6}
-        onFocus={() => setIsFocus(true)}
-        onBlur={() => setIsFocus(false)}
-        onChange={(item) => {
-          setIsFocus(false);
-          onChange(item);
-        }}
-        onChangeText={(text) => onChangeText(text)}
-        renderItem={renderItem ? (item) => renderItem(item) : null}
-        renderRightIcon={() => (loading == true ? <ActivityIndicator color={"#000"} /> : <Icon name="angle-down" groupName="FontAwesome" />)}
-        mode={modal ? "modal" : "default"}
-      />
+
+      {mutliSelect === false ? <Dropdown {...props} /> : <MultiSelect {...props} {...otherProps} activeColor={Colors.gray} />}
+
       {isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>}
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: { marginTop: 8, flexDirection: "row", justifyContent: "center", paddingHorizontal: 8 },
   dropdown: {
