@@ -37,6 +37,7 @@ const MyInput = ({
     onDateChange(selectedDate);
   };
 
+  const shouldShowError = isSubmitted && showError && !value;
   return (
     <View style={[{}, style]}>
       {label !== "" && (
@@ -64,7 +65,7 @@ const MyInput = ({
           borderRadius: 5,
           padding: 6,
           borderWidth: 0.6,
-          borderColor: darkMode ? Colors.primary : Colors.dark,
+          borderColor: shouldShowError ? Colors.error : darkMode ? Colors.primary : Colors.dark,
           paddingHorizontal: 10,
           justifyContent: "space-between",
         }}
@@ -113,7 +114,7 @@ const MyInput = ({
           </>
         )}
       </Pressable>
-      {isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>}
+      {shouldShowError && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>}
     </View>
   );
 };

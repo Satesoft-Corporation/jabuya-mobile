@@ -39,6 +39,9 @@ import CheckOut from "@screens/sales_desk/CheckOut";
 import NotTest from "NotTest";
 import * as Notifications from "expo-notifications";
 import * as Haptics from "expo-haptics"; // For vibration feedback
+import CancelledSales from "@screens/sales/CancelledSales";
+import UserPerfomance from "@screens/sales/UserPerfomance";
+import ReportsMenu from "@screens/reports";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -115,6 +118,11 @@ export default function App() {
             <Stack.Screen name={s.DAMAGES} component={Damages} />
             <Stack.Screen name={s.CONTACT_DETAILS} component={ContactDetails} />
             <Stack.Screen name={s.CHECK_OUT} component={CheckOut} />
+            <Stack.Screen name={s.CANCELED_SALES} component={CancelledSales} />
+            <Stack.Screen name={s.REPORTS_MENU} component={ReportsMenu} />
+
+
+            <Stack.Screen name={s.USER_PERFOMANCE} component={UserPerfomance} />
           </Stack.Navigator>
         </NavigationContainer>
       </MenuProvider>

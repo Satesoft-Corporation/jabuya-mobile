@@ -118,14 +118,15 @@ export const MyDropDown = ({
   ...otherProps
 }) => {
   const [isFocus, setIsFocus] = useState(false);
+  const shouldShowError = isSubmitted && showError && !value;
 
   const props = {
     disable,
     style: [
       {
         height: 40,
-        borderColor: Colors.dark,
-        borderWidth: 0.5,
+        borderColor: shouldShowError ? Colors.error : Colors.dark,
+        borderWidth: shouldShowError ? 1 : 0.5,
         borderRadius: 5,
         paddingHorizontal: 13,
         width: "100%",
@@ -156,8 +157,10 @@ export const MyDropDown = ({
     renderRightIcon: () => (loading ? <ActivityIndicator color={"#000"} /> : <Icon name="angle-down" size={20} color={"#000"} />),
     mode: modal ? "modal" : "default",
   };
+
   return (
     <View style={[{ width: "100%" }, divStyle]}>
+      {/* <Text>{String(shouldShowError)}</Text> */}
       {label && (
         <Text style={{ fontSize: 15, marginBottom: 5 }}>
           {label}
@@ -166,8 +169,6 @@ export const MyDropDown = ({
       )}
 
       {mutliSelect === false ? <Dropdown {...props} /> : <MultiSelect {...props} {...otherProps} activeColor={Colors.gray} />}
-
-      {isSubmitted && showError && !value && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>}
     </View>
   );
 };

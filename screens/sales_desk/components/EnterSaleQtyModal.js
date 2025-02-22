@@ -111,8 +111,7 @@ export default function EnterSaleQtyModal({ showMoodal, setShowModal, itemToEdit
           saleUnitId: saleUnit?.id || null,
           positionIndex: cart?.cartItems?.length,
           isMixed: mixed,
-          numberOfProductsToMix: selectedMixPdts?.length,
-          productIdsToMix: selectedMixPdts,
+          ...(mixed && { numberOfProductsToMix: selectedMixPdts?.length + 1, productIdsToMix: selectedMixPdts }),
         };
 
         dispatch(addItemToCart(readyItem));

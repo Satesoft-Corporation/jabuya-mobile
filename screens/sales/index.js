@@ -39,6 +39,7 @@ export default function ViewSales() {
   const [selectedLineItem, setSelectedLineItem] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [payments, setPayments] = useState([]);
+  const [params, setParams] = useState(null);
 
   const filterParams = useSelector(getFilterParams);
   const selectedShop = useSelector(getSelectedShop);
@@ -93,9 +94,11 @@ export default function ViewSales() {
       limit: 100,
       ...filterParams,
       ...(!params && { startDate: getCurrentDay() }),
-      ...(!params?.startDate && !params?.shopProductId && !params?.userId && !params?.clientId && !params?.endDate && { startDate: getCurrentDay() }),
+      ...(!params?.startDate && { startDate: getCurrentDay() }),
       ...(params && params),
     };
+
+    setParams(params);
 
     if (searchParameters?.startDate) {
       setDate(searchParameters?.startDate);
@@ -104,6 +107,11 @@ export default function ViewSales() {
     if (searchParameters?.endDate) {
       setEndDate(searchParameters?.endDate);
     }
+
+    if (!searchParameters?.endDate) {
+      setEndDate(null);
+    }
+
     const hasNet = await hasInternetConnection();
 
     if (hasNet === false) {
@@ -111,15 +119,18 @@ export default function ViewSales() {
       setLoading(false);
     } else {
       setIsFetchingMore(true);
-
-       await getDebtPayments(searchParameters);
+      await getDebtPayments(searchParameters);
 
       await new BaseApiService(SHOP_SALES_ENDPOINT)
         .getRequestWithJsonResponse(searchParameters)
         .then((response) => {
           if (response.totalItems === 0) {
+            if (params?.userId) {
+              setMessage(`No sale records found this shop user`);
+            }
             setMessage(`No sale records found.`);
           }
+
           setTotalReords(response?.totalItems);
           setDaysProfit(Math.round(response?.totalProfit));
           setDaysCapital(Math.round(response?.totalPurchaseCost));
@@ -217,11 +228,12 @@ export default function ViewSales() {
             print={() => print(item)}
             isShopAttendant={isShopAttendant}
             onDelete={() => {
+              setSelectedLineItem(null);
               setSelectedSale(item);
               setDeleteModal(true);
             }}
             onSwipe={(lineItem) => {
-              console.log(lineItem?.item);
+              setSelectedSale(null);
               setSelectedLineItem(lineItem?.item);
               setDeleteModal(true);
             }}

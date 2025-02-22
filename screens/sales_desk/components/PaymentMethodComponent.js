@@ -24,12 +24,13 @@ const PaymentMethodComponent = ({
   setClientNumber,
   selectedPaymentMethod,
   setSelectedPaymentMethod,
+  submitted,
+  existingClient,
+  setExistingClient,
 }) => {
   const offersDebt = useSelector(getOffersDebt);
   const collectInfo = useSelector(getCollectClientInfo);
   const cart = useSelector(getCart);
-
-  const [existingClient, setExistingClient] = useState(true);
 
   const [clients, setClients] = useState([]);
 
@@ -114,7 +115,7 @@ const PaymentMethodComponent = ({
 
             {existingClient && (
               <MyDropDown
-                style={{ backgroundColor: Colors.light, borderColor: Colors.dark, marginTop: 5 }}
+                style={{ marginTop: 5 }}
                 data={clients}
                 onChange={(e) => setSelectedClient(e)}
                 value={selectedClient}
@@ -122,6 +123,8 @@ const PaymentMethodComponent = ({
                 labelField={"displayName"}
                 valueField="id"
                 modal
+                showError={existingClient}
+                isSubmitted={submitted}
               />
             )}
           </View>
@@ -129,7 +132,7 @@ const PaymentMethodComponent = ({
 
         {selectedPaymentMethod?.id === 1 && offersDebt === true && (
           <MyDropDown
-            style={{ backgroundColor: Colors.light, borderColor: Colors.dark, marginTop: 5 }}
+            style={{ marginTop: 5 }}
             data={clients}
             onChange={(e) => setSelectedClient(e)}
             value={selectedClient}
@@ -137,6 +140,8 @@ const PaymentMethodComponent = ({
             labelField={"displayName"}
             valueField="id"
             modal
+            showError
+            isSubmitted={submitted}
           />
         )}
 

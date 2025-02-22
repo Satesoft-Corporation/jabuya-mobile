@@ -19,6 +19,7 @@ import AdminStock from "./AdminStock";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import { hasInternetConnection } from "@utils/NetWork";
 import { useNavigation } from "@react-navigation/native";
+import UnlistModal from "./UnlistModal";
 
 const StockLevels = () => {
   const [message, setMessage] = useState(null);
@@ -28,6 +29,8 @@ const StockLevels = () => {
   const [loading, setLoading] = useState(true);
   const [stock, setStock] = useState(0);
   const [pdtValue, setPdtValue] = useState(0);
+  const [unListModal, setUnListModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const offlineParams = useSelector(getOfflineParams);
   const selectedShop = useSelector(getSelectedShop);
@@ -137,7 +140,15 @@ const StockLevels = () => {
   }
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <AppStatusBar />
+      <UnlistModal
+        selectedItem={selectedItem}
+        showMoodal={unListModal}
+        setShowModal={setUnListModal}
+        onComplete={() => {
+          snackbarRef.current.show("Details saved");
+          handleRefresh();
+        }}
+      />
 
       <TopHeader
         title="Stock levels"
@@ -175,7 +186,15 @@ const StockLevels = () => {
         style={{ marginTop: 5 }}
         showsHorizontalScrollIndicator={false}
         data={stockLevels}
-        renderItem={({ item }) => <StockLevelCard data={item} />}
+        renderItem={({ item }) => (
+          <StockLevelCard
+            data={item}
+            handleDelete={() => {
+              setUnListModal(true);
+              setSelectedItem(item);
+            }}
+          />
+        )}
         onRefresh={() => fetchShopProducts()}
         refreshing={loading}
         ListEmptyComponent={() => (

@@ -118,10 +118,7 @@ export const saveShopDetails = async (searchParameters, isShopAttendant = false)
       if (isShopAttendant === false) {
         const finalList = response?.records?.map((item) => {
           const currency = currencyList?.find((cur) => cur?.id === item?.currencyId);
-          return {
-            ...item,
-            currency: currency?.symbol || "",
-          };
+          return { ...item, currency: currency?.symbol || "" };
         });
         shopsArray = [...finalList];
       }
@@ -138,6 +135,27 @@ export const saveShopDetails = async (searchParameters, isShopAttendant = false)
       console.log(error);
     });
 
+  getShopUsers(shopsArray);
+
   // return saved;
   return shopsArray;
+};
+
+export const getShopUsers = async (shopsList = []) => {
+  let data = [];
+  shopsList?.forEach(async (shop) => {
+    if (shop) {
+      console.log("Saving users", shop?.name);
+      await new BaseApiService(`/shops/${shop?.id}/user-accounts`)
+        .getRequestWithJsonResponse({ offset: 0, limit: 0 })
+        .then((response) => {
+          data.push(...response?.records);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  });
+  console.log("Users saved");
+  return data;
 };

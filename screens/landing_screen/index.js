@@ -10,6 +10,7 @@ import { MenuIcon } from "@components/MenuIcon";
 import Colors from "@constants/Colors";
 import LockScreenModal from "@screens/applock/LockScreenModal";
 import {
+  getShopUsers,
   saveLookUps,
   saveShopClients,
   saveShopDetails,
@@ -45,6 +46,7 @@ import {
   EXPENSES,
   LEADS,
   OFFLINE_SALES,
+  REPORTS_MENU,
   SALES_DESK,
   SALES_REPORTS,
   STOCK_ENTRY,
@@ -85,6 +87,8 @@ const LandingScreen = () => {
 
     { icon: require("assets/icons/stock_purc.jpg"), title: "Stock purchases", target: STOCK_ENTRY },
     { icon: require("assets/icons/icons8-box-501.png"), title: "Stock levels", target: STOCK_LEVELS },
+    ...(!isShopAttendant ? [{ icon: require("../../assets/icons/icons8-report-50.png"), title: "Reports", target: REPORTS_MENU }] : []),
+
     { icon: require("assets/icons/income.png"), title: "Expenses", target: EXPENSES },
 
     { icon: require("assets/icons/entries.png"), title: "Entries", target: ENTRIES },

@@ -4,7 +4,8 @@ import { useNavigation } from "@react-navigation/native";
 import TopHeader from "@components/TopHeader";
 import Colors from "@constants/Colors";
 import Icon from "@components/Icon";
-import { CLIENT_FORM } from "@navigation/ScreenNames";
+import { CLIENT_DEBTS, CLIENT_FORM } from "@navigation/ScreenNames";
+import PrimaryButton from "@components/buttons/PrimaryButton";
 
 const ContactDetails = ({ route }) => {
   const client = route?.params;
@@ -71,6 +72,19 @@ const ContactDetails = ({ route }) => {
             <Icon name="edit" size={25} onPress={editContact} groupName="AntDesign" />
           </View>
         </View>
+      </View>
+
+      <View style={{ flexDirection: "row", gap: 10, marginTop: 10, paddingHorizontal: 10 }}>
+        <PrimaryButton
+          title={"View Sales"}
+          style={{ flex: 0.5 }}
+          onPress={() => navigation.navigate(CLIENT_DEBTS, { client, currency: client.currency, cashSales: true })}
+        />
+        <PrimaryButton
+          title={"View Debts"}
+          style={{ flex: 0.5 }}
+          onPress={() => navigation.navigate(CLIENT_DEBTS, { client, currency: client.currency })}
+        />
       </View>
     </SafeAreaView>
   );

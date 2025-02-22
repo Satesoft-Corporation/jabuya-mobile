@@ -42,8 +42,6 @@ export default function Login() {
             await UserSessionUtils.setUserAuthToken(response.accessToken);
             await UserSessionUtils.setUserRefreshToken(response.refreshToken);
             await UserSessionUtils.setFullSessionObject(response);
-            await UserSessionUtils.setLoginTime(String(date));
-            await UserSessionUtils.resetPendingSales();
             await UserSessionUtils.setLoginDetails(loginInfo);
 
             if (user) {

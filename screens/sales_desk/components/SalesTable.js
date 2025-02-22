@@ -95,7 +95,9 @@ const SaleListItem = ({ data }) => {
       <Text style={{ flex: 2.5, justifyContent: "center", textDecorationLine: cancellationReason ? "line-through" : "" }} numberOfLines={2}>
         {productName?.trim() || shopProductName?.trim() + unitName}
       </Text>
-      <Text style={{ flex: 0.5, textAlign: "center", textDecorationLine: cancellationReason ? "line-through" : "" }}>{data?.quantity}</Text>
+      <Text style={{ flex: 0.5, textAlign: "center", textDecorationLine: cancellationReason ? "line-through" : "" }}>
+        {data?.formattedQuantity?.replace(".0", "") || data?.quantity}
+      </Text>
 
       <Text style={{ flex: 1, textAlign: "right", textDecorationLine: cancellationReason ? "line-through" : "" }}>
         {formatNumberWithCommas(data?.unitCost)}

@@ -14,7 +14,7 @@ import ChipButton2 from "@components/buttons/ChipButton2";
 import { useNavigation } from "@react-navigation/native";
 import { CREDIT_PAYMENTS } from "@navigation/ScreenNames";
 
-function SaleTxnCard({ data, print, onDelete, onSwipe }) {
+function SaleTxnCard({ data, print, onDelete, onSwipe, onClient = false, onReturns = false }) {
   const shops = useSelector(getShops) ?? [];
   const canViewIncome = useSelector(getCanViewShopIncome);
 
@@ -142,22 +142,26 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
 
           <DataRow key={2} label={"Recieved"} value={formatNumberWithCommas(amountPaid, data?.currency)} />
 
-          <DataRow
-            label={`Purchased ${itemCount > 1 ? `${itemCount} items` : `${itemCount} item`}`}
-            value={formatNumberWithCommas(totalCost, data?.currency)}
-          />
+          {!onReturns && (
+            <>
+              <DataRow
+                label={`Purchased ${itemCount > 1 ? `${itemCount} items` : `${itemCount} item`}`}
+                value={formatNumberWithCommas(totalCost, data?.currency)}
+              />
 
-          {balanceGivenOut !== 0 && <DataRow key={4} label={"Balance"} value={formatNumberWithCommas(balanceGivenOut, data?.currency)} />}
+              {balanceGivenOut !== 0 && <DataRow key={4} label={"Balance"} value={formatNumberWithCommas(balanceGivenOut, data?.currency)} />}
 
-          {data?.debtBalance > 0 && (
-            <DataRow key={6} label={"Outstanding balance"} value={formatNumberWithCommas(data?.debtBalance, data?.currency)} />
+              {data?.debtBalance > 0 && (
+                <DataRow key={6} label={"Outstanding balance"} value={formatNumberWithCommas(data?.debtBalance, data?.currency)} />
+              )}
+
+              {canViewIncome && <DataRow key={5} label={"Income"} value={formatNumberWithCommas(profit, data?.currency)} />}
+
+              {data?.clientName && <DataRow key={63} label={"Client's name"} value={data?.clientName} />}
+
+              {data?.clientPhoneNumber && <DataRow key={7} label={"Client's mobile"} value={data?.clientPhoneNumber} />}
+            </>
           )}
-
-          {canViewIncome && <DataRow key={5} label={"Income"} value={formatNumberWithCommas(profit, data?.currency)} />}
-
-          {data?.clientName && <DataRow key={63} label={"Client's name"} value={data?.clientName} />}
-
-          {data?.clientPhoneNumber && <DataRow key={7} label={"Client's mobile"} value={data?.clientPhoneNumber} />}
         </View>
       )}
 
@@ -172,8 +176,8 @@ function SaleTxnCard({ data, print, onDelete, onSwipe }) {
         served
         btnTitle2={expanded ? "Hide" : "More"}
         onPrint={print}
-        print
-        deleteIcon={canDeleteSales}
+        print={!onClient}
+        deleteIcon={canDeleteSales && !onClient}
         onDelete={onDelete}
         debt={balanceGivenOut < 0}
         onPayClick={() => navigation.navigate(CREDIT_PAYMENTS, { ...data, idType: "SaleId" })}

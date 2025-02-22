@@ -43,6 +43,7 @@ const CheckOut = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [existingClient, setExistingClient] = useState(true);
 
   const [offline, setOffline] = useState(false);
 
@@ -54,10 +55,15 @@ const CheckOut = () => {
     setError(null);
     setClientName("");
     setClientNumber("");
+    setSubmitted(false);
   };
+  useEffect(() => {
+    if (selectedClient) {
+      setError(null);
+    }
+  }, [selectedClient]);
 
   const postSales = async () => {
-    setSubmitted(true);
     setError(null);
 
     const onCredit = selectedPaymentMethod?.id === 1;
@@ -138,6 +144,8 @@ const CheckOut = () => {
 
   const validate = () => {
     setError(null);
+    setSubmitted(true);
+
     const isValidAmount = Number(recievedAmount) >= totalCartCost;
     let isValid = true;
 
@@ -149,6 +157,12 @@ const CheckOut = () => {
       }
       if (!isValidAmount) {
         setError(`Recieved amount should not be less than ${selectedShop?.currency}${formatNumberWithCommas(totalCartCost)}`);
+        isValid = false;
+        return;
+      }
+
+      if (!selectedClient && existingClient) {
+        setError("Client selection is required for this sale");
         isValid = false;
         return;
       }
@@ -237,6 +251,8 @@ const CheckOut = () => {
           setClientNumber={setClientNumber}
           selectedPaymentMethod={selectedPaymentMethod}
           setSelectedPaymentMethod={setSelectedPaymentMethod}
+          existingClient={existingClient}
+          setExistingClient={setExistingClient}
         />
 
         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, gap: 10, marginBottom: 10 }}>

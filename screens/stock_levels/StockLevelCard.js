@@ -10,7 +10,7 @@ import CardFooter from "@components/card_components/CardFooter";
 import { getCanCreateUpdateMyShopStock, getCanViewShopCapital } from "duqactStore/selectors/permissionSelectors";
 import { useSelector } from "react-redux";
 
-function StockLevelCard({ data }) {
+function StockLevelCard({ data, handleDelete }) {
   const [expanded, setExpanded] = useState(false);
   const navigation = useNavigation();
   const canViewCapital = useSelector(getCanViewShopCapital);
@@ -78,6 +78,8 @@ function StockLevelCard({ data }) {
         onEdit={() => navigation.navigate(PDT_ENTRY, data)}
         onStock={() => navigation.navigate(STOCK_ENTRY_FORM, { stock: true, product: data })}
         stock
+        deleteIcon
+        onDelete={handleDelete}
       />
     </View>
   );
