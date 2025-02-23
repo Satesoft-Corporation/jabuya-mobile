@@ -64,10 +64,12 @@ const UserPerfomance = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
-      <TopHeader title={`Daily user summary ${formatDate(new Date(), true)}`} />
+      <TopHeader title={`Daily user summary `} />
 
+      <View style={{ paddingHorizontal: 10, marginTop: 10 }}>
+        <Text style={{ fontSize: 16 }}>{formatDate(new Date(), true)}</Text>
+      </View>
       <FlatList
-        style={{ marginTop: 5 }}
         keyExtractor={(item) => item?.id?.toString()}
         data={userData}
         renderItem={({ item, i }) => (

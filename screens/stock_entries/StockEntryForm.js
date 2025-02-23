@@ -21,6 +21,7 @@ import { getCanCreateUpdateMyShopStock } from "duqactStore/selectors/permissionS
 import NoAuth from "@screens/Unauthorised";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import SuccessDialog from "@components/SuccessDialog";
+import { STOCK_LEVELS } from "@navigation/ScreenNames";
 
 const StockEntryForm = () => {
   const selectedShop = useSelector(getSelectedShop);
@@ -39,16 +40,20 @@ const StockEntryForm = () => {
   const [selectedSupplier, setSelectedSupplier] = useState(suppliers?.find((i) => i?.companyOrBusinessName?.toLowerCase() === "unknown"));
   const [expiryDate, setExpiryDate] = useState(new Date());
   const [isPackedProduct, setIsPackedProduct] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [batchNo, setBatchNo] = useState("");
   const [purchaseDate, setPurchaseDate] = useState(new Date());
   const [packedPurchasedQuantity, setPackedPurchasedQuantity] = useState("");
+  const [quantity, setQuantity] = useState("");
+
   const [remarks, setRemarks] = useState("");
   const [purchasePrice, setPurchasePrice] = useState("");
   const [unpackedPurchasedQty, setUnpackedPurchasedQty] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [edit, setEdit] = useState(false);
   const [sModal, setSModal] = useState(false);
+  const [selectedSaleUnit, setSelectedSaleUnit] = useState(null);
+  const [saleUnits, setSaleUnits] = useState([]);
 
   const snackBarRef = useRef(null);
 
@@ -62,11 +67,25 @@ const StockEntryForm = () => {
     const pdtList = shopProducts.filter((p) => p.shopId === selectedShop?.id);
 
     setProducts(pdtList);
-    setLoading(false);
+    if (route?.params) {
+      populateForm(pdtList);
+    } else {
+      setLoading(false);
+    }
   };
 
   const onProductChange = (pdt) => {
     setSelectedProduct(pdt);
+    const { multipleSaleUnits, saleUnitName, saleUnitId } = pdt;
+
+    const defaultUnit = { id: saleUnitId, productSaleUnitName: saleUnitName };
+
+    setSelectedSaleUnit(defaultUnit);
+    if (multipleSaleUnits) {
+      setSaleUnits([defaultUnit, ...multipleSaleUnits]);
+    } else {
+      setSaleUnits([defaultUnit]);
+    }
   };
 
   const onSupplierChange = (e) => {
@@ -104,7 +123,7 @@ const StockEntryForm = () => {
     setSubmitted(true);
     setLoading(true);
 
-    const isPacked = isPackedProduct && isPackedProduct === true;
+    const isPacked = selectedSaleUnit?.id === selectedProduct?.saleUnitId;
     //setting payload basing on item package type
 
     const payload = {
@@ -119,8 +138,9 @@ const StockEntryForm = () => {
       supplierId: selectedSupplier?.id,
       remarks: remarks || "",
       purchasePrice: Number(purchasePrice),
-      ...(isPacked && { packedPurchasedQuantity: Number(packedPurchasedQuantity), unpackedPurchase: false }),
-      ...(!isPacked && { unpackedPurchase: true, unpackedPurchasedQuantity: Number(unpackedPurchasedQty) }),
+      saleUnitId: selectedSaleUnit?.id,
+      ...(isPacked && { packedPurchasedQuantity: Number(quantity), unpackedPurchase: false }),
+      ...(!isPacked && { unpackedPurchase: true, unpackedPurchasedQuantity: Number(quantity) }),
     };
 
     const isValidPayload = hasNull(payload) === false;
@@ -148,36 +168,20 @@ const StockEntryForm = () => {
     }
   };
 
-  const populateForm = () => {
+  const populateForm = (productList) => {
     if (route?.params) {
       if (route?.params?.stock == true) {
-        console.log(route.params);
-
         const product = route.params.product;
 
         setLoading(false);
         setProducts([product]);
-
-        setSelectedProduct(product);
-        setIsPackedProduct(true);
+        onProductChange(product);
       } else {
         const selectedRecord = { ...route.params };
 
-        setLoading(false);
         setEdit(true);
-
-        setSelectedProduct({
-          productName: selectedRecord?.productName,
-          id: selectedRecord?.id,
-          productId: selectedRecord?.productId,
-          packageUnitName: selectedRecord?.formattedQuantity.split(" ")[1],
-          manufacturerId: selectedRecord?.manufacturerId,
-          packageQuantity: selectedRecord?.purchasedQuantity,
-          shopId: selectedRecord?.shopId,
-          currency: selectedRecord?.currency,
-        });
-
-        setIsPackedProduct(!selectedRecord?.unpackedPurchase);
+        const productMatch = productList?.find((i) => i?.id === selectedRecord?.productId);
+        onProductChange(productMatch);
 
         setExpiryDate(new Date(selectedRecord?.expiryDate));
 
@@ -185,30 +189,28 @@ const StockEntryForm = () => {
 
         setPurchaseDate(new Date(selectedRecord?.stockedOnDate));
         setPurchasePrice(String(selectedRecord.purchasePrice));
-        setUnpackedPurchasedQty(String(selectedRecord?.unpackedQuantity));
+        setQuantity(String(selectedRecord?.unpackedQuantity > 0 ? selectedRecord?.unpackedQuantity : selectedRecord?.packedQuantity));
+
         setPackedPurchasedQuantity(String(selectedRecord?.packedQuantity));
         setBatchNo(selectedRecord?.batchNumber);
         setRemarks(selectedRecord?.remarks);
+        setLoading(false);
       }
-    } else {
-      fetchProducts();
     }
   };
 
   const getUnitPurchasePrice = () => {
-    let qty = isPackedProduct ? packedPurchasedQuantity : unpackedPurchasedQty;
-
     let price = Number(purchasePrice);
 
     if (isPackedProduct) {
-      return String(Math.round(price / (selectedProduct?.packageQuantity * Number(qty))));
+      return String(Math.round(price / (selectedProduct?.packageQuantity * Number(quantity))));
     } else {
-      return String(Math.round(price / qty));
+      return String(Math.round(price / quantity));
     }
   };
 
   useEffect(() => {
-    populateForm();
+    fetchProducts();
   }, [selectedShop]);
 
   if (!canDoStockCrud) {
@@ -264,21 +266,23 @@ const StockEntryForm = () => {
           <View>
             <Text style={styles.inputLabel}>Product</Text>
             <MyDropDown
-              style={styles.dropDown}
               data={edit ? [{ ...selectedProduct }] : products}
               onChange={onProductChange}
               value={selectedProduct}
               placeholder="Select product"
               labelField="productName"
               valueField="id"
+              showError
+              isSubmitted={submitted}
+              required
             />
-            {submitted && !selectedProduct && <Text style={styles.errorText}>Product is required</Text>}
           </View>
 
           <View>
             <Text style={styles.inputLabel}>Supplier</Text>
             <MyDropDown
-              style={styles.dropDown}
+              showError
+              isSubmitted={submitted}
               data={edit ? [{ ...selectedSupplier }] : suppliers}
               onChange={onSupplierChange}
               value={selectedSupplier}
@@ -289,62 +293,62 @@ const StockEntryForm = () => {
             {submitted && !selectedSupplier && <Text style={styles.errorText}>Supplier is required</Text>}
           </View>
 
-          <View>
-            <Text style={styles.inputLabel}>Package type</Text>
-            <MyDropDown
-              style={styles.dropDown}
-              search={false}
-              data={packageOptions}
-              disable={selectedProduct === null}
-              value={isPackedProduct}
-              onChange={(e) => {
-                setIsPackedProduct(e.type);
+          <MyDropDown
+            label={"Package unit"}
+            data={saleUnits}
+            disable={selectedProduct === null}
+            value={selectedSaleUnit}
+            onChange={(e) => {
+              setSelectedSaleUnit(e);
+            }}
+            placeholder="Select package unit"
+            labelField="productSaleUnitName"
+            valueField="id"
+            showError
+            isSubmitted={submitted}
+          />
+          <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 10 }}>
+            <MyInput
+              label={"Quantity"}
+              value={quantity}
+              cursorColor={Colors.dark}
+              onValueChange={(text) => {
+                setQuantity(text);
               }}
-              placeholder="Select package type"
-              labelField="value"
-              valueField="type"
+              inputMode="numeric"
+              style={{ flex: 0.5 }}
+              required
+              showError
+              isSubmitted={submitted}
             />
-            {submitted && !isPackedProduct && <Text style={styles.errorText}>Package type is required</Text>}
+
+            <MyInput
+              label={`Purchase amount `}
+              value={purchasePrice}
+              cursorColor={Colors.dark}
+              onValueChange={(text) => setPurchasePrice(text)}
+              inputMode="numeric"
+              style={{ flex: 0.5 }}
+              required
+              showError
+              isSubmitted={submitted}
+            />
           </View>
-
-          {isPackedProduct !== null && (
-            <View style={styles.row}>
-              <View style={{ flex: 1 }}>
-                <MyInput
-                  label={isPackedProduct === true ? `Quantity (${selectedProduct?.packageUnitName || ""})` : "Unpacked quantity"}
-                  value={isPackedProduct === true ? packedPurchasedQuantity : unpackedPurchasedQty}
-                  cursorColor={Colors.dark}
-                  onValueChange={(text) => {
-                    isPackedProduct === true ? setPackedPurchasedQuantity(text) : setUnpackedPurchasedQty(text);
-                  }}
-                  inputMode="numeric"
-                />
-                {submitted && ((!unpackedPurchasedQty && !isPackedProduct) || (!packedPurchasedQuantity && isPackedProduct)) && (
-                  <Text style={styles.errorText}>Quantity is required</Text>
-                )}
-              </View>
-
-              <View style={{ flex: 1 }}>
-                <MyInput
-                  label={`Purchase amount (${selectedProduct?.currency})`}
-                  value={purchasePrice}
-                  cursorColor={Colors.dark}
-                  onValueChange={(text) => setPurchasePrice(text)}
-                  inputMode="numeric"
-                />
-                {submitted && !purchasePrice && <Text style={styles.errorText}>Price is required</Text>}
-              </View>
-            </View>
-          )}
 
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <MyInput label="Unit purchase price" editable={false} value={formatNumberWithCommas(getUnitPurchasePrice())} />
+              <MyInput inputMode="numeric" label="Unit purchase price" editable={false} value={formatNumberWithCommas(getUnitPurchasePrice())} />
             </View>
 
             <View style={{ flex: 1 }}>
-              <MyInput label="Purchase date" dateValue={purchaseDate} isDateInput onDateChange={(date) => setPurchaseDate(date)} maximumDate />
-              {submitted && !purchaseDate && <Text style={styles.errorText}>Purchase date is required</Text>}
+              <MyInput
+                label="Purchase date"
+                dateValue={purchaseDate}
+                isDateInput
+                onDateChange={(date) => setPurchaseDate(date)}
+                maximumDate
+                required
+              />
             </View>
           </View>
 

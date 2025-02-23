@@ -43,7 +43,7 @@ const CheckOut = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [existingClient, setExistingClient] = useState(true);
+  const [existingClient, setExistingClient] = useState(false);
 
   const [offline, setOffline] = useState(false);
 
@@ -61,6 +61,8 @@ const CheckOut = () => {
     if (selectedClient) {
       setError(null);
     }
+
+    setExistingClient(selectedShop?.clientDetailsAreMandatoryOnAllSales === true);
   }, [selectedClient]);
 
   const postSales = async () => {

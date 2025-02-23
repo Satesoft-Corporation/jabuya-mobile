@@ -114,7 +114,7 @@ const MyInput = ({
           </>
         )}
       </Pressable>
-      {shouldShowError && <Text style={{ fontSize: 12, color: Colors.error }}>{label} is required</Text>}
+      {shouldShowError && <Text style={{ fontSize: 12, color: Colors.error }}>Field is required</Text>}
     </View>
   );
 };
