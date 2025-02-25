@@ -62,20 +62,7 @@ const StockLevels = () => {
       //for calculations
       const newList = pdtList?.map((data) => {
         const summary = data?.performanceSummary;
-        const productSoldQty = summary?.totalQuantitySold || 0;
-        const productStockedQty = summary?.totalQuantityStocked || 0;
-        const price = data?.salesPrice;
-
-        let remainingStock = Math.round(productStockedQty - productSoldQty);
-
-        if (remainingStock === undefined || isNaN(remainingStock) || remainingStock < 1) {
-          remainingStock = 0;
-        }
-
-        return {
-          stockValue: Math.round(remainingStock * price),
-          items: Math.round(remainingStock),
-        };
+        return { stockValue: Math.round(summary?.remainingStockValue || 0), items: Math.round(summary?.remainingStockQuantity || 0) };
       });
 
       const items = newList.reduce((a, b) => a + b?.items, 0);

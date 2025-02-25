@@ -39,17 +39,18 @@ const CreditSales = () => {
   const fetchClients = async () => {
     setMessage(null);
     setLoading(true);
-    setBal(0);
-    setDebt(0);
-    setPaid(0);
-    const shopClients = await UserSessionUtils.getShopClients();
+    const shopClients = await UserSessionUtils.getShopDebtors(selectedShop?.id);
 
-    const list = shopClients
-      ?.filter((i) => i?.shopId === selectedShop?.id)
-      ?.filter((item) => item?.fullName?.toLowerCase()?.includes(searchTerm.toLowerCase().trim()));
+    const list = shopClients?.filter((item) => {
+      const name = item?.fullName?.toLowerCase();
+      const match = name?.includes(searchTerm.toLowerCase().trim());
+
+      if (match) {
+        return item;
+      }
+    });
 
     setClients(list);
-
     if (list.length === 0) {
       setMessage("No records found");
       setLoading(false);
@@ -83,7 +84,7 @@ const CreditSales = () => {
 
   useEffect(() => {
     fetchClients();
-  }, [selectedShop]);
+  }, [selectedShop, searchTerm]);
 
   if (!viewDebts) {
     return <NoAuth />;

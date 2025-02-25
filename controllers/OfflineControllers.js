@@ -60,6 +60,7 @@ export const saveShopProductsOnDevice = async (searchParameters) => {
 
 export const saveShopClients = async (searchParameters) => {
   console.log("saving clients");
+
   await new BaseApiService(CLIENTS_ENDPOINT)
     .getRequestWithJsonResponse(searchParameters)
     .then(async (response) => {
@@ -82,11 +83,14 @@ export const saveShopClients = async (searchParameters) => {
           return 0;
         });
 
+      const shopDebtors = sorted?.filter((i) => i?.balance > 0);
+
+      await UserSessionUtils.setShopDebtors(shopDebtors);
       await UserSessionUtils.setShopClients(sorted);
       console.log("clients saved");
     })
     .catch((error) => {
-      console.log("Unknown Error", error?.message);
+      console.log("Error saving client", error?.message);
     });
 };
 

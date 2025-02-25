@@ -15,7 +15,7 @@ import { scale } from "react-native-size-matters";
 import { ALL_SHOPS_LABEL, screenHeight, screenWidth } from "@constants/Constants";
 import { SHOP_PRODUCTS_ENDPOINT } from "@utils/EndPointUtils";
 import { BaseApiService } from "@utils/BaseApiService";
-import { saveShopProductsOnDevice } from "@controllers/OfflineControllers";
+import { saveShopClients, saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getCart,
@@ -87,6 +87,7 @@ function SalesDesk({ navigation }) {
         setSearchTerm("");
         setLoading(true);
         await saveShopProductsOnDevice(offlineParams);
+        await saveShopClients(offlineParams);
         await fetchProducts();
         setLoading(false);
         snackbarRef.current.show("Data synced", 5000);

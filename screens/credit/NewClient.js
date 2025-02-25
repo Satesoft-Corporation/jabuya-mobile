@@ -58,14 +58,17 @@ const NewClient = ({ route }) => {
       id: route?.params?.id || 0,
       phoneNumber: phone1,
       fullName: firstName?.trim() + " " + lastName?.trim(),
-      shopId: route?.params ? route?.params?.shop?.id : selectedShop?.id,
+      shopId: route?.params ? route?.params?.shopId : selectedShop?.id,
+      email: email,
     };
 
+    console.log(payload);
     await new BaseApiService("/clients-controller")
       .postRequestWithJsonResponse(payload)
       .then(async (response) => {
-        const list = await saveShopClients(offlineParams);
-        //dispatch(setShopClients(list));
+        await saveShopClients(offlineParams);
+        await saveShopClients(offlineParams);
+
         setLoading(false);
         snackRef.current.show("Client details saved successfully.", 8000);
       })
@@ -94,16 +97,16 @@ const NewClient = ({ route }) => {
           <Text style={{ marginTop: 10, fontSize: 16 }}>Client Details</Text>
 
           <View style={{ flexDirection: "row", gap: 10 }}>
-            <MyInput label="First name" value={firstName} style={{ flex: 1 }} onValueChange={(text) => setFirstName(text)} />
+            <MyInput required label="First name" value={firstName} style={{ flex: 1 }} onValueChange={(text) => setFirstName(text)} />
             <MyInput label="Last name" value={lastName} style={{ flex: 1 }} onValueChange={(text) => setLastName(text)} />
           </View>
 
           <View style={{ flexDirection: "row", gap: 10 }}>
-            <MyInput inputMode="numeric" label="Phone number" value={phone1} style={{ flex: 1 }} onValueChange={(text) => setPhone1(text)} />
+            <MyInput required inputMode="numeric" label="Phone number" value={phone1} style={{ flex: 1 }} onValueChange={(text) => setPhone1(text)} />
             <MyInput label="Alternate number" value={phone2} style={{ flex: 1 }} inputMode="numeric" onValueChange={(text) => setPhone2(text)} />
           </View>
 
-          <MyInput label="Email" value={email} inputMode="email" onValueChange={(text) => setEmail(text)} />
+          <MyInput required label="Email" value={email} inputMode="email" onValueChange={(text) => setEmail(text)} />
           <MyInput label="Physical address" value={address} onValueChange={(text) => setAddress(text)} />
         </View>
 

@@ -40,6 +40,8 @@ export default function ViewSales() {
   const [endDate, setEndDate] = useState(null);
   const [payments, setPayments] = useState([]);
   const [params, setParams] = useState(null);
+  const [saleCapital, setSaleCapital] = useState([]); //capital list
+  const [profits, setProfits] = useState([]); //profits list
 
   const filterParams = useSelector(getFilterParams);
   const selectedShop = useSelector(getSelectedShop);
@@ -88,6 +90,10 @@ export default function ViewSales() {
   const getSales = async (params) => {
     setLoading(true);
     setMessage(null);
+    setProfits([]);
+    setSaleCapital([]);
+    setSales([]);
+    setTotalReords(0);
 
     const searchParameters = {
       offset: 0,
@@ -131,17 +137,43 @@ export default function ViewSales() {
             setMessage(`No sale records found.`);
           }
 
-          setTotalReords(response?.totalItems);
-          setDaysProfit(Math.round(response?.totalProfit));
-          setDaysCapital(Math.round(response?.totalPurchaseCost));
-          setSalesValue(Math.round(response?.totalCost));
+          // setTotalReords(response?.totalItems);
+          // setDaysProfit(Math.round(response?.totalProfit));
+          // setDaysCapital(Math.round(response?.totalPurchaseCost));
+          // setSalesValue(Math.round(response?.totalCost));
+
+          const data = [...response.records].filter((sale) => sale?.balanceGivenOut >= 0); //to filter out credit sales
+
+          let sV = data.reduce((a, sale) => a + sale?.totalCost, 0); //sales value
+
+          data.forEach((item) => {
+            const { lineItems } = item;
+            if (lineItems !== undefined) {
+              let cartProfit = lineItems.reduce((a, i) => a + i.totalProfit, 0);
+
+              let cap = lineItems.reduce((a, i) => a + i.totalPurchaseCost, 0); // cart capital
+
+              profits.push(cartProfit);
+              saleCapital.push(cap);
+            }
+          });
+
+          let income = profits.reduce((a, b) => a + b, 0); //getting the sum profit in all carts
+          let capital = saleCapital.reduce((a, b) => a + b, 0);
+
+          setDaysProfit(Math.round(income));
+          setDaysCapital(Math.round(capital));
+          setSalesValue(sV);
           setSales(response?.records);
+
+          setTotalReords(response?.totalItems);
           setLoading(false);
           setIsFetchingMore(false);
         })
         .catch((error) => {
           setLoading(false);
           setMessage("Cannot get sales!", error?.message);
+          console.log(error);
         });
     }
   };

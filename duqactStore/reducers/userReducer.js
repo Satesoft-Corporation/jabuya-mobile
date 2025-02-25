@@ -40,22 +40,26 @@ const initialState = {
 const userReduer = (state = initialState, action) => {
   switch (action.type) {
     case actions.LOG_OUT: {
-      const exisistngUser = state.usersList.find((u) => u.user.id === state.user.id);
+      if (state?.user?.id) {
+        const exisistngUser = state.usersList.find((u) => u?.user?.id === state.user.id);
 
-      let prevUserState = { ...state };
+        let prevUserState = { ...state };
 
-      delete prevUserState.usersList;
-      delete prevUserState.permissions;
-      delete prevUserState.permissionPool;
-      delete prevUserState.lastLoginTime;
+        delete prevUserState.usersList;
+        delete prevUserState.permissions;
+        delete prevUserState.permissionPool;
+        delete prevUserState.lastLoginTime;
 
-      if (exisistngUser) {
-        return { ...initialState, usersList: state.usersList };
+        if (exisistngUser) {
+          return { ...initialState, usersList: state.usersList };
+        }
+        return {
+          ...initialState,
+          usersList: [...state.usersList, { user: state.user, prevData: prevUserState }],
+        };
+      } else {
+        return state;
       }
-      return {
-        ...initialState,
-        usersList: [...state.usersList, { user: state.user, prevData: prevUserState }],
-      };
     }
 
     case actions.LOGIN_ACTION: {
@@ -322,6 +326,10 @@ const userReduer = (state = initialState, action) => {
       const newQty = items?.reduce((a, b) => a + b?.quantity, 0);
 
       return { ...state, cart: { cartItems: items, totalCartCost: newCost, totalQty: newQty, recievedAmount: "" } };
+    }
+
+    case actions.CLEAR_STATE: {
+      return initialState;
     }
 
     default:

@@ -36,3 +36,7 @@ export const logOutAction = () => {
 export const addLookUps = (data) => {
   return { type: actionTypes.ADD_LOOK_UPS, payload: data };
 };
+
+export const clearState = () => {
+  return { type: actionTypes.CLEAR_STATE };
+};

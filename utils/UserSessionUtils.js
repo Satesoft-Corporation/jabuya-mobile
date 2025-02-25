@@ -63,6 +63,7 @@ export class UserSessionUtils {
    */
   static async clearLocalStorageAndLogout() {
     // remove all
+    await AsyncStorage.clear();
     navigatorRef?.dispatch(CommonActions.reset({ index: 0, routes: [{ name: LOGIN }] }));
   }
 
@@ -148,27 +149,42 @@ export class UserSessionUtils {
     await AsyncStorage.setItem(key, data);
   }
 
-  static async getShopClients(shopId = null, withNumber = false) {
+  static async getShopClients(shopId = null) {
     const user = await this.getUserDetails();
     const key = "clts" + user?.username;
 
     const list = await AsyncStorage.getItem(key);
 
     if (shopId !== null) {
-      let newList = [...JSON.parse(list)];
-      let filtered = newList.filter((item) => item?.shop?.id === shopId);
-      if (withNumber === true) {
-        filtered = filtered.map((item) => {
-          return {
-            ...item,
-            fullName: `${item?.fullName}  ${item?.phoneNumber}`,
-          };
-        });
-      }
+      let filtered = [...JSON.parse(list)].filter((item) => item?.shopId === shopId);
       return filtered;
     } else {
       return list ? JSON.parse(list) : [];
     }
+  }
+
+  static async setShopDebtors(debtors) {
+    const user = await this.getUserDetails();
+    const key = "dbts" + user?.username;
+    const data = JSON.stringify(debtors);
+    await AsyncStorage.setItem(key, data);
+  }
+
+  static async getShopDebtors(shopId = null) {
+    const user = await this.getUserDetails();
+    const key = "dbts" + user?.username;
+    const list = await AsyncStorage.getItem(key);
+
+    if (list) {
+      if (shopId !== null) {
+        let filtered = [...JSON.parse(list)].filter((item) => item?.shopId === shopId);
+        return filtered;
+      } else {
+        return list ? JSON.parse(list) : [];
+      }
+    }
+
+    return [];
   }
 
   static async setLoginDetails(data) {

@@ -6,14 +6,7 @@ import PrimaryButton from "@components/buttons/PrimaryButton";
 import Colors from "@constants/Colors";
 import DataRow from "@components/card_components/DataRow";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getAttendantShopId,
-  getCart,
-  getIsAdmin,
-  getIsShopAttendant,
-  getOfflineParams,
-  getSelectedShop,
-} from "duqactStore/selectors";
+import { getAttendantShopId, getCart, getIsAdmin, getIsShopAttendant, getOfflineParams, getSelectedShop } from "duqactStore/selectors";
 import { addOfflineSale, clearCart } from "actions/shopActions";
 import { paymentMethods, screenHeight } from "@constants/Constants";
 import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
@@ -68,9 +61,12 @@ const CheckOut = () => {
     if (selectedClient) {
       setError(null);
     }
-
     setExistingClient(selectedShop?.clientDetailsAreMandatoryOnAllSales === true);
-  }, [selectedClient]);
+  }, []);
+
+  useEffect(() => {
+    setSubmitted(false);
+  }, [selectedPaymentMethod]);
 
   const postSales = async () => {
     setError(null);
@@ -165,11 +161,7 @@ const CheckOut = () => {
         return;
       }
       if (!isValidAmount) {
-        setError(
-          `Recieved amount should not be less than ${
-            selectedShop?.currency
-          }${formatNumberWithCommas(totalCartCost)}`
-        );
+        setError(`Recieved amount should not be less than ${selectedShop?.currency}${formatNumberWithCommas(totalCartCost)}`);
         isValid = false;
         return;
       }
@@ -201,9 +193,7 @@ const CheckOut = () => {
   };
 
   useEffect(() => {
-    setSelectedPaymentMethod(
-      recievedAmount < totalCartCost ? paymentMethods[1] : paymentMethods[0]
-    );
+    setSelectedPaymentMethod(recievedAmount < totalCartCost ? paymentMethods[1] : paymentMethods[0]);
   }, []);
 
   const navigation = useNavigation();
@@ -213,9 +203,7 @@ const CheckOut = () => {
 
       <SuccessDialog
         text={offline ? "Sale saved offline" : "Sale confirmed successfully"}
-        onAgree={() =>
-          navigation.dispatch(StackActions.replace(offline ? OFFLINE_SALES : SALES_REPORTS))
-        }
+        onAgree={() => navigation.dispatch(StackActions.replace(offline ? OFFLINE_SALES : SALES_REPORTS))}
         agreeText={offline ? "Offline sales" : "View sales"}
         cancelText={"Add new Sale"}
         hide={() => navigation.goBack()}
@@ -247,20 +235,14 @@ const CheckOut = () => {
         )}
 
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={{ fontSize: 12, color: Colors.gray, alignSelf: "flex-end" }}>
-            {formatDate(new Date())}
-          </Text>
+          <Text style={{ fontSize: 12, color: Colors.gray, alignSelf: "flex-end" }}>{formatDate(new Date())}</Text>
         </View>
 
         <View style={{ height: screenHeight / 3 }}>
           <SalesTable sales={cartItems} disableSwipe />
         </View>
 
-        <DataRow
-          label={"Recieved"}
-          value={formatNumberWithCommas(recievedAmount)}
-          currency={selectedShop?.currency}
-        />
+        <DataRow label={"Recieved"} value={formatNumberWithCommas(recievedAmount)} currency={selectedShop?.currency} />
 
         <DataRow
           label={`Sold ${totalQty > 1 ? `${totalQty} items` : `${totalQty} item`}`}
@@ -268,11 +250,7 @@ const CheckOut = () => {
           currency={selectedShop?.currency}
         />
 
-        <DataRow
-          label={"Balance"}
-          value={formatNumberWithCommas(recievedAmount - totalCartCost)}
-          currency={selectedShop?.currency}
-        />
+        <DataRow label={"Balance"} value={formatNumberWithCommas(recievedAmount - totalCartCost)} currency={selectedShop?.currency} />
 
         <PaymentMethodComponent
           submitted={submitted}

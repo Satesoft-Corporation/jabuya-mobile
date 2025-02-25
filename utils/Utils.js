@@ -14,7 +14,7 @@ export function formatNumberWithCommas(number, symbol) {
 
   const formattedNumber = Number(number).toLocaleString(undefined, {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 3,
+    maximumFractionDigits: 2,
   });
 
   return symbol ? `${symbol} ${formattedNumber}` : formattedNumber;

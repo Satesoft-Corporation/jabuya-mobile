@@ -8,8 +8,8 @@ import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { getSelectedShop } from "duqactStore/selectors";
 import { useSelector } from "react-redux";
 
-import { formatDate, formatNumberWithCommas, getCurrentDay } from "@utils/Utils";
-import DataColumn from "@components/card_components/DataColumn";
+import { formatDate, getCurrentDay } from "@utils/Utils";
+import UserCard from "./UserCard";
 
 const UserPerfomance = ({ navigation }) => {
   const [userData, setUserData] = useState([]);
@@ -66,38 +66,15 @@ const UserPerfomance = ({ navigation }) => {
     <View style={{ flex: 1, backgroundColor: Colors.light_2 }}>
       <TopHeader title={`Daily user summary `} />
 
-      <View style={{ paddingHorizontal: 10, marginTop: 10 }}>
-        <Text style={{ fontSize: 16 }}>{formatDate(new Date(), true)}</Text>
-      </View>
+      {!loading && (
+        <View style={{ paddingHorizontal: 10, marginTop: 10 }}>
+          <Text style={{ fontSize: 16 }}>{formatDate(new Date(), true)}</Text>
+        </View>
+      )}
       <FlatList
         keyExtractor={(item) => item?.id?.toString()}
         data={userData}
-        renderItem={({ item, i }) => (
-          <View
-            style={{
-              flex: 1,
-              marginTop: 10,
-              marginHorizontal: 10,
-              borderRadius: 3,
-              backgroundColor: "white",
-              paddingVertical: 10,
-              paddingHorizontal: 10,
-              gap: 5,
-            }}
-          >
-            <View>
-              <Text>
-                {item?.firstName} {item?.lastName}
-              </Text>
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <DataColumn title={"Txn"} value={item?.totalItems} />
-                <DataColumn title={"Sales"} value={formatNumberWithCommas(item?.totalSalesValue)} />
-                <DataColumn title={"Capital"} value={formatNumberWithCommas(item?.totalCapital)} />
-                <DataColumn title={"Income"} value={formatNumberWithCommas(item?.totalIncome)} />
-              </View>
-            </View>
-          </View>
-        )}
+        renderItem={({ item, i }) => <UserCard item={item} users={userData} />}
         onRefresh={() => getData()}
         refreshing={loading}
       />

@@ -21,22 +21,10 @@ function StockLevelCard({ data, handleDelete }) {
     setExpanded(!expanded);
   };
 
-  let remainingStock = summary?.totalQuantityStocked - summary?.totalQuantitySold;
+  const remainingStock = summary?.remainingStockQuantity;
 
-  if (remainingStock === undefined || isNaN(remainingStock) || remainingStock < 1) {
-    remainingStock = 0;
-  }
   return (
-    <View
-      style={{
-        marginTop: 10,
-        marginHorizontal: 10,
-        borderRadius: 3,
-        backgroundColor: "white",
-        paddingVertical: 15,
-        paddingHorizontal: 10,
-      }}
-    >
+    <View style={{ marginTop: 10, marginHorizontal: 10, borderRadius: 3, backgroundColor: "white", paddingVertical: 15, paddingHorizontal: 10 }}>
       <CardHeader value1={`SN: ${data?.serialNumber}`} date={data?.dateCreated} shop={data?.shopName} />
 
       <View style={{ flexDirection: "row", marginVertical: 10, justifyContent: "space-between" }}>
@@ -46,7 +34,9 @@ function StockLevelCard({ data, handleDelete }) {
 
         <DataColumn title={"Stock"} value={Math.round(remainingStock)} />
 
-        {canViewCapital && <DataColumn title={"Value"} value={formatNumberWithCommas(remainingStock * data?.salesPrice, data?.currency)} />}
+        {canViewCapital && (
+          <DataColumn title={"Value"} value={formatNumberWithCommas(Math.floor(summary?.remainingStockValue || 0), data?.currency)} />
+        )}
       </View>
 
       {expanded && (

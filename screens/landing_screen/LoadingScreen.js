@@ -7,7 +7,7 @@ import { LANDING_SCREEN, LOGIN } from "@navigation/ScreenNames";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
-import { logOutAction } from "actions/userActions";
+import { clearState, logOutAction } from "actions/userActions";
 import { APP_VERSION } from "@constants/Constants";
 
 const LoadingScreen = () => {
@@ -33,15 +33,14 @@ const LoadingScreen = () => {
     if (val == APP_VERSION) {
       doLoginCheck();
     } else {
-      UserSessionUtils.clearLocalStorageAndLogout(navigation);
-      dispatch(logOutAction());
-      return;
+      dispatch(clearState());
+      await AsyncStorage.clear();
+      console.log("outdated version");
+      logOut();
     }
   };
   useEffect(() => {
-    setTimeout(() => {
-      doFTICheck();
-    }, 3000);
+    setTimeout(() => doFTICheck(), 3000);
   }, []);
 
   return (

@@ -47,3 +47,4 @@ export const ADD_HELD_TXNS_TO_CART = "ADD_HELD_TXNS_TO_CART";
 export const REMOVE_HELD_TXN = "REMOVE_HELD_TXN";
 
 export const ADD_LOOK_UPS = "ADD_LOOK_UPS";
+export const CLEAR_STATE = "CLEAR_STATE";

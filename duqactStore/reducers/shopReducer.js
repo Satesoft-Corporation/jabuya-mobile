@@ -26,6 +26,9 @@ const shopReducer = (state = initialState, action) => {
       return { ...state, lookUps: action.payload };
     }
 
+    case actions.CLEAR_STATE: {
+      return initialState;
+    }
     default:
       return state;
   }
