@@ -73,7 +73,7 @@ const StockEntryCard = ({ data, handleDelete, handleDamage }) => {
         restocked
         label={createdByFullName}
         btnTitle2={expanded ? "Hide" : "More"}
-        edit={canDoStockCrud}
+        //edit={canDoStockCrud}
         onEdit={() => navigation?.navigate(STOCK_ENTRY_FORM, data)}
         onClick2={toggleExpand}
         deleteIcon={canDoStockCrud}

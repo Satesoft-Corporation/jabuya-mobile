@@ -22,6 +22,7 @@ import NoAuth from "@screens/Unauthorised";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import SuccessDialog from "@components/SuccessDialog";
 import { STOCK_LEVELS } from "@navigation/ScreenNames";
+import { STOCK_API, STOCK_ENDPOINT } from "api";
 
 const StockEntryForm = () => {
   const selectedShop = useSelector(getSelectedShop);
@@ -38,22 +39,27 @@ const StockEntryForm = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedSupplier, setSelectedSupplier] = useState(suppliers?.find((i) => i?.companyOrBusinessName?.toLowerCase() === "unknown"));
-  const [expiryDate, setExpiryDate] = useState(new Date());
+  const [expiryDate, setExpiryDate] = useState(() => {
+    const date = new Date();
+    date.setMonth(date.getMonth() + 6); // Add 6 months
+    return date;
+  });
+
   const [isPackedProduct, setIsPackedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [batchNo, setBatchNo] = useState("");
   const [purchaseDate, setPurchaseDate] = useState(new Date());
-  const [packedPurchasedQuantity, setPackedPurchasedQuantity] = useState("");
   const [quantity, setQuantity] = useState("");
 
   const [remarks, setRemarks] = useState("");
   const [purchasePrice, setPurchasePrice] = useState("");
-  const [unpackedPurchasedQty, setUnpackedPurchasedQty] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [edit, setEdit] = useState(false);
   const [sModal, setSModal] = useState(false);
   const [selectedSaleUnit, setSelectedSaleUnit] = useState(null);
   const [saleUnits, setSaleUnits] = useState([]);
+  const [stockEntryId, setStockEntryId] = useState(0);
+  const [selectedEntry, setSelectedEntry] = useState(null);
 
   const snackBarRef = useRef(null);
 
@@ -79,7 +85,9 @@ const StockEntryForm = () => {
     const { multipleSaleUnits, saleUnitName, saleUnitId } = pdt;
 
     const defaultUnit = { id: saleUnitId, productSaleUnitName: saleUnitName };
-
+    if (edit) {
+      setSelectedSaleUnit(multipleSaleUnits?.find((i) => i?.id === selectedEntry?.stockUnitId));
+    }
     setSelectedSaleUnit(defaultUnit);
     if (multipleSaleUnits) {
       setSaleUnits([defaultUnit, ...multipleSaleUnits]);
@@ -95,15 +103,14 @@ const StockEntryForm = () => {
   const clearForm = () => {
     setBatchNo("");
     setExpiryDate(new Date());
-    setPackedPurchasedQuantity(null);
     setPurchasePrice(null);
     setSelectedProduct(null);
     setIsPackedProduct(null);
-    setSelectedSupplier(null);
     setRemarks("");
-    setUnpackedPurchasedQty(null);
     setSubmitted(false);
     setSModal(false);
+    setQuantity("");
+    setPurchasePrice("");
   };
 
   const handleSync = async () => {
@@ -121,39 +128,46 @@ const StockEntryForm = () => {
   };
   const saveStockEntry = async () => {
     setSubmitted(true);
-    setLoading(true);
 
     const isPacked = selectedSaleUnit?.id === selectedProduct?.saleUnitId;
-    //setting payload basing on item package type
 
     const payload = {
+      // expiryDate: convertToServerDate(expiryDate),
+      // id: 0,
+      // manufacturerId: selectedProduct?.manufacturerId,
+      // productId: edit ? selectedProduct?.productId : selectedProduct?.id,
+      // productName: selectedProduct?.productName,
+      // shopId: edit ? selectedProduct?.shopId : selectedShop?.id,
+      // stockedOnDate: convertToServerDate(purchaseDate),
+      // supplierId: selectedSupplier?.id,
+      // remarks: remarks || "",
+      // purchasePrice: Number(purchasePrice),
+      // saleUnitId: selectedSaleUnit?.id,
+      // ...(isPacked && { packedPurchasedQuantity: Number(quantity), unpackedPurchase: false }),
+      // ...(!isPacked && { unpackedPurchase: true, unpackedPurchasedQuantity: Number(quantity) }),
+
+      id: stockEntryId,
+      productId: selectedProduct?.id,
+      totalPurchasePrice: Number(purchasePrice),
       batchNumber: batchNo,
       expiryDate: convertToServerDate(expiryDate),
-      id: 0,
-      manufacturerId: selectedProduct?.manufacturerId,
-      productId: edit ? selectedProduct?.productId : selectedProduct?.id,
-      productName: selectedProduct?.productName,
-      shopId: edit ? selectedProduct?.shopId : selectedShop?.id,
-      stockedOnDate: convertToServerDate(purchaseDate),
+      unpackedPurchase: isPacked,
+      quantity: Number(quantity),
       supplierId: selectedSupplier?.id,
-      remarks: remarks || "",
-      purchasePrice: Number(purchasePrice),
       saleUnitId: selectedSaleUnit?.id,
-      ...(isPacked && { packedPurchasedQuantity: Number(quantity), unpackedPurchase: false }),
-      ...(!isPacked && { unpackedPurchase: true, unpackedPurchasedQuantity: Number(quantity) }),
+      manufacturerId: selectedProduct?.manufacturerId,
+      // distributorId: 169396,
+      remarks: remarks || "",
+      stockedOnDate: convertToServerDate(purchaseDate),
     };
 
-    const isValidPayload = hasNull(payload) === false;
-
-    if (isValidPayload === false) {
-      setLoading(false); //removing loader if form is invalid
-    }
+    const isValidPayload = selectedProduct !== null && quantity != "" && purchasePrice != "";
 
     if (isValidPayload === true) {
-      const apiUrl = edit ? STOCK_ENTRY_ENDPOINT + "/" + selectedProduct.id : STOCK_ENTRY_ENDPOINT;
+      setLoading(true);
 
-      await new BaseApiService(apiUrl)
-        .saveRequestWithJsonResponse(payload, edit)
+      await new BaseApiService(STOCK_ENDPOINT.STOCK_WITH_SALE_UNIT)
+        .postRequestWithJsonResponse(payload)
         .then(async (response) => {
           setSubmitted(false);
           setLoading(false);
@@ -169,33 +183,32 @@ const StockEntryForm = () => {
   };
 
   const populateForm = (productList) => {
-    if (route?.params) {
-      if (route?.params?.stock == true) {
-        const product = route.params.product;
+    if (route?.params?.stock == true) {
+      //stocking from stock levels
+      const product = route.params.product;
 
-        setLoading(false);
-        setProducts([product]);
-        onProductChange(product);
-      } else {
-        const selectedRecord = { ...route.params };
+      setLoading(false);
+      setProducts([product]);
+      onProductChange(product);
+    } else {
+      const selectedRecord = { ...route.params };
+      setSelectedEntry(route.params);
 
-        setEdit(true);
-        const productMatch = productList?.find((i) => i?.id === selectedRecord?.productId);
-        onProductChange(productMatch);
+      setEdit(true);
+      const productMatch = productList?.find((i) => i?.id === selectedRecord?.productId);
+      onProductChange(productMatch);
 
-        setExpiryDate(new Date(selectedRecord?.expiryDate));
+      setExpiryDate(new Date(selectedRecord?.expiryDate));
+      setStockEntryId(selectedRecord?.id);
+      setSelectedSupplier({ companyOrBusinessName: selectedRecord?.supplierName, id: selectedRecord?.supplierId });
 
-        setSelectedSupplier({ companyOrBusinessName: selectedRecord?.supplierName, id: selectedRecord?.supplierId });
+      setPurchaseDate(new Date(selectedRecord?.stockedOnDate));
+      setPurchasePrice(String(selectedRecord.purchasePrice));
+      setQuantity(String(selectedRecord?.unpackedQuantity > 0 ? selectedRecord?.unpackedQuantity : selectedRecord?.packedQuantity));
 
-        setPurchaseDate(new Date(selectedRecord?.stockedOnDate));
-        setPurchasePrice(String(selectedRecord.purchasePrice));
-        setQuantity(String(selectedRecord?.unpackedQuantity > 0 ? selectedRecord?.unpackedQuantity : selectedRecord?.packedQuantity));
-
-        setPackedPurchasedQuantity(String(selectedRecord?.packedQuantity));
-        setBatchNo(selectedRecord?.batchNumber);
-        setRemarks(selectedRecord?.remarks);
-        setLoading(false);
-      }
+      setBatchNo(selectedRecord?.batchNumber);
+      setRemarks(selectedRecord?.remarks);
+      setLoading(false);
     }
   };
 
@@ -217,163 +230,144 @@ const StockEntryForm = () => {
     return <NoAuth />;
   }
   return (
-    <KeyboardAvoidingView
-      enabled={true}
-      // behavior={"height"}
-      style={{ flex: 1 }}
-    >
-      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
-        <TopHeader
-          title="Stock purchase"
-          showMenuDots
-          sync
-          onSync={() => {
-            setLoading(true);
-            handleSync();
-          }}
-        />
-        <Loader loading={loading} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light }}>
+      <TopHeader
+        title="Stock purchase"
+        showMenuDots
+        sync
+        onSync={() => {
+          setLoading(true);
+          handleSync();
+        }}
+      />
+      <Loader loading={loading} />
 
-        <SuccessDialog
-          hide={handleHide}
-          visible={sModal}
-          text={"Stock information has been saved successfully"}
-          onAgree={() => navigation.dispatch(StackActions.replace(STOCK_LEVELS))}
-          agreeText="View stock"
-          cancelText={edit || route?.params?.stock === true ? "Cancel" : "Add new stock"}
-        />
+      <SuccessDialog
+        hide={handleHide}
+        visible={sModal}
+        text={"Stock information has been saved successfully"}
+        onAgree={() => navigation.dispatch(StackActions.replace(STOCK_LEVELS))}
+        agreeText="View stock"
+        cancelText={edit || route?.params?.stock === true ? "Cancel" : "Add new stock"}
+      />
 
-        <ScrollView contentContainerStyle={{ gap: 8, paddingBottom: 30 }} style={{ paddingHorizontal: 10 }}>
-          <Text style={styles.headerText}>{edit ? "Edit" : "Enter"} stock detail</Text>
+      <ScrollView contentContainerStyle={{ gap: 8, paddingBottom: 30 }} style={{ paddingHorizontal: 10 }}>
+        <Text style={styles.headerText}>{edit ? "Edit" : "Enter"} stock detail</Text>
 
-          {!edit && shops?.length > 1 && (
-            <View style={{ gap: 5 }}>
-              <Text>Shop</Text>
-              <MyDropDown
-                search={false}
-                style={{ backgroundColor: Colors.light, borderColor: Colors.dark }}
-                data={shops?.filter((shop) => !shop?.name?.includes("All"))}
-                value={selectedShop}
-                onChange={(e) => {
-                  dispatch(changeSelectedShop(e));
-                }}
-                placeholder="Select Shop"
-                labelField="name"
-                valueField="id"
-              />
-            </View>
-          )}
-          <View>
-            <Text style={styles.inputLabel}>Product</Text>
+        {!edit && shops?.length > 1 && (
+          <View style={{ gap: 5 }}>
+            <Text>Shop</Text>
             <MyDropDown
-              data={edit ? [{ ...selectedProduct }] : products}
-              onChange={onProductChange}
-              value={selectedProduct}
-              placeholder="Select product"
-              labelField="productName"
-              valueField="id"
-              showError
-              isSubmitted={submitted}
-              required
-            />
-          </View>
-
-          <View>
-            <Text style={styles.inputLabel}>Supplier</Text>
-            <MyDropDown
-              showError
-              isSubmitted={submitted}
-              data={edit ? [{ ...selectedSupplier }] : suppliers}
-              onChange={onSupplierChange}
-              value={selectedSupplier}
-              placeholder="Select supplier"
-              labelField="companyOrBusinessName"
+              search={false}
+              style={{ backgroundColor: Colors.light, borderColor: Colors.dark }}
+              data={shops?.filter((shop) => !shop?.name?.includes("All"))}
+              value={selectedShop}
+              onChange={(e) => {
+                dispatch(changeSelectedShop(e));
+              }}
+              placeholder="Select Shop"
+              labelField="name"
               valueField="id"
             />
-            {submitted && !selectedSupplier && <Text style={styles.errorText}>Supplier is required</Text>}
           </View>
-
+        )}
+        <View>
+          <Text style={styles.inputLabel}>Product</Text>
           <MyDropDown
-            label={"Package unit"}
-            data={saleUnits}
-            disable={selectedProduct === null}
-            value={selectedSaleUnit}
-            onChange={(e) => {
-              setSelectedSaleUnit(e);
-            }}
-            placeholder="Select package unit"
-            labelField="productSaleUnitName"
+            data={edit ? [{ ...selectedProduct }] : products}
+            onChange={onProductChange}
+            value={selectedProduct}
+            placeholder="Select product"
+            labelField="productName"
             valueField="id"
             showError
             isSubmitted={submitted}
+            required
           />
-          <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 10 }}>
-            <MyInput
-              label={"Quantity"}
-              value={quantity}
-              cursorColor={Colors.dark}
-              onValueChange={(text) => {
-                setQuantity(text);
-              }}
-              inputMode="numeric"
-              style={{ flex: 0.5 }}
-              required
-              showError
-              isSubmitted={submitted}
-            />
+        </View>
 
-            <MyInput
-              label={`Purchase amount `}
-              value={purchasePrice}
-              cursorColor={Colors.dark}
-              onValueChange={(text) => setPurchasePrice(text)}
-              inputMode="numeric"
-              style={{ flex: 0.5 }}
-              required
-              showError
-              isSubmitted={submitted}
-            />
+        <MyDropDown
+          showError
+          isSubmitted={submitted}
+          data={edit ? [{ ...selectedSupplier }] : suppliers}
+          onChange={onSupplierChange}
+          value={selectedSupplier}
+          placeholder="Select supplier"
+          labelField="companyOrBusinessName"
+          valueField="id"
+          label={"Supplier"}
+        />
+
+        <MyDropDown
+          label={"Package unit"}
+          data={saleUnits}
+          disable={selectedProduct === null}
+          value={selectedSaleUnit}
+          onChange={(e) => {
+            setSelectedSaleUnit(e);
+          }}
+          placeholder="Select package unit"
+          labelField="productSaleUnitName"
+          valueField="id"
+        />
+        <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 10 }}>
+          <MyInput
+            label={"Quantity"}
+            value={quantity}
+            cursorColor={Colors.dark}
+            onValueChange={(text) => {
+              setQuantity(text);
+            }}
+            inputMode="numeric"
+            style={{ flex: 0.5 }}
+            required
+            showError
+            isSubmitted={submitted}
+          />
+
+          <MyInput
+            label={`Purchase amount `}
+            value={purchasePrice}
+            cursorColor={Colors.dark}
+            onValueChange={(text) => setPurchasePrice(text)}
+            inputMode="numeric"
+            style={{ flex: 0.5 }}
+            required
+            showError
+            isSubmitted={submitted}
+          />
+        </View>
+
+        <View style={styles.row}>
+          <View style={{ flex: 1 }}>
+            <MyInput inputMode="numeric" label="Unit purchase price" editable={false} value={formatNumberWithCommas(getUnitPurchasePrice())} />
           </View>
 
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <MyInput inputMode="numeric" label="Unit purchase price" editable={false} value={formatNumberWithCommas(getUnitPurchasePrice())} />
-            </View>
+          <View style={{ flex: 1 }}>
+            <MyInput label="Purchase date" dateValue={purchaseDate} isDateInput onDateChange={(date) => setPurchaseDate(date)} maximumDate required />
+          </View>
+        </View>
 
-            <View style={{ flex: 1 }}>
-              <MyInput
-                label="Purchase date"
-                dateValue={purchaseDate}
-                isDateInput
-                onDateChange={(date) => setPurchaseDate(date)}
-                maximumDate
-                required
-              />
-            </View>
+        <View style={styles.row}>
+          <View style={{ flex: 1 }}>
+            <MyInput label=" Batch no." value={batchNo} onValueChange={(text) => setBatchNo(text)} />
           </View>
 
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <MyInput label=" Batch no." value={batchNo} onValueChange={(text) => setBatchNo(text)} />
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <MyInput isDateInput dateValue={expiryDate} label="Expiry Date" onDateChange={(date) => setExpiryDate(date)} minimumDate />
-              {submitted && !expiryDate && <Text style={styles.errorText}>Expiry date is required</Text>}
-            </View>
+          <View style={{ flex: 1 }}>
+            <MyInput isDateInput dateValue={expiryDate} label="Expiry Date" onDateChange={(date) => setExpiryDate(date)} minimumDate />
           </View>
+        </View>
 
-          <MyInput value={remarks} label="Remarks" multiline onValueChange={(text) => setRemarks(text)} numberOfLines={3} />
+        <MyInput value={remarks} label="Remarks" multiline onValueChange={(text) => setRemarks(text)} numberOfLines={3} />
 
-          <View style={[styles.row, { marginTop: 15 }]}>
-            <PrimaryButton title={"Clear"} onPress={clearForm} style={{ flex: 0.5 }} />
-            <PrimaryButton title={"Save"} onPress={saveStockEntry} darkMode style={{ flex: 0.5 }} />
-          </View>
-        </ScrollView>
+        <View style={[styles.row, { marginTop: 15 }]}>
+          <PrimaryButton title={"Clear"} onPress={clearForm} style={{ flex: 0.5 }} />
+          <PrimaryButton title={"Save"} onPress={saveStockEntry} darkMode style={{ flex: 0.5 }} />
+        </View>
+      </ScrollView>
 
-        <Snackbar ref={snackBarRef} />
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+      <Snackbar ref={snackBarRef} />
+    </SafeAreaView>
   );
 };
 

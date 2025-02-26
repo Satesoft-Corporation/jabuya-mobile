@@ -1,4 +1,4 @@
-import { View, SafeAreaView, Text } from "react-native";
+import { View, SafeAreaView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { FlatList } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -9,14 +9,7 @@ import UserProfile from "@components/UserProfile";
 import { MenuIcon } from "@components/MenuIcon";
 import Colors from "@constants/Colors";
 import LockScreenModal from "@screens/applock/LockScreenModal";
-import {
-  getShopUsers,
-  saveLookUps,
-  saveShopClients,
-  saveShopDetails,
-  saveShopProductsOnDevice,
-  saveSuppliers,
-} from "@controllers/OfflineControllers";
+import { saveLookUps, saveShopClients, saveShopDetails, saveShopProductsOnDevice, saveSuppliers } from "@controllers/OfflineControllers";
 import { useSelector } from "react-redux";
 import {
   getConfigureStatus,

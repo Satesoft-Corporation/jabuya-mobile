@@ -20,6 +20,8 @@ const TopHeader = ({
   menuItems,
   showShops = false,
   sync = false,
+  filter = false,
+  onFilterPress = () => {},
   onSync = () => {},
 }) => {
   const [showBar, setShowBar] = useState(false);
@@ -48,6 +50,8 @@ const TopHeader = ({
 
           <View style={{ alignItems: "center", minWidth: 30, justifyContent: "flex-end", flexDirection: "row", gap: 10 }}>
             {sync && <Icon name="sync" color={Colors.primary} size={18} onPress={onSync} />}
+
+            {filter && <Icon name="filter" groupName="Feather" color={Colors.primary} size={20} onPress={onFilterPress} />}
 
             {showSearch && <Icon name="search" color={Colors.primary} size={20} onPress={toggleSearch} />}
 

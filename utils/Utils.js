@@ -119,7 +119,7 @@ export function hasNull(obj) {
 export function getCurrentDay(getTomorrowDate = false) {
   const now = new Date();
   if (getTomorrowDate === true) {
-    now.setDate(now.getDate() - 1);
+    now.setDate(now.getDate() + 1);
   }
   const year = now.getUTCFullYear();
   const month = String(now.getUTCMonth() + 1).padStart(2, "0");

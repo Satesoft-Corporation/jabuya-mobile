@@ -1,6 +1,6 @@
 import { View, FlatList, Pressable, Text } from "react-native";
 import React from "react";
-import { CANCELED_SALES, CREDIT_SALES, DAMAGES, EXPENSES, SALES_REPORTS, STOCK_ENTRY, STOCK_LEVELS, USER_PERFOMANCE } from "@navigation/ScreenNames";
+import { CANCELED_SALES, USER_PERFOMANCE } from "@navigation/ScreenNames";
 import Colors from "@constants/Colors";
 import AppStatusBar from "@components/AppStatusBar";
 import TopHeader from "@components/TopHeader";
@@ -18,7 +18,7 @@ const ReportsMenu = () => {
   const canViewSales = useSelector(getCanViewSales);
 
   const list = [
-    { title: "User summary", target: USER_PERFOMANCE, icon: "hospital-user",  },
+    { title: "User sales", target: USER_PERFOMANCE, icon: "hospital-user" },
     { title: "Returned Items", target: CANCELED_SALES, icon: "truck-check", group: "MaterialCommunityIcons" },
   ];
 
