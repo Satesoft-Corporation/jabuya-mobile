@@ -6,13 +6,13 @@ import Colors from "@constants/Colors";
 import TopHeader from "@components/TopHeader";
 import StockEntryCard from "./StockEntryCard";
 import Snackbar from "@components/Snackbar";
-import { STOCK_ENTRY_ENDPOINT } from "@utils/EndPointUtils";
 import { STOCK_ENTRY_FORM } from "@navigation/ScreenNames";
 import { getFilterParams, getSelectedShop, getUserType } from "duqactStore/selectors";
 import { useSelector } from "react-redux";
 import DeleteRecordModal from "@components/DeleteRecordModal";
 import DamagesForm from "@screens/damages/DamagesForm";
 import { getCanCreateUpdateMyShopStock } from "duqactStore/selectors/permissionSelectors";
+import { STOCK_ENDPOINT } from "api";
 
 const StockEntries = ({ navigation }) => {
   const [stockEntries, setStockEntries] = useState([]);
@@ -47,7 +47,7 @@ const StockEntries = ({ navigation }) => {
 
       setIsFetchingMore(true);
 
-      const response = await new BaseApiService(STOCK_ENTRY_ENDPOINT).getRequestWithJsonResponse(searchParameters);
+      const response = await new BaseApiService(STOCK_ENDPOINT.GET_ALL).getRequestWithJsonResponse(searchParameters);
 
       if (offsetToUse === 0) {
         setStockEntries(response.records);

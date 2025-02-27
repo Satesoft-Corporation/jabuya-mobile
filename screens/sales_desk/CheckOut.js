@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAttendantShopId, getCart, getIsAdmin, getIsShopAttendant, getOfflineParams, getSelectedShop } from "duqactStore/selectors";
 import { addOfflineSale, clearCart } from "actions/shopActions";
 import { paymentMethods, screenHeight } from "@constants/Constants";
-import { SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { hasInternetConnection } from "@utils/NetWork";
 import { saveShopClients, saveShopProductsOnDevice } from "@controllers/OfflineControllers";
 import TopHeader from "@components/TopHeader";
@@ -19,6 +18,7 @@ import Loader from "@components/Loader";
 import SuccessDialog from "@components/SuccessDialog";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import { OFFLINE_SALES, SALES_REPORTS } from "@navigation/ScreenNames";
+import { SHOP_SALE_ENDPOINT } from "api";
 
 const CheckOut = () => {
   const dispatch = useDispatch();
@@ -90,7 +90,7 @@ const CheckOut = () => {
     const hasNet = await hasInternetConnection();
 
     if (hasNet === true) {
-      await new BaseApiService(SHOP_SALES_ENDPOINT)
+      await new BaseApiService(SHOP_SALE_ENDPOINT.CREATE)
         .postRequest(payLoad)
         .then(async (response) => {
           let d = { info: await response.json(), status: response.status };
@@ -101,7 +101,7 @@ const CheckOut = () => {
           let id = info?.id;
 
           if (status === 200) {
-            await new BaseApiService(`${SHOP_SALES_ENDPOINT}/${id}/confirm`)
+            await new BaseApiService(SHOP_SALE_ENDPOINT.CONFIRM(id))
               .postRequest()
               .then((d) => d.json())
               .then(async (response) => {
@@ -202,7 +202,7 @@ const CheckOut = () => {
       <Loader loading={loading} />
 
       <SuccessDialog
-        text={offline ? "Sale saved offline" : "Sale confirmed successfully"}
+        text={offline ? "Offline sale confirmed and" : "Sale confirmed and"}
         onAgree={() => navigation.dispatch(StackActions.replace(offline ? OFFLINE_SALES : SALES_REPORTS))}
         agreeText={offline ? "Offline sales" : "View sales"}
         cancelText={"Add new Sale"}

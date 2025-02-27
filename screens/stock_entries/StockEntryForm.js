@@ -84,10 +84,11 @@ const StockEntryForm = () => {
     setSelectedProduct(pdt);
     const { multipleSaleUnits, saleUnitName, saleUnitId } = pdt;
 
-    const defaultUnit = { id: saleUnitId, productSaleUnitName: saleUnitName };
-    if (edit) {
-      setSelectedSaleUnit(multipleSaleUnits?.find((i) => i?.id === selectedEntry?.stockUnitId));
-    }
+    const defaultUnit =
+      route?.params?.stockUnitId > 0
+        ? multipleSaleUnits?.find((i) => i?.id === route?.params?.stockUnitId)
+        : { id: saleUnitId, productSaleUnitName: saleUnitName };
+
     setSelectedSaleUnit(defaultUnit);
     if (multipleSaleUnits) {
       setSaleUnits([defaultUnit, ...multipleSaleUnits]);
@@ -132,20 +133,6 @@ const StockEntryForm = () => {
     const isPacked = selectedSaleUnit?.id === selectedProduct?.saleUnitId;
 
     const payload = {
-      // expiryDate: convertToServerDate(expiryDate),
-      // id: 0,
-      // manufacturerId: selectedProduct?.manufacturerId,
-      // productId: edit ? selectedProduct?.productId : selectedProduct?.id,
-      // productName: selectedProduct?.productName,
-      // shopId: edit ? selectedProduct?.shopId : selectedShop?.id,
-      // stockedOnDate: convertToServerDate(purchaseDate),
-      // supplierId: selectedSupplier?.id,
-      // remarks: remarks || "",
-      // purchasePrice: Number(purchasePrice),
-      // saleUnitId: selectedSaleUnit?.id,
-      // ...(isPacked && { packedPurchasedQuantity: Number(quantity), unpackedPurchase: false }),
-      // ...(!isPacked && { unpackedPurchase: true, unpackedPurchasedQuantity: Number(quantity) }),
-
       id: stockEntryId,
       productId: selectedProduct?.id,
       totalPurchasePrice: Number(purchasePrice),
@@ -156,7 +143,6 @@ const StockEntryForm = () => {
       supplierId: selectedSupplier?.id,
       saleUnitId: selectedSaleUnit?.id,
       manufacturerId: selectedProduct?.manufacturerId,
-      // distributorId: 169396,
       remarks: remarks || "",
       stockedOnDate: convertToServerDate(purchaseDate),
     };
@@ -245,7 +231,7 @@ const StockEntryForm = () => {
       <SuccessDialog
         hide={handleHide}
         visible={sModal}
-        text={"Stock information has been saved successfully"}
+        text={"Stock information has been"}
         onAgree={() => navigation.dispatch(StackActions.replace(STOCK_LEVELS))}
         agreeText="View stock"
         cancelText={edit || route?.params?.stock === true ? "Cancel" : "Add new stock"}
@@ -272,7 +258,6 @@ const StockEntryForm = () => {
           </View>
         )}
         <View>
-          <Text style={styles.inputLabel}>Product</Text>
           <MyDropDown
             data={edit ? [{ ...selectedProduct }] : products}
             onChange={onProductChange}
@@ -283,20 +268,9 @@ const StockEntryForm = () => {
             showError
             isSubmitted={submitted}
             required
+            label={"Product"}
           />
         </View>
-
-        <MyDropDown
-          showError
-          isSubmitted={submitted}
-          data={edit ? [{ ...selectedSupplier }] : suppliers}
-          onChange={onSupplierChange}
-          value={selectedSupplier}
-          placeholder="Select supplier"
-          labelField="companyOrBusinessName"
-          valueField="id"
-          label={"Supplier"}
-        />
 
         <MyDropDown
           label={"Package unit"}
@@ -323,6 +297,7 @@ const StockEntryForm = () => {
             required
             showError
             isSubmitted={submitted}
+            editable={selectedProduct !== null}
           />
 
           <MyInput
@@ -335,6 +310,7 @@ const StockEntryForm = () => {
             required
             showError
             isSubmitted={submitted}
+            editable={selectedProduct !== null}
           />
         </View>
 
@@ -344,7 +320,14 @@ const StockEntryForm = () => {
           </View>
 
           <View style={{ flex: 1 }}>
-            <MyInput label="Purchase date" dateValue={purchaseDate} isDateInput onDateChange={(date) => setPurchaseDate(date)} maximumDate required />
+            <MyInput
+              label="Purchase date"
+              dateValue={purchaseDate}
+              isDateInput
+              onDateChange={(date) => setPurchaseDate(date)}
+              maximumDate
+              editable={selectedProduct !== null}
+            />
           </View>
         </View>
 
@@ -357,6 +340,18 @@ const StockEntryForm = () => {
             <MyInput isDateInput dateValue={expiryDate} label="Expiry Date" onDateChange={(date) => setExpiryDate(date)} minimumDate />
           </View>
         </View>
+
+        <MyDropDown
+          showError
+          isSubmitted={submitted}
+          data={edit ? [{ ...selectedSupplier }] : suppliers}
+          onChange={onSupplierChange}
+          value={selectedSupplier}
+          placeholder="Select supplier"
+          labelField="companyOrBusinessName"
+          valueField="id"
+          label={"Supplier"}
+        />
 
         <MyInput value={remarks} label="Remarks" multiline onValueChange={(text) => setRemarks(text)} numberOfLines={3} />
 

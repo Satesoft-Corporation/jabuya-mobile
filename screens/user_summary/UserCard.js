@@ -4,20 +4,27 @@ import { formatDate, formatNumberWithCommas } from "@utils/Utils";
 import DataColumn from "@components/card_components/DataColumn";
 import CardFooter from "@components/card_components/CardFooter";
 import UserTable from "./UserTable";
+import { getOffersDebt } from "duqactStore/selectors";
+import { useSelector } from "react-redux";
 
-const UserCard = ({ item, users }) => {
+const UserCard = ({ item }) => {
   const [expanded, setExpanded] = useState(false);
   const { reportDate, data } = item;
   const [totalSales, setTotalSales] = useState(0);
   const [totalDebt, setTotalDebt] = useState(0);
+  const [totalTxn, setTotalTxn] = useState(0);
+
+  const offersDebt = useSelector(getOffersDebt);
 
   useEffect(() => {
     const total = data?.reduce((a, b) => a + b?.totalSalesMade, 0);
 
     const totalD = data?.reduce((a, b) => a + b?.totalDebtsCollected, 0);
 
-    setTotalSales(total);
+    const totalTs = data?.reduce((a, b) => a + b?.totalSalesCount, 0);
 
+    setTotalSales(total);
+    setTotalTxn(totalTs);
     setTotalDebt(totalD);
   }, []);
   return (
@@ -38,17 +45,24 @@ const UserCard = ({ item, users }) => {
           <>
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
               <DataColumn title={"Date"} value={formatDate(new Date(reportDate), true)} left />
-              {/* <DataColumn title={"Txns"} value={data?.length} /> */}
               <DataColumn title={"Sales"} value={formatNumberWithCommas(totalSales)} />
-              <DataColumn title={"Debt"} value={formatNumberWithCommas(totalDebt)} />
+              {offersDebt && (
+                <>
+                  <DataColumn title={"Paid"} value={formatNumberWithCommas(totalDebt)} />
+                  <DataColumn title={"Debt"} value={formatNumberWithCommas(0)} />
+                </>
+              )}
             </View>
           </>
         )}
 
         {expanded && (
-          <View style={{ gap: 10 }}>
-            <Text>{formatDate(new Date(reportDate), true)}</Text>
-            <UserTable data={data} />
+          <View style={{ gap: 15 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <Text style={{ fontWeight: "600", fontSize: 16 }}>Sales summary</Text>
+              <Text>{formatDate(new Date(reportDate), true)}</Text>
+            </View>
+            <UserTable data={data} offersDebt={offersDebt} />
           </View>
         )}
         <CardFooter btnTitle2={expanded ? "Hide" : "More"} onClick2={() => setExpanded(!expanded)} />

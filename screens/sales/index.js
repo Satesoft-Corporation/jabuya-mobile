@@ -12,13 +12,13 @@ import { SHOP_SUMMARY } from "@navigation/ScreenNames";
 import { printSale } from "@utils/PrintService";
 import { useSelector } from "react-redux";
 import { getFilterParams, getIsShopAttendant, getIsShopOwner, getSelectedShop } from "duqactStore/selectors";
-import { CREDIT_SALE_PAYMENTS, SHOP_SALES_ENDPOINT } from "@utils/EndPointUtils";
 import { hasInternetConnection } from "@utils/NetWork";
 import DeleteSaleModal from "./components/DeleteSaleModal";
 import Snackbar from "@components/Snackbar";
 import SalesFilter from "./components/SalesFilter";
 import { getCanViewSales, getCanViewShopCapital, getCanViewShopIncome } from "duqactStore/selectors/permissionSelectors";
 import NoAuth from "@screens/Unauthorised";
+import { CREDIT_SALE_ENDPOINT, SHOP_SALE_ENDPOINT } from "api";
 
 export default function ViewSales() {
   const [sales, setSales] = useState([]);
@@ -76,7 +76,7 @@ export default function ViewSales() {
   };
 
   const getDebtPayments = async (params) => {
-    await new BaseApiService(CREDIT_SALE_PAYMENTS)
+    await new BaseApiService(CREDIT_SALE_ENDPOINT.PAYMENTS)
       .getRequestWithJsonResponse(params)
       .then((response) => {
         setPayments(response?.records);
@@ -127,7 +127,7 @@ export default function ViewSales() {
       setIsFetchingMore(true);
       await getDebtPayments(searchParameters);
 
-      await new BaseApiService(SHOP_SALES_ENDPOINT)
+      await new BaseApiService(SHOP_SALE_ENDPOINT.GET_ALL)
         .getRequestWithJsonResponse(searchParameters)
         .then((response) => {
           if (response.totalItems === 0) {

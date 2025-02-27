@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Image, Text, View, SafeAreaView } from "react-native";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import { BaseApiService } from "@utils/BaseApiService";
-import { LOGIN_END_POINT } from "@utils/EndPointUtils";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
 import MyInput from "@components/MyInput";
 import PrimaryButton from "@components/buttons/PrimaryButton";
@@ -13,6 +12,7 @@ import { ScrollView } from "react-native";
 import { useDispatch } from "react-redux";
 import { loginAction } from "actions/userActions";
 import { APP_VERSION, screenWidth } from "@constants/Constants";
+import { AUTH_ENDPOINT } from "api";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -31,7 +31,7 @@ export default function Login() {
 
     if (!loading) {
       setLoading(true);
-      await new BaseApiService(LOGIN_END_POINT)
+      await new BaseApiService(AUTH_ENDPOINT.LOGIN)
         .saveRequestWithJsonResponse(loginInfo, false)
         .then(async (response) => {
           const doCheck = async () => {

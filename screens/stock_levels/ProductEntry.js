@@ -260,7 +260,7 @@ const ProductEntry = ({ route }) => {
           <Text style={{ fontWeight: "bold" }} numberOfLines={2}>
             {item?.displayName}
           </Text>
-          <Text numberOfLines={2}>By: {item?.manufacturerName}</Text>
+          <Text numberOfLines={2}>Mfr: {item?.manufacturerName}</Text>
           {item?.barcode && <Text>Barcode: {item?.barcode}</Text>}
         </View>
       </View>
@@ -299,7 +299,7 @@ const ProductEntry = ({ route }) => {
       <SuccessDialog
         hide={() => clearForm()}
         visible={sModal}
-        text={"Product information has been saved successfully"}
+        text={"Product information has been"}
         onAgree={() => navigation.navigate(STOCK_LEVELS)}
         agreeText="View products"
         cancelText={"Add new product"}

@@ -36,6 +36,11 @@ const MyInput = ({
     setVisible(false);
     onDateChange(selectedDate);
   };
+  const showCalendar = () => {
+    if (isDateInput && editable == true) {
+      setVisible(true);
+    }
+  };
 
   const shouldShowError = isSubmitted && showError && !value;
   return (
@@ -53,11 +58,7 @@ const MyInput = ({
         </Text>
       )}
       <Pressable
-        onPress={() => {
-          if (isDateInput) {
-            setVisible(true);
-          }
-        }}
+        onPress={showCalendar}
         style={{
           alignItems: "center",
           flexDirection: "row",
@@ -97,7 +98,7 @@ const MyInput = ({
         )}
         {isDateInput && (
           <>
-            <TouchableOpacity onPress={() => setVisible(true)}>
+            <TouchableOpacity onPress={showCalendar}>
               <Icon name="calendar-alt" size={20} />
             </TouchableOpacity>
             {visible && (

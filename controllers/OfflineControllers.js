@@ -1,19 +1,10 @@
-import { MAXIMUM_CACHEPAGE_SIZE, MAXIMUM_RECORDS_PER_FETCH } from "@constants/Constants";
 import { BaseApiService } from "@utils/BaseApiService";
-import {
-  CLIENTS_ENDPOINT,
-  CURRENCIES_ENDPOINT,
-  LOOK_UPS_ENDPOINT,
-  MANUFACTURERS_ENDPOINT,
-  SHOP_ENDPOINT,
-  SHOP_PRODUCTS_ENDPOINT,
-  SUPPLIERS_ENDPOINT,
-} from "@utils/EndPointUtils";
 import { UserSessionUtils } from "@utils/UserSessionUtils";
+import { CLIENT_ENDPOINT, CURRENCY_ENDPOINT, LOOKUP_ENDPOINT, SHOP_ENDPOINT, SHOP_PRODUCT_ENDPOINT, SUPPLIER_ENDPOINT } from "api";
 
 export const saveSuppliers = async (prev = []) => {
   let suppliers = [];
-  await new BaseApiService(SUPPLIERS_ENDPOINT)
+  await new BaseApiService(SUPPLIER_ENDPOINT.GET_ALL)
     .getRequestWithJsonResponse({ limit: 0, offset: 0 })
     .then((response) => {
       suppliers = [...response?.records];
@@ -27,12 +18,9 @@ export const saveSuppliers = async (prev = []) => {
 };
 
 export const saveCurrencies = async () => {
-  const searchParameters = {
-    limit: 0,
-    offset: 0,
-  };
+  const searchParameters = { limit: 0, offset: 0 };
   let currencies = [];
-  await new BaseApiService(CURRENCIES_ENDPOINT)
+  await new BaseApiService(CURRENCY_ENDPOINT.GET_ALL)
     .getRequestWithJsonResponse(searchParameters)
     .then(async (response) => {
       await UserSessionUtils.setCurrencies(response?.records);
@@ -47,7 +35,7 @@ export const saveCurrencies = async () => {
 
 export const saveShopProductsOnDevice = async (searchParameters) => {
   console.log("saving pdts offline");
-  await new BaseApiService(SHOP_PRODUCTS_ENDPOINT)
+  await new BaseApiService(SHOP_PRODUCT_ENDPOINT.GET_ALL)
     .getRequestWithJsonResponse(searchParameters)
     .then(async (response) => {
       await UserSessionUtils.setShopProducts(response.records); //to keep updating the list locally
@@ -61,7 +49,7 @@ export const saveShopProductsOnDevice = async (searchParameters) => {
 export const saveShopClients = async (searchParameters) => {
   console.log("saving clients");
 
-  await new BaseApiService(CLIENTS_ENDPOINT)
+  await new BaseApiService(CLIENT_ENDPOINT.GET_ALL)
     .getRequestWithJsonResponse(searchParameters)
     .then(async (response) => {
       const sorted = response.records
@@ -97,7 +85,7 @@ export const saveShopClients = async (searchParameters) => {
 export const saveLookUps = async (prev = []) => {
   let data = [];
 
-  await new BaseApiService(LOOK_UPS_ENDPOINT)
+  await new BaseApiService(LOOKUP_ENDPOINT.GET_LOOKUP_VALUES)
     .getRequestWithJsonResponse({ limit: 0, offset: 0 })
     .then(async (response) => {
       data = [...response.records];
@@ -114,7 +102,7 @@ export const saveShopDetails = async (searchParameters, isShopAttendant = false)
   console.log("Saving shops");
   const currencyList = await saveCurrencies();
 
-  const apiUrl = isShopAttendant === false ? SHOP_ENDPOINT : `${SHOP_ENDPOINT}/${searchParameters?.shopId}`;
+  const apiUrl = isShopAttendant === false ? SHOP_ENDPOINT.GET_ALL : SHOP_ENDPOINT.GET_BY_ID(searchParameters?.shopId);
 
   await new BaseApiService(apiUrl)
     .getRequestWithJsonResponse(searchParameters)

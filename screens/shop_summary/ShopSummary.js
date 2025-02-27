@@ -10,6 +10,7 @@ import { formatNumberWithCommas } from "../../utils/Utils";
 import { UserSessionUtils } from "../../utils/UserSessionUtils";
 import { useSelector } from "react-redux";
 import { getSelectedShop, getShopOwnerId } from "duqactStore/selectors";
+import { REPORTS_ENDPOINT } from "api";
 
 const ShopSummary = ({ navigation, route }) => {
   const [initialCapital, setInitialCapital] = useState("");
@@ -21,84 +22,25 @@ const ShopSummary = ({ navigation, route }) => {
   const selectedShop = useSelector(getSelectedShop);
   const shopOwnerId = useSelector(getShopOwnerId);
 
-  const fetchShopProducts = async () => {
-    let products = await UserSessionUtils.getShopProducts();
-
-    let totalStockValue = [];
-    let totalSaleValue = [];
-
-    products.forEach((item) => {
-      const { salesPrice } = item;
-      const summary = item?.performanceSummary;
-
-      const qtyStocked = summary?.totalQuantityStocked || 0;
-      const qtySold = summary?.totalQuantitySold || 0;
-
-      const remainingStock = qtyStocked - qtySold;
-
-      const iteSalesValue = qtySold * salesPrice;
-      const itemStockValue = salesPrice * remainingStock; //itemstock value
-
-      totalSaleValue.push(iteSalesValue);
-      totalStockValue.push(itemStockValue);
-    });
-
-    let stockValue = totalStockValue.reduce((a, b) => a + b, 0);
-    let cash = totalSaleValue.reduce((a, b) => a + b, 0);
-    setStock(stockValue);
-    setTotalSalesValue(cash);
-
-    setLoading(false);
-  };
-
-  const fetchShopDetails = () => {
-    let searchParameters = {
-      offset: 0,
-      limit: 0,
-      shopOwnerId: shopOwnerId, //1427, // 2453,
-    };
-
-    new BaseApiService("/shops")
-      .getRequestWithJsonResponse(searchParameters)
-      .then(async (response) => {
-        let totalCapital = 0;
-        let stockValue = 0;
-        let cashAtHand = 0;
-        let expenses = 0;
-        let grossProfit = 0;
-        let initialCap = 0;
-
-        response.records.forEach(async (item) => {
-          totalCapital += item?.initialCapital;
-
-          stockValue += item?.performanceSummary?.totalStockValue || 0;
-
-          cashAtHand += item?.performanceSummary?.totalSalesValue || 0;
-
-          expenses += item?.performanceSummary?.totalExpenses || 0;
-
-          grossProfit += item?.performanceSummary?.totalStockValue || 0;
-          initialCap += item?.initialCapital;
-        });
-
-        setFinancialRecords({
-          totalCapital,
-          stockValue,
-          cashAtHand,
-          expenses,
-          grossProfit,
-        });
-        setInitialCapital(initialCap);
+  const getSummary = async () => {
+    await new BaseApiService(REPORTS_ENDPOINT.GET_SHOP_SUMMARIES)
+      .getRequestWithJsonResponse({ shopId: selectedShop?.id })
+      .then((r) => {
+        const data = r[0];
+        setInitialCapital(data?.capitalAdded);
+        setTotalSalesValue(data?.totalSold);
+        setStock(data?.totalStock);
         setLoading(false);
+        console.log(r);
       })
-      .catch((error) => {
+      .catch((e) => {
         setLoading(false);
+        console.log(e);
       });
   };
 
   useEffect(() => {
-    fetchShopProducts();
-    fetchShopDetails();
+    getSummary();
   }, []);
 
   return (
@@ -157,7 +99,7 @@ const ShopSummary = ({ navigation, route }) => {
             >
               Shops
             </Text>
-            <Text style={{ color: Colors.primary, alignSelf: "flex-end" }}>01</Text>
+            <Text style={{ color: Colors.primary, alignSelf: "flex-end" }}>1</Text>
           </View>
 
           <TouchableOpacity

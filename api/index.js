@@ -117,3 +117,25 @@ export const REPORTS_ENDPOINT = {
   GET_SHOP_SUMMARIES: "/reports/shop-summaries",
   GET_PRODUCT_STOCK_INFO: "/reports/product-stock-info",
 };
+
+export const CURRENCY_ENDPOINT = {
+  GET_ALL: "/currencies",
+  CREATE: "/currencies",
+  GET_SHOP_CURRENCIES: "/currencies/shop-currencies",
+  DELETE: (id) => `/currencies/${id}`,
+};
+
+export const LOOKUP_ENDPOINT = {
+  GET_LOOKUP_VALUES: "/lookups/lookup-values",
+  CREATE_LOOKUP_VALUE: "/lookups/lookup-values",
+  GET_GENDERS: "/lookups/genders",
+  GET_COUNTRIES: "/lookups/countries",
+};
+
+export const CLIENT_ENDPOINT = {
+  GET_ALL: "/clients-controller",
+  CREATE: "/clients-controller",
+  UNBLACKLIST: (id) => `/clients-controller/${id}/unblackist`,
+  BLACKLIST: (id) => `/clients-controller/${id}/blacklist`,
+  DELETE: (id) => `/clients-controller/${id}`,
+};
